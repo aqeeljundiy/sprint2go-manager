@@ -473,7 +473,7 @@ export function Reader(props: Props) {
   /** Done, or the way back for an email that isn't in the inbox. */
   const primary =
     thread.location === 'inbox'
-      ? { label: t('Done'), icon: Check, run: () => props.onArchive(thread.id), title: t('Done (E): out of the inbox, into Archive') }
+      ? { label: t('Archive'), icon: Archive, run: () => props.onArchive(thread.id), title: t('Archive (E)') }
       : thread.location === 'drafts'
         ? null
         : { label: thread.location === 'spam' ? t('Not spam') : thread.location === 'trash' ? t('Restore') : t('Inbox'), icon: thread.location === 'trash' ? RotateCcw : Inbox, run: () => props.onMoveToInbox(thread.id), title: t('Move to Inbox') };

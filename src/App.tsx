@@ -979,7 +979,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
   };
   const n1 = (ids: string[]) => ids.length === 1;
   const mailActions: MailActions = {
-    done: (ids) => changeMail(ids, () => ({ location: 'archive' }), n1(ids) ? t('Marked done. It’s in Archive') : t('{n} emails marked done', { n: ids.length })),
+    done: (ids) => changeMail(ids, () => ({ location: 'archive' }), n1(ids) ? t('Archived') : t('{n} emails archived', { n: ids.length })),
     inbox: (ids) => changeMail(ids, () => ({ location: 'inbox' }), n1(ids) ? t('Moved to Inbox') : t('{n} emails moved to Inbox', { n: ids.length })),
     trash: (ids) => changeMail(ids, () => ({ location: 'trash' }), n1(ids) ? t('Moved to Trash') : t('{n} emails moved to Trash', { n: ids.length })),
     spam: (ids) => changeMail(ids, () => ({ location: 'spam' }), n1(ids) ? t('Reported as spam') : t('{n} emails reported as spam', { n: ids.length })),

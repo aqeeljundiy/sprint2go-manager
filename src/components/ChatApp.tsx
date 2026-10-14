@@ -1072,7 +1072,8 @@ function ConvoRow({ c, p, info, phone, two = false, starred, draggable, onDragSt
         </span>
         {info?.draft && p.current !== c.id ? <PenLine size={13} className="nav-draft" aria-label={t('Draft')} /> : null}
         {live && <Headphones size={13} className="nav-live" aria-label={t('Huddle on now')} />}
-        {info?.muted ? <BellOff size={12} className="nav-muted" aria-label={t('Muted')} /> : info?.mentions ? <span className="count">{info.mentions}</span> : unread && c.kind === 'dm' ? <span className="count">{info!.unread}</span> : null}
+        {/* An @mention always shows, even in a muted channel (Slack's and Discord's rule): muting quiets the chatter, not you. */}
+        {info?.mentions ? <span className="count">{info.mentions}</span> : info?.muted ? <BellOff size={12} className="nav-muted" aria-label={t('Muted')} /> : unread && c.kind === 'dm' ? <span className="count">{info!.unread}</span> : null}
       </button>
       <button ref={more} className="nav-more" aria-label={t('Conversation options')} onClick={() => more.current && onMenu({ anchor: more.current })}>
         <MoreHorizontal size={14} />

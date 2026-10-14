@@ -652,11 +652,27 @@ function SettingsTab({ tm, users, isAdmin, actions, homeTemplate, onHomeTemplate
     <div className="team-sec team-settings">
       <label className="team-field">
         <span>{t('Name')}</span>
-        <input value={tm.name} onChange={(e) => patch({ name: e.target.value })} />
+        {/* Saved when you leave the field, never empty (a cleared name goes back to what it was). */}
+        <input
+          key={`name-${tm.id}`}
+          defaultValue={tm.name}
+          onBlur={(e) => {
+            const v = e.target.value.trim();
+            if (!v) return void (e.target.value = tm.name);
+            if (v !== tm.name) patch({ name: v });
+          }}
+          onKeyDown={(e) => e.key === 'Enter' && (e.target as HTMLInputElement).blur()}
+        />
       </label>
       <label className="team-field">
         <span>{t('What it does')}</span>
-        <input value={tm.about ?? ''} placeholder={t('Edits every video and reel')} onChange={(e) => patch({ about: e.target.value })} />
+        <input
+          key={`about-${tm.id}`}
+          defaultValue={tm.about ?? ''}
+          placeholder={t('Edits every video and reel')}
+          onBlur={(e) => e.target.value.trim() !== (tm.about ?? '') && patch({ about: e.target.value.trim() })}
+          onKeyDown={(e) => e.key === 'Enter' && (e.target as HTMLInputElement).blur()}
+        />
       </label>
       <div className="team-field">
         <span>{t('Colour')}</span>

@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { AlertTriangle, ArrowLeft, Bell, BellOff, MoreHorizontal, UserPlus, Users, Bookmark, BookmarkMinus, ChevronRight, Clock, Copy, Forward, Handshake, Hash, Headphones, Link2, ListChecks, Lock, LogOut, MailOpen, Menu, MessageSquareReply, Pencil, Pin, Search, Settings, Sparkles, Trash2, WifiOff, X } from 'lucide-react';
+import { ArrowDown, AlertTriangle, ArrowLeft, Bell, BellOff, MoreHorizontal, UserPlus, Users, Bookmark, BookmarkMinus, ChevronRight, Clock, Copy, Forward, Handshake, Hash, Headphones, Link2, ListChecks, Lock, LogOut, MailOpen, Menu, MessageSquareReply, Pencil, Pin, Search, Settings, Sparkles, Trash2, WifiOff, X } from 'lucide-react';
 import type { Channel, ChatFile, ChatMessage, Client, DriveItem, Role, Status, Team, Thread, Todo, User } from '../../types';
 import { localDay } from '../../utils';
 import { term } from '../../terms';
@@ -211,6 +211,7 @@ export function ChatView(p: ViewProps) {
   const [muteOpen, setMuteOpen] = useState(false);
   const scroll = useRef<HTMLDivElement>(null);
   const atBottom = useRef(true);
+  const [farUp, setFarUp] = useState(false); // scrolled well up the history: "Jump to recent" shows
   const anchorRef = useRef<HTMLElement | null>(null);
   const dockRef = useDockRef();
   const foot = useRef<HTMLDivElement>(null);
@@ -541,7 +542,11 @@ export function ChatView(p: ViewProps) {
       ref={scroll}
       onScroll={(e) => {
         const el = e.currentTarget;
-        atBottom.current = el.scrollHeight - el.scrollTop - el.clientHeight < 48;
+        const gap = el.scrollHeight - el.scrollTop - el.clientHeight;
+        atBottom.current = gap < 48;
+        // Far up the history: offer the way back down (Slack's "Jump to recent", Discord's "Jump to present").
+        const far = gap > 600;
+        if (far !== farUp) setFarUp(far);
       }}
     >
       {(() => {
@@ -578,6 +583,11 @@ export function ChatView(p: ViewProps) {
         ) : (
           <p className="chat-start">{t('This is the start of {name}.', { name: title })}</p>
         ))}
+      {farUp && (
+        <button type="button" className="jump-recent" onClick={() => scroll.current?.scrollTo({ top: scroll.current.scrollHeight, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })}>
+          <ArrowDown size={14} /> {t('Jump to recent')}
+        </button>
+      )}
     </div>
   );
 

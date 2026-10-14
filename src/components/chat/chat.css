@@ -1534,3 +1534,36 @@
 .huddle-actions {
   gap: 4px;
 }
+
+/* "Jump to recent": sticks to the bottom of the messages while you read far up (Conversation.tsx). */
+.jump-recent {
+  position: sticky;
+  bottom: 12px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: max-content;
+  margin: 8px auto 0;
+  padding: 0 14px;
+  min-height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-lg);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  animation: fadeIn 0.2s var(--ease) backwards;
+  transition: background 0.18s var(--ease);
+}
+.jump-recent:hover {
+  background: var(--hover);
+}
+@media (prefers-reduced-motion: reduce) {
+  .jump-recent {
+    animation: none;
+  }
+}

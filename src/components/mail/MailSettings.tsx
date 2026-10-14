@@ -13,10 +13,10 @@ export interface MailSwipes {
   right: SwipeKind; // swipe right: the action on the left
   left: SwipeKind; // swipe left: the action on the right
 }
-export const DEFAULT_SWIPES: MailSwipes = { right: 'done', left: 'snooze' };
+export const DEFAULT_SWIPES: MailSwipes = { right: 'done', left: 'done' }; // Gmail's: archive either way; snooze is a choice in Settings
 
 export const SWIPE_CHOICES: { id: SwipeKind; label: string; hint: string; icon: LucideIcon }[] = [
-  { id: 'done', label: mark('Done'), hint: mark('Out of the inbox, into Archive'), icon: Archive },
+  { id: 'done', label: mark('Archive'), hint: mark('Out of the inbox, into Archive'), icon: Archive },
   { id: 'snooze', label: mark('Snooze'), hint: mark('Back at a time you pick'), icon: Clock },
   { id: 'read', label: mark('Read or unread'), hint: mark('Mark it either way'), icon: MailOpen },
   { id: 'star', label: mark('Star'), hint: mark('Keep it in Starred'), icon: Star },

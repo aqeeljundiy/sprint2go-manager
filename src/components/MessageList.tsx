@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useMemo, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { lastTracked, summarize } from '../tracking';
-import { Check, Clock, Eye, EyeOff, FileText, Inbox, Mail, MailOpen, Menu, MessageSquare, MoreHorizontal, Paperclip, PenLine, RefreshCw, Search, ShieldAlert, Star, Tag, Trash2, X } from 'lucide-react';
+import { Archive, Check, Clock, Eye, EyeOff, FileText, Inbox, Mail, MailOpen, Menu, MessageSquare, MoreHorizontal, Paperclip, PenLine, RefreshCw, Search, ShieldAlert, Star, Tag, Trash2, X } from 'lucide-react';
 import type { Client, Label, Person, Thread, User } from '../types';
 import { threadHasAttachment } from '../mailAttachments';
 import { lastMessage, listDate, participants, relative, snippet } from '../utils';
@@ -244,7 +244,7 @@ export const MessageList = forwardRef<HTMLInputElement, Props>(function MessageL
     const leaves = (patch: Partial<Thread>) => !props.stays(th, patch);
     switch (kind) {
       case 'done':
-        if (th.location === 'inbox') return { id: 'done', label: t('Done'), icon: Check, tone: 'ok', removes: leaves({ location: 'archive' }), run: () => actions.done([th.id]) };
+        if (th.location === 'inbox') return { id: 'done', label: t('Archive'), icon: Archive, tone: 'ok', removes: leaves({ location: 'archive' }), run: () => actions.done([th.id]) };
         if (th.location === 'archive' || th.location === 'spam' || th.location === 'trash') return { id: 'inbox', label: t('Inbox'), icon: Inbox, tone: 'accent', removes: leaves({ location: 'inbox' }), run: () => actions.inbox([th.id]) };
         return null;
       case 'snooze':
@@ -267,7 +267,7 @@ export const MessageList = forwardRef<HTMLInputElement, Props>(function MessageL
     const allStarred = list.every((th) => th.starred);
     const out: SheetAction[] = [];
     if (extra && list.length === 1) out.push({ label: t('Open'), icon: MailOpen, run: () => props.onOpen(ids[0]) });
-    if (list.some((th) => th.location === 'inbox')) out.push({ label: t('Done'), icon: Check, hint: t('Out of the inbox, into Archive'), run: () => actions.done(ids.filter((id) => list.find((th) => th.id === id)?.location === 'inbox')) });
+    if (list.some((th) => th.location === 'inbox')) out.push({ label: t('Archive'), icon: Archive, hint: t('Out of the inbox, into Archive'), run: () => actions.done(ids.filter((id) => list.find((th) => th.id === id)?.location === 'inbox')) });
     if (list.some((th) => th.location !== 'inbox' && th.location !== 'drafts')) out.push({ label: t('Move to Inbox'), icon: Inbox, run: () => actions.inbox(ids) });
     if (extra) out.push({ id: 'snooze', label: t('Snooze…'), icon: Clock, run: () => setSnoozing({ ids }) });
     out.push({ label: anyUnread ? t('Mark as read') : t('Mark as unread'), icon: anyUnread ? MailOpen : Mail, run: () => actions.read(ids, !anyUnread) });
@@ -477,6 +477,7 @@ export const MessageList = forwardRef<HTMLInputElement, Props>(function MessageL
                     onStar={() => actions.star([t.id], !t.starred)}
                     onDone={() => (t.location === 'inbox' ? actions.done([t.id]) : actions.inbox([t.id]))}
                     onTrash={() => actions.trash([t.id])}
+                    onReadToggle={() => actions.read([t.id], !t.unread)}
                     onSnooze={(anchor) => setSnoozing({ ids: [t.id], anchor })}
                   />
                 </SwipeRow>
@@ -491,7 +492,7 @@ export const MessageList = forwardRef<HTMLInputElement, Props>(function MessageL
           {selList.some((th) => th.location === 'inbox') ? (
             <button type="button" onClick={() => (actions.done(selList.filter((th) => th.location === 'inbox').map((th) => th.id)), endSelect())}>
               <Check size={20} />
-              <span>{t('Done')}</span>
+              <span>{t('Archive')}</span>
             </button>
           ) : (
             <button type="button" onClick={() => (actions.inbox([...sel]), endSelect())}>
@@ -600,6 +601,7 @@ export function MailRow(p: {
   onStar: () => void;
   onDone: () => void;
   onTrash: () => void;
+  onReadToggle?: () => void;
   onSnooze: (anchor: React.RefObject<HTMLElement | null>) => void;
   hl?: string; // search words to bold
 }) {
@@ -794,19 +796,25 @@ export function MailRow(p: {
       </div>
       {!p.selecting && (
         <div className="row-actions" onClick={(e) => e.stopPropagation()}>
-          {th.location !== 'drafts' && th.location !== 'trash' && th.location !== 'spam' && (
-            <button ref={snoozeBtn} className="icon-btn sm" onClick={() => p.onSnooze(snoozeBtn)} title={t('Snooze')}>
-              <Clock size={15} />
-            </button>
-          )}
+          {/* Gmail's order: Archive, Delete, Read/Unread, Snooze. */}
           {th.location !== 'drafts' && (
-            <button className="icon-btn sm" onClick={p.onDone} title={th.location === 'inbox' ? t('Done (E)') : t('Move to Inbox')}>
-              {th.location === 'inbox' ? <Check size={15} /> : <Inbox size={15} />}
+            <button className="icon-btn sm" onClick={p.onDone} title={th.location === 'inbox' ? t('Archive (E)') : t('Move to Inbox')}>
+              {th.location === 'inbox' ? <Archive size={15} /> : <Inbox size={15} />}
             </button>
           )}
           {th.location !== 'trash' && (
             <button className="icon-btn sm" onClick={p.onTrash} title={t('Delete (#)')}>
               <Trash2 size={15} />
+            </button>
+          )}
+          {th.location !== 'drafts' && p.onReadToggle && (
+            <button className="icon-btn sm" onClick={p.onReadToggle} title={th.unread ? t('Mark as read') : t('Mark as unread')}>
+              {th.unread ? <MailOpen size={15} /> : <Mail size={15} />}
+            </button>
+          )}
+          {th.location !== 'drafts' && th.location !== 'trash' && th.location !== 'spam' && (
+            <button ref={snoozeBtn} className="icon-btn sm" onClick={() => p.onSnooze(snoozeBtn)} title={t('Snooze')}>
+              <Clock size={15} />
             </button>
           )}
         </div>

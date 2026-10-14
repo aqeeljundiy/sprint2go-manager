@@ -495,7 +495,7 @@ function MeetingPage(p: MeetProps & { m: Meeting }) {
       ...(live && status !== 'stopping' && status !== 'processing' ? [{ label: t('Make bot leave'), icon: Square, run: () => p.onStop(m.id) }] : []),
       ...(!live && (m.transcript?.length ?? 0) > 0 ? [{ label: t('Regenerate notes'), hint: t('From the transcript'), icon: RefreshCw, run: regenerate }] : []),
       ...(status === 'done' ? [{ label: t('Who can see this'), icon: Lock, run: () => setAccessOpen(true) }] : []),
-      ...(phone ? [{ label: t('Bot log'), hint: t('What the notetaker did, step by step'), icon: FileText, run: () => setTab('log') }] : []),
+      { label: t('Bot log'), hint: t('What the notetaker did, step by step'), icon: FileText, run: () => setTab('log') },
       { label: t('Delete'), icon: Trash2, danger: true, group: 'end', run: remove },
     ],
     { title: m.title, menu: phone },
@@ -748,13 +748,14 @@ function MeetingPage(p: MeetProps & { m: Meeting }) {
           items={(
             [
               ['summary', t('Summary'), t('Summary')],
-              ['tasks', t('Tasks {n}', { n: mTasks.filter((tk) => !tk.done).length }), t('Tasks')],
+              ['tasks', t('Action items {n}', { n: mTasks.filter((tk) => !tk.done).length }), t('Action items')],
               ['transcript', t('Transcript'), t('Transcript')],
               ['log', t('Bot log'), t('Bot log')],
             ] as const
           )
-            // Phones: the bot log is in ⋮ (it's for checking what went wrong, not reading).
-            .filter(([id]) => !phone || id !== 'log' || tab === 'log')
+            // The bot log is for checking what went wrong, not reading (Read AI keeps diagnostics out of sight): a tab
+            // only when the recording failed, else in ⋮.
+            .filter(([id]) => id !== 'log' || tab === 'log' || (!phone && m.status === 'failed'))
             .map(([id, label, name]) => ({ id, label, name }))}
           trailing={
             <>

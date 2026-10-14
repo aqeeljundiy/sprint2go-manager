@@ -1,5 +1,5 @@
 import { forwardRef } from 'react';
-import { Check, Inbox, Mail, MailOpen, Menu, MoreVertical, Trash2, X } from 'lucide-react';
+import { Archive, Inbox, Mail, MailOpen, Menu, MoreVertical, Trash2, X } from 'lucide-react';
 import type { Person } from '../../types';
 import { Avatar } from '../Avatar';
 import { t, tn } from '../../i18n';
@@ -49,8 +49,8 @@ export const MailSelectBar = forwardRef<HTMLButtonElement, { count: number; inIn
         {p.count}
       </span>
       <span className="spacer" />
-      <button type="button" className="gm-icon" onClick={p.onDone} aria-label={p.inInbox ? t('Done') : t('Move to Inbox')} title={p.inInbox ? t('Done') : t('Move to Inbox')}>
-        {p.inInbox ? <Check size={22} /> : <Inbox size={22} />}
+      <button type="button" className="gm-icon" onClick={p.onDone} aria-label={p.inInbox ? t('Archive') : t('Move to Inbox')} title={p.inInbox ? t('Archive') : t('Move to Inbox')}>
+        {p.inInbox ? <Archive size={22} /> : <Inbox size={22} />}
       </button>
       <button type="button" className="gm-icon" onClick={p.onTrash} aria-label={t('Delete')} title={t('Delete')}>
         <Trash2 size={22} />

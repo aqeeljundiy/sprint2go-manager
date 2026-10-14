@@ -73,7 +73,7 @@ const SHORTCUTS = (): { group: string; keys: [string, string][] }[] => [
   {
     group: t('The open email'),
     keys: [
-      ['e', t('Done (to Archive)')],
+      ['e', t('Archive')],
       ['#', t('Delete')],
       ['!', t('Report spam')],
       ['v', t('Move to…')],

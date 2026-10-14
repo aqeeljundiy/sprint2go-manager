@@ -107,7 +107,7 @@ export function VaultSidebar({ items, clients, filter, onFilter, onNew, workspac
         </>
       )}
       <p className="muted small sb-label sb-note vault-note">
-        <ShieldCheck size={13} /> {t('Passwords stay encrypted on the server. Copying one is logged, and the clipboard clears after 30 seconds.')}
+        <ShieldCheck size={13} /> {t('Logins are kept encrypted. Copying one is logged, and the clipboard clears after 30 seconds.')}
       </p>
     </>
   );
@@ -164,6 +164,19 @@ export function VaultView({
   useEffect(() => {
     if (code && code.left <= 0) void showCode(code.id);
   }, [code?.left]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Locks itself after 15 minutes with nothing done in the app, like 1Password and Bitwarden: the key leaves memory and
+  // the passphrase is asked again. "Lock" in the header does it at once.
+  const lock = () => (setVaultUnlocked(me, null), setCode(null), setTick((n) => n + 1));
+  useEffect(() => {
+    let last = Date.now();
+    const seen = () => void (last = Date.now());
+    const check = () => vaultUnlocked(me) && Date.now() - last > 15 * 60_000 && lock();
+    const timer = setInterval(check, 30_000);
+    const events = ['pointerdown', 'keydown'] as const;
+    events.forEach((ev) => window.addEventListener(ev, seen, { passive: true }));
+    document.addEventListener('visibilitychange', check);
+    return () => (clearInterval(timer), events.forEach((ev) => window.removeEventListener(ev, seen)), document.removeEventListener('visibilitychange', check));
+  }, [me]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Phones: Apple Passwords. Two-line rows, a login opens full screen, + adds one, the title switches the list.
   const phone = usePhone();
@@ -410,6 +423,11 @@ export function VaultView({
             <Users size={14} /> {t('Re-share all')}
           </button>
         )}
+        {priv && (
+          <button className="ghost-btn sm" onClick={lock} title={t('Lock the Vault: your passphrase is needed to open it again')}>
+            <Lock size={14} /> {t('Lock')}
+          </button>
+        )}
         <button className="primary-btn sm" onClick={() => setEditing('new')}>
           <Plus size={14} /> {t('Add a login')}
         </button>
@@ -441,9 +459,12 @@ export function VaultView({
                     <span className="src">
                       <Users size={11} /> {accessLabel(it)}
                     </span>
-                    <span className={`src vault-e2e${it.meta.keys ? ' on' : ''}`} title={it.meta.keys ? t('Encrypted on your devices; the server can’t read it') : t('Locked by the server. Edit and save to move it to end-to-end')}>
-                      <Lock size={11} /> {it.meta.keys ? t('End-to-end') : t('Server-locked')}
-                    </span>
+                    {/* Password managers don't show crypto per item; only an older login that still needs re-saving says so. */}
+                    {!it.meta.keys && (
+                      <span className="src vault-e2e" title={t('Locked by the server. Edit and save to move it to end-to-end')}>
+                        <Lock size={11} /> {t('Re-save to encrypt')}
+                      </span>
+                    )}
                   </div>
                 </div>
                 {code?.id === it.id ? (
