@@ -304,6 +304,7 @@ export interface Account {
   connected: boolean; // false until the mail server is linked
   provider?: MailProvider; // default: sprint2go
   users: string[]; // user ids who can open this mailbox
+  readOnly?: string[]; // of those, who may read a shared inbox but not send from it
   /** A throwaway address: made in seconds, shared with a few people, deleted by itself (or by hand). */
   temp?: { createdBy: string; createdAt: string; expiresAt?: string };
   away?: AwayReply; // out of office

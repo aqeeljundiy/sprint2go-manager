@@ -136,7 +136,8 @@ interface Props {
   onInvite: () => void;
   onRole: (userId: string, role: Role) => void;
   onRemoveMember: (userId: string) => void;
-  onAccess: (accountId: string, users: string[]) => void;
+  /** Who opens a mailbox; `readOnly` (when given) also sets who of them can only read a shared inbox. */
+  onAccess: (accountId: string, users: string[], readOnly?: string[]) => void;
   blocked: BlockRule[];
   onUnblock: (id: string) => void;
   admin: {
@@ -568,8 +569,17 @@ export function SettingsPage({ email, settings: s, update, section, onSection, u
                         const on = a.users.includes(u.id);
                         const last = on && a.users.length === 1;
                         return (
-                          <label key={u.id} className="access-row" title={last ? t('At least one person needs access') : ''}>
+                          <div key={u.id} className="access-row" title={last ? t('At least one person needs access') : ''}>
                             <PersonCell person={u} sub={null} size={24} badges={u.id === me && <Badge tone="accent">{t('You')}</Badge>} />
+                            {on && (
+                              <Select
+                                value={(a.readOnly ?? []).includes(u.id) ? 'read' : 'send'}
+                                options={[{ value: 'send', label: t('Can read and send') }, { value: 'read', label: t('Can read') }]}
+                                onChange={(v) => onAccess(a.id, a.users, v === 'read' ? [...(a.readOnly ?? []), u.id] : (a.readOnly ?? []).filter((x) => x !== u.id))}
+                                label={t('Access for {name}', { name: u.name })}
+                                width={170}
+                              />
+                            )}
                             <button
                               role="switch"
                               aria-checked={on}
@@ -579,7 +589,7 @@ export function SettingsPage({ email, settings: s, update, section, onSection, u
                             >
                               <span />
                             </button>
-                          </label>
+                          </div>
                         );
                       })}
                     </div>

@@ -31,7 +31,7 @@ db.db.exec(`
   CREATE INDEX IF NOT EXISTS app_passwords_user ON app_passwords (user_id);
 `);
 
-type Account = { id: string; email?: string; name?: string; kind?: string; users?: string[]; provider?: string };
+type Account = { id: string; email?: string; name?: string; kind?: string; users?: string[]; readOnly?: string[]; provider?: string };
 type Ws = { id: string; name?: string; accounts?: Account[]; members: { userId: string; role: string }[]; mailAliases?: { address: string; to?: string[] }[]; mailApps?: boolean; timeZone?: string; suspended?: unknown; plan?: { paused?: unknown }; mailReady?: { mailboxes?: Record<string, { send?: boolean }> } };
 
 export interface MailAppsDeps {
@@ -154,7 +154,7 @@ export function mailboxesFor(userId: string, username = ''): store.Mailbox[] {
     for (const a of w.accounts ?? []) {
       if (!a.email || !(a.users ?? []).includes(userId)) continue;
       const aliases = (w.mailAliases ?? []).filter((al) => (al.to ?? []).includes(a.id)).map((al) => lower(al.address));
-      out.push({ id: a.id, email: lower(a.email), name: a.name || w.name || 'Mail', kind: a.kind ?? 'personal', wsId: w.id, wsName: w.name ?? '', hosted: !a.provider || a.provider === 'sprint2go', addresses: new Set([lower(a.email), ...aliases]), tz: companyTz(w), primary: false });
+      out.push({ id: a.id, email: lower(a.email), name: a.name || w.name || 'Mail', kind: a.kind ?? 'personal', readOnly: (a.readOnly ?? []).includes(userId), wsId: w.id, wsName: w.name ?? '', hosted: !a.provider || a.provider === 'sprint2go', addresses: new Set([lower(a.email), ...aliases]), tz: companyTz(w), primary: false });
     }
   }
   if (!out.length) return out;
@@ -167,7 +167,7 @@ export function mailboxesFor(userId: string, username = ''): store.Mailbox[] {
 /** Who someone may send as from a mail app: their mailboxes here and the aliases that deliver into them. */
 export function sendersFor(userId: string): submission.Sender[] {
   const out: submission.Sender[] = [];
-  for (const mb of mailboxesFor(userId)) for (const address of mb.addresses) if (!out.some((s) => s.address === address)) out.push({ address, mailbox: mb });
+  for (const mb of mailboxesFor(userId)) if (!mb.readOnly) for (const address of mb.addresses) if (!out.some((s) => s.address === address)) out.push({ address, mailbox: mb });
   return out;
 }
 

@@ -351,7 +351,8 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
       .map((b) => (k === 'send' ? (b.sendWhy ?? b.why) : b.why))
       .find(Boolean);
   const mailWhy = { receive: whyFor('receive') ?? ready?.why?.receive, send: whyFor('send') ?? ready?.why?.send };
-  const sendable = myAccounts.filter((a) => boxReady(a.id).send);
+  // Mailboxes that can send, and that this person may send from (read-only access to a shared inbox can't).
+  const sendable = myAccounts.filter((a) => boxReady(a.id).send && !(a.readOnly ?? []).includes(user.id));
   // AI: on when the company has it (included or its own key), or in a demo.
   const [aiOn, setAiOn] = useState(true);
   const [aiWhy, setAiWhy] = useState<'no-key' | 'down' | 'used-up' | 'off' | null>(null); // why it's off: nothing set up, our AI is down, or the allowance is used up
@@ -5928,11 +5929,19 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
               setBlocked((b) => b.filter((x) => x.id !== id));
               showToast({ text: t('Unblocked. Their email will arrive again') });
             }}
-            onAccess={(accountId, users) => {
-              const before = ws.accounts.find((x) => x.id === accountId)?.users ?? [];
-              patchWorkspace(ws.id, { accounts: ws.accounts.map((x) => (x.id === accountId ? { ...x, users } : x)) });
-              const added = users.find((x) => !before.includes(x));
+            onAccess={(accountId, users, readOnly) => {
+              const acct = ws.accounts.find((x) => x.id === accountId);
+              const before = acct?.users ?? [];
+              // Read-only is a level of access: it only ever lists people who can open the inbox.
+              const ro = (readOnly ?? acct?.readOnly ?? []).filter((x) => users.includes(x));
+              patchWorkspace(ws.id, { accounts: ws.accounts.map((x) => (x.id === accountId ? { ...x, users, readOnly: ro.length ? ro : undefined } : x)) });
               const name = (id: string) => allUsers.find((u) => u.id === id)?.name.split(' ')[0] ?? t('They');
+              if (readOnly) {
+                const changed = [...new Set([...readOnly, ...(acct?.readOnly ?? [])])].find((x) => readOnly.includes(x) !== (acct?.readOnly ?? []).includes(x));
+                if (changed) showToast({ text: readOnly.includes(changed) ? t('{name} can read this inbox, not send from it', { name: name(changed) }) : t('{name} can read and send from this inbox', { name: name(changed) }) });
+                return;
+              }
+              const added = users.find((x) => !before.includes(x));
               showToast({ text: added ? t('{name} can now open this inbox', { name: name(added) }) : t('{name} no longer has access', { name: name(before.find((x) => !users.includes(x))!) }) });
             }}
             admin={{
@@ -6087,8 +6096,8 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
           replying={!!compose.replyThreadId}
           trackByDefault={settings.trackByDefault}
           canTrack={ws.readTracking !== false}
-          accounts={sendable.length ? sendable : myAccounts}
-          defaultFrom={activeAccount !== 'all' && sendable.some((a) => a.id === activeAccount) ? activeAccount : (sendable[0] ?? myAccounts[0])?.id}
+          accounts={sendable.length ? sendable : myAccounts.filter((a) => !(a.readOnly ?? []).includes(user.id))}
+          defaultFrom={activeAccount !== 'all' && sendable.some((a) => a.id === activeAccount) ? activeAccount : (sendable[0] ?? myAccounts.find((a) => !(a.readOnly ?? []).includes(user.id)) ?? myAccounts[0])?.id}
           initial={compose.initial}
           userId={user.id}
           parked={!!compose.parked}

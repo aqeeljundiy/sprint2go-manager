@@ -2476,6 +2476,8 @@ createServer(async (req, res) => {
       // Someone the owner gave access to (server/mailDelegation.ts) sends from it too: as the mailbox, or on its behalf.
       const delegate = delegation.delegateOf(account, me);
       if (!delegate && (users.length ? !users.includes(me) && !(account.kind === 'shared' && isAdminOf(me, ws.id)) : account.kind !== 'shared' && !isAdminOf(me, ws.id))) return json(res, 403, { error: mark('Not your mailbox.') });
+      // Read-only access to a shared inbox (Settings, Email accounts, Access): reading, never sending.
+      if (!delegate && (account.readOnly ?? []).includes(me)) return json(res, 403, { error: mark('You can read this inbox but not send from it. Ask an admin for send access.') });
       const ro = billing.readOnlyWords(ws);
       if (ro) return json(res, 403, { error: ro });
       // The message lives in a thread of this mailbox (or a new one, saved a moment later); attachments are this company's files.

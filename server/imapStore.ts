@@ -38,6 +38,7 @@ export interface Mailbox {
   email: string;
   name: string;
   kind: string;
+  readOnly?: boolean; // this person may read a shared inbox but not send from it
   wsId: string;
   wsName: string;
   hosted: boolean; // lives here (not a forwarded copy of a Google or Microsoft mailbox)

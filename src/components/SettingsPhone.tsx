@@ -151,7 +151,7 @@ export function MembersPhone({ ws, users, me, canManage, onRole, onRemove, onInv
 }
 
 /** Email accounts: a row per mailbox; its screen has who opens it (shared inboxes), its state and Remove. */
-export function MailboxesPhone({ ws, users, me, canManage, nameOf, onAccess, onAdd, onRemove, stateOf }: { ws: Workspace; users: User[]; me: string; canManage: boolean; nameOf: (id: string) => string; onAccess: (accountId: string, users: string[]) => void; onAdd: () => void; onRemove: (id: string) => void; stateOf: (a: Account) => MailState }) {
+export function MailboxesPhone({ ws, users, me, canManage, nameOf, onAccess, onAdd, onRemove, stateOf }: { ws: Workspace; users: User[]; me: string; canManage: boolean; nameOf: (id: string) => string; onAccess: (accountId: string, users: string[], readOnly?: string[]) => void; onAdd: () => void; onRemove: (id: string) => void; stateOf: (a: Account) => MailState }) {
   const list = ws.accounts.filter((a) => !a.temp);
   const rows = useLeaving(list, (a) => a.id);
   const [open, setOpen] = useState<string | null>(null);
@@ -202,6 +202,19 @@ export function MailboxesPhone({ ws, users, me, canManage, nameOf, onAccess, onA
                     />
                   );
                 })}
+              </Group>
+            )}
+            {canManage && a.kind === 'shared' && a.users.length > 0 && (
+              <Group title={t('What they can do')} footer={t('People who can only read see every email but can’t send from {email}.', { email: a.email })}>
+                {a.users.map((id) => (
+                  <ChoiceRow
+                    key={id}
+                    label={nameOf(id)}
+                    value={(a.readOnly ?? []).includes(id) ? 'read' : 'send'}
+                    options={[{ value: 'send', label: t('Can read and send') }, { value: 'read', label: t('Can read') }]}
+                    onChange={(v) => onAccess(a.id, a.users, v === 'read' ? [...(a.readOnly ?? []), id] : (a.readOnly ?? []).filter((x) => x !== id))}
+                  />
+                ))}
               </Group>
             )}
             {canManage && ws.accounts.length > 1 && (
