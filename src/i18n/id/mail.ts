@@ -649,6 +649,19 @@ const id: Record<string, string> = {
   "Open {folder}": "Buka {folder}",
   "{n} inboxes": "{n} kotak masuk",
   "{n} inbox": "{n} kotak masuk",
+  // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
+  "Design a signature": "Rancang tanda tangan",
+  "Internal note · only your team sees it": "Catatan internal · hanya tim Anda yang melihatnya",
+  "On the free plan the signature ends with “Sent with sprint2go”. Paid plans don’t have it.": "Di paket gratis, tanda tangan diakhiri “Sent with sprint2go”. Paket berbayar tidak.",
+  "Use this signature": "Pakai tanda tangan ini",
+  "Your logo is an SVG, which mail apps don’t show. Add a PNG logo in Settings, General & email, Brands, to put it in your signature.": "Logo Anda berformat SVG, yang tidak ditampilkan aplikasi email. Tambahkan logo PNG di Pengaturan, Umum & email, Brand, untuk memasukkannya ke tanda tangan.",
+  "Classic": "Klasik",
+  "Logo on the side": "Logo di samping",
+  "Minimal": "Minimal",
+  "Strong": "Tegas",
+  "One line": "Satu baris",
+  "Layout": "Tata letak",
+  "Preview": "Pratinjau",
 };
 
 export default id;

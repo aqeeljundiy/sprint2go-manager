@@ -128,7 +128,9 @@ export function CalendarView(props: Props) {
   const canWeek = phone || paneW >= WEEK_MIN;
   const narrow = !phone && paneW < 720; // a tablet beside the panel: the views go in a dropdown
   const view = shownView(props.view, canWeek);
-  const views: CalView[] = canWeek ? ['schedule', 'day', '3day', 'week', 'month'] : ['schedule', 'day', '3day', 'month'];
+  // Google Calendar's order on computers (Day, Week, Month, then Schedule and the few-days view); phones keep Schedule
+  // first, which is their default.
+  const views: CalView[] = phone ? (canWeek ? ['schedule', 'day', '3day', 'week', 'month'] : ['schedule', 'day', '3day', 'month']) : canWeek ? ['day', 'week', 'month', 'schedule', '3day'] : ['day', 'month', 'schedule', '3day'];
   const days = useMemo(() => gridDays(view, cursor), [view, cursor]);
   const color = (id: string) => calendars.find((c) => c.id === id)?.color ?? '#888';
   const step = (dir: 1 | -1) => props.onCursor(stepOf(view, cursor, dir));

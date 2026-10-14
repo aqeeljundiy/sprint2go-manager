@@ -1,5 +1,5 @@
 {
-    "updated":  "2026-10-14T22:48:03Z",
+    "updated":  "2026-10-14T22:57:53Z",
     "items":  [
                   {
                       "id":  "G1",
@@ -170,7 +170,7 @@
                       "title":  "Signature designer with ~5 templates",
                       "detail":  "Raw: design a signature, add logo etc. 5 templates. Free plan has a watermark, paid removes it.",
                       "priority":  "medium",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "R8",
@@ -179,7 +179,7 @@
                       "title":  "Amazon SES: cost, what customers get free",
                       "detail":  "Raw: we talked about SES but don\u0027t use it. How much does it cost us, is it expensive to provide, how many free per month? Back-end logic needed (message cut off).",
                       "priority":  "medium",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "R9",
@@ -188,7 +188,7 @@
                       "title":  "Submit a ticket, queue in the admin backend",
                       "detail":  "Raw: feature to submit a ticket that goes to the backend, see which tickets need processing.",
                       "priority":  "medium",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "R10",
@@ -781,6 +781,150 @@
                       "area":  "Notes",
                       "title":  "Empty states that are true",
                       "detail":  "\"First line is the title\" was wrong; filtered views offer Show all notes.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "D1",
+                      "round":  "Audit 4",
+                      "area":  "Mail",
+                      "title":  "Internal notes say so on the box",
+                      "detail":  "\"Internal note · only your team sees it\", above the comment field next to Reply.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "D2",
+                      "round":  "Audit 4",
+                      "area":  "Mail",
+                      "title":  "A replies to all; L (label) listed",
+                      "detail":  "Gmail\u0027s keys.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "D3",
+                      "round":  "Audit 4",
+                      "area":  "Chat",
+                      "title":  "@mention autocomplete like Slack",
+                      "detail":  "Any word of a name, any language\u0027s letters, the conversation\u0027s people first, arrows and Tab.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "D4",
+                      "round":  "Audit 4",
+                      "area":  "Vault",
+                      "title":  "Search on desktop",
+                      "detail":  "Phones had it; desktop didn\u0027t.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "D5",
+                      "round":  "Audit 4",
+                      "area":  "Projects",
+                      "title":  "Grouped Active / Leads / Paused, in name order",
+                      "detail":  "Cards no longer reshuffle as tasks go late (Basecamp\u0027s way).",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "D6",
+                      "round":  "Audit 4",
+                      "area":  "Projects",
+                      "title":  "Find a project",
+                      "detail":  "Search field once there are more than six.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "D7",
+                      "round":  "Audit 4",
+                      "area":  "Projects",
+                      "title":  "One New project button",
+                      "detail":  "The sidebar\u0027s; the header copy is gone.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "D8",
+                      "round":  "Audit 4",
+                      "area":  "Teams",
+                      "title":  "One New team button; tabs Tasks and Who\u0027s busy",
+                      "detail":  "\"Work\" next to \"Workload\" read as the same thing.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "D9",
+                      "round":  "Audit 4",
+                      "area":  "Notes",
+                      "title":  "Date sections on desktop",
+                      "detail":  "Today, Previous 7 days, months: as on the phone and in Apple Notes.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "D10",
+                      "round":  "Audit 4",
+                      "area":  "Mail",
+                      "title":  "Signature designer (R7)",
+                      "detail":  "5 layouts, brand logo and colour, live preview, Use this signature. Free plan adds \"Sent with sprint2go\".",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "D11",
+                      "round":  "Audit 4",
+                      "area":  "Mail",
+                      "title":  "Tables allowed in email HTML",
+                      "detail":  "Designed signatures (and most designed emails) use tables; they can\u0027t run anything.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "D12",
+                      "round":  "Audit 4",
+                      "area":  "Mail",
+                      "title":  "Signature logos reach Gmail and Outlook",
+                      "detail":  "Uploaded as a company file so the mail engine attaches it; SVG logos are left out and explained.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "D13",
+                      "round":  "Audit 4",
+                      "area":  "Calendar",
+                      "title":  "Google Calendar\u0027s view order on computers",
+                      "detail":  "Day, Week, Month, Schedule, 3 days; phones keep Schedule first.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "D14",
+                      "round":  "Audit 4",
+                      "area":  "Tasks",
+                      "title":  "p1 to p4 in quick add say what they become",
+                      "detail":  "p1-p2 high, p3-p4 normal; the chip names it.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "D15",
+                      "round":  "Audit 4",
+                      "area":  "Support",
+                      "title":  "Tickets (R9): already built",
+                      "detail":  "Help \u0026 support files tickets with replies and ratings; the queue is at /admin/tickets.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "D16",
+                      "round":  "Audit 4",
+                      "area":  "Mail",
+                      "title":  "Amazon SES costs (R8)",
+                      "detail":  "docs/SES-COSTS.md: about $0.10 per 1,000 emails; the risk is reputation, not price.",
                       "priority":  "high",
                       "status":  "done"
                   }

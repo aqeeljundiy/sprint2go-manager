@@ -159,6 +159,9 @@ const id: Record<string, string> = {
   'Work with {name} ended. They’re in Past {projects}': 'Kerja sama dengan {name} berakhir. Sekarang ada di {Projects} lama',
   '{name} is an active {project} again': '{name} jadi {project} aktif lagi',
   'Overview updated': 'Ringkasan diperbarui',
+  // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
+  "No {projects} match “{q}”.": "Tidak ada {projects} yang cocok dengan “{q}”.",
+  "Find a {project}": "Cari {project}",
 };
 
 export default id;

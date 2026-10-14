@@ -53,7 +53,7 @@ const TEMPLATES: Tpl[] = [
   },
   {
     id: 'banner',
-    name: 'Bold',
+    name: 'Strong',
     render: (f, l) =>
       `<table cellpadding="0" cellspacing="0" style="${FONT};line-height:1.4"><tr><td style="border-top:4px solid ${l.color};padding-top:10px">` +
       `<div style="font-size:18px;font-weight:bold;color:#0b0c10">${esc(f.name)}</div>` +

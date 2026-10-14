@@ -287,7 +287,9 @@ export function parseQuickAdd(text: string, ctx: QuickContext): QuickParsed {
     const u = pick(ctx.people, m[1]);
     if (u) add('person', m.index, m.index + m[0].length, u.id, u.name.split(' ')[0]);
   }
-  for (const m of scan(text, '\\b[pP]([1-4])\\b')) add('priority', m.index, m.index + m[0].length, m[1] === '1' ? 'high' : 'normal', `P${m[1]}`);
+  // Todoist's p1 to p4 on our two levels: p1 and p2 are high, p3 and p4 normal. The chip says what it becomes, so "p2"
+  // never looks kept while it quietly turns normal.
+  for (const m of scan(text, '\\b[pP]([1-4])\\b')) add('priority', m.index, m.index + m[0].length, m[1] <= '2' ? 'high' : 'normal', m[1] <= '2' ? t('High priority') : t('Normal priority'));
 
   // Keys: the words and which time they appear, so turning one off survives edits elsewhere in the text.
   const seen = new Map<string, number>();

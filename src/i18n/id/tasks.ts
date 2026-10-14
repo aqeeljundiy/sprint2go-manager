@@ -763,6 +763,8 @@ const id: Record<string, string> = {
   "No tasks due today": "Tidak ada tugas yang jatuh tempo hari ini",
   "Reviews, replies and requests waiting on you are in Needs you on Home. Plan ahead in Upcoming.": "Tinjauan, balasan, dan permintaan yang menunggu Anda ada di Perlu Anda di Beranda. Rencanakan ke depan di Mendatang.",
   "“{title}” done": "“{title}” selesai",
+  // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
+  "Normal priority": "Prioritas normal",
 };
 
 export default id;
