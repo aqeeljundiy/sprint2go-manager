@@ -224,6 +224,9 @@ function inView(t: Thread, v: View, ctx: ViewCtx = {}): boolean {
   switch (v.id) {
     case 'inbox':
       return t.location === 'inbox' && !snoozed;
+    case 'all':
+      // Gmail's All mail: every account, every tab, archived too, never spam, trash or unsent drafts.
+      return kept && t.location !== 'drafts';
     case 'snoozed':
       return snoozed && t.location !== 'trash';
     case 'scheduled':
@@ -3852,7 +3855,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
     value: mailId(view) ?? 'inbox',
     options: [
       // Each folder with its icon (Gmail's drawer); a count shows on the right of the row (MobileTop puts numbers there).
-      ...(['inbox', 'starred', 'snoozed', 'sent', 'scheduled', 'drafts', 'assigned', 'archive', 'spam', 'trash'] as FolderId[]).map((id) => {
+      ...(['inbox', 'starred', 'snoozed', 'sent', 'scheduled', 'drafts', 'assigned', 'archive', 'all', 'spam', 'trash'] as FolderId[]).map((id) => {
         const I = FOLDERS.find((f) => f.id === id)?.icon;
         return { value: id, label: folderName(id), group: t('Mail'), icon: I ? <I size={20} /> : undefined, hint: (counts as Record<string, number>)[id] ? fmtNumber((counts as Record<string, number>)[id]) : undefined };
       }),

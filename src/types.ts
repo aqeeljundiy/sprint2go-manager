@@ -3,7 +3,7 @@ import type { SandboxMark } from './sandbox';
 import type { SummaryRun } from './jobTimes';
 import type { FiledBy } from './mailFilterMatch';
 
-export type FolderId = 'inbox' | 'starred' | 'sent' | 'drafts' | 'archive' | 'spam' | 'trash' | 'snoozed' | 'scheduled' | 'assigned';
+export type FolderId = 'inbox' | 'all' | 'starred' | 'sent' | 'drafts' | 'archive' | 'spam' | 'trash' | 'snoozed' | 'scheduled' | 'assigned';
 
 /** Where a thread physically lives. "starred" and "sent" are views, not locations. */
 export type Location = 'inbox' | 'drafts' | 'archive' | 'spam' | 'trash';

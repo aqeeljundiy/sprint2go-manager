@@ -12,6 +12,7 @@ const id: Record<string, string> = {
   'Compose (C)': 'Tulis (C)',
   Inboxes: 'Kotak masuk',
   Inbox: 'Kotak masuk',
+  'All mail': 'Semua email',
   'All inboxes': 'Semua kotak masuk',
   'My inbox': 'Kotak masuk saya',
   'Not connected': 'Belum terhubung',

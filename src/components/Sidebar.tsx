@@ -3,6 +3,7 @@ import { term } from '../terms';
 import {
   Activity,
   Archive,
+  Mails,
   FileText,
   Inbox,
   Layers,
@@ -29,6 +30,7 @@ export const FOLDERS: { id: FolderId; icon: LucideIcon }[] = [
   { id: 'sent', icon: Send },
   { id: 'drafts', icon: FileText },
   { id: 'archive', icon: Archive },
+  { id: 'all', icon: Mails },
   { id: 'spam', icon: ShieldAlert },
   { id: 'trash', icon: Trash2 },
   { id: 'snoozed', icon: Clock },
@@ -41,6 +43,8 @@ export function folderName(id: FolderId): string {
   switch (id) {
     case 'inbox':
       return t('Inbox');
+    case 'all':
+      return t('All mail');
     case 'starred':
       return t('Starred');
     case 'sent':
@@ -383,6 +387,7 @@ function PhoneMailDrawer(props: Props & { pm: NonNullable<Props['phoneMail']>; i
           {item('scheduled', CalendarClock, folderName('scheduled'), isActive({ kind: 'folder', id: 'scheduled' }), () => pick({ kind: 'folder', id: 'scheduled' }), counts.scheduled)}
           {item('drafts', File, folderName('drafts'), isActive({ kind: 'folder', id: 'drafts' }), () => pick({ kind: 'folder', id: 'drafts' }), counts.drafts)}
           {item('archive', Archive, folderName('archive'), isActive({ kind: 'folder', id: 'archive' }), () => pick({ kind: 'folder', id: 'archive' }))}
+          {item('all', Mails, folderName('all'), isActive({ kind: 'folder', id: 'all' }), () => pick({ kind: 'folder', id: 'all' }))}
           {item('spam', ShieldAlert, folderName('spam'), isActive({ kind: 'folder', id: 'spam' }), () => pick({ kind: 'folder', id: 'spam' }), counts.spam)}
           {item('trash', Trash2, folderName('trash'), isActive({ kind: 'folder', id: 'trash' }), () => pick({ kind: 'folder', id: 'trash' }))}
         </nav>
