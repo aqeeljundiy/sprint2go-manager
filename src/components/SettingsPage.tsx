@@ -51,7 +51,7 @@ import { MAIL_STORAGE_SECTION, MailStorage } from './mail/MailStorage';
 import { MAIL_GROUPS_SECTION, MailGroups } from './mail/MailGroups';
 import { MAIL_RULES_SECTION, MailRules } from './mail/MailRules';
 import { Avatar } from './Avatar';
-import { ChoiceRow, Group, GRow, type GColor } from './ui/Grouped';
+import { ChoiceRow, Group, GRow } from './ui/Grouped';
 import { AccountPhone, DeleteAccountPhone, MailPhone, MailboxesPhone, MembersPhone, PasswordPhone, WorkspacePhone } from './SettingsPhone';
 import { SignaturesDesktop, WritingDesktop } from './mail/MailWriting';
 import { fmtSize } from '../data/drive';
@@ -199,33 +199,6 @@ const PHONE_GROUPS: { id: string; head: () => string; rows: SettingsSection[] }[
   { id: 'plan', head: () => t('Plan and data'), rows: ['billing', 'storage', 'security'] },
   { id: 'support', head: () => t('Support'), rows: ['help', 'developer'] },
 ];
-const ROW_COLOR: Partial<Record<SettingsSection, GColor>> = {
-  notifications: 'red',
-  appearance: 'indigo',
-  myapps: 'blue',
-  mail: 'blue',
-  mailapps: 'teal',
-  mailaccess: 'indigo',
-  mailstorage: 'grey',
-  mailgroups: 'green',
-  mailrules: 'orange',
-  workspace: 'grey',
-  teams: 'green',
-  permissions: 'grey',
-  clients: 'orange',
-  agency: 'pink',
-  stages: 'purple',
-  apps: 'blue',
-  meetings: 'green',
-  ai: 'indigo',
-  email: 'teal',
-  import: 'orange',
-  billing: 'green',
-  storage: 'grey',
-  security: 'blue',
-  help: 'blue',
-  developer: 'grey',
-};
 
 function SettingsList({ sections, company, me, values, onOpen }: { sections: typeof SECTIONS; company: string; me?: User; values: Partial<Record<SettingsSection, string>>; onOpen: (id: SettingsSection) => void }) {
   const has = new Set(sections.map((x) => x.id));
@@ -251,7 +224,8 @@ function SettingsList({ sections, company, me, values, onOpen }: { sections: typ
         return (
           <Group key={g.id} title={g.id === 'company' ? company : g.head()}>
             {rows.map(({ id, name, icon }) => (
-              <GRow key={id} icon={icon} color={ROW_COLOR[id] ?? 'grey'} label={t(name)} value={values[id]} onClick={() => onOpen(id)} />
+              // Plain icons, as on desktop: our look, not iOS's rainbow of coloured tiles.
+              <GRow key={id} icon={icon} plainIcon label={t(name)} value={values[id]} onClick={() => onOpen(id)} />
             ))}
           </Group>
         );

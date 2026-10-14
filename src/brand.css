@@ -187,9 +187,18 @@ body {
   border-radius: 14px;
 }
 
-/* aqeeljundiy.com labels: small uppercase */
+/* Settings' section headers: 15/600 sentence case, as on the phone (one style for both). */
+.settings-content h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: var(--t-heading);
+  color: var(--text);
+  letter-spacing: normal;
+  text-transform: none;
+}
+/* aqeeljundiy.com labels: small uppercase (sidebar group labels and menu titles) */
 .nav-heading,
-.settings-content h3,
 .d-heading,
 .ws-menu-title,
 .am-label,

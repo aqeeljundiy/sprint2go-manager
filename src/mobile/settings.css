@@ -101,8 +101,12 @@
   .set-edit .push-actions {
     margin-left: auto;
   }
+  /* Each section says what it's for on phones too (it was hidden, which left the screens thinner than desktop's). */
   .settings-push .settings-content > .set-intro {
-    display: none;
+    margin: 0 0 16px;
+    font-size: var(--fs-secondary);
+    line-height: var(--lh-secondary);
+    color: var(--text-3);
   }
   .set-rows {
     margin: 0 -16px 8px;

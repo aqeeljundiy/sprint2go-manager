@@ -9,13 +9,11 @@
 .g-group {
   margin: 0 0 24px;
 }
+/* Section headers: 15/600 in sentence case, the same on phone and desktop (the system's rule; not iOS's small caps). */
 .g-head {
-  margin: 0 32px 8px;
-  font-size: var(--fs-secondary);
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: var(--text-3);
+  margin: 0 20px 8px;
+  font: var(--t-heading);
+  color: var(--text);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -29,7 +27,7 @@
   overflow: hidden;
 }
 :root[data-theme='dark'] .g-card {
-  background: #1c1c1f;
+  background: var(--surface);
 }
 .g-foot {
   margin: 8px 32px 0;
