@@ -148,21 +148,46 @@
   padding: 6px 8px;
 }
 /* The list is narrow: the tabs share its width, words only (the hint names each on hover). */
+/* Every tab the same width, so the sliding highlight and the words never jump when one is picked. */
+.list-pane .mail-tabs {
+  container-type: inline-size;
+}
 .list-pane .mail-tabs > button {
-  flex: 1 1 auto;
+  position: relative;
+  flex: 1 1 0;
   min-width: 0;
   padding: 0 8px;
 }
 .list-pane .mail-tabs > button > svg {
   display: none;
 }
+.mail-tab-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Narrow list: icons only, the name in the hint, so no tab is cut to "Promo…". */
+@container (max-width: 380px) {
+  .list-pane .mail-tabs > button > svg {
+    display: block;
+  }
+  .list-pane .mail-tabs > button > .mail-tab-name {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+}
 .mail-tab-new {
-  padding: 1px 6px;
-  border-radius: 999px;
-  background: var(--accent-soft);
-  color: var(--accent-text);
-  font-size: 11px;
-  font-weight: 600;
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
   animation: fadeIn 0.2s ease-out backwards;
 }
 

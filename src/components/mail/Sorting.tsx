@@ -6,6 +6,7 @@ import { Bookmark, ChevronRight, Inbox, Info, ListFilter, MessagesSquare, Plus, 
 import type { Thread } from '../../types';
 import { CATEGORIES, EMPTY_FORM, formToQuery, hasTerm, queryToForm, toggleTerm, type Category, type SearchForm } from '../../mailQuery';
 import { Popover } from '../ui/Popover';
+import { useActionMenu } from '../ui/ActionSheet';
 import { Select } from '../ui/Select';
 import { PushScreen } from '../ui/PushScreen';
 import { Group, SwitchRow, ChoiceRow, GRow } from '../ui/Grouped';
@@ -247,23 +248,41 @@ function tabNews(threads: Thread[], c: Category, on: Category[]) {
 
 /** The inbox's tabs on desktop (Primary, Promotions, Social, Updates, Forums, the ones switched on). */
 export function InboxTabs({ inbox, current, onPick }: { inbox: Thread[]; current: Category; onPick: (c: Category) => void }) {
-  const [prefs] = useMailPrefs();
+  const [prefs, update] = useMailPrefs();
   const on = tabsOn(prefs);
+  // Right-click the bar (long-press on touch): hide a tab, bring one back, or turn tabs off, like Gmail's labels.
+  const [hit, setHit] = useState<Category | null>(null);
+  const menu = useActionMenu(() => [
+    ...(hit && hit !== 'primary' ? [{ label: t('Hide {tab}', { tab: categoryName(hit) }), icon: X, run: () => (update((p) => ({ tabs: { ...p.tabs, [hit]: false } })), hit === current && onPick('primary')) }] : []),
+    ...(['promotions', 'social', 'updates', 'forums'] as const).filter((c) => !prefs.tabs[c]).map((c) => ({ label: t('Show {tab}', { tab: categoryName(c) }), icon: CATEGORY_ICON[c], group: 'show', run: () => update((p) => ({ tabs: { ...p.tabs, [c]: true } })) })),
+    { label: t('Turn off inbox tabs'), icon: Inbox, group: 'all', run: () => (update({ tabs: { promotions: false, social: false, updates: false, forums: false } }), onPick('primary')) },
+  ]);
+  const onContext = (e: React.MouseEvent) => {
+    const el = (e.target as HTMLElement).closest<HTMLElement>('[data-tab]');
+    setHit((el?.dataset.tab as Category | undefined) ?? null);
+    menu.bind.onContextMenu(e);
+  };
   if (on.length < 2) return null;
   return (
-    <div className="cs-tabs mail-tabs" role="tablist" aria-label={t('Inbox tabs')}>
+    <>
+    <div className="cs-tabs mail-tabs" role="tablist" aria-label={t('Inbox tabs')} {...menu.bind} onContextMenu={onContext}>
       {on.map((c) => {
         const Icon = CATEGORY_ICON[c];
         const news = c === 'primary' ? null : tabNews(inbox, c, on);
+        const fresh = !!news && news.n > 0 && current !== c;
         return (
-          <button key={c} type="button" role="tab" aria-selected={current === c} className={current === c ? 'on' : ''} onClick={() => onPick(c)} title={news?.names.length ? news.names.join(', ') : t(CATEGORY_HINT[c])}>
+          <button key={c} type="button" role="tab" data-tab={c} aria-selected={current === c} className={current === c ? 'on' : ''} onClick={() => onPick(c)} title={news?.names.length ? `${tn(news.n, '{n} new', '{n} new')}: ${news.names.join(', ')}` : t(CATEGORY_HINT[c])}>
             <Icon size={15} />
-            {categoryName(c)}
-            {news && news.n > 0 && current !== c && <span className="mail-tab-new">{tn(news.n, '{n} new', '{n} new')}</span>}
+            <span className="mail-tab-name">{categoryName(c)}</span>
+            {/* New mail: a dot that takes no width, so picking a tab never resizes the others. */}
+            {fresh && <span className="mail-tab-new" aria-label={tn(news!.n, '{n} new', '{n} new')} />}
           </button>
         );
       })}
     </div>
+    {/* Outside the bar: it's a container (narrow-list rule), which would trap a fixed menu inside it. */}
+    {menu.menu}
+    </>
   );
 }
 

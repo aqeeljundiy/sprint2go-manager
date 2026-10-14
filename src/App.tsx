@@ -1350,10 +1350,19 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
     }, 9000);
   };
 
-  const closeCompose = (draft: Outgoing | null) => {
+  const closeCompose = (draft: Outgoing | null, discarded?: Outgoing) => {
     const draftId = compose?.draftId;
+    const replyThreadId = compose?.replyThreadId;
     setCompose(null);
-    if (!draft) return;
+    if (!draft) {
+      // Discarded: a saved draft goes away too, and Undo brings the words back.
+      const had = discarded && (discarded.text.trim() || discarded.subject.trim() || discarded.to.length);
+      if (!had) return;
+      const before = draftId ? threads.find((x) => x.id === draftId) : undefined;
+      if (before) setThreads((ts) => ts.filter((x) => x.id !== draftId));
+      showToast({ text: t('Draft discarded'), action: { label: t('Undo'), run: () => (before && setThreads((ts) => (ts.some((x) => x.id === before.id) ? ts : [before, ...ts])), openCompose({ draftId, replyThreadId, initial: discarded })) } });
+      return;
+    }
     const replyTo = draftId ? threads.find((x) => x.id === draftId)?.replyTo : undefined;
     const th = { ...toThread(draft, 'drafts', draftId), ...(replyTo ? { replyTo } : {}) };
     setThreads((ts) => (draftId ? ts.map((x) => (x.id === draftId ? th : x)) : [th, ...ts]));

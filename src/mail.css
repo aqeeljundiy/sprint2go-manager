@@ -568,6 +568,18 @@
 .mail-chips::-webkit-scrollbar {
   display: none;
 }
+/* With a mouse there's no sideways swipe: chips that don't fit wrap to a second line instead of hiding off the edge
+   (Attachments was out of reach in a narrow list). Touch keeps the one swipeable row. */
+@media (hover: hover) and (pointer: fine) {
+  .mail-chips {
+    flex-wrap: wrap;
+    row-gap: 6px;
+    overflow: visible;
+    padding-right: 0;
+    margin-right: 0;
+    mask-image: none;
+  }
+}
 .mail-chip {
   position: relative;
   flex: none;

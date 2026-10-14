@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useMemo, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { lastTracked, summarize } from '../tracking';
-import { Archive, Check, Clock, Eye, EyeOff, FileText, Inbox, Mail, MailOpen, Menu, MessageSquare, MoreHorizontal, Paperclip, PenLine, RefreshCw, Search, ShieldAlert, Star, Tag, Trash2, X } from 'lucide-react';
+import { Check, Clock, Eye, EyeOff, FileText, Inbox, Mail, MailOpen, Menu, MessageSquare, MoreHorizontal, Paperclip, PenLine, RefreshCw, Search, ShieldAlert, Star, Tag, Trash2, X } from 'lucide-react';
 import type { Client, Label, Person, Thread, User } from '../types';
 import { threadHasAttachment } from '../mailAttachments';
 import { lastMessage, listDate, participants, relative, snippet } from '../utils';
@@ -267,7 +267,7 @@ export const MessageList = forwardRef<HTMLInputElement, Props>(function MessageL
     const allStarred = list.every((th) => th.starred);
     const out: SheetAction[] = [];
     if (extra && list.length === 1) out.push({ label: t('Open'), icon: MailOpen, run: () => props.onOpen(ids[0]) });
-    if (list.some((th) => th.location === 'inbox')) out.push({ label: t('Done'), icon: Archive, hint: t('Out of the inbox, into Archive'), run: () => actions.done(ids.filter((id) => list.find((th) => th.id === id)?.location === 'inbox')) });
+    if (list.some((th) => th.location === 'inbox')) out.push({ label: t('Done'), icon: Check, hint: t('Out of the inbox, into Archive'), run: () => actions.done(ids.filter((id) => list.find((th) => th.id === id)?.location === 'inbox')) });
     if (list.some((th) => th.location !== 'inbox' && th.location !== 'drafts')) out.push({ label: t('Move to Inbox'), icon: Inbox, run: () => actions.inbox(ids) });
     if (extra) out.push({ id: 'snooze', label: t('Snooze…'), icon: Clock, run: () => setSnoozing({ ids }) });
     out.push({ label: anyUnread ? t('Mark as read') : t('Mark as unread'), icon: anyUnread ? MailOpen : Mail, run: () => actions.read(ids, !anyUnread) });
@@ -423,8 +423,9 @@ export const MessageList = forwardRef<HTMLInputElement, Props>(function MessageL
         ))}
       {threads.length === 0 ? (
         <div className={`empty ${pull ? 'pulled' : ''} ${dragging ? 'dragging' : ''}`} ref={(el) => void (bodyRef.current = el)} style={pull ? { transform: `translateY(${pull}px)` } : undefined}>
-          <div className="empty-art">✓</div>
-          <p className="empty-title">{query ? t('No matches') : filter !== 'all' ? t('Nothing like that here') : (props.empty?.title ?? t('All caught up'))}</p>
+          {/* The tick only means "all caught up": a search or a filter that finds nothing says so with its own icon. */}
+          <div className="empty-art">{query ? <Search size={28} /> : filter !== 'all' ? <Mail size={28} /> : <Check size={28} />}</div>
+          <p className="empty-title">{query ? t('No matches') : filter === 'unread' ? t('No unread emails') : filter === 'reply' ? t('Nothing needs your reply') : filter === 'assigned' ? t('Nothing assigned to you') : filter === 'files' ? t('No emails with attachments') : (props.empty?.title ?? t('All caught up'))}</p>
           <p className="empty-sub">
             {query
               ? t('Nothing found for “{query}”. Try a name, an email address or a few words from the subject.', { query })
@@ -800,7 +801,7 @@ export function MailRow(p: {
           )}
           {th.location !== 'drafts' && (
             <button className="icon-btn sm" onClick={p.onDone} title={th.location === 'inbox' ? t('Done (E)') : t('Move to Inbox')}>
-              {th.location === 'inbox' ? <Archive size={15} /> : <Inbox size={15} />}
+              {th.location === 'inbox' ? <Check size={15} /> : <Inbox size={15} />}
             </button>
           )}
           {th.location !== 'trash' && (

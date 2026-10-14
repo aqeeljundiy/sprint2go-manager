@@ -76,7 +76,8 @@ interface Props {
   initial?: Outgoing;
   onSend: (m: Outgoing) => void;
   /** Called with the unsent message (or null if it was empty). */
-  onClose: (draft: Outgoing | null) => void;
+  /** null: nothing to keep. `discarded`: the person threw this draft away (offered back with Undo). */
+  onClose: (draft: Outgoing | null, discarded?: Outgoing) => void;
   /** Phones: parked as a pill at the bottom (swiped down), and back. */
   parked?: boolean;
   onPark?: (parked: boolean) => void;
@@ -235,8 +236,10 @@ export function Compose({ contacts, signature: baseSignature, signatureFor, work
     });
   const suggest = smartCompose ? (before: string) => suggestNext(before, { aiOn, workspaceId: workspace?.id ?? '', subject, to: to[0]?.name || to[0]?.email, me: myName, lang: getLang() === 'id' ? 'Indonesian' : undefined }) : undefined;
   const discard = () => {
+    // What was written comes along, so a mistaken Discard can be undone (the rest of Mail undoes too).
+    const gone = message();
     setClosing(true);
-    setTimeout(() => onClose(null), 160);
+    setTimeout(() => onClose(null, gone), 160);
   };
   const insertTemplate = (text: string) => {
     editor.current?.setHtml(textToHtml(text) + (signature ? `<p><br></p>${signature}` : ''));
