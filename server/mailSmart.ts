@@ -107,6 +107,17 @@ export function teachCategory(accountId: string, sender: string, category: Categ
   db.db.prepare('INSERT INTO mail_cat_teach (account_id, sender, category, at) VALUES (?, ?, ?, ?) ON CONFLICT (account_id, sender) DO UPDATE SET category = excluded.category, at = excluded.at').run(accountId, e, category, now());
 }
 
+/** The sorting rules of some mailboxes (taught by moving mail, or added in Settings), newest first. */
+export function taughtRules(accountIds: string[]): { accountId: string; sender: string; category: Category; at: string }[] {
+  if (!accountIds.length) return [];
+  return db.db.prepare(`SELECT account_id AS accountId, sender, category, at FROM mail_cat_teach WHERE account_id IN (${accountIds.map(() => '?').join(',')}) ORDER BY at DESC LIMIT 500`).all(...accountIds) as any[];
+}
+
+/** Forgets one rule: that sender's mail is sorted by the built-in rules again. */
+export function forgetRule(accountId: string, sender: string) {
+  db.db.prepare('DELETE FROM mail_cat_teach WHERE account_id = ? AND sender = ?').run(accountId, lower(sender));
+}
+
 /* ---------- spam ---------- */
 
 const SPAM_PATTERNS: [RegExp, string][] = [

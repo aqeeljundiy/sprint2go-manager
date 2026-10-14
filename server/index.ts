@@ -2360,6 +2360,23 @@ createServer(async (req, res) => {
         return json(res, 409, { error: e instanceof Error ? e.message : 'Could not send the test.' });
       }
     }
+    // Sorting rules: which tab a sender (you@x.com) or a whole domain (@x.com) goes to, per mailbox you can open.
+    if (p === '/api/mail/sorting') {
+      const wsId = req.method === 'GET' ? url.searchParams.get('ws') ?? '' : '';
+      const b = req.method === 'GET' ? {} : ((await body(req)) as any);
+      const ws = memberOf(me).find((w: any) => w.id === (wsId || b.workspaceId)) as any;
+      if (!ws) return json(res, 403, { error: mark('Not in this company.') });
+      const boxes = (ws.accounts ?? []).filter((a: any) => delegation.openersOf(a).includes(me)).map((a: any) => String(a.id));
+      if (req.method === 'GET') return json(res, 200, { rules: mailSmart.taughtRules(boxes) });
+      const accountId = String(b.accountId ?? '');
+      if (!boxes.includes(accountId)) return json(res, 403, { error: mark('Not your mailbox.') });
+      const sender = String(b.sender ?? '').trim().toLowerCase().slice(0, 200);
+      if (!/^[^@\s]*@[^@\s]+\.[^@\s]+$/.test(sender)) return json(res, 400, { error: mark('Use an address (name@shop.com) or a whole domain (@shop.com).') });
+      if (req.method === 'DELETE') return (mailSmart.forgetRule(accountId, sender), json(res, 200, { ok: true }));
+      if (!['primary', 'promotions', 'social', 'updates', 'forums'].includes(b.category)) return json(res, 400, { error: mark('Pick a tab.') });
+      mailSmart.teachCategory(accountId, sender, b.category);
+      return json(res, 200, { ok: true });
+    }
     if (p === '/api/mail/routing-test' && req.method === 'GET') {
       const wsId = url.searchParams.get('ws') ?? '';
       if (!memberOf(me).some((w) => w.id === wsId)) return json(res, 403, { error: mark('Not in this company.') });

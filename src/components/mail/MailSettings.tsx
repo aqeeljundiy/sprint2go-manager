@@ -4,7 +4,7 @@ import { usePersisted } from '../../settings';
 import { PushScreen } from '../ui/PushScreen';
 import { Sheet } from '../ui/Sheet';
 import { mark, t } from '../../i18n';
-import { InboxSettingsScreen, inboxSummary } from './Sorting';
+import { InboxSettingsScreen, inboxSummary, type SortScope } from './Sorting';
 import { useMailPrefs } from './sortPrefs';
 
 /** What a swipe on an email does. Kept on this device (a phone and a tablet can differ, like Spark). */
@@ -95,7 +95,7 @@ export interface MailSettingsRow {
 }
 
 /** Mail settings on phones (Gmail's, from the drawer): grouped rows, each opening its own screen. */
-export function MailSettingsScreen({ rows, onBack }: { rows: MailSettingsRow[]; onBack: () => void }) {
+export function MailSettingsScreen({ rows, onBack, scope }: { rows: MailSettingsRow[]; onBack: () => void; scope?: SortScope }) {
   const [swipesOpen, setSwipesOpen] = useState(false);
   const [swipes] = useMailSwipes();
   const [inboxOpen, setInboxOpen] = useState(false); // Inbox: tabs, order, reading (Sorting.tsx)
@@ -127,7 +127,7 @@ export function MailSettingsScreen({ rows, onBack }: { rows: MailSettingsRow[]; 
           </button>
         ))}
       </div>
-      {inboxOpen && <InboxSettingsScreen onBack={() => setInboxOpen(false)} />}
+      {inboxOpen && <InboxSettingsScreen scope={scope} onBack={() => setInboxOpen(false)} />}
       {swipesOpen && (
         <PushScreen title={t('Swipe actions')} onBack={() => setSwipesOpen(false)} iconBack className="gm-settings">
           <SwipeSettingsPhone />

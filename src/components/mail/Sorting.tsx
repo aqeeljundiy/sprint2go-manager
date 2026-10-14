@@ -1,7 +1,7 @@
 // Mail's sorting on screen: the search options panel (Gmail's arrow) and the chips under a search, saved searches,
 // the inbox tabs (desktop) and their rows on phones, multiple inboxes, the Spam and Trash notice, the Important
 // marker, and the inbox settings (desktop and phone). The logic is in ./sorting.ts and src/mailQuery.ts.
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Bookmark, ChevronRight, Inbox, Info, ListFilter, MessagesSquare, Plus, Search, SlidersHorizontal, Tag, Trash2, Users, X, type LucideIcon } from 'lucide-react';
 import type { Thread } from '../../types';
 import { CATEGORIES, EMPTY_FORM, formToQuery, hasTerm, queryToForm, toggleTerm, type Category, type SearchForm } from '../../mailQuery';
@@ -434,8 +434,81 @@ const advanceWords = (): { value: Advance; label: string; hint: string }[] => [
   { value: 'list', label: t('Go back to the list'), hint: t('Nothing opens by itself') },
 ];
 
+/** Which company and mailboxes the sorting rules are for. */
+export type SortScope = { wsId: string; accounts: { id: string; email: string }[] };
+type Rule = { accountId: string; sender: string; category: Category; at: string };
+
+/** Sorting rules: a sender or a whole domain always goes to one tab. Moving mail to a tab adds one; here they can be seen, changed and added. */
+function useSortingRules(scope?: SortScope) {
+  const [rules, setRules] = useState<Rule[] | null>(null);
+  // null: not loaded, or rules aren't kept for this company (the demo company has no server-side mail).
+  const load = () => {
+    if (!scope) return;
+    fetch(`/api/mail/sorting?ws=${encodeURIComponent(scope.wsId)}`).then((r) => (r.ok ? r.json() : null)).then((d) => setRules(d ? d.rules ?? [] : null), () => setRules(null));
+  };
+  useEffect(load, [scope?.wsId]); // eslint-disable-line react-hooks/exhaustive-deps
+  const send = async (method: 'POST' | 'DELETE', rule: { accountId: string; sender: string; category?: Category }) => {
+    const r = await fetch('/api/mail/sorting', { method, headers: { 'content-type': 'application/json' }, body: JSON.stringify({ workspaceId: scope!.wsId, ...rule }) }).catch(() => null);
+    const d = r ? await r.json().catch(() => ({})) : {};
+    if (!r?.ok) return (toast(d.error ?? t('Couldn’t save the rule. Try again.')), false);
+    load();
+    return true;
+  };
+  return { rules, save: (x: { accountId: string; sender: string; category: Category }) => send('POST', x), remove: (x: Rule) => send('DELETE', x) };
+}
+
+const ruleTabs = () => CATEGORIES.map((c) => ({ value: c, label: categoryName(c) }));
+
+/** Desktop: the rules under Inbox tabs, with a row to add one. */
+function SortingRules({ scope }: { scope: SortScope }) {
+  const { rules, save, remove } = useSortingRules(scope);
+  const [sender, setSender] = useState('');
+  const [tab, setTab] = useState<Category>('updates');
+  const [box, setBox] = useState(scope.accounts[0]?.id ?? '');
+  const many = scope.accounts.length > 1;
+  const emailOf = (id: string) => scope.accounts.find((a) => a.id === id)?.email ?? '';
+  const add = async () => {
+    const s = sender.trim().toLowerCase();
+    if (!s) return;
+    if (await save({ accountId: box, sender: s.includes('@') ? s : '@' + s, category: tab })) setSender('');
+  };
+  if (!rules) return null;
+  return (
+    <>
+      <h3>{t('Sorting rules')}</h3>
+      <small className="set-hint">{t('Mail from these senders always goes to the tab you pick. Use a whole domain (@shop.com) for every address there. Rules come first, before the built-in sorting.')}</small>
+      {rules.length > 0 && (
+        <div className="acct-list sort-rules">
+          {rules.map((r) => (
+            <div key={r.accountId + r.sender} className="acct-row">
+              <span className="acct-icon">{(() => { const I = CATEGORY_ICON[r.category]; return <I size={15} />; })()}</span>
+              <span className="acct-info">
+                <strong>{r.sender.startsWith('@') ? t('Anyone at {domain}', { domain: r.sender.slice(1) }) : r.sender}</strong>
+                {many && <small>{emailOf(r.accountId)}</small>}
+              </span>
+              <Select value={r.category} options={ruleTabs()} onChange={(category) => void save({ accountId: r.accountId, sender: r.sender, category })} label={t('Tab')} width={150} />
+              <button type="button" className="icon-btn" aria-label={t('Remove rule for {sender}', { sender: r.sender })} onClick={() => void remove(r)}>
+                <X size={16} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+      {rules.length === 0 &&<small className="set-hint">{t('No rules yet. Move an email to another tab, or add one here.')}</small>}
+      <div className="mx-add">
+        <input value={sender} onChange={(e) => setSender(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && void add()} placeholder={t('name@shop.com or @shop.com')} aria-label={t('Sender or domain')} />
+        <Select value={tab} options={ruleTabs()} onChange={setTab} label={t('Tab')} width={150} />
+        {many && <Select value={box} options={scope.accounts.map((a) => ({ value: a.id, label: a.email }))} onChange={setBox} label={t('Mailbox')} width={200} />}
+        <button type="button" className="ghost-btn outline sm" disabled={!sender.trim()} onClick={() => void add()}>
+          <Plus size={14} /> {t('Add rule')}
+        </button>
+      </div>
+    </>
+  );
+}
+
 /** The inbox settings in Settings, Mail (desktop). */
-export function InboxSettings() {
+export function InboxSettings({ scope }: { scope?: SortScope }) {
   const [prefs, update] = useMailPrefs();
   const [newName, setNewName] = useState('');
   const [newQ, setNewQ] = useState('');
@@ -462,6 +535,8 @@ export function InboxSettings() {
       <h3>{t('Inbox tabs')}</h3>
       <small className="set-hint">{t('New mail is sorted when it arrives. Move an email to another tab and that sender’s mail goes there from now on. A tab that’s off stays in Primary.')}</small>
       {(['promotions', 'social', 'updates', 'forums'] as const).map(tabSwitch)}
+
+      {scope && <SortingRules scope={scope} />}
 
       <h3>{t('Inbox order')}</h3>
       <div className="set-row">
@@ -532,8 +607,9 @@ export function InboxSettings() {
 }
 
 /** Mail settings, Inbox on phones: tabs, order, reading (iOS rows). */
-export function InboxSettingsScreen({ onBack }: { onBack: () => void }) {
+export function InboxSettingsScreen({ onBack, scope }: { onBack: () => void; scope?: SortScope }) {
   const [prefs, update] = useMailPrefs();
+  const sorting = useSortingRules(scope);
   return (
     <PushScreen title={t('Inbox')} onBack={onBack} iconBack className="g-page gm-settings">
       <Group title={t('Inbox tabs')} footer={t('Primary shows the rest. Move an email to another tab and that sender’s mail goes there from now on.')}>
@@ -541,6 +617,13 @@ export function InboxSettingsScreen({ onBack }: { onBack: () => void }) {
           <SwitchRow key={c} label={categoryName(c)} sub={t(CATEGORY_HINT[c])} on={!!prefs.tabs[c]} onChange={(v) => update((p) => ({ tabs: { ...p.tabs, [c]: v } }))} />
         ))}
       </Group>
+      {sorting.rules && sorting.rules.length > 0 && (
+        <Group title={t('Sorting rules')} footer={t('Move an email to another tab to add a rule for its sender.')}>
+          {sorting.rules.map((r) => (
+            <ChoiceRow key={r.accountId + r.sender} label={r.sender.startsWith('@') ? t('Anyone at {domain}', { domain: r.sender.slice(1) }) : r.sender} value={r.category} options={[...ruleTabs(), { value: 'none' as Category, label: t('Remove rule') }]} onChange={(c) => void (c === ('none' as Category) ? sorting.remove(r) : sorting.save({ accountId: r.accountId, sender: r.sender, category: c }))} />
+          ))}
+        </Group>
+      )}
       <Group title={t('Inbox order')}>
         <ChoiceRow label={t('Show first')} value={prefs.inboxType} options={typeWords().map((x) => ({ value: x.value, label: x.label, hint: x.hint }))} onChange={(inboxType) => update({ inboxType })} />
       </Group>

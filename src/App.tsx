@@ -335,6 +335,8 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
     () => ws.accounts.filter(opens).sort((a, b) => Number(a.kind === 'shared') - Number(b.kind === 'shared') || Number(!a.users.includes(user.id)) - Number(!b.users.includes(user.id))),
     [ws.accounts, user.id], // eslint-disable-line react-hooks/exhaustive-deps
   );
+  // Mail's sorting rules (Settings, Mail): the mailboxes this person opens in this company.
+  const sortScope = useMemo(() => ({ wsId: ws.id, accounts: myAccounts.filter((a) => !a.temp).map((a) => ({ id: a.id, email: a.email })) }), [ws.id, myAccounts]);
   // What really works (worked out on the server). The standalone demo, demo servers and the demo company have everything on.
   const demoOk = !server.on || caps.demo || inSandbox;
   const ready = ws.mailReady;
@@ -5028,6 +5030,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
         {mobile && mailSettingsOpen && (
           <MailSettingsScreen
             onBack={() => setMailSettingsOpen(false)}
+            scope={sortScope}
             rows={[
               { id: 'signature', label: t('Signature'), value: settings.signature.replace(/<[^>]+>/g, '').trim() ? t('On') : t('Off'), run: () => pushMailSection() },
               { id: 'undo', label: t('Undo send'), value: settings.undoSend ? tn(settings.undoSend, '{n} second', '{n} seconds') : t('Off'), run: () => pushMailSection(t('Undo send')) },
@@ -5975,7 +5978,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
             mailExtras={
               <>
               {/* Inbox tabs, order, multiple inboxes, conversation view, auto-advance (phones: Mail settings, Inbox). */}
-              {!mobile && <InboxSettings />}
+              {!mobile && <InboxSettings scope={sortScope} />}
               <OutOfOffice
                 accounts={myAccounts.filter((a) => !a.temp && a.users.includes(user.id))}
                 canSend={(id) => (boxReady(id).send ? null : (boxReady(id).sendWhy ?? boxReady(id).why ?? 'Sending isn’t set up for this mailbox yet.'))}
