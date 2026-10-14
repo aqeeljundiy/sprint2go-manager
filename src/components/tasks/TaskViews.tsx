@@ -205,19 +205,27 @@ export function TaskViews({
   });
   const done = (task: Todo) => stageIdFor(task, 'done');
   const [ticking, setTicking] = useState<string[]>([]);
+  // Completing says so with Undo (Todoist's "1 task completed · Undo"): a mis-tap never loses a task. Undo puts it
+  // back in the stage it was in, not just "open".
+  const completed = (task: Todo) => {
+    const was = stageOf(task).id;
+    toastUndo(t('“{title}” done', { title: task.title.length > 40 ? task.title.slice(0, 39) + '…' : task.title }), () => ops.status(task.id, was));
+  };
   const tick = (task: Todo) => {
-    if (task.done || matchMedia('(prefers-reduced-motion: reduce)').matches) return ops.status(task.id, stageIdFor(task, task.done ? 'open' : 'done'));
+    if (task.done) return ops.status(task.id, stageIdFor(task, 'open'));
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return (ops.status(task.id, done(task)), completed(task));
     setTicking((x) => [...x, task.id]);
     setTimeout(() => {
       ops.status(task.id, done(task));
       setTicking((x) => x.filter((id) => id !== task.id));
+      completed(task);
     }, 320);
   };
   const swipeOf = (which: SwipeChoice, task: Todo): SwipeAction | null => {
     if (which === 'complete') {
       const review = kindOf(task) === 'review' && task.supervisorId === ops.me;
       if (task.done) return { id: 'reopen', label: t('Reopen'), icon: Check, tone: 'neutral', run: () => ops.status(task.id, stageIdFor(task, 'open')) };
-      return { id: 'done', label: review ? t('Approve') : t('Done'), icon: Check, tone: 'ok', removes: !d.completed, run: () => ops.status(task.id, done(task)) };
+      return { id: 'done', label: review ? t('Approve') : t('Done'), icon: Check, tone: 'ok', removes: !d.completed, run: () => (ops.status(task.id, done(task)), completed(task)) };
     }
     if (which === 'schedule') return { id: 'schedule', label: t('Schedule'), icon: CalendarDays, tone: 'warn', run: () => sheets.open('schedule', [task.id]) };
     if (which === 'delete') return { id: 'delete', label: t('Delete'), icon: Trash2, tone: 'danger', removes: true, run: () => ops.remove([task.id]) };

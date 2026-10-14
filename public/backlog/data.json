@@ -603,6 +603,15 @@
                       "detail":  "520 px panel left a 176 px sliver. No change: a 520 px panel over a dimmed list is iPad\u0027s slide-over pattern.",
                       "priority":  "high",
                       "status":  "done"
+                  },
+                  {
+                      "id":  "C1",
+                      "round":  "Audit 3",
+                      "area":  "Mail",
+                      "title":  "A second window follows the first (compose, folder)",
+                      "detail":  "Seen tonight: with two windows open as the same person, opening a draft in one opened the same compose and folder in the other. Not reproducible with one window; needs a second window to trace (look at live sync of threads and any draft/compose state).",
+                      "priority":  "medium",
+                      "status":  "todo"
                   }
               ]
 }

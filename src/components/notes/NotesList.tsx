@@ -134,7 +134,12 @@ export function NotesList({
         (looking ? (
           <p className="nl-none">{query ? t('No notes with “{query}”.', { query }) : t('No notes here.')}</p>
         ) : (
-          <EmptyState compact icon={<SquarePen size={20} />} title={filter === 'all' ? t('No notes yet') : t('No notes here yet')} text={phone ? t('Tap the pen to write one. The first line is its title.') : t('Write one with New note. The first line is its title.')} />
+          filter === 'all' ? (
+            <EmptyState compact icon={<SquarePen size={20} />} title={t('No notes yet')} text={phone ? t('Tap the pen to write one. The first line is its title.') : t('The first line of a note is its title.')} />
+          ) : (
+            // A filter hides them: say so, and offer the way back (not "write one", the button is right above).
+            <EmptyState compact title={t('No notes in this view')} action={<button type="button" className="link-btn" onClick={() => onFilter('all')}>{t('Show all notes')}</button>} />
+          )
         ))}
       {deleted.length > 0 && !looking && (
         <button type="button" className="nl-trash" onClick={() => setTrash(true)}>

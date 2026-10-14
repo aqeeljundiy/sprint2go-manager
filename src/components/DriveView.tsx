@@ -145,24 +145,46 @@ export function DriveView(props: Props) {
       </>
     );
 
-  // The same actions as a list, for long-press, right-click and "…".
-  const menuFor = (i: DriveItem) => (): SheetAction[] =>
-    section === 'trash'
-      ? [
-          { label: t('Restore'), icon: RotateCcw, run: () => props.onRestore(i.id) },
-          { label: t('Delete forever'), icon: X, danger: true, group: 'end', run: () => props.onDeleteForever(i.id) },
-        ]
-      : i.id.startsWith('att:')
-        ? [
-            { label: t('Open'), icon: Eye, run: () => open(i) },
-            { label: t('Open the email'), icon: Mail, run: () => props.onOpenThread(i.threadId!) },
-          ]
-        : [
-            { label: t('Open'), icon: Eye, run: () => open(i) },
-            { label: i.starred ? t('Unstar') : t('Star'), icon: Star, run: () => props.onStar(i.id) },
-            { label: t('Rename'), icon: PenLine, run: () => props.onStartRename(i.id) },
-            { label: t('Move to trash'), icon: Trash2, danger: true, group: 'end', run: () => props.onTrash(i.id) },
-          ];
+  const shareLink = (i: DriveItem) => {
+    const url = i.url && !i.url.startsWith('data:') ? new URL(i.url, location.href).href : '';
+    if (!url) return;
+    void navigator.clipboard?.writeText(url).then(() => toast({ text: t('Link copied') }));
+  };
+  const download = (i: DriveItem) => {
+    if (!i.url) return;
+    const a = document.createElement('a');
+    a.href = i.url;
+    a.download = i.name;
+    a.rel = 'noreferrer';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
+
+  // The same actions as a list, for right-click and "…" on computers: Google Drive's order (open, share, download,
+  // organise, trash), the same set the phone's sheet has.
+  const menuFor = (i: DriveItem) => (): SheetAction[] => {
+    if (section === 'trash')
+      return [
+        { label: t('Restore'), icon: RotateCcw, run: () => props.onRestore(i.id) },
+        { label: t('Delete forever'), icon: X, danger: true, group: 'end', run: () => props.onDeleteForever(i.id) },
+      ];
+    const own = !i.id.startsWith('att:');
+    const canLink = !!i.url && !i.url.startsWith('data:');
+    return [
+      { label: t('Open'), icon: Eye, run: () => open(i) },
+      ...(i.kind !== 'folder' && canLink ? [{ label: t('Share link'), icon: Link2, run: () => shareLink(i) }] : []),
+      ...(i.kind !== 'folder' && i.url ? [{ label: t('Download'), icon: Download, run: () => download(i) }] : []),
+      ...(i.threadId ? [{ label: t('Open the email'), icon: Mail, run: () => props.onOpenThread(i.threadId!) }] : []),
+      ...(own ? [{ label: i.starred ? t('Remove star') : t('Star'), icon: Star, group: 'file', run: () => props.onStar(i.id) }] : []),
+      ...(own ? [{ label: t('Rename'), icon: PenLine, group: 'file', run: () => props.onStartRename(i.id) }] : []),
+      ...(own && props.onMove ? [{ label: t('Move to folder'), icon: FolderInput, group: 'file', run: () => setMoving(i) }] : []),
+      ...(own ? [{ label: t('Move to trash'), icon: Trash2, danger: true, group: 'end', run: () => props.onTrash(i.id) }] : []),
+    ];
+  };
+  // Computers: "New" opens upload or a new folder (Google Drive's button), not straight to Upload.
+  const newBtn = useRef<HTMLButtonElement>(null);
+  const deskNew = useActionMenu(() => newActions.filter((a) => a.icon !== Camera), { title: t('New') });
 
   const name = (i: DriveItem) =>
     props.renamingId === i.id ? (
@@ -199,21 +221,6 @@ export function DriveView(props: Props) {
       if (i.threadId) return `${props.senderOf(i.threadId)} · ${fmtDay(i.modified)} · ${fmtSize(i.size)}`;
       const by = i.uploadedBy === props.me ? t('You uploaded') : who(i) ? t('{name} uploaded', { name: who(i) }) : '';
       return [by, fmtDay(i.modified), fmtSize(i.size)].filter(Boolean).join(' · ');
-    };
-    const shareLink = (i: DriveItem) => {
-      const url = i.url && !i.url.startsWith('data:') ? new URL(i.url, location.href).href : '';
-      if (!url) return;
-      void navigator.clipboard?.writeText(url).then(() => toast({ text: t('Link copied') }));
-    };
-    const download = (i: DriveItem) => {
-      if (!i.url) return;
-      const a = document.createElement('a');
-      a.href = i.url;
-      a.download = i.name;
-      a.rel = 'noreferrer';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
     };
     const phoneMenu = (i: DriveItem) => (): SheetAction[] => {
       if (section === 'trash') return menuFor(i)();
@@ -342,9 +349,11 @@ export function DriveView(props: Props) {
             <List size={15} />
           </button>
         </div>
-        <button className="primary-btn hide-mobile" onClick={props.onPickFiles}>
-          <Upload size={15} /> {t('Upload')}
-        </button>
+        {section !== 'trash' && (
+          <button ref={newBtn} className="primary-btn hide-mobile" onClick={() => deskNew.openFrom(newBtn)} aria-haspopup="menu">
+            <Plus size={15} /> {t('New')}
+          </button>
+        )}
       </header>
 
       <div className="drive-scroll" key={`${section}:${folderId}:${layout}`}>
@@ -357,9 +366,10 @@ export function DriveView(props: Props) {
 
         {shown.length === 0 ? (
           <EmptyState
-            icon={section === 'trash' ? '✓' : '+'}
+            icon={q ? <Search size={22} /> : section === 'trash' ? <Trash2 size={22} /> : <Upload size={22} />}
             title={q ? t('No files found') : section === 'trash' ? t('Trash is empty') : t('Nothing here yet')}
-            text={q ? t('Nothing matches “{q}”.', { q: query.trim() }) : section === 'trash' ? '' : t('Drag files here or press Upload.')}
+            // Phones have no Upload button and no dragging: the + is how files get in there.
+            text={q ? t('Nothing matches “{q}”.', { q: query.trim() }) : section === 'trash' ? '' : phone ? t('Tap + to add files.') : t('Drag files here or press Upload.')}
           />
         ) : layout === 'list' ? (
           <div className="d-table">
@@ -437,6 +447,17 @@ export function DriveView(props: Props) {
           <span>{section === 'my' && crumbs.length ? t('to {folder}', { folder: crumbs[crumbs.length - 1].name }) : t('to My Drive')}</span>
         </div>
       )}
+      {deskNew.menu}
+      {naming && (
+        <NameSheet
+          title={naming.kind === 'new' ? t('New folder') : t('Rename')}
+          initial={naming.kind === 'new' ? t('Untitled folder') : naming.item.name}
+          done={naming.kind === 'new' ? t('Create') : t('Save')}
+          onDone={(n) => (naming.kind === 'new' ? props.onMakeFolder?.(n) : props.onRename(naming.item.id, n))}
+          onClose={() => setNaming(null)}
+        />
+      )}
+      {moving && <MoveSheet item={moving} items={items} onMove={(parentId) => props.onMove?.(moving.id, parentId)} onClose={() => setMoving(null)} />}
     </section>
   );
 }

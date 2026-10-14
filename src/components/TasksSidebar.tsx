@@ -1,7 +1,7 @@
 import { ProjectBadge } from './ProjectBadge';
 import { useState } from 'react';
 import { PROJECT_TYPES, term } from '../terms';
-import { Archive, CalendarRange, Eye, FileText, Inbox, LayoutGrid, Layers, Plus, Send, Sparkles, Building2, Sun, Users } from 'lucide-react';
+import { Archive, CalendarRange, Eye, FileText, CircleCheck, LayoutGrid, Layers, Plus, Send, Sparkles, Building2, Sun, Users } from 'lucide-react';
 import type { Client, Team, Todo } from '../types';
 import { doers, isBrief, type TaskScope } from './TasksView';
 import { kindOf } from '../stages';
@@ -61,7 +61,7 @@ export function TasksSidebar({ scope, tasks, clients: allClients, teams: allTeam
       <nav className="nav">
         {(
           [
-            [{ kind: 'mine' }, Inbox, t('My tasks'), 0],
+            [{ kind: 'mine' }, CircleCheck, t('My tasks'), 0], // not Inbox: in Todoist that's where unfiled tasks land, which this isn't
             [{ kind: 'today' }, Sun, t('Today'), open.filter((x) => doers(x).includes(me) && urgent(x)).length],
             [{ kind: 'upcoming' }, CalendarRange, t('Upcoming'), 0],
             [{ kind: 'supervising' }, Eye, t('Supervising'), open.filter((x) => x.supervisorId === me && kindOf(x) === 'review').length],
