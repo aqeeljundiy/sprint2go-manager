@@ -18,8 +18,8 @@
 @media (max-width: 767px) {
   /* The bar's room at the bottom: gone on focused screens (.bar-away), the keyboard's height while typing. */
   :root {
-    --bar-space: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
-    --fab-space: 88px;
+    --bar-space: calc(var(--tabbar-h) + var(--bar-bottom));
+    --fab-space: 96px;
   }
   :root.bar-away,
   :root.no-app-bar {
@@ -543,24 +543,31 @@
 
   /* ---------- Bottom bar (Teams' plain bar, Gmail's pill behind the selected icon) ---------- */
 
+  /* A floating pill: inset from the sides, on the home indicator's line, corners following the screen's. Content
+     scrolls behind it (lists keep --fab-space at their end), so it reads as part of the page, not a strip. */
   .tabbar {
     position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    left: var(--bar-inset);
+    right: var(--bar-inset);
+    bottom: var(--bar-bottom);
     z-index: 35;
     display: block;
-    height: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
-    padding: 0 0 env(safe-area-inset-bottom);
-    background: var(--surface);
-    border-top: 1px solid var(--line);
+    height: var(--tabbar-h);
+    padding: 0;
+    border-radius: var(--bar-r);
+    background: color-mix(in srgb, var(--surface) 92%, transparent);
+    -webkit-backdrop-filter: saturate(1.6) blur(18px);
+    backdrop-filter: saturate(1.6) blur(18px);
+    border: 1px solid var(--line);
+    box-shadow: 0 8px 24px -10px rgba(16, 24, 40, 0.22), 0 2px 6px -2px rgba(16, 24, 40, 0.08);
+    overflow: hidden;
     transition:
       transform 0.24s var(--ease),
       opacity 0.2s ease-out;
   }
   /* A focused screen or the keyboard: the bar steps down out of the way. */
   .bar-away .tabbar {
-    transform: translateY(100%);
+    transform: translateY(calc(100% + var(--bar-bottom)));
     opacity: 0;
     pointer-events: none;
     transition:

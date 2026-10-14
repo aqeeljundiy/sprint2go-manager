@@ -1842,7 +1842,7 @@ body.resizing-x .pane-resize::after {
     padding-top: max(12px, env(safe-area-inset-top));
   }
   .ev-detail {
-    bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+    bottom: calc(var(--tabbar-h) + var(--bar-bottom));
   }
   .modal-scrim {
     place-items: end stretch;
@@ -4069,7 +4069,7 @@ fieldset.plain:disabled {
 
 @media (max-width: 767px) {
   .ai-panel {
-    inset: 0 0 calc(var(--tabbar-h) + env(safe-area-inset-bottom)) 0;
+    inset: 0 0 calc(var(--tabbar-h) + var(--bar-bottom)) 0;
     width: auto;
     border-radius: 0;
     border: 0;
