@@ -2,7 +2,7 @@ import { ProjectBadge } from './ProjectBadge';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { SmoothHeight } from './ui/Smooth';
 import { term } from '../terms';
-import { AlertTriangle, ArrowDown, ArrowRight, ArrowUp, CalendarDays, Check, ChevronRight, FileText, FlaskConical, GripVertical, Hash, Inbox, LayoutGrid, ListChecks, Maximize2, Menu, Mic, Minimize2, PartyPopper, Plus, Settings2, Sparkles, Users, Video, X, Search, Megaphone } from 'lucide-react';
+import { AlertTriangle, ArrowDown, ArrowRight, ArrowUp, CalendarDays, Check, ChevronRight, FileText, FlaskConical, GripVertical, Hash, Inbox, LayoutGrid, ListChecks, Menu, Mic, PartyPopper, Plus, Settings2, Sparkles, Users, Video, X, Search, Megaphone } from 'lucide-react';
 import type { CalEvent, Client, HomeTemplateId, Meeting, Notice, Team, Thread, Todo, User } from '../types';
 import { fmtDay, fmtTime, fmtWeekday, fmtWeekdayLong } from '../i18n/format';
 import { mark, t, textOf, tn, tx } from '../i18n';
@@ -42,10 +42,29 @@ type CardId =
   | 'clients'
   | 'wins';
 type Size = 'm' | 'l';
+/** A card's height: as tall as its content, a short scrolling box, or a tall one. */
+type Height = 'auto' | 'short' | 'tall';
+interface HomeCard {
+  id: CardId;
+  size: Size; // older layouts: 'l' wide, 'm' normal (still read when `w` isn't set)
+  w?: number; // columns of 12 it spans
+  h?: Height;
+}
 interface Layout {
   template: HomeTemplateId;
-  cards: { id: CardId; size: Size }[];
+  cards: HomeCard[];
 }
+/** Widths a card snaps to, in columns of 12. */
+const WIDTHS: { w: number; label: string }[] = [
+  { w: 3, label: '¼' },
+  { w: 4, label: '⅓' },
+  { w: 6, label: '½' },
+  { w: 8, label: '⅔' },
+  { w: 9, label: '¾' },
+  { w: 12, label: mark('Full') },
+];
+const widthOf = (c: HomeCard) => c.w ?? (c.size === 'l' ? 8 : 4);
+const snapWidth = (cols: number) => WIDTHS.reduce((best, x) => (Math.abs(x.w - cols) < Math.abs(best - cols) ? x.w : best), 12);
 
 /** A name and a hint, read in the person's language each time they're shown (mark() lets the check find the words). */
 const named = (name: string, hint: string) => ({
@@ -183,6 +202,10 @@ export function HomeView(p: Props) {
   const [dump, setDump] = useState('');
   const [editing, setEditing] = useState(false);
   const [dragId, setDragId] = useState<CardId | null>(null);
+  // Resizing a card by its right edge (Customise): the width it would get, snapped to the columns, while dragging.
+  const [resizing, setResizing] = useState<{ id: CardId; w: number } | null>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const resizeDown = useRef(false);
   const [saved, setSaved] = usePersisted<Layout | null>(`s2g-home:${p.me.id}:${p.workspaceId}`, null);
   const layout = saved ?? fromTemplate(guessTemplate(p));
   const setLayout = (l: Layout) => setSaved(l);
@@ -705,6 +728,36 @@ export function HomeView(p: Props) {
 
   const visible = layout.cards.filter((c) => cards[c.id] && cards[c.id].show !== false);
   const missing = (Object.keys(CARD_INFO) as CardId[]).filter((id) => !layout.cards.some((c) => c.id === id) && cards[id].show !== false);
+  /** Drag a card's right edge: its width follows the pointer in columns of 12 and snaps to ¼, ⅓, ½, ⅔, ¾ or full. */
+  const startResize = (e: React.PointerEvent, c: HomeCard) => {
+    const grid = gridRef.current;
+    const el = (e.currentTarget as HTMLElement).parentElement;
+    if (!grid || !el) return;
+    e.preventDefault();
+    e.stopPropagation();
+    resizeDown.current = true;
+    const gap = parseFloat(getComputedStyle(grid).columnGap) || 0;
+    const col = (grid.clientWidth - gap * 11) / 12;
+    const left = el.getBoundingClientRect().left;
+    let w = widthOf(c);
+    setResizing({ id: c.id, w });
+    const moveTo = (ev: PointerEvent) => {
+      const cols = Math.max(1, Math.min(12, Math.round((ev.clientX - left + gap) / (col + gap))));
+      const next = snapWidth(cols);
+      if (next !== w) setResizing({ id: c.id, w: (w = next) });
+    };
+    const done = () => {
+      window.removeEventListener('pointermove', moveTo);
+      window.removeEventListener('pointerup', done);
+      window.removeEventListener('pointercancel', done);
+      resizeDown.current = false;
+      setResizing(null);
+      setLayout({ ...layout, cards: layout.cards.map((x) => (x.id === c.id ? { ...x, w } : x)) });
+    };
+    window.addEventListener('pointermove', moveTo);
+    window.addEventListener('pointerup', done);
+    window.addEventListener('pointercancel', done);
+  };
   const move = (id: CardId, to: number) => {
     const list = [...layout.cards];
     const from = list.findIndex((c) => c.id === id);
@@ -931,7 +984,7 @@ export function HomeView(p: Props) {
               <Select<CardId>
                 value={null}
                 options={missing.map((id) => ({ value: id, label: CARD_INFO[id].name, hint: CARD_INFO[id].hint, icon: <Plus size={14} /> }))}
-                onChange={(id) => setLayout({ ...layout, cards: [...layout.cards, { id, size: 'm' }] })}
+                onChange={(id) => setLayout({ ...layout, cards: [...layout.cards, { id, size: 'm', w: 4 }] })}
                 placeholder={missing.length ? t('Add a card') : t('All cards added')}
                 disabled={!missing.length}
                 label={t('Add a card')}
@@ -941,7 +994,7 @@ export function HomeView(p: Props) {
                 {t('Reset')}
               </button>
             </div>
-            <p className="muted small">{t('Drag cards to reorder, or use the arrows. Make a card wide or narrow, or remove it. Only your Home changes.')}</p>
+            <p className="muted small">{t('Drag a card to move it. Drag its right edge, or pick a width and height on the card, to resize it. Only your Home changes.')}</p>
           </div>
         )}
         </SmoothHeight>
@@ -1015,16 +1068,21 @@ export function HomeView(p: Props) {
           )}
         </div>
 
-        <div className={`home-grid cards ${editing ? 'editing' : ''}`}>
+        <div ref={gridRef} className={`home-grid cards ${editing ? 'editing' : ''}`}>
           {visible.map((c, i) => {
             const card = cards[c.id];
             const info = CARD_INFO[c.id];
+            const w = resizing?.id === c.id ? resizing.w : widthOf(c);
+            const patch = (x: Partial<HomeCard>) => setLayout({ ...layout, cards: layout.cards.map((y) => (y.id === c.id ? { ...y, ...x } : y)) });
             return (
               <div
                 key={c.id}
-                className={`side-card home-card ${c.size === 'l' ? 'wide' : ''} ${dragId === c.id ? 'dragging' : ''}`}
-                draggable={editing}
+                className={`side-card home-card w${w} h-${c.h ?? 'auto'} ${dragId === c.id ? 'dragging' : ''} ${resizing?.id === c.id ? 'resizing' : ''}`}
+                style={{ gridColumn: `span ${w}` }}
+                draggable={editing && !resizing}
                 onDragStart={(e) => {
+                  // A drag that starts on the edge handle resizes; it never moves the card.
+                  if (resizeDown.current) return e.preventDefault();
                   setDragId(c.id);
                   e.dataTransfer.effectAllowed = 'move';
                 }}
@@ -1048,20 +1106,42 @@ export function HomeView(p: Props) {
                       <button className="icon-btn sm phone-only" onClick={() => move(c.id, i + 1)} disabled={i === visible.length - 1} aria-label={t('Move down')}>
                         <ArrowDown size={14} />
                       </button>
-                      <button
-                        className="icon-btn sm hide-phone"
-                        onClick={() => setLayout({ ...layout, cards: layout.cards.map((x) => (x.id === c.id ? { ...x, size: x.size === 'l' ? 'm' : 'l' } : x)) })}
-                        title={c.size === 'l' ? t('Make narrow') : t('Make wide')}
-                      >
-                        {c.size === 'l' ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
-                      </button>
-                      <button className="icon-btn sm" onClick={() => setLayout({ ...layout, cards: layout.cards.filter((x) => x.id !== c.id) })} title={t('Remove card')}>
+                      <button className="icon-btn sm" onClick={() => setLayout({ ...layout, cards: layout.cards.filter((x) => x.id !== c.id) })} title={t('Remove card')} aria-label={t('Remove {card}', { card: info.name })}>
                         <X size={14} />
                       </button>
                     </span>
                   )}
                 </h3>
+                <div className={`fold${editing ? ' open' : ''} hide-phone`}>
+                  <div>
+                    <div className="card-size" role="group" aria-label={t('Size of {card}', { card: info.name })}>
+                      <span className="seg-mini" role="radiogroup" aria-label={t('Width')}>
+                        {WIDTHS.map((x) => (
+                          <button key={x.w} type="button" role="radio" aria-checked={w === x.w} className={w === x.w ? 'on' : ''} onClick={() => patch({ w: x.w })} title={t('{n} of 12 columns', { n: x.w })}>
+                            {x.w === 12 ? t(x.label) : x.label}
+                          </button>
+                        ))}
+                      </span>
+                      <span className="seg-mini" role="radiogroup" aria-label={t('Height')}>
+                        {(['auto', 'short', 'tall'] as const).map((h) => (
+                          <button key={h} type="button" role="radio" aria-checked={(c.h ?? 'auto') === h} className={(c.h ?? 'auto') === h ? 'on' : ''} onClick={() => patch({ h })}>
+                            {h === 'auto' ? t('Fit') : h === 'short' ? t('Short') : t('Tall')}
+                          </button>
+                        ))}
+                      </span>
+                    </div>
+                  </div>
+                </div>
                 <div className={editing ? 'card-body dim' : 'card-body'}>{card.body()}</div>
+                {editing && (
+                  <span
+                    className="card-resize hide-phone"
+                    role="separator"
+                    aria-orientation="vertical"
+                    aria-label={t('Drag to resize {card}', { card: info.name })}
+                    onPointerDown={(e) => startResize(e, c)}
+                  />
+                )}
               </div>
             );
           })}

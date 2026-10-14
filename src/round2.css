@@ -714,18 +714,111 @@ button.cell:hover {
   background: var(--accent);
   color: #fff;
 }
+/* Home's cards on 12 columns: each card spans its own width (HomeView WIDTHS), set inline. Narrow screens widen the
+   small ones so nothing gets cramped: below 1180 px a quarter or third takes half, below 760 px everything is full. */
 .home-grid.cards {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(12, minmax(0, 1fr));
   margin-top: 18px;
   align-items: start;
 }
-.home-grid.cards .home-card.wide {
-  grid-column: span 2;
+.home-card {
+  position: relative;
+  min-width: 0;
+  transition: box-shadow 0.2s var(--ease), outline-color 0.2s var(--ease);
+}
+.home-card.h-short .card-body {
+  max-height: 220px;
+  overflow: auto;
+}
+.home-card.h-tall .card-body {
+  min-height: 420px;
 }
 @media (max-width: 1180px) {
-  .home-grid.cards {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .home-grid.cards .home-card.w3,
+  .home-grid.cards .home-card.w4 {
+    grid-column: span 6 !important;
   }
+  .home-grid.cards .home-card.w8,
+  .home-grid.cards .home-card.w9 {
+    grid-column: span 12 !important;
+  }
+}
+@media (max-width: 760px) {
+  .home-grid.cards .home-card {
+    grid-column: 1 / -1 !important;
+  }
+}
+/* Resizing (Customise): a handle on the right edge, and the size picks under the title. */
+.card-resize {
+  position: absolute;
+  top: 12px;
+  bottom: 12px;
+  right: -7px;
+  width: 14px;
+  cursor: ew-resize;
+  touch-action: none;
+  z-index: 1;
+}
+.card-resize::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 5px;
+  width: 4px;
+  height: 36px;
+  margin-top: -18px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 45%, transparent);
+  transition: background 0.18s var(--ease), height 0.18s var(--ease), margin 0.18s var(--ease);
+}
+.card-resize:hover::after,
+.home-card.resizing .card-resize::after {
+  background: var(--accent);
+  height: 56px;
+  margin-top: -28px;
+}
+.home-card.resizing {
+  outline-color: var(--accent) !important;
+  outline-style: solid !important;
+}
+.card-size {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 16px 8px;
+}
+.seg-mini {
+  display: inline-flex;
+  padding: 2px;
+  gap: 2px;
+  border-radius: 999px;
+  background: var(--hover);
+}
+.seg-mini button {
+  border: 0;
+  background: transparent;
+  color: var(--text-2);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 30px;
+  height: 26px;
+  padding: 0 8px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.18s var(--ease), color 0.18s var(--ease);
+}
+.seg-mini button:hover {
+  color: var(--text);
+}
+.seg-mini button.on {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+/* The customise bar keeps the same gap to the search below it as to the header above it (it touched the search). */
+.home-edit {
+  margin-bottom: 16px;
 }
 .home-card .card-body {
   padding: 0 4px 6px;
