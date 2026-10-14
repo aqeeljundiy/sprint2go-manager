@@ -5324,6 +5324,11 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
           <ChatPages
             page={chatPage}
             phone={false}
+            notices={myNotices.filter((n) => n.link?.app === 'chat')}
+            otherNotices={myNotices.filter((n) => n.link?.app !== 'chat' && !n.read).length}
+            onOtherNotices={() => setNoticesOpen(true)}
+            onOpenNotice={openNotice}
+            onReadNotices={(ids, read) => setNotices((ns) => ns.map((n) => (ids.includes(n.id) ? { ...n, read } : n)))}
             channels={wsChannels}
             messages={wsMessages}
             users={members}

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { ArrowUp, BellOff, Bookmark, CheckCheck, Clock, Hash, Lock, MessagesSquare, MoreHorizontal, PenLine, RotateCcw, SendHorizontal, SkipForward, Trash2, Undo2, X, Handshake, Send } from 'lucide-react';
-import type { Channel, ChatMessage, User } from '../../types';
+import type { Channel, ChatMessage, Notice, User } from '../../types';
+import { ChatActivity } from './Activity';
 import { relative } from '../../utils';
 import { toast, toastUndo } from '../../toast';
 import { haptic, useLongPress } from '../ui/useLongPress';
@@ -36,15 +37,23 @@ export interface PagesProps {
   onSendNow: (id: string) => void;
   onReschedule: (id: string, at: string) => void;
   onDelete: (id: string) => void;
+  /** Activity (computers): chat's notices, as on the phone's Activity tab. */
+  notices?: Notice[];
+  otherNotices?: number;
+  onOtherNotices?: () => void;
+  onOpenNotice?: (n: Notice) => void;
+  onReadNotices?: (ids: string[], read: boolean) => void;
 }
 
 /** Catch up, Threads, Drafts and sent, Saved: full screen on phones, in the main area on wider screens. */
 export function ChatPages(p: PagesProps) {
   const chat = useChatState(p.me);
-  const title = TILE_NAMES[p.page];
+  const title = p.page === 'activity' ? t('Activity') : TILE_NAMES[p.page];
   const body = (
     <TabPane key={p.page}>
-      {p.page === 'catchup' ? <CatchUp {...p} chat={chat} /> : p.page === 'threads' ? <Threads {...p} chat={chat} /> : p.page === 'drafts' ? <DraftsSent {...p} chat={chat} /> : <Saved {...p} chat={chat} />}
+      {p.page === 'activity' ? (
+        <ChatActivity notices={p.notices ?? []} messages={p.messages} channels={p.channels} users={p.users} me={p.me} myFirst={p.myFirst} chat={chat} onOpen={(n) => p.onOpenNotice?.(n)} onRead={(ids, read) => p.onReadNotices?.(ids, read)} onFollow={p.onFollow} otherNew={p.otherNotices} onOthers={p.onOtherNotices} />
+      ) : p.page === 'catchup' ? <CatchUp {...p} chat={chat} /> : p.page === 'threads' ? <Threads {...p} chat={chat} /> : p.page === 'drafts' ? <DraftsSent {...p} chat={chat} /> : <Saved {...p} chat={chat} />}
     </TabPane>
   );
   // Phones: Catch up is its own full screen with a close X and the reply box at the bottom (Slack).
@@ -61,7 +70,7 @@ export function ChatPages(p: PagesProps) {
       <header className="chat-head">
         <div className="th-text">
           <h1>{title}</h1>
-          <p>{p.page === 'catchup' ? t('Unread conversations, one at a time') : p.page === 'threads' ? t('Threads you follow: ones you started, replied in, were mentioned in or chose to follow') : p.page === 'drafts' ? t('What you started writing, what waits to be sent, and what you sent') : t('Messages you saved, and their reminders')}</p>
+          <p>{p.page === 'activity' ? t('Mentions, replies and reactions to you') : p.page === 'catchup' ? t('Unread conversations, one at a time') : p.page === 'threads' ? t('Threads you follow: ones you started, replied in, were mentioned in or chose to follow') : p.page === 'drafts' ? t('What you started writing, what waits to be sent, and what you sent') : t('Messages you saved, and their reminders')}</p>
         </div>
         <button className="icon-btn sm" onClick={p.onClose} aria-label={t('Close')} title={t('Close')}>
           <X size={16} />

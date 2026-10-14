@@ -1,9 +1,11 @@
 import { useRef, useState, type ReactNode } from 'react';
 import { useActionMenu } from './ui/ActionSheet';
+import { usePersisted } from '../settings';
 import { term } from '../terms';
 import {
   Activity,
   Archive,
+  ChevronRight,
   Mails,
   MailOpen,
   FileText,
@@ -135,6 +137,8 @@ interface Props {
 export function Sidebar(props: Props) {
   const { mode, collapsed, view, counts, open } = props;
   const isActive = (v: View) => mode === 'mail' && v.kind === view.kind && v.id === view.id;
+  const [moreStored, setMoreOpen] = usePersisted<boolean>('s2g-mail-more', false);
+  const moreOpen = moreStored || (['tracking', 'todos', 'contacts', 'files'] as string[]).includes(view.kind);
   // Right-click a folder: open it, or mark everything in it read (with Undo).
   const [folderHit, setFolderHit] = useState<FolderId | null>(null);
   const folderMenu = useActionMenu(() =>
@@ -240,6 +244,11 @@ export function Sidebar(props: Props) {
                   {folderMenu.menu}
                 </nav>
 
+                {/* Gmail's "More": the extra views folded under the folders, so labels stay in reach. Open while one is in use. */}
+                <button type="button" className="nav-more-head sb-label" aria-expanded={moreOpen} onClick={() => setMoreOpen(!moreOpen)}>
+                  <ChevronRight size={14} className={`rot-chev${moreOpen ? ' open' : ''}`} /> {t('More')}
+                </button>
+                <div className={`fold${moreOpen ? ' open' : ''}`}>
                 <nav className="nav">
                   <button
                     className={`nav-item ${isActive({ kind: 'tracking', id: 'tracking' }) ? 'active' : ''}`}
@@ -271,6 +280,7 @@ export function Sidebar(props: Props) {
                   </button>
 
                 </nav>
+                </div>
                 {props.savedNav}
 
                 {props.labelNav}

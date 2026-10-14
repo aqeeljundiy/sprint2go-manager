@@ -826,6 +826,9 @@ const id: Record<string, string> = {
   "The summary couldn’t be written. Try again.": "Ringkasan tidak bisa ditulis. Coba lagi.",
   // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
   "Jump to recent": "Ke pesan terbaru",
+  // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
+  "Mentions and replies to you": "Sebutan dan balasan untuk Anda",
+  "Mentions, replies and reactions to you": "Sebutan, balasan, dan reaksi untuk Anda",
 };
 
 export default id;

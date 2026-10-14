@@ -1,5 +1,5 @@
 {
-    "updated":  "2026-10-14T22:57:53Z",
+    "updated":  "2026-10-14T23:04:36Z",
     "items":  [
                   {
                       "id":  "G1",
@@ -116,7 +116,7 @@
                       "title":  "Own persona, not copied. Look like the landing page / elkiya.com / elkiyagroup.com",
                       "detail":  "Raw: Settings feels copied from Apple settings. No persona yet. Brand consistent across the whole app, like the landing page or Elkiya.",
                       "priority":  "high",
-                      "status":  "doing"
+                      "status":  "done"
                   },
                   {
                       "id":  "R2",
@@ -206,7 +206,7 @@
                       "title":  "Five audit rounds, 15+ items each, UX/UI first",
                       "detail":  "Raw: audit, 15-20 backlog items, fix, audit again, five times (75+). Customer-centric, UX/UI first, features second. Question every placement against common habits on phone and desktop. Open to removing features nobody uses.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "R13",
@@ -224,7 +224,7 @@
                       "title":  "Phone should feel as clean as desktop",
                       "detail":  "Raw: desktop UI is pretty clean but the phone doesn\u0027t reflect its similarities.",
                       "priority":  "high",
-                      "status":  "doing"
+                      "status":  "done"
                   },
                   {
                       "id":  "R12",
@@ -925,6 +925,114 @@
                       "area":  "Mail",
                       "title":  "Amazon SES costs (R8)",
                       "detail":  "docs/SES-COSTS.md: about $0.10 per 1,000 emails; the risk is reputation, not price.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "E1",
+                      "round":  "Audit 5",
+                      "area":  "Phone",
+                      "title":  "Create button slides away while scrolling down",
+                      "detail":  "It sat on rows\u0027 own controls at rest (Material\u0027s rule; Compose still shrinks).",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "E2",
+                      "round":  "Audit 5",
+                      "area":  "Meet",
+                      "title":  "Phone tab \"Past\", not \"Notes\"",
+                      "detail":  "Clashed with the Notes app.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "E3",
+                      "round":  "Audit 5",
+                      "area":  "Drive",
+                      "title":  "No repeated Upload/New in the header",
+                      "detail":  "The sidebar has Upload and New folder; the header copy from round 3 was a duplicate.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "E4",
+                      "round":  "Audit 5",
+                      "area":  "Calendar",
+                      "title":  "One New event button",
+                      "detail":  "Sidebar\u0027s (and C); the header copy is gone.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "E5",
+                      "round":  "Audit 5",
+                      "area":  "Meet",
+                      "title":  "One Send notetaker button; no static subtitle",
+                      "detail":  "Sidebar\u0027s; the header copy is gone.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "E6",
+                      "round":  "Audit 5",
+                      "area":  "Mail",
+                      "title":  "\"More\" folds Waiting for reply, To-do, Contacts, Files",
+                      "detail":  "Gmail\u0027s More; labels stay in reach. Opens itself while one is in use.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "E7",
+                      "round":  "Audit 5",
+                      "area":  "Mail",
+                      "title":  "Quick replies only when there\u0027s no draft",
+                      "detail":  "Two ways to reply side by side was noise.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "E8",
+                      "round":  "Audit 5",
+                      "area":  "Vault",
+                      "title":  "No static tagline in the header",
+                      "detail":  "Screens say what to do, not what they are.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "E9",
+                      "round":  "Audit 5",
+                      "area":  "Chat",
+                      "title":  "Activity on computers",
+                      "detail":  "Mentions and replies to you, first in Chat\u0027s sidebar (Slack\u0027s Activity); was phone-only.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "E10",
+                      "round":  "Audit 5",
+                      "area":  "Everywhere",
+                      "title":  "Dark mode checked after the white theme",
+                      "detail":  "Settings, Home and Mail read well in dark.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "E11",
+                      "round":  "Audit 5",
+                      "area":  "Everywhere",
+                      "title":  "Primary buttons counted on every app",
+                      "detail":  "Mail, Projects, Teams, Notes, Drive, Calendar, Meet, Vault: one each now (Tasks and Tables keep two different actions).",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "E12",
+                      "round":  "Audit 5",
+                      "area":  "Tables",
+                      "title":  "Kept \"New row\" (not Notion\u0027s \"New\")",
+                      "detail":  "Clearer for people who don\u0027t know databases: a deliberate no.",
                       "priority":  "high",
                       "status":  "done"
                   }

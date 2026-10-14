@@ -416,7 +416,6 @@ export function VaultView({
       <header className="tracking-head tasks-head">
         <div className="th-text">
           <h1>{filter === '' ? t('All logins') : filter === 'company' ? t('Company logins') : (clients.find((c) => c.id === filter)?.name ?? t('Logins'))}</h1>
-          <p>{t('Shared logins and 2FA codes, only for the people you choose')}</p>
         </div>
         {priv && items.some((it) => it.meta.keys?.[me]) && (
           <button className="ghost-btn sm" title={t('Give everyone who may open a login the key to it (after they set up their Vault, or lost their passphrase)')} onClick={() => void reshareAll()}>

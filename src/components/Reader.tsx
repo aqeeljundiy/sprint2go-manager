@@ -618,7 +618,8 @@ export function Reader(props: Props) {
     );
   };
 
-  const quick = canReply && (
+  // Quick replies only while nothing's being written (Gmail shows them on a fresh email, not beside a draft).
+  const quick = canReply && !draft && (
     <div className="smart-replies">
       <span>
         <Sparkles size={13} /> {t('Quick replies')}

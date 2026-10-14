@@ -35,7 +35,7 @@ import { fmtNumber } from '../i18n/format';
 
 export type Presence = 'active' | 'away' | 'meeting';
 /** Pages of Chat besides the conversations: shown in the main area on wider screens, pushed full screen on phones. */
-export type ChatPage = 'catchup' | 'threads' | 'drafts' | 'saved';
+export type ChatPage = 'catchup' | 'threads' | 'drafts' | 'saved' | 'activity';
 
 
 
@@ -405,7 +405,11 @@ export function ChatSidebar(p: SidebarProps) {
   const subChannel = p.channels.find((c) => c.id === rowSub?.id);
 
   const counts: Partial<Record<ChatPage, number>> = { catchup: unreadConvos.length, threads: newReplies };
-  const pages: { id: ChatPage; label: string; icon: ReactNode; line: string; n: number }[] = (['catchup', 'threads', 'drafts', 'saved'] as const).map((id) => ({ id, label: TILE_NAMES[id], icon: tileState[id].icon, line: tileState[id].line, n: counts[id] ?? 0 }));
+  const pages: { id: ChatPage; label: string; icon: ReactNode; line: string; n: number }[] = [
+    // Activity first on computers too (Slack's left rail): mentions and replies to you, in one place.
+    { id: 'activity', label: t('Activity'), icon: <Bell size={18} />, line: t('Mentions and replies to you'), n: (p.notices ?? []).filter((n) => !n.read).length },
+    ...(['catchup', 'threads', 'drafts', 'saved'] as const).map((id) => ({ id, label: TILE_NAMES[id], icon: tileState[id].icon, line: tileState[id].line, n: counts[id] ?? 0 })),
+  ];
 
   return (
     <>

@@ -4223,3 +4223,28 @@ fieldset.plain:disabled {
     display: none;
   }
 }
+
+/* Mail sidebar: "More" folds the extra views (Sidebar.tsx). Looks like a section label, works like a disclosure. */
+.nav-more-head {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  margin: 12px 0 2px;
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--text-3);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.16s var(--ease), background 0.16s var(--ease);
+}
+.nav-more-head:hover {
+  color: var(--text);
+  background: var(--hover);
+}
