@@ -183,10 +183,10 @@ export function TaskViews({
       openAdd({}, 'later');
     }
   }, [addKey]); // eslint-disable-line react-hooks/exhaustive-deps
-  // N: new task (desktop).
+  // N or Q: new task (desktop). Q is Todoist's quick add, for people coming from it.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if ((e.key !== 'n' && e.key !== 'N') || e.metaKey || e.ctrlKey || e.altKey || e.defaultPrevented) return;
+      if (!['n', 'N', 'q', 'Q'].includes(e.key) || e.metaKey || e.ctrlKey || e.altKey || e.defaultPrevented) return;
       if ((document.activeElement as HTMLElement | null)?.closest('input, textarea, select, [contenteditable]')) return;
       if (document.querySelector('.modal-scrim:not(.is-leaving), .palette-scrim:not(.is-leaving), .pop:not(.is-leaving), .sheet-scrim:not(.is-leaving)')) return;
       e.preventDefault();

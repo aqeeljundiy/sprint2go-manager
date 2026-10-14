@@ -104,6 +104,8 @@ const id: Record<string, string> = {
   PDF: 'PDF',
   Slides: 'Slide',
   Spreadsheet: 'Spreadsheet',
+  // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
+  "Tap + to add files.": "Ketuk + untuk menambah file.",
 };
 
 export default id;

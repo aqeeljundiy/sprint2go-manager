@@ -1,5 +1,6 @@
 import { Fragment, useMemo, useRef, useState, type ReactNode } from 'react';
-import { BarChart3, Bookmark, FileText, Forward, Image as ImageIcon, ListChecks, MessageSquareReply, MoreHorizontal, Pause, Play, RotateCw, SmilePlus, Sparkles, SquareCheck, Table2, Video } from 'lucide-react';
+import { BarChart3, Bookmark, FileText, Forward, Image as ImageIcon, MessageSquareReply, MoreHorizontal, Pause, Play, RotateCw, SmilePlus, Sparkles, SquareCheck, Table2, Video } from 'lucide-react';
+import { QUICK } from './Sheets';
 import type { Channel, ChatMessage, Client, Status, Todo, User } from '../../types';
 import { relative } from '../../utils';
 import { companyOf } from '../../clientView';
@@ -395,6 +396,13 @@ export function Msg({ m, grouped, inThread = false, ctx }: { m: ChatMessage; gro
       </div>
       {!ctx.phone && (
         <div className="cm-tools">
+          {/* Slack's hover bar: three one-click reactions first, then react, thread, save, more ("Make a task" is in More). */}
+          {!ctx.guest &&
+            QUICK.slice(0, 3).map((e) => (
+              <button key={e} className="cm-quick" title={t('React {emoji}', { emoji: e })} aria-label={t('React {emoji}', { emoji: e })} onClick={() => ctx.onReact(m.id, e)}>
+                {e}
+              </button>
+            ))}
           {!ctx.guest && (
             <button title={t('React')} aria-label={t('React')} onClick={(e) => ctx.onReactPick(m, e.currentTarget)}>
               <SmilePlus size={15} />
@@ -403,11 +411,6 @@ export function Msg({ m, grouped, inThread = false, ctx }: { m: ChatMessage; gro
           {!inThread && (
             <button title={t('Reply in thread')} aria-label={t('Reply in thread')} onClick={() => ctx.onOpenThread(m.id)}>
               <MessageSquareReply size={15} />
-            </button>
-          )}
-          {!ctx.guest && !task && m.kind !== 'kudos' && m.text && (
-            <button title={t('Make a task')} aria-label={t('Make a task')} onClick={() => ctx.onMakeTask(m)}>
-              <ListChecks size={15} />
             </button>
           )}
           {!ctx.guest && (

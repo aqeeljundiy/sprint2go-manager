@@ -92,6 +92,8 @@ export function TableScreen(p: ScreenProps) {
   const tabAnchor = useRef<HTMLElement | null>(null);
   const addViewAnchor = useRef<HTMLElement | null>(null);
   const [name, setName] = useState(tb.name);
+  const badgeRef = useRef<HTMLButtonElement>(null);
+  const [colorsOpen, setColorsOpen] = useState(false);
   const [renamingView, setRenamingView] = useState('');
   const [autoOpen, setAutoOpen] = useState(false);
   const [buttonFor, setButtonFor] = useState<string | null>(null);
@@ -629,9 +631,17 @@ export function TableScreen(p: ScreenProps) {
           <button className="icon-btn menu-btn" onClick={p.onMenu} aria-label={t('Open menu')}>
             <Menu size={18} />
           </button>
-          <button type="button" className="client-badge tb-badge" style={{ background: tb.color }} title={g || !structure ? tb.name : t('Change colour')} disabled={!!g || !structure} onClick={() => patchTable({ color: TABLE_COLORS[(TABLE_COLORS.indexOf(tb.color) + 1) % TABLE_COLORS.length] })}>
+          {/* The badge opens the colours to pick from (it used to jump to the next colour on each click, which read as a bug). */}
+          <button ref={badgeRef} type="button" className="client-badge tb-badge" style={{ background: tb.color }} title={g || !structure ? tb.name : t('Change colour')} disabled={!!g || !structure} onClick={() => setColorsOpen(true)} aria-haspopup="dialog">
             {tb.name.charAt(0).toUpperCase()}
           </button>
+          <Popover anchor={badgeRef} open={colorsOpen} onClose={() => setColorsOpen(false)} title={t('Table colour')} width={220}>
+            <div className="tb-colors">
+              {TABLE_COLORS.map((c) => (
+                <button key={c} type="button" className={`swatch${tb.color === c ? ' on' : ''}`} style={{ background: c }} aria-label={t('Colour {color}', { color: c })} aria-pressed={tb.color === c} onClick={() => (patchTable({ color: c }), setColorsOpen(false))} />
+              ))}
+            </div>
+          </Popover>
           <div className="th-text">
             <input className="tb-title" value={name} readOnly={!!g || !structure} aria-label={t('Table name')} onChange={(e) => setName(e.target.value)} onBlur={() => (name.trim() ? name.trim() !== tb.name && patchTable({ name: name.trim() }) : setName(tb.name))} onKeyDown={(e) => e.key === 'Enter' && (e.target as HTMLInputElement).blur()} />
             {g || !structure ? tb.description && <span className="muted small tb-desc">{tb.description}</span> : <ProjectPicker value={tb.clientId ?? ''} onChange={(v) => patchTable({ clientId: v || undefined })} projects={p.clients} none={t('Whole company')} label={t('Belongs to')} className="sel-flat" />}

@@ -168,6 +168,11 @@ const id: Record<string, string> = {
   // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
   "Passwords are kept on the {product} server, never in the browser. Sign in to your company to open the Vault.": "Kata sandi disimpan di server {product}, tidak pernah di browser. Masuk ke perusahaan Anda untuk membuka Vault.",
   "The Vault isn’t available here": "Vault tidak tersedia di sini",
+  // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
+  "Lock the Vault: your passphrase is needed to open it again": "Kunci Vault: kata sandi utama Anda diperlukan untuk membukanya lagi",
+  "Lock": "Kunci",
+  "Logins are kept encrypted. Copying one is logged, and the clipboard clears after 30 seconds.": "Login disimpan terenkripsi. Setiap penyalinan dicatat, dan papan klip dikosongkan setelah 30 detik.",
+  "Re-save to encrypt": "Simpan ulang untuk mengenkripsi",
 };
 
 export default id;

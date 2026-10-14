@@ -170,6 +170,11 @@ const id: Record<string, string> = {
   'Previous 30 days': '30 hari sebelumnya',
   'No more text': 'Tidak ada teks lain',
   'Undo (hold to redo)': 'Urungkan (tahan untuk mengulang)',
+  // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
+  "Give it a title, then write.": "Beri judul, lalu mulai menulis.",
+  "No notes in this view": "Tidak ada catatan di tampilan ini",
+  "Show all notes": "Tampilkan semua catatan",
+  "Tap the pen to write one.": "Ketuk pena untuk menulis catatan.",
 };
 
 export default id;

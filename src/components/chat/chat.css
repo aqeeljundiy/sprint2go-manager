@@ -1567,3 +1567,18 @@
     animation: none;
   }
 }
+/* One-click reactions at the front of a message's hover bar (Slack's three most-used). */
+.cm-tools .cm-quick {
+  font-size: 15px;
+  line-height: 1;
+  filter: saturate(0.95);
+  transition: transform 0.15s var(--ease), background 0.15s var(--ease);
+}
+.cm-tools .cm-quick:hover {
+  transform: scale(1.12);
+}
+@media (prefers-reduced-motion: reduce) {
+  .cm-tools .cm-quick:hover {
+    transform: none;
+  }
+}

@@ -642,6 +642,13 @@ const id: Record<string, string> = {
   "Nothing assigned to you": "Tidak ada yang ditugaskan ke Anda",
   "Nothing needs your reply": "Tidak ada yang perlu Anda balas",
   "Turn off inbox tabs": "Matikan tab kotak masuk",
+  // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
+  "Add an email address": "Tambah alamat email",
+  "Archive (E)": "Arsipkan (E)",
+  "Made in seconds, deleted by itself": "Dibuat dalam hitungan detik, terhapus sendiri",
+  "Open {folder}": "Buka {folder}",
+  "{n} inboxes": "{n} kotak masuk",
+  "{n} inbox": "{n} kotak masuk",
 };
 
 export default id;

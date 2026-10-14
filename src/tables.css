@@ -3821,3 +3821,11 @@
 .tb-pane:has(> .tb-bulkbar:not(.phone)) .tb-list {
   padding-bottom: 88px;
 }
+
+/* A table's colour picker (the badge in its header). */
+.tb-colors {
+  display: grid;
+  grid-template-columns: repeat(5, 28px);
+  gap: 8px;
+  padding: 4px;
+}

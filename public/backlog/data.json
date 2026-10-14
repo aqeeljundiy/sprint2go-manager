@@ -1,5 +1,5 @@
 {
-    "updated":  "2026-10-14T22:36:40Z",
+    "updated":  "2026-10-14T22:48:03Z",
     "items":  [
                   {
                       "id":  "G1",
@@ -132,9 +132,9 @@
                       "round":  "Inbox",
                       "area":  "Research",
                       "title":  "Research each app against its reference",
-                      "detail":  "Raw: Mail = Gmail/Proton UI, Chat = Slack + Discord, Tasks = Todoist, Calendar = Google Calendar, Projects = ?, Meet = Read AI, Drive = Google Drive, Notes = notes, Tables = Notion database, Teams = team management, Vault = passwords, Settings = settings.",
+                      "detail":  "Raw: Mail = Gmail/Proton UI, Chat = Slack + Discord, Tasks = Todoist, Calendar = Google Calendar, Projects = ?, Meet = Read AI, Drive = Google Drive, Notes = notes, Tables = Notion database, Teams = team management, Vault = passwords, Settings = settings. Round 3 compared every app with its reference; 60+ findings. Projects: Basecamp recommended (built for agencies with clients).",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "doing"
                   },
                   {
                       "id":  "R4",
@@ -612,6 +612,177 @@
                       "detail":  "Seen tonight: with two windows open as the same person, opening a draft in one opened the same compose and folder in the other. Not reproducible with one window; needs a second window to trace (look at live sync of threads and any draft/compose state).",
                       "priority":  "medium",
                       "status":  "todo"
+                  },
+                  {
+                      "id":  "C2",
+                      "round":  "Audit 3",
+                      "area":  "Mail",
+                      "title":  "Archive, not Done (Gmail and Proton\u0027s word and icon)",
+                      "detail":  "Hover, bulk bar, phone bar, reader, swipes, shortcut sheet, toasts. Reverses A12: you named Gmail as the reference.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "C3",
+                      "round":  "Audit 3",
+                      "area":  "Mail",
+                      "title":  "Hover actions in Gmail\u0027s order, with Read/Unread",
+                      "detail":  "Archive, Delete, Read/Unread, Snooze.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "C4",
+                      "round":  "Audit 3",
+                      "area":  "Mail",
+                      "title":  "Swipes archive both ways by default",
+                      "detail":  "Gmail\u0027s default; snooze stays a choice in Settings.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "C5",
+                      "round":  "Audit 3",
+                      "area":  "Chat",
+                      "title":  "@mentions show in muted channels",
+                      "detail":  "Muting quiets chatter, not you (Slack, Discord).",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "C6",
+                      "round":  "Audit 3",
+                      "area":  "Chat",
+                      "title":  "Jump to recent",
+                      "detail":  "A pill above the composer when you\u0027re far up the history.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "C7",
+                      "round":  "Audit 3",
+                      "area":  "Chat",
+                      "title":  "One-click reactions on hover; Make a task moved to More",
+                      "detail":  "Slack\u0027s hover bar.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "C8",
+                      "round":  "Audit 3",
+                      "area":  "Tasks",
+                      "title":  "Undo after completing a task",
+                      "detail":  "Todoist\u0027s \"1 task completed · Undo\"; Undo restores the exact stage.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "C9",
+                      "round":  "Audit 3",
+                      "area":  "Tasks",
+                      "title":  "My tasks: no Inbox icon",
+                      "detail":  "In Todoist Inbox means unfiled tasks.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "C10",
+                      "round":  "Audit 3",
+                      "area":  "Tasks",
+                      "title":  "Q opens quick add",
+                      "detail":  "Todoist\u0027s shortcut, next to N.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "C11",
+                      "round":  "Audit 3",
+                      "area":  "Drive",
+                      "title":  "Desktop New menu (upload, new folder)",
+                      "detail":  "Desktop had no way to make a folder.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "C12",
+                      "round":  "Audit 3",
+                      "area":  "Drive",
+                      "title":  "Desktop right-click has share link, download, move",
+                      "detail":  "Same actions as the phone sheet.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "C13",
+                      "round":  "Audit 3",
+                      "area":  "Drive",
+                      "title":  "Empty Drive on phones says tap +",
+                      "detail":  "It said \"press Upload\", which phones don\u0027t have.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "C14",
+                      "round":  "Audit 3",
+                      "area":  "Meet",
+                      "title":  "Bot log only when a recording failed",
+                      "detail":  "Diagnostics out of sight (Read AI); in the meeting\u0027s menu otherwise.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "C15",
+                      "round":  "Audit 3",
+                      "area":  "Meet",
+                      "title":  "\"Action items\", one name",
+                      "detail":  "Was \"Tasks\" in one place and \"Action items\" in another.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "C16",
+                      "round":  "Audit 3",
+                      "area":  "Vault",
+                      "title":  "Lock button and auto-lock after 15 minutes idle",
+                      "detail":  "1Password and Bitwarden do.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "C17",
+                      "round":  "Audit 3",
+                      "area":  "Vault",
+                      "title":  "Honest encryption wording; chip only on logins needing re-save",
+                      "detail":  "The sidebar contradicted the end-to-end claim.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "C18",
+                      "round":  "Audit 3",
+                      "area":  "Teams",
+                      "title":  "Team name and description save on leaving the field, never empty",
+                      "detail":  "Saved on every keystroke; an empty name could be saved.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "C19",
+                      "round":  "Audit 3",
+                      "area":  "Tables",
+                      "title":  "Colour badge opens a picker",
+                      "detail":  "It cycled colours on click, which read as a bug.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "C20",
+                      "round":  "Audit 3",
+                      "area":  "Notes",
+                      "title":  "Empty states that are true",
+                      "detail":  "\"First line is the title\" was wrong; filtered views offer Show all notes.",
+                      "priority":  "high",
+                      "status":  "done"
                   }
               ]
 }

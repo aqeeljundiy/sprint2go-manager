@@ -75,6 +75,8 @@ const id: Record<string, string> = {
   'Search teams and people': 'Cari tim dan orang',
   // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
   "Departments like Video, Design or Finance. Tasks belong to a project and a team, so leads see their team’s work and who has too much. People can be in more than one team.": "Departemen seperti Video, Desain, atau Keuangan. Tugas milik sebuah proyek dan sebuah tim, jadi pemimpin tim melihat pekerjaan timnya dan siapa yang terlalu banyak beban. Satu orang bisa ada di lebih dari satu tim.",
+  // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
+  "Leave team": "Keluar dari tim",
 };
 
 export default id;

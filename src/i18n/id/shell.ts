@@ -415,6 +415,16 @@ const id: Record<string, string> = {
   "{name} can read this inbox, not send from it": "{name} bisa membaca kotak masuk ini, tapi tidak mengirim darinya",
   // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
   "Draft discarded": "Draf dibuang",
+  // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
+  "Hidden apps": "Aplikasi tersembunyi",
+  "Nothing unread in {folder}": "Tidak ada yang belum dibaca di {folder}",
+  "Open {app}": "Buka {app}",
+  "Show a hidden app": "Tampilkan aplikasi tersembunyi",
+  "Show {app}": "Tampilkan {app}",
+  "{app} hidden. Right-click the apps, or the + under them, to show it again.": "{app} disembunyikan. Klik kanan daftar aplikasi, atau tombol + di bawahnya, untuk menampilkannya lagi.",
+  "{n} emails archived": "{n} email diarsipkan",
+  "{n} emails marked read": "{n} email ditandai sudah dibaca",
+  "Archived": "Diarsipkan",
 };
 
 export default id;

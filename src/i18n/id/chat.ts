@@ -824,6 +824,8 @@ const id: Record<string, string> = {
   "Updated {when}": "Diperbarui {when}",
   // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
   "The summary couldn’t be written. Try again.": "Ringkasan tidak bisa ditulis. Coba lagi.",
+  // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
+  "Jump to recent": "Ke pesan terbaru",
 };
 
 export default id;
