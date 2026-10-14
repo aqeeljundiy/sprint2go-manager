@@ -5558,7 +5558,8 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
               query={query}
               filter={filter}
               showSnippets={settings.showSnippets}
-              width={Math.min(Math.max(listW, 300), 560)}
+              // Never more than about a third of the window: an iPad in landscape (1180 px) keeps room to read.
+              width={Math.min(Math.max(listW, 300), 560, Math.max(300, Math.round(window.innerWidth * 0.32)))}
               onWidth={setListW}
               onRefresh={refreshMail}
               onCompose={mailOut ? () => openCompose() : undefined}

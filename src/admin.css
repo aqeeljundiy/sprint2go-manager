@@ -2398,7 +2398,7 @@ button.adm-q-text:hover strong {
     grid-template-columns: 150px minmax(0, 1fr) 48px 40px;
   }
 }
-@media (max-width: 1100px) {
+@media (max-width: 1099px) {
   .adm {
     --ad-nav: 224px;
   }

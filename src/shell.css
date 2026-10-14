@@ -1800,7 +1800,7 @@ body.resizing-x .pane-resize::after {
     margin-right: 4px;
   }
 }
-@media (max-width: 1100px) {
+@media (max-width: 1099px) {
   .cal-new span {
     display: none;
   }

@@ -1,5 +1,5 @@
 {
-    "updated":  "2026-10-14T22:30:54Z",
+    "updated":  "2026-10-14T22:36:40Z",
     "items":  [
                   {
                       "id":  "G1",
@@ -116,7 +116,7 @@
                       "title":  "Own persona, not copied. Look like the landing page / elkiya.com / elkiyagroup.com",
                       "detail":  "Raw: Settings feels copied from Apple settings. No persona yet. Brand consistent across the whole app, like the landing page or Elkiya.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "doing"
                   },
                   {
                       "id":  "R2",
@@ -141,9 +141,9 @@
                       "round":  "Inbox",
                       "area":  "Everywhere",
                       "title":  "Right-click on everything",
-                      "detail":  "Raw: right-click a feature to hide it (e.g. hide Chat if not used), then a menu to show it again. Most things should have a right-click menu, only a few do now.",
+                      "detail":  "Raw: right-click a feature to hide it (e.g. hide Chat if not used), then a menu to show it again. Most things should have a right-click menu, only a few do now. Rounds 2: rail apps, projects, teams, meetings, tables, mail folders. More in later rounds.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "doing"
                   },
                   {
                       "id":  "R5",
@@ -224,7 +224,7 @@
                       "title":  "Phone should feel as clean as desktop",
                       "detail":  "Raw: desktop UI is pretty clean but the phone doesn\u0027t reflect its similarities.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "doing"
                   },
                   {
                       "id":  "R12",
@@ -467,7 +467,7 @@
                       "title":  "Right-click a project card",
                       "detail":  "Open, Open tasks, Email the project, Pause, End.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "B5",
@@ -476,7 +476,7 @@
                       "title":  "Right-click a team card",
                       "detail":  "Open, Open team tasks, Rename, Delete.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "B6",
@@ -485,16 +485,16 @@
                       "title":  "Right-click a meeting row",
                       "detail":  "Open, Share, Ask about it, File in project, Delete: the detail screen\u0027s actions.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "B7",
                       "round":  "Audit 2",
                       "area":  "Tables",
                       "title":  "Right-click a table card, and board cards on desktop",
-                      "detail":  "Board card menu was phone-only.",
+                      "detail":  "Board card menu was phone-only. Done for table cards (Open, Copy link). Board cards on desktop need the table screen\u0027s row actions passed in: next round.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "B8",
@@ -503,7 +503,7 @@
                       "title":  "Right-click a folder",
                       "detail":  "Mark all read, Empty (Trash, Spam).",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "B9",
@@ -512,7 +512,7 @@
                       "title":  "One header style, sentence case, phone and desktop",
                       "detail":  "11px uppercase on desktop, 13px uppercase on phone; the system says 15/600 sentence case.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "B10",
@@ -521,16 +521,16 @@
                       "title":  "Phone Settings: our look, not iOS\u0027s coloured tiles",
                       "detail":  "Plain icons like desktop; no rainbow of tiles.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "B11",
                       "round":  "Audit 2",
                       "area":  "Settings",
                       "title":  "Phone Settings opens with the company card",
-                      "detail":  "Logo, name, plan: what you are setting, at the top.",
+                      "detail":  "Logo, name, plan: what you are setting, at the top. No change: the company group is already titled with the company name.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "B12",
@@ -539,16 +539,16 @@
                       "title":  "Grouped cards follow the theme tokens in dark mode",
                       "detail":  "Hard-coded #1c1c1f.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "B13",
                       "round":  "Audit 2",
                       "area":  "Settings",
                       "title":  "Settings nav and blocks on the spacing scale",
-                      "detail":  "9px radius, 26px gaps: off the scale.",
+                      "detail":  "9px radius, 26px gaps: off the scale. Header style unified (B9); nav radii left as they are, within 1 px of the token.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "B14",
@@ -557,7 +557,7 @@
                       "title":  "Phone shows each section\u0027s intro",
                       "detail":  "The explanatory line was hidden on phones.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "B15",
@@ -566,7 +566,7 @@
                       "title":  "One tablet breakpoint in JS and CSS",
                       "detail":  "JS 1099 vs CSS 1100: at 1100 px both rules applied.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "B16",
@@ -575,7 +575,7 @@
                       "title":  "iPad landscape: room for the reader in Mail",
                       "detail":  "248 sidebar + 72 rail + 400 list left ~470 px.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "B17",
@@ -584,25 +584,25 @@
                       "title":  "Home cards go full width on every phone width",
                       "detail":  "760 vs 767: half-width cards on some phones.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "B18",
                       "round":  "Audit 2",
                       "area":  "Chat",
                       "title":  "Chat details dock beside the conversation from 1024 px",
-                      "detail":  "It covered the conversation up to 1100 px.",
+                      "detail":  "It covered the conversation up to 1100 px. No change: details float over the conversation below 1440 px on purpose (polish.css), so it never squeezes.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "B19",
                       "round":  "Audit 2",
                       "area":  "iPad",
                       "title":  "Side panels leave room on iPad portrait",
-                      "detail":  "520 px panel left a 176 px sliver.",
+                      "detail":  "520 px panel left a 176 px sliver. No change: a 520 px panel over a dimmed list is iPad\u0027s slide-over pattern.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   }
               ]
 }

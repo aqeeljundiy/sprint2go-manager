@@ -743,7 +743,7 @@ button.cell:hover {
     grid-column: span 12 !important;
   }
 }
-@media (max-width: 760px) {
+@media (max-width: 767px) {
   .home-grid.cards .home-card {
     grid-column: 1 / -1 !important;
   }
@@ -1958,7 +1958,7 @@ button.chat-members:hover {
   color: var(--danger) !important;
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1099px) {
   .chat-side {
     position: absolute;
     inset: 0 0 0 auto;
@@ -3036,7 +3036,7 @@ button.chat-members:hover {
 .cat-pick.three {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
-@media (max-width: 1100px) {
+@media (max-width: 1099px) {
   .job-row {
     grid-template-columns: 1fr auto;
   }
