@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AlertTriangle, FileText, Mail, Plus, Sparkles, Users } from 'lucide-react';
+import { AlertTriangle, ChevronRight, FileText, Mail, Plus, RefreshCw, Sparkles, Users } from 'lucide-react';
 import type { Channel, ChatMessage, Client, Status, Team, Thread, Todo, User } from '../../types';
 import { localDay, relative } from '../../utils';
 import { term } from '../../terms';
@@ -16,7 +16,7 @@ import { CATEGORY_ONE, categoryText } from '../ChannelDialog';
 import type { Presence } from '../ChatApp';
 import { statusText } from './chatPrefs';
 import { periodWords } from './Message';
-import { t, tx } from '../../i18n';
+import { t, tn, tx } from '../../i18n';
 import { fmtDate, fmtTime, fmtWeekday } from '../../i18n/format';
 
 /* What's inside a conversation besides its messages: its tasks, summaries, people and details. On desktop they're the
@@ -73,8 +73,74 @@ export function TasksPane(p: { channel: Channel; title: string; client?: Client;
   );
 }
 
-/** Summaries: the schedule, writing one now, "since my last visit", and the ones written before. */
-export function SummaryPane(p: {
+/** The Summary tab: the brief on top (where things stand), the older dated summaries and their schedule folded below. */
+export function SummaryPane(p: Parameters<typeof PeriodSummaries>[0] & { brief: { busy: boolean; error: string; refresh: () => void; newSince: number } }) {
+  const b = p.channel.brief;
+  const [older, setOlder] = useState(false);
+  const by = p.users.find((u) => u.id === b?.by)?.name.split(' ')[0];
+  const part = (title: string, items: string[], tone?: 'urgent') =>
+    items.length > 0 && (
+      <section className={`brief-part${tone ? ' ' + tone : ''}`}>
+        <h4>{title}</h4>
+        <ul>
+          {items.map((x, i) => (
+            <li key={i}>{x}</li>
+          ))}
+        </ul>
+      </section>
+    );
+  const pastCount = (p.channel.summary?.history ?? []).length;
+  return (
+    <div className="chan-pane brief-pane">
+      {b ? (
+        <article className={`brief${p.brief.busy ? ' busy' : ''}`} aria-busy={p.brief.busy}>
+          <header className="brief-head">
+            <span className="brief-when">
+              {t('Updated {when}', { when: relative(b.at) })}
+              {by && ` · ${by}`}
+              {p.brief.newSince > 0 && <span className="brief-new">{tn(p.brief.newSince, '{n} new message since', '{n} new messages since')}</span>}
+            </span>
+            <button type="button" className={p.brief.newSince > 0 ? 'primary-btn sm' : 'ghost-btn sm'} disabled={p.brief.busy} onClick={p.brief.refresh}>
+              <RefreshCw size={14} className={p.brief.busy ? 'spin' : ''} /> {p.brief.busy ? t('Updating…') : t('Update')}
+            </button>
+          </header>
+          <p className="brief-overview">{b.overview}</p>
+          {part(t('Urgent'), b.urgent, 'urgent')}
+          {part(t('Decided'), b.decided)}
+          {part(t('Open questions'), b.open)}
+          {part(t('Next steps'), b.next)}
+          {!b.urgent.length && !b.decided.length && !b.open.length && !b.next.length && <small className="muted">{t('Nothing urgent, decided or open yet.')}</small>}
+        </article>
+      ) : (
+        <EmptyState
+          compact
+          icon={<Sparkles size={22} />}
+          title={t('No brief yet')}
+          text={t('A short brief of this channel: the big picture, what’s urgent, what’s decided and what’s still open.')}
+          action={
+            <button type="button" className="primary-btn sm" disabled={p.brief.busy} onClick={p.brief.refresh}>
+              <Sparkles size={14} /> {p.brief.busy ? t('Writing…') : t('Write the brief')}
+            </button>
+          }
+        />
+      )}
+      {p.brief.error && (
+        <div className="sum-off" role="alert">
+          <AlertTriangle size={15} aria-hidden /> <span>{p.brief.error}</span>
+        </div>
+      )}
+      <button type="button" className="brief-older-btn" aria-expanded={older} onClick={() => setOlder((x) => !x)}>
+        <ChevronRight size={15} className={`rot-chev${older ? ' open' : ''}`} /> {pastCount ? t('Dated summaries ({n})', { n: pastCount }) : t('Dated summaries')}
+      </button>
+      <div className={`fold${older ? ' open' : ''}`}>
+        <div>{older && <PeriodSummaries {...p} />}</div>
+      </div>
+    </div>
+  );
+}
+
+/** Dated summaries: the schedule, writing one now, "since my last visit", and the ones written before. */
+function PeriodSummaries(p: {
   channel: Channel;
   users: User[];
   since: string;

@@ -729,6 +729,8 @@ export interface Channel {
   sharedWith?: { workspaceName: string; domain: string; status: 'pending' | 'connected' }; // shared channel with another sprint2go company
   digest?: boolean; // old name for summary.schedule === 'daily'
   summary?: ChannelSummary;
+  /** The channel's brief (Summary tab): where things stand, rewritten when someone refreshes it. `through`: the last message it read. */
+  brief?: { overview: string; urgent: string[]; decided: string[]; open: string[]; next: string[]; at: string; by: string; through: string };
   bookmarks?: { id: string; title: string; url: string; addedBy: string; at: string }[];
   materials?: Materials; // folders of files, links and docs for this channel
   archived?: boolean;

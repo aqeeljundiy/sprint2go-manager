@@ -805,6 +805,7 @@ const tablesEnv: tablesEngine.Env = { broadcast: (c, u, d) => broadcast(c, u, d)
 const JOB_OF: Record<string, string> = {
   summarize: 'summary',
   catchup: 'summary',
+  brief: 'summary',
   folderoverview: 'summary',
   replies: 'replies',
   draft: 'draft',
@@ -976,6 +977,7 @@ const routes: Record<string, (b: any) => Promise<unknown>> = {
   assistant: (b) => ai.assistant(b.question, b.threads, b.me, b.today),
   braindump: (b) => ai.braindump(b),
   catchup: (b) => ai.catchUp(b),
+  brief: (b) => ai.channelBrief(b),
   meetingnotes: (b) => ai.meetingNotes(b),
   folderoverview: (b) => ai.folderOverview(b),
   askmeetings: (b) => ai.askMeetings(b),

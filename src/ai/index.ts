@@ -82,6 +82,7 @@ export const ai = {
     run('folderoverview', { client, meetings, openTasks, doneTasks }, () => demo.folderOverview(client, meetings, openTasks, doneTasks)),
   askMeetings: (question: string, sources: demo.MeetSource[]): Promise<string> => run('askmeetings', { question, sources }, () => demo.askMeetings(question, sources)),
   catchUp: (channel: string, messages: demo.CatchUpMessage[], me: string): Promise<string> => run('catchup', { channel, messages, me }, () => demo.catchUp(channel, messages, me)),
+  brief: (channel: string, messages: demo.CatchUpMessage[], previous?: demo.ChannelBrief): Promise<demo.ChannelBrief> => run('brief', { channel, messages, previous }, () => demo.channelBrief(channel, messages)),
   assistant: (question: string, threads: Thread[], me: string): Promise<{ answer: string; threadIds: string[] }> =>
     run('assistant', { question, threads: threads.map(plain), me, today: today() }, () => demo.assistant(question, threads, me)),
 };

@@ -326,6 +326,100 @@
 .chan-pane .d-heading {
   margin-top: 8px;
 }
+/* The channel brief (Details.tsx SummaryPane): one card, the big picture then short lists. */
+.brief {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  border-radius: var(--r-card);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  transition: opacity 0.2s var(--ease);
+  animation: fadeIn 0.22s var(--ease) backwards;
+}
+.brief.busy {
+  opacity: 0.6;
+}
+.brief-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.brief-when {
+  font-size: 12px;
+  color: var(--text-3);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  align-items: center;
+}
+.brief-new {
+  color: var(--accent-text, var(--accent));
+  font-weight: 600;
+}
+.brief-overview {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text);
+}
+.brief-part h4 {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-3);
+}
+.brief-part.urgent h4 {
+  color: var(--danger, #c2410c);
+}
+.brief-part ul {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+}
+.brief-part li {
+  font-size: 14px;
+  line-height: 1.5;
+}
+.brief-older-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: start;
+  border: 0;
+  background: none;
+  padding: 8px 0;
+  min-height: 44px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+  cursor: pointer;
+}
+.brief-older-btn:hover {
+  color: var(--text);
+}
+.brief-pane .fold > div {
+  display: grid;
+  gap: 12px;
+}
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .brief,
+  .spin {
+    animation: none;
+  }
+}
 .sum-head {
   display: flex;
   justify-content: space-between;

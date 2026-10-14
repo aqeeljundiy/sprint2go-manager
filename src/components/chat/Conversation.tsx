@@ -185,6 +185,8 @@ export function ChatView(p: ViewProps) {
   const startOrJoin = () => (p.huddle?.joined ? p.huddle.onOpen?.() : channel?.huddle?.members.length ? p.huddle?.onJoin() : setAskHuddle(true));
   const [findText, setFindText] = useState(''); // phones: Search in this conversation (its details)
   const [summarizing, setSummarizing] = useState<'period' | 'since' | null>(null);
+  const [briefing, setBriefing] = useState(false); // the brief (Summary tab) being written
+  const [briefError, setBriefError] = useState('');
   const [sinceText, setSinceText] = useState<string | null>(null);
   const [catchUp, setCatchUp] = useState(false);
   const [threadId, setThreadId] = useState<string | null>(null);
@@ -363,6 +365,25 @@ export function ChatView(p: ViewProps) {
       }
     }
     setSummarizing(null);
+  };
+  /** The brief (Summary tab): the last 30 days, up to 300 messages, with the last brief so settled points drop off. */
+  const refreshBrief = async () => {
+    setBriefing(true);
+    setBriefError('');
+    try {
+      const from = new Date(Date.now() - 30 * 86_400_000).toISOString();
+      const msgs = sorted
+        .filter((m) => m.at > from && !m.sendAt)
+        .slice(-300)
+        .map((m) => ({ who: authorOf(m, { me, users, channel }).first, text: m.voice?.transcript ?? m.text, at: m.at, task: m.taskId ? p.tasks.find((x) => x.id === m.taskId)?.title : undefined, files: m.files?.map((f) => f.name) }));
+      const prev = channel.brief;
+      const b = await ai.brief(title, msgs, prev && { overview: prev.overview, urgent: prev.urgent, decided: prev.decided, open: prev.open, next: prev.next });
+      p.onChannel({ brief: { ...b, at: new Date().toISOString(), by: me, through: sorted[sorted.length - 1]?.at ?? new Date().toISOString() } });
+    } catch (e) {
+      setBriefError(e instanceof Error && e.message ? e.message : t('The brief couldn’t be written. Try again.'));
+    } finally {
+      setBriefing(false);
+    }
   };
   const mentioned = (s: string) => users.find((u) => u.id !== me && new RegExp(`@${u.name.split(' ')[0]}\\b`, 'i').test(s));
 
@@ -638,7 +659,21 @@ export function ChatView(p: ViewProps) {
       case 'tasks':
         return <TasksPane channel={channel} title={title} client={client} team={team} tasks={chanTasks} users={users} me={me} onCreateTask={p.onCreateTask} onToggleTask={p.onToggleTask} onOpenTask={p.onOpenTask} />;
       case 'summary':
-        return <SummaryPane channel={channel} users={users} since={p.since} summaryCost={p.summaryCost} summaryOff={p.summaryOff} timeZone={p.timeZone} summarizing={summarizing} sinceText={sinceText} summarize={summarize} onChannel={p.onChannel} />;
+        return (
+          <SummaryPane
+            channel={channel}
+            users={users}
+            since={p.since}
+            summaryCost={p.summaryCost}
+            summaryOff={p.summaryOff}
+            timeZone={p.timeZone}
+            summarizing={summarizing}
+            sinceText={sinceText}
+            summarize={summarize}
+            onChannel={p.onChannel}
+            brief={{ busy: briefing, error: briefError, refresh: () => void refreshBrief(), newSince: channel.brief ? sorted.filter((m) => m.at > channel.brief!.through && !m.sendAt).length : 0 }}
+          />
+        );
       case 'pinned':
         return <PinnedPane pinned={pinned} render={(m) => <Msg key={m.id} m={m} grouped={false} ctx={ctx} />} />;
       case 'people':

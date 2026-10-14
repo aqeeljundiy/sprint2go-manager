@@ -391,6 +391,30 @@ export async function catchUp(channel: string, messages: CatchUpMessage[], me: s
   return lines.join('\n');
 }
 
+export interface ChannelBrief {
+  overview: string;
+  urgent: string[];
+  decided: string[];
+  open: string[];
+  next: string[];
+}
+
+/** A channel's brief from its messages alone (no AI): rough, but the same shape the real one has. */
+export async function channelBrief(channel: string, messages: CatchUpMessage[]): Promise<ChannelBrief> {
+  await wait(900);
+  const short = (s: string) => (s.length > 90 ? s.slice(0, 87).trimEnd() + '…' : s);
+  const recent = [...messages].reverse();
+  const people = [...new Set(messages.map((m) => m.who))];
+  const pick = (re: RegExp) => recent.filter((m) => re.test(m.text)).slice(0, 3).map((m) => `${m.who}: ${short(m.text)}`);
+  return {
+    overview: messages.length ? `${messages.length} messages from ${people.slice(0, 3).join(', ')}${people.length > 3 ? ` and ${people.length - 3} more` : ''} in ${channel}.` : `Nothing has happened in ${channel} yet.`,
+    urgent: pick(/\b(urgent|asap|today|tomorrow|deadline|blocked|by (mon|tue|wed|thu|fri)\w*)\b/i),
+    decided: pick(/\b(decided|agreed|approved|let'?s go with|final|confirmed)\b/i),
+    open: recent.filter((m) => m.text.trim().endsWith('?')).slice(0, 3).map((m) => `${m.who}: ${short(m.text)}`),
+    next: [...new Set(messages.filter((m) => m.task).map((m) => m.task!))].slice(0, 3),
+  };
+}
+
 /* ---------------- Meetings: notes, folder overview, Ask AI ---------------- */
 
 export interface MeetingNotes {
