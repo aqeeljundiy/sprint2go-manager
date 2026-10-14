@@ -7,6 +7,7 @@ import { term, brand as product } from '../terms';
 import { Handshake, Ban, Bell, Building2, ChevronDown, ChevronRight, Columns3, CreditCard, HardDrive, KeyRound, KeySquare, Stamp, LayoutGrid, UserPlus, Inbox, Plus, Sparkles, Trash2, Users, Keyboard, Menu, Palette, PenLine, ShieldCheck, UserRound, Video, type LucideIcon, FlaskConical, Send, LifeBuoy, FolderInput } from 'lucide-react';
 import { ACCENTS, type Settings } from '../settings';
 import { mailState, type MailState } from '../mailStatus';
+import { BackupEmailRow } from './BackupEmail';
 import { DEFAULT_PERMISSIONS } from '../types';
 import type { Account, AISettings, AppId, BlockRule, CalendarDef, DriveItem, HomeTemplateId, MeetingSettings, Plan, Role, StorageSettings, Team, Todo, User, Workspace } from '../types';
 import { TaskStagesSection } from './admin/TaskStages';
@@ -631,6 +632,7 @@ export function SettingsPage({ email, settings: s, update, section, onSection, u
                               return err;
                             }}
                           />
+                          <BackupEmailRow toast={admin.toast} />
                           <TwoStepRow toast={admin.toast} />
                         </Group>
                         <ConnectedApps toast={admin.toast} />
@@ -679,6 +681,7 @@ export function SettingsPage({ email, settings: s, update, section, onSection, u
 
               <h3>{t('Security')}</h3>
               <PasswordRow />
+              <BackupEmailRow toast={admin.toast} />
               <TwoStepRow toast={admin.toast} />
               <ConnectedApps toast={admin.toast} />
               <DeleteAccountRow />

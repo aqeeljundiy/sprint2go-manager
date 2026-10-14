@@ -7,13 +7,13 @@ import * as emailLayout from './emailLayout.ts';
 import { t, textOf } from '../src/i18n/index.ts';
 
 /** The code email, in `l` (the language of the screen that asked for it): to finish signing up or to set a new password. */
-export function codeMail(what: 'signup' | 'reset', code: string, l: lang.Lang) {
+export function codeMail(what: 'signup' | 'reset' | 'backup', code: string, l: lang.Lang) {
   return lang.inLang(l, () => {
-    const line = what === 'signup' ? t('{code} is your code to finish signing up.', { code }) : t('{code} is your code to set a new password.', { code });
+    const line = what === 'signup' ? t('{code} is your code to finish signing up.', { code }) : what === 'backup' ? t('{code} is your code to add this backup sign-in email.', { code }) : t('{code} is your code to set a new password.', { code });
     // The code big and copyable, the old sentence as the inbox preview.
     const m = emailLayout.codeEmail({
-      title: what === 'signup' ? t('Finish signing up') : t('Set a new password'),
-      lead: what === 'signup' ? t('Enter this code where you signed up to finish creating your sprint2go account.') : t('Enter this code where you asked for it to set a new password.'),
+      title: what === 'signup' ? t('Finish signing up') : what === 'backup' ? t('Confirm your backup email') : t('Set a new password'),
+      lead: what === 'signup' ? t('Enter this code where you signed up to finish creating your sprint2go account.') : what === 'backup' ? t('Enter this code in Settings, Account. You can then sign in and get codes at this email too.') : t('Enter this code where you asked for it to set a new password.'),
       preheader: line,
       code,
       footer: [t('If this wasn’t you, ignore this email.')],

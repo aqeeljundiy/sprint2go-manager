@@ -705,7 +705,7 @@ function kick(userId: string, keepToken?: string) {
  */
 const codes = new Map<string, { code: string; tries: number; until: number; data?: any }>();
 const newCode = () => String(randomInt(0, 1_000_000)).padStart(6, '0');
-async function sendCode(to: string, what: 'signup' | 'reset', code: string, l: lang.Lang) {
+async function sendCode(to: string, what: 'signup' | 'reset' | 'backup', code: string, l: lang.Lang) {
   const m = codeMail(what, code, l);
   const sent = await mailer.sendNote(to, m.subject, m.text, m.html).catch((e) => (console.error('[mail]', e instanceof Error ? e.message : e), false));
   if (!sent) console.log(`Code for ${to} (${what === 'signup' ? 'finish signing up' : 'set a new password'}): ${code}`);
@@ -1947,7 +1947,8 @@ createServer(async (req, res) => {
       const second = twostep.resetNeedsCode(login.user_id, twoStep);
       if (second) return json(res, second.status, second.body);
       codes.delete(`reset:${mail}`);
-      await db.setLogin(login.user_id, mail, password);
+      // The account's own sign-in email stays: a reset asked for at the backup email only changes the password.
+      await db.setLogin(login.user_id, login.email, password);
       db.endSessions(login.user_id);
       connector.endAll(login.user_id, 'password reset'); // connected AI apps too: they connect again with the new password
       mailApps.endAll(login.user_id); // and mail apps' app passwords
@@ -2799,6 +2800,34 @@ createServer(async (req, res) => {
       if (passed) twostep.markPassed(fresh);
       setSession(res, fresh);
       return json(res, 200, {});
+    }
+
+    // A backup sign-in email: a second address that signs in and gets reset codes, confirmed by a code sent to it.
+    // So leaving a company (and its mailbox) never locks someone out of their own account.
+    if (p === '/api/account/backup-email') {
+      if (req.method === 'GET') return json(res, 200, { email: db.backupEmailOf(me) });
+      if (req.method === 'DELETE') return (db.removeBackupEmail(me), platform.event('security.backup-email', null, me, 'removed'), json(res, 200, { email: null }));
+      const b = await body(req);
+      if (b.code === undefined) {
+        const mail = String(b.email ?? '').trim().toLowerCase();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) return json(res, 400, { error: mark('That email doesn’t look right.') });
+        if (tooMany(`backup:${me}`, 5, 60 * 60_000)) return json(res, 429, { error: mark('Too many tries. Try again later.') });
+        if (db.findLogin(mail)) return json(res, 409, { error: mark('That email already signs in to an account.') });
+        const code = newCode();
+        codes.set(`backup:${me}`, { code, tries: 0, until: Date.now() + 15 * 60_000, data: { email: mail } });
+        const sent = await sendCode(mail, 'backup', code, lang.requestLang(req));
+        return json(res, 200, { ok: true, ...(process.env.NODE_ENV === 'production' || sent ? {} : { devCode: code }) });
+      }
+      const c = codes.get(`backup:${me}`);
+      if (!c || c.until < Date.now()) return json(res, 410, { error: mark('That code has expired. Ask for a new one.') });
+      if (++c.tries > 5) return (codes.delete(`backup:${me}`), json(res, 429, { error: mark('Too many tries. Ask for a new code.') }));
+      if (String(b.code ?? '').replace(/\D/g, '') !== c.code) return json(res, 400, { error: mark('That code isn’t right.') });
+      codes.delete(`backup:${me}`);
+      const email = String(c.data?.email ?? '');
+      if (!email || db.findLogin(email)) return json(res, 409, { error: mark('That email already signs in to an account.') });
+      db.setBackupEmail(me, email);
+      platform.event('security.backup-email', null, me, 'added');
+      return json(res, 200, { email });
     }
 
     // Deleting the account: the sign-in, sessions and the person's record go; work they did stays with its company.

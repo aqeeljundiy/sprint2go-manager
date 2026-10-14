@@ -15,6 +15,7 @@ db.exec(`
   PRAGMA busy_timeout = 5000;
   CREATE TABLE IF NOT EXISTS docs (coll TEXT NOT NULL, id TEXT NOT NULL, data TEXT NOT NULL, updated_at TEXT NOT NULL, updated_by TEXT, PRIMARY KEY (coll, id));
   CREATE TABLE IF NOT EXISTS logins (user_id TEXT PRIMARY KEY, email TEXT NOT NULL UNIQUE COLLATE NOCASE, pw_hash TEXT NOT NULL);
+  CREATE TABLE IF NOT EXISTS login_backup (user_id TEXT PRIMARY KEY, email TEXT NOT NULL UNIQUE COLLATE NOCASE, at TEXT NOT NULL);
   CREATE TABLE IF NOT EXISTS sessions (token TEXT PRIMARY KEY, user_id TEXT NOT NULL, created_at TEXT NOT NULL, expires_at TEXT NOT NULL);
   CREATE TABLE IF NOT EXISTS invites (token TEXT PRIMARY KEY, user_id TEXT NOT NULL, email TEXT NOT NULL, expires_at TEXT NOT NULL);
   CREATE TABLE IF NOT EXISTS ai_usage (id INTEGER PRIMARY KEY AUTOINCREMENT, workspace_id TEXT NOT NULL, user_id TEXT, job TEXT NOT NULL, provider TEXT NOT NULL, model TEXT NOT NULL, in_tokens INTEGER NOT NULL, out_tokens INTEGER NOT NULL, at TEXT NOT NULL);
@@ -90,11 +91,20 @@ export function setLoginHashes(list: { userId: string; email: string; hash: stri
 export async function setLogin(userId: string, email: string, pw: string) {
   db.prepare('INSERT INTO logins (user_id, email, pw_hash) VALUES (?, ?, ?) ON CONFLICT (user_id) DO UPDATE SET email = excluded.email, pw_hash = excluded.pw_hash').run(userId, email, await hashPassword(pw));
 }
-export const deleteLogin = (userId: string) => db.prepare('DELETE FROM logins WHERE user_id = ?').run(userId);
+export const deleteLogin = (userId: string) => (db.prepare('DELETE FROM login_backup WHERE user_id = ?').run(userId), db.prepare('DELETE FROM logins WHERE user_id = ?').run(userId));
 export const hasLogin = (userId: string) => !!db.prepare('SELECT 1 FROM logins WHERE user_id = ?').get(userId);
+/**
+ * The sign-in for an email: the account's own email, or its verified backup email (Settings, Account), so losing a
+ * company mailbox never locks anyone out of their other companies. `email` is always the account's own sign-in email.
+ */
 export function findLogin(email: string) {
-  return db.prepare('SELECT user_id, pw_hash FROM logins WHERE email = ?').get(email) as { user_id: string; pw_hash: string } | undefined;
+  return (db.prepare('SELECT user_id, email, pw_hash FROM logins WHERE email = ?').get(email) ??
+    db.prepare('SELECT l.user_id, l.email, l.pw_hash FROM login_backup b JOIN logins l ON l.user_id = b.user_id WHERE b.email = ?').get(email)) as { user_id: string; email: string; pw_hash: string } | undefined;
 }
+/** A person's backup sign-in email, verified by a code. One each. */
+export const backupEmailOf = (userId: string) => (db.prepare('SELECT email FROM login_backup WHERE user_id = ?').get(userId) as { email: string } | undefined)?.email ?? null;
+export const setBackupEmail = (userId: string, email: string) => db.prepare('INSERT INTO login_backup (user_id, email, at) VALUES (?, ?, ?) ON CONFLICT (user_id) DO UPDATE SET email = excluded.email, at = excluded.at').run(userId, email, new Date().toISOString());
+export const removeBackupEmail = (userId: string) => db.prepare('DELETE FROM login_backup WHERE user_id = ?').run(userId);
 
 const DAY = 86_400_000;
 // Only a hash of the session token is stored: a copy of the database can't be used to sign in as anyone.
