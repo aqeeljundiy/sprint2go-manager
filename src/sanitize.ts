@@ -22,8 +22,9 @@ DOMPurify.addHook('afterSanitizeAttributes', (node) => {
 export function sanitize(html: string) {
   html = html.replace(/url\s*\(/gi, 'url-off(');
   return DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: ['p', 'br', 'div', 'span', 'b', 'strong', 'i', 'em', 'u', 's', 'strike', 'a', 'ul', 'ol', 'li', 'blockquote', 'h1', 'h2', 'h3', 'font', 'code', 'pre', 'hr', 'img'],
-    ALLOWED_ATTR: ['href', 'style', 'color', 'size', 'src', 'alt', 'width', 'height'],
+    // Tables too: email signatures (and most designed emails) are laid out with them; they can't run anything.
+    ALLOWED_TAGS: ['p', 'br', 'div', 'span', 'b', 'strong', 'i', 'em', 'u', 's', 'strike', 'a', 'ul', 'ol', 'li', 'blockquote', 'h1', 'h2', 'h3', 'font', 'code', 'pre', 'hr', 'img', 'table', 'tbody', 'tr', 'td'],
+    ALLOWED_ATTR: ['href', 'style', 'color', 'size', 'src', 'alt', 'width', 'height', 'cellpadding', 'cellspacing'],
     FORBID_ATTR: ['srcset'],
   });
 }

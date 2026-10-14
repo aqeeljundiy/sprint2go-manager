@@ -1238,3 +1238,89 @@
     animation: none;
   }
 }
+
+/* Signature designer (mail/SignatureDesigner.tsx): layouts on top, your details left, the live preview right. */
+.sig-design {
+  margin-top: 8px;
+}
+.sigd-modal {
+  width: min(760px, calc(100vw - 32px));
+}
+.sigd-body {
+  display: grid;
+  gap: 16px;
+}
+.sigd-tpls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.sigd-tpl {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-2);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.18s var(--ease), background 0.18s var(--ease), color 0.18s var(--ease);
+}
+.sigd-tpl.on {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+.sigd-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
+  gap: 24px;
+}
+@media (max-width: 640px) {
+  .sigd-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.sigd-fields {
+  display: grid;
+  gap: 12px;
+}
+.sigd-fields .field {
+  display: grid;
+  gap: 4px;
+}
+.sigd-fields .field > span {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-3);
+}
+.sigd-fields input {
+  font: inherit;
+  font-size: 14px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+}
+.sigd-preview {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+.sigd-preview > small {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-3);
+}
+/* The preview is the email as recipients see it: white paper in both themes. */
+.sigd-paper {
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+  color: #0b0c10;
+  overflow-x: auto;
+}

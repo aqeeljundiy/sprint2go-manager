@@ -8,6 +8,8 @@ import { Select } from '../ui/Select';
 import { SmoothHeight } from '../ui/Smooth';
 import { EditScreen, GRow, Group, ChoiceRow, SwitchRow } from '../ui/Grouped';
 import { sendersOf } from './composeExtras';
+import { SignatureDesigner } from './SignatureDesigner';
+import { PenLine } from 'lucide-react';
 import { t } from '../../i18n';
 
 /** The addresses this person sends from: each mailbox of theirs, then its aliases. */
@@ -35,6 +37,9 @@ export function SignaturesDesktop({ s, update, ws, me }: { s: Settings; update: 
   const addresses = myAddresses(ws, me);
   const [addr, setAddr] = useState('');
   const mine = addr ? own(s, addr) : undefined;
+  const [designing, setDesigning] = useState(false);
+  const [ver, setVer] = useState(0); // a designed signature reloads the editor with it
+  const useDesigned = (html: string) => (update(addr ? withOwn(s, addr, html) : { signature: html }), setVer((v) => v + 1));
   return (
     <>
       {addresses.length > 1 && (
@@ -55,10 +60,16 @@ export function SignaturesDesktop({ s, update, ws, me }: { s: Settings; update: 
           </button>
         </div>
       ) : (
-        <div className="signature-box" key={addr || 'default'}>
-          <RichEditor initialHtml={addr ? (mine ?? '') : s.signature} placeholder={addr ? t('The signature for {address}', { address: addr }) : t('Your signature')} onChange={(html) => update(addr ? withOwn(s, addr, html) : { signature: html })} />
-        </div>
+        <>
+          <div className="signature-box" key={`${addr || 'default'}:${ver}`}>
+            <RichEditor initialHtml={addr ? (mine ?? '') : s.signature} placeholder={addr ? t('The signature for {address}', { address: addr }) : t('Your signature')} onChange={(html) => update(addr ? withOwn(s, addr, html) : { signature: html })} />
+          </div>
+          <button type="button" className="ghost-btn outline sm sig-design" onClick={() => setDesigning(true)}>
+            <PenLine size={14} /> {t('Design a signature')}
+          </button>
+        </>
       )}
+      {designing && <SignatureDesigner ws={ws} address={addr || addresses[0] || ''} me={{ name: s.name, title: s.title }} onUse={useDesigned} onClose={() => setDesigning(false)} />}
       {addr && mine !== undefined && (
         <button type="button" className="link-btn sig-reset" onClick={() => update(withOwn(s, addr, undefined))}>
           {t('Use the default signature for {address}', { address: addr })}
