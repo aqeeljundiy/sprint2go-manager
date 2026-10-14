@@ -2771,6 +2771,73 @@ body.resizing-x .pane-resize::after {
 }
 
 /* Inboxes (multiple accounts) */
+/* Settings, Brands (admin/Brands.tsx) */
+.brand-row {
+  width: 100%;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.18s var(--ease);
+}
+.brand-row:hover {
+  background: var(--hover);
+}
+.brand-swatch {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+.brand-edit {
+  display: grid;
+  gap: 16px;
+  padding: 8px 16px 16px 56px;
+}
+.brand-edit .field {
+  display: grid;
+  gap: 6px;
+}
+.brand-edit .field > span {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-3);
+}
+.brand-colors,
+.brand-domains,
+.brand-logo-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.brand-domains .mail-chip button {
+  border: 0;
+  background: none;
+  padding: 0 0 0 4px;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+}
+.brand-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+/* A mailbox's brand (src/brands.ts): a small dot on its icon's corner, only when the company has several brands. */
+.nav-item.acct {
+  position: relative;
+}
+.brand-dot {
+  position: absolute;
+  left: 22px;
+  top: 7px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--surface);
+}
 .acct-text {
   display: grid;
   min-width: 0;

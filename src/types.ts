@@ -353,6 +353,18 @@ export interface AwayReply {
   since?: string; // set by the server when it was switched on or changed: everyone gets the new answer
 }
 
+/**
+ * A brand inside a company (a group with several brands): its own name, colour, logo and the domains it sends from.
+ * Mailboxes on those domains are the brand's (src/brands.ts); one team, one bill, one search across all of them.
+ */
+export interface Brand {
+  id: string;
+  name: string;
+  color: string;
+  logo?: string; // data URL, small
+  domains: string[]; // of the company's domains
+}
+
 /** Another address that delivers into mailboxes: sales@ into Isabel's and Thomas's, or info@ into the hello@ shared inbox. */
 export interface MailAlias {
   id: string;
@@ -367,6 +379,7 @@ export interface Workspace {
   color: string; // brand colour, used as the app accent
   logo?: string; // data URL of an uploaded logo
   domains: string[];
+  brands?: Brand[]; // brands inside this company, each owning some of its domains
   accounts: Account[];
   members: Member[];
   apps?: AppId[]; // switched-on apps (default: all)

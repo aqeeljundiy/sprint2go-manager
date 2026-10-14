@@ -8,6 +8,7 @@ import { Handshake, Ban, Bell, Building2, ChevronDown, ChevronRight, Columns3, C
 import { ACCENTS, type Settings } from '../settings';
 import { mailState, type MailState } from '../mailStatus';
 import { BackupEmailRow } from './BackupEmail';
+import { BrandsSettings } from './admin/Brands';
 import { DEFAULT_PERMISSIONS } from '../types';
 import type { Account, AISettings, AppId, BlockRule, CalendarDef, DriveItem, HomeTemplateId, MeetingSettings, Plan, Role, StorageSettings, Team, Todo, User, Workspace } from '../types';
 import { TaskStagesSection } from './admin/TaskStages';
@@ -604,6 +605,7 @@ export function SettingsPage({ email, settings: s, update, section, onSection, u
                   </button>
                 )}
               </div>
+              {(canManage || (ws.brands?.length ?? 0) > 0) && <BrandsSettings ws={ws} canManage={canManage} onWorkspace={onWorkspace} />}
               </>
               )}
             </>

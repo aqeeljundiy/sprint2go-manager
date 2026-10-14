@@ -8,6 +8,7 @@ import { flushSync } from 'react-dom';
 import { term, setTermWord, brand as product, setBrandName, brandOf, portalOrigin } from './terms';
 import { setPhotos } from './photos';
 import { mailState } from './mailStatus';
+import { brandOf as mailBrandOf } from './brands';
 import { TempAddressDialog, lifeLeft } from './components/TempAddress';
 import { AppSetupCard } from './components/AppSetupCard';
 import { ProjectsCtx } from './components/ProjectPicker';
@@ -4901,6 +4902,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
         activeAccount={activeAccount}
         accountUnread={accountUnread}
         accountState={accountState}
+        brandColor={(ws.brands?.length ?? 0) > 1 ? (email) => mailBrandOf(ws, email)?.color : undefined}
         onNewTemp={() => setTempDialog({})}
         onNewProject={enabled.has('projects') ? () => (newProjectFlow(), setSidebarOpen(false)) : undefined}
         onTempMenu={(a, el) => ((tempAnchor.current = el), setTempMenu(a))}

@@ -89,6 +89,8 @@ interface Props {
   accountUnread: Record<string, number>;
   /** Each mailbox's state (src/mailStatus.ts): only problems show under its name. */
   accountState?: Record<string, MailState>;
+  /** The colour of the brand a mailbox belongs to (src/brands.ts), shown as a dot by its icon. */
+  brandColor?: (email: string) => string | undefined;
   /** Mailboxes someone gave you access to (delegation): marked as theirs in the list. */
   delegated?: Set<string>;
   onAccountFilter: (id: string) => void;
@@ -205,6 +207,7 @@ export function Sidebar(props: Props) {
                           title={a.email || a.name}
                         >
                           {a.kind === 'all' ? <Layers size={17} /> : a.kind === 'shared' ? <Users size={17} /> : props.delegated?.has(a.id) ? <UserRoundCheck size={17} /> : <Inbox size={17} />}
+                          {a.kind !== 'all' && props.brandColor?.(a.email) && <span className="brand-dot" style={{ background: props.brandColor(a.email) }} aria-hidden />}
                           <span className="sb-label acct-text">
                             <span>{a.kind === 'all' ? a.name : a.email.split('@')[0] + '@'}</span>
                             {props.delegated?.has(a.id) ? (
