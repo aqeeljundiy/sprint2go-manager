@@ -444,7 +444,9 @@ export function TaskViews({
     );
     if (filteredOut)
       return <EmptyState icon={<SlidersHorizontal size={22} />} title={t('Nothing matches these filters')} text={t('Showing: {filters}.', { filters: words.join(', ') })} action={<button type="button" className="ghost-btn sm" onClick={() => setD({ ...d, who: 'any', people: [], only: [] })}>{t('Clear filters')}</button>} />;
-    if (kind === 'today') return <EmptyState icon={<Check size={22} />} title={t('All done for today')} text={t('Plan ahead in Upcoming, or add something for today.')} action={<button type="button" className="link-btn" onClick={() => onScope({ kind: 'upcoming' })}>{t('See Upcoming')}</button>} />;
+    // Today is your own tasks due today; reviews, replies and requests live in Home's "Needs you". Saying so keeps the
+    // two from contradicting each other ("All done" here while Home lists things).
+    if (kind === 'today') return <EmptyState icon={<Check size={22} />} title={t('No tasks due today')} text={t('Reviews, replies and requests waiting on you are in Needs you on Home. Plan ahead in Upcoming.')} action={<button type="button" className="link-btn" onClick={() => onScope({ kind: 'upcoming' })}>{t('See Upcoming')}</button>} />;
     if (kind === 'supervising') return <EmptyState icon="✓" title={t('Nothing to check')} text={t('When someone finishes work you supervise, it waits here for you.')} />;
     if (triage) return <EmptyState icon="✓" title={t('The queue is empty')} text={t('Every task in this team has someone on it.')} action={action} />;
     return <EmptyState icon="✓" title={t('Nothing open')} text={t('Add one, or use Brain dump to turn your thoughts into tasks.')} action={action} />;

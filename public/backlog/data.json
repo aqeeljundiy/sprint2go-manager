@@ -1,5 +1,5 @@
 {
-    "updated":  "2026-10-14T22:16:57Z",
+    "updated":  "2026-10-14T22:26:11Z",
     "items":  [
                   {
                       "id":  "G1",
@@ -152,7 +152,7 @@
                       "title":  "Inbox tabs should be removable (like Gmail labels)",
                       "detail":  "Raw: Primary/Promotions/Social/Updates feel default, should be able to cancel them out if not wanted.",
                       "priority":  "medium",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "R6",
@@ -161,7 +161,7 @@
                       "title":  "Filter chips cropped (Attachments cut off)",
                       "detail":  "Raw: Unread / Needs reply / Assigned to me / Attachments row gets cropped when the list isn\u0027t wide, can\u0027t reach Attachments.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "R7",
@@ -305,7 +305,7 @@
                       "title":  "Filter chips never cropped",
                       "detail":  "Attachments chip was cut off in a narrow list (R6).",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "A9",
@@ -314,7 +314,7 @@
                       "title":  "Inbox tabs keep one width; new-mail dot takes no space",
                       "detail":  "Tabs resized when you picked one; the highlight jumped.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "A10",
@@ -323,7 +323,7 @@
                       "title":  "Read and unread rows keep the same width",
                       "detail":  "Bold-on-unread shifted text when an email was opened.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "A11",
@@ -332,7 +332,7 @@
                       "title":  "Row hover actions without a box, date not hidden",
                       "detail":  "Box inside a box covering the date.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "A12",
@@ -341,7 +341,7 @@
                       "title":  "Done has one icon everywhere",
                       "detail":  "Check in some places, archive box in others.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "A13",
@@ -350,7 +350,7 @@
                       "title":  "Empty list says why, with the right icon",
                       "detail":  "A big tick showed for searches that found nothing.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "A14",
@@ -359,7 +359,7 @@
                       "title":  "Discarding a draft can be undone",
                       "detail":  "One tap lost everything typed.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "A15",
@@ -368,7 +368,7 @@
                       "title":  "Today agrees with Home",
                       "detail":  "\"All done for today\" while Home listed things that need you.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "A16",
@@ -386,7 +386,7 @@
                       "title":  "One primary button per empty screen",
                       "detail":  "Header and empty state both had the same primary button.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "A18",
@@ -395,7 +395,7 @@
                       "title":  "No developer instructions shown to users",
                       "detail":  "Vault told end users to run npm run server.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "A19",
@@ -404,7 +404,7 @@
                       "title":  "Unknown Settings page says so, not \"Ask an admin\"",
                       "detail":  "/settings/general showed a permission message.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "A20",
@@ -413,7 +413,7 @@
                       "title":  "Dated summaries never hang on an AI error",
                       "detail":  "An AI failure left it on \"Writing…\" forever.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "R15",

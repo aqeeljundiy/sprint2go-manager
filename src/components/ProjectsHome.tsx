@@ -160,7 +160,7 @@ export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu,
             ))}
           </div>
         </Popover>
-        {onCreate && (
+        {onCreate && (rows.length > 0 || adding) && (
           <button className="primary-btn sm" onClick={() => setAdding((a) => !a)}>
             <Plus size={14} /> {t('New {project}', { project: term.one })}
           </button>

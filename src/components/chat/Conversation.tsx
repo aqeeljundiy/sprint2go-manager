@@ -340,6 +340,7 @@ export function ChatView(p: ViewProps) {
   /** AI summary of a period (this month / week / day) or of what I missed. Only on click, or on the schedule. */
   const summarize = async (kind: 'period' | 'since') => {
     setSummarizing(kind);
+    try {
     const schedule = channelSchedule(channel);
     const sch = schedule === 'off' ? 'monthly' : schedule;
     const from = kind === 'since' ? p.since : new Date(Date.now() - (sch === 'daily' ? 1 : sch === 'weekly' ? 7 : 31) * 86_400_000).toISOString();
@@ -364,7 +365,12 @@ export function ChatView(p: ViewProps) {
         p.onSend({ text: words.text, tr: words.tr });
       }
     }
-    setSummarizing(null);
+    } catch (e) {
+      // An AI failure says so instead of leaving "Writing…" on screen forever.
+      toast({ text: e instanceof Error && e.message ? e.message : t('The summary couldn’t be written. Try again.') });
+    } finally {
+      setSummarizing(null);
+    }
   };
   /** The brief (Summary tab): the last 30 days, up to 300 messages, with the last brief so settled points drop off. */
   const refreshBrief = async () => {

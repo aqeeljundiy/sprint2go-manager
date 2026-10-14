@@ -413,6 +413,8 @@ const id: Record<string, string> = {
   // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
   "{name} can read and send from this inbox": "{name} bisa membaca dan mengirim dari kotak masuk ini",
   "{name} can read this inbox, not send from it": "{name} bisa membaca kotak masuk ini, tapi tidak mengirim darinya",
+  // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
+  "Draft discarded": "Draf dibuang",
 };
 
 export default id;

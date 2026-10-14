@@ -165,6 +165,9 @@ const id: Record<string, string> = {
     'Login dienkripsi dengan kunci yang hanya Anda pegang. Frasa sandi ini mengunci kunci Anda, dan tidak bisa diatur ulang.',
   'The server never sees a password: logins are locked on your devices. If the passphrase is lost, teammates share the logins with you again.':
     'Server tidak pernah melihat kata sandi: login dikunci di perangkat Anda. Jika frasa sandi hilang, rekan tim membagikan ulang login kepada Anda.',
+  // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
+  "Passwords are kept on the {product} server, never in the browser. Sign in to your company to open the Vault.": "Kata sandi disimpan di server {product}, tidak pernah di browser. Masuk ke perusahaan Anda untuk membuka Vault.",
+  "The Vault isn’t available here": "Vault tidak tersedia di sini",
 };
 
 export default id;

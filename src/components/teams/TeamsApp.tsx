@@ -155,9 +155,9 @@ export function TeamsHome({ teams, users, tasks, me, canCreate, actions, onOpen,
         </button>
         <div className="th-text">
           <h1>{t('Teams')}</h1>
-          <p>{t('Departments like Video, Design or Finance. Tasks belong to a project and a team, so leads see their team’s work and who has too much.')}</p>
         </div>
-        {canCreate && (
+        {/* One primary action per screen: while there are no teams, the empty state has it. */}
+        {canCreate && teams.length > 0 && (
           <button className="primary-btn sm" onClick={onNew}>
             <Plus size={14} /> {t('New team')}
           </button>
@@ -168,7 +168,7 @@ export function TeamsHome({ teams, users, tasks, me, canCreate, actions, onOpen,
           <EmptyState
             icon={<Users size={20} />}
             title={t('No teams yet')}
-            text={t('Make one per department. People can be in more than one team.')}
+            text={t('Departments like Video, Design or Finance. Tasks belong to a project and a team, so leads see their team’s work and who has too much. People can be in more than one team.')}
             action={
               canCreate && (
                 <button className="primary-btn sm" onClick={onNew}>

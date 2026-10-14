@@ -636,6 +636,12 @@ const id: Record<string, string> = {
   "Sender or domain": "Pengirim atau domain",
   "Sorting rules": "Aturan penyortiran",
   "name@shop.com or @shop.com": "nama@toko.com atau @toko.com",
+  // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
+  "No emails with attachments": "Tidak ada email dengan lampiran",
+  "No unread emails": "Tidak ada email yang belum dibaca",
+  "Nothing assigned to you": "Tidak ada yang ditugaskan ke Anda",
+  "Nothing needs your reply": "Tidak ada yang perlu Anda balas",
+  "Turn off inbox tabs": "Matikan tab kotak masuk",
 };
 
 export default id;

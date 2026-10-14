@@ -201,8 +201,13 @@ export function VaultView({
       <section className="tasks-pane view-enter">
         <EmptyState
           icon={<KeyRound size={22} />}
-          title={t('The Vault needs the {product} server', { product: product.name })}
-          text={t('Passwords are never kept in the browser. Run the local server (npm run server) and sign in to use it.')}
+          title={t('The Vault isn’t available here')}
+          text={
+            // Developer instructions only for developers; everyone else gets what it means for them.
+            import.meta.env.DEV
+              ? t('Passwords are never kept in the browser. Run the local server (npm run server) and sign in to use it.')
+              : t('Passwords are kept on the {product} server, never in the browser. Sign in to your company to open the Vault.', { product: product.name })
+          }
         />
       </section>
     );

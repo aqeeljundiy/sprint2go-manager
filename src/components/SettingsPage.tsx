@@ -8,6 +8,7 @@ import { Handshake, Ban, Bell, Building2, ChevronDown, ChevronRight, Columns3, C
 import { ACCENTS, type Settings } from '../settings';
 import { mailState, type MailState } from '../mailStatus';
 import { BackupEmailRow } from './BackupEmail';
+import { tj } from '../i18n/tj';
 import { BrandsSettings } from './admin/Brands';
 import { DEFAULT_PERMISSIONS } from '../types';
 import type { Account, AISettings, AppId, BlockRule, CalendarDef, DriveItem, HomeTemplateId, MeetingSettings, Plan, Role, StorageSettings, Team, Todo, User, Workspace } from '../types';
@@ -957,7 +958,16 @@ export function SettingsPage({ email, settings: s, update, section, onSection, u
             />
           )}
           {section === 'meetings' && <MeetingsSection ws={ws} canManage={canManage} onMeetings={admin.onMeetings} />}
-          {!sections.some((x) => x.id === section) && <p className="muted">{demo?.inDemo && DEMO_OUT.includes(section) ? t('The demo company has no billing, AI keys, mail delivery, brand or sign-in rules of its own: they’re set in your real company.') : t('Ask an admin about this.')}</p>}
+          {!sections.some((x) => x.id === section) && (
+            <p className="muted">
+              {demo?.inDemo && DEMO_OUT.includes(section)
+                ? t('The demo company has no billing, AI keys, mail delivery, brand or sign-in rules of its own: they’re set in your real company.')
+                : SECTIONS.some((x) => x.id === section)
+                  ? t('Only admins can change this. Ask an admin of {company}.', { company: ws.name })
+                  : // An address that isn't a Settings page at all (an old link): say so, and offer the first page.
+                    tj('There’s no such page in Settings. {link}', { link: <button key="go" type="button" className="link-btn" onClick={() => onSection(sections[0].id)}>{t('Go to {page}', { page: sections[0].name })}</button> })}
+            </p>
+          )}
           {section === 'ai' && sections.some((x) => x.id === 'ai') && <AISection ws={ws} people={admin.people} users={wsUsers} me={me} canManage={canManage} onAI={admin.onAI} onBilling={() => onSection('billing')} toast={admin.toast} />}
           {section === 'billing' && sections.some((x) => x.id === 'billing') && (plan.unlimited ? <UnlimitedSection ws={ws} users={wsUsers} me={me} canManage={canManage} onExport={admin.onExport} toast={admin.toast} /> : <BillingSection ws={ws} people={admin.people} isOwner={myRole === 'owner'} onPlan={admin.onPlan} onExport={admin.onExport} toast={admin.toast} />)}
           {section === 'import' && sections.some((x) => x.id === 'import') && <ImportSection ws={ws} members={wsUsers} projects={admin.projects} toast={admin.toast} />}

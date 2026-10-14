@@ -759,6 +759,9 @@ const id: Record<string, string> = {
   Photo: 'Foto',
   // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
   "No recorded meetings with {name} yet. Send the notetaker to your next call with them (Meet, Send notetaker).": "Belum ada rapat terekam dengan {name}. Kirim notulis ke panggilan berikutnya dengan mereka (Meet, Kirim notulis).",
+  // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
+  "No tasks due today": "Tidak ada tugas yang jatuh tempo hari ini",
+  "Reviews, replies and requests waiting on you are in Needs you on Home. Plan ahead in Upcoming.": "Tinjauan, balasan, dan permintaan yang menunggu Anda ada di Perlu Anda di Beranda. Rencanakan ke depan di Mendatang.",
 };
 
 export default id;

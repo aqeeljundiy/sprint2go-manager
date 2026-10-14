@@ -532,6 +532,10 @@ const id: Record<string, string> = {
   "Use a PNG, JPG, WebP or SVG image.": "Gunakan gambar PNG, JPG, WebP, atau SVG.",
   "Use a logo under 300 KB.": "Gunakan logo di bawah 300 KB.",
   "What they can do": "Yang bisa mereka lakukan",
+  // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
+  "Go to {page}": "Buka {page}",
+  "Only admins can change this. Ask an admin of {company}.": "Hanya admin yang bisa mengubah ini. Tanyakan ke admin {company}.",
+  "There’s no such page in Settings. {link}": "Halaman ini tidak ada di Pengaturan. {link}",
 };
 
 export default id;
