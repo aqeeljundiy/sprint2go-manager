@@ -307,6 +307,10 @@
   .month-drop.bare .md-day:active > span {
     background: var(--hover);
   }
+  /* The months around this one: there to read the week by, muted. */
+  .month-drop.bare .md-day.out {
+    color: var(--text-3);
+  }
   .month-drop.bare .md-day.today {
     color: var(--accent-text, var(--accent));
     font-weight: 600;

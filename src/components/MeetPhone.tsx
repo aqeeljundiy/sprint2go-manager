@@ -82,7 +82,7 @@ export function MeetSettingsScreen({ settings, rows, myRole, autoJoin, onJoinMod
           </button>
         ))}
         <div className="ms-join">
-          <div className="ad-heading">{t('Bot joins automatically')}</div>
+          <div className="ad-heading">{t('Notetaker joins automatically')}</div>
           <p className="ms-note">
             {autoJoin === 'off'
               ? t('The notetaker isn’t available on this server yet, so it can’t join meetings. Recordings and notes start working as soon as it is.')
@@ -90,7 +90,7 @@ export function MeetSettingsScreen({ settings, rows, myRole, autoJoin, onJoinMod
                 ? t('It joins a minute before each meeting with a Google Meet or Zoom link, for everyone in the company. Read only: it never changes your calendar.')
                 : t('{mode}, for everyone in the company. An admin can change it in Settings, Meetings. Use the switch on a meeting to change just that one.', { mode: t(JOIN_MODES.find((x) => x.value === mode)?.label ?? '') })}
           </p>
-          {autoJoin !== 'off' && admin && <Select value={mode} onChange={onJoinMode} label={t('Bot joins automatically')} className="ms-sel" options={JOIN_MODES.map((x) => ({ value: x.value, label: t(x.label), hint: t(x.hint) }))} />}
+          {autoJoin !== 'off' && admin && <Select value={mode} onChange={onJoinMode} label={t('Notetaker joins automatically')} className="ms-sel" options={JOIN_MODES.map((x) => ({ value: x.value, label: t(x.label), hint: t(x.hint) }))} />}
         </div>
       </div>
     </PushScreen>
@@ -281,7 +281,7 @@ export function MeetHome(p: HomeProps) {
             })}
           </div>
         ) : (
-          <EmptyState compact text={q || filter !== 'all' ? t('Nothing matches.') : t('No meetings here yet. Tap “{send}” to send the notetaker to one.', { send: t('Take notes') })} />
+          <EmptyState compact text={q || filter !== 'all' ? t('Nothing matches.') : t('No meetings here yet. Tap “{send}” to send the notetaker to one.', { send: t('Send notetaker') })} />
         )}
       </div>
       {filing && (

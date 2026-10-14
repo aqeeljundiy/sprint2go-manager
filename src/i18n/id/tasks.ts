@@ -757,6 +757,8 @@ const id: Record<string, string> = {
   'Remove {name}': 'Hapus {name}',
   'The upload failed.': 'Unggahan gagal.',
   Photo: 'Foto',
+  // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
+  "No recorded meetings with {name} yet. Send the notetaker to your next call with them (Meet, Send notetaker).": "Belum ada rapat terekam dengan {name}. Kirim notulis ke panggilan berikutnya dengan mereka (Meet, Kirim notulis).",
 };
 
 export default id;

@@ -211,6 +211,17 @@ const id: Record<string, string> = {
   '{n} things need you.': '{n} hal perlu Anda tangani.',
   'Nothing needs you right now. Next: {title} at {time}.': 'Tidak ada yang perlu Anda tangani sekarang. Berikutnya: {title} pukul {time}.',
   '{n} left: {what}': '{n} lagi: {what}',
+  // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
+  "Drag a card to move it. Drag its right edge, or pick a width and height on the card, to resize it. Only your Home changes.": "Seret kartu untuk memindahkannya. Seret tepi kanannya, atau pilih lebar dan tinggi di kartu, untuk mengubah ukurannya. Hanya Beranda Anda yang berubah.",
+  "Drag to resize {card}": "Seret untuk mengubah ukuran {card}",
+  "Fit": "Pas",
+  "Full": "Penuh",
+  "Height": "Tinggi",
+  "Remove {card}": "Hapus {card}",
+  "Size of {card}": "Ukuran {card}",
+  "Tall": "Tinggi",
+  "Width": "Lebar",
+  "{n} of 12 columns": "{n} dari 12 kolom",
 };
 
 export default id;

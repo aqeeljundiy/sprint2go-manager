@@ -15,7 +15,7 @@ import { ProjectsCtx } from './components/ProjectPicker';
 import { ProjectsSidebar } from './components/ProjectsSidebar';
 import { ProjectsHome } from './components/ProjectsHome';
 import { Popover } from './components/ui/Popover';
-import { Brain, Briefcase, Building2, CalendarPlus, Copy, FileText, Hash, ListChecks, Mail, PenLine, Send, Sparkles, Timer, Trash2, Undo2, Upload, User as UserIcon, Video, Table2, MessagesSquare, AlertTriangle, Menu, Inbox, Search as Paperclip, Contact, House, MessageCircle, Bell, Sun, CalendarRange, CircleCheck, Layers, List, CalendarDays, Users, Star, Folder, UserRound, Archive, NotebookText } from 'lucide-react';
+import { Brain, Briefcase, Building2, CalendarPlus, Copy, FileText, Hash, ListChecks, Mail, PenLine, Send, Sparkles, Timer, Trash2, Undo2, Upload, User as UserIcon, Video, Table2, MessagesSquare, AlertTriangle, Menu, Inbox, Search as Paperclip, Contact, Clock, MessageCircle, Bell, Sun, CalendarRange, CircleCheck, Layers, List, CalendarDays, Users, Star, Folder, UserRound, Archive, NotebookText } from 'lucide-react';
 import { DEFAULT_PERMISSIONS } from './types';
 import type { Quote, Team, Note, Account, AppId, Attachment, BlockRule, CalEvent, Channel, ChannelCategory, Client, ClientPerson, ChatFile, ChatMessage, CommentFile, Meeting, Message, Notice, RsvpStatus, TaskEvent, TaskStatus, Todo, DriveItem, DriveSection, Location, Person, Thread, User, View, Workspace, FolderId } from './types';
 import { useMailOrganize } from './components/mail/Organize';
@@ -3905,7 +3905,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
         value: driveSection,
         // Drive: Recent is the Home tab on phones, so it's called Home here too; each place has its icon (Google Drive's drawer).
         // Phones: Home, Starred, Shared and My Drive are tabs; the title menu holds only the places that aren't.
-        options: DRIVE_SECTIONS.filter((s) => !isPhone() || s.id === driveSection || !['recent', 'starred', 'shared', 'my'].includes(s.id)).map((s) => ({ value: s.id, label: s.id === 'recent' && isPhone() ? t('Home') : t(s.name), icon: <s.icon size={20} /> })),
+        options: DRIVE_SECTIONS.filter((s) => !isPhone() || s.id === driveSection || !['recent', 'starred', 'shared', 'my'].includes(s.id)).map((s) => ({ value: s.id, label: t(s.name), icon: <s.icon size={20} /> })),
         onChange: (v: string) => (setDriveSection(v as DriveSection), setDriveFolder(null)),
       };
     return undefined;
@@ -4313,7 +4313,8 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
         ]);
       case 'chat':
         return bar([
-          { id: 'home', label: t('Home'), icon: House },
+          // "Channels", not "Home": Home is its own app (Teams calls this tab Chat, Slack Home; ours is the channel list).
+          { id: 'home', label: t('Channels'), icon: Hash },
           { id: 'dms', label: t('DMs'), icon: MessageCircle, badge: dmUnread },
           { id: 'activity', label: t('Activity'), icon: Bell, badge: chatActivity },
           // Slack's fourth tab: you (status, saved, drafts, Chat's settings). Search is the top bar's magnifier.
@@ -4338,7 +4339,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
         return null;
       case 'drive':
         return bar([
-          { id: 'home', label: t('Home'), icon: House },
+          { id: 'home', label: t('Recent'), icon: Clock },
           { id: 'starred', label: t('Starred'), icon: Star },
           { id: 'shared', label: t('Shared'), icon: Users },
           { id: 'files', label: t('My Drive'), icon: Folder },
@@ -4946,7 +4947,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
             title={mode === 'settings' ? t('Settings') : (APPS.find((a) => a.id === mode)?.name ?? '')}
             menu={chrome.title ?? mobileSwitcher}
             settings={mode === 'chat' || mode === 'tasks' ? [] : settingsRows}
-            back={chrome.back ?? (mode === 'home' ? toLauncher : undefined)}
+            back={chrome.back /* Home is a main screen: the launcher button, never a back arrow */}
             onLauncher={toLauncher}
             launcherDot={launcherDot}
             workspaces={workspaces}

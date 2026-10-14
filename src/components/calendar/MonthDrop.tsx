@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { addMonths, monthGrid, sameDay } from '../../calendarUtils';
 import { useSwipeNav } from './useSwipeNav';
 import { fmtDate, fmtMonth, fmtWeekdayLong } from '../../i18n/format';
+import { t } from '../../i18n';
 
 /**
  * The mini month that folds down from the calendar's title: tap a day to go there (it folds back up), swipe it or use
@@ -83,10 +84,9 @@ export function MonthDrop({
           {fmtDate(d, { weekday: 'narrow' })}
         </span>
       ))}
+      {/* Days of the months around it show too, muted (Google Calendar's): a row of blanks read as broken. */}
       {cells.map((d) =>
-        bare && d.getMonth() !== month.getMonth() ? (
-          <span key={d.toISOString()} className="md-day blank" aria-hidden />
-        ) : (
+        (
           <button
             key={d.toISOString()}
             type="button"
@@ -131,11 +131,11 @@ export function MonthDrop({
       <div className="fold-in">
         <div className="md-wrap">
           <div className="md-head">
-            <button type="button" className="icon-btn" onClick={() => setMonth(addMonths(month, -by))} aria-label={months ? 'Previous year' : 'Previous month'}>
+            <button type="button" className="icon-btn" onClick={() => setMonth(addMonths(month, -by))} aria-label={months ? t('Previous year') : t('Previous month')}>
               <ChevronLeft size={18} />
             </button>
             <span className="md-title">{months ? month.getFullYear() : fmtMonth(month)}</span>
-            <button type="button" className="icon-btn" onClick={() => setMonth(addMonths(month, by))} aria-label={months ? 'Next year' : 'Next month'}>
+            <button type="button" className="icon-btn" onClick={() => setMonth(addMonths(month, by))} aria-label={months ? t('Next year') : t('Next month')}>
               <ChevronRight size={18} />
             </button>
           </div>

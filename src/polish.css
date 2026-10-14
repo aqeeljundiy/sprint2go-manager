@@ -2013,7 +2013,7 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
   animation: s2gPopOut 0.2s cubic-bezier(0.4, 0, 1, 1) forwards !important;
 }
 .is-leaving .drawer {
-  animation: s2gDrawerOut 0.2s cubic-bezier(0.4, 0, 1, 1) forwards !important;
+  animation: s2gPanelOut 0.2s cubic-bezier(0.4, 0, 1, 1) forwards !important;
 }
 .is-leaving .drawer.tb-drawer.full {
   animation: s2gPopOut 0.18s cubic-bezier(0.4, 0, 1, 1) forwards !important;
@@ -2071,6 +2071,10 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
   .is-leaving.push-screen {
     animation: s2gFadeOut 0.15s ease forwards !important;
   }
+  /* The shade came in without motion, so it leaves without it too. */
+  .is-leaving.sheet-scrim {
+    animation: none !important;
+  }
 }
 .is-leaving.pop,
 .is-leaving.account-menu,
@@ -2098,7 +2102,8 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
     transform: scale(0.97) translateY(4px);
   }
 }
-@keyframes s2gDrawerOut {
+/* A side panel (.drawer) leaves to the right, where it came from; the phone's left drawer has s2gDrawerOut. */
+@keyframes s2gPanelOut {
   to {
     opacity: 0;
     transform: translateX(40px);

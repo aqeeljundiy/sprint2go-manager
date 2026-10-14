@@ -494,6 +494,14 @@ const id: Record<string, string> = {
   "{name} used 80% of their storage ({cap}).": "{name} sudah memakai 80% penyimpanannya ({cap}).",
   "{name} used all of their AI for this month ({share}).": "{name} sudah menghabiskan AI-nya bulan ini ({share}).",
   "{name}’s storage ({cap}) is full.": "Penyimpanan {name} ({cap}) sudah penuh.",
+  // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
+  "Confirm your backup email": "Konfirmasi email cadangan Anda",
+  "Enter this code in Settings, Account. You can then sign in and get codes at this email too.": "Masukkan kode ini di Pengaturan, Akun. Setelah itu Anda juga bisa masuk dan menerima kode di email ini.",
+  "Pick a tab.": "Pilih tab.",
+  "That email already signs in to an account.": "Email itu sudah dipakai untuk masuk ke sebuah akun.",
+  "Use an address (name@shop.com) or a whole domain (@shop.com).": "Gunakan alamat (nama@toko.com) atau seluruh domain (@toko.com).",
+  "You can read this inbox but not send from it. Ask an admin for send access.": "Anda bisa membaca kotak masuk ini tapi tidak bisa mengirim darinya. Minta akses kirim ke admin.",
+  "{code} is your code to add this backup sign-in email.": "{code} adalah kode Anda untuk menambahkan email masuk cadangan ini.",
 };
 
 export default id;

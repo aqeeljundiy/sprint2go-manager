@@ -550,7 +550,7 @@
     left: var(--bar-inset);
     right: var(--bar-inset);
     bottom: var(--bar-bottom);
-    z-index: 35;
+    z-index: var(--z-chrome);
     display: block;
     height: var(--tabbar-h);
     padding: 0;
@@ -675,7 +675,7 @@
     position: fixed;
     right: 16px;
     bottom: max(var(--fab-bottom), calc(var(--bar-space) + 16px)); /* one spot in every app; above the keyboard when open */
-    z-index: 34;
+    z-index: var(--z-fab);
     display: inline-flex;
     align-items: center;
     justify-content: center;

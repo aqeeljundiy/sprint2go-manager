@@ -1122,7 +1122,7 @@ export function TasksView(p: Props) {
 
         {client && clientTab === 'meetings' && (
           <div className="te-list">
-            {clientMeetings.length === 0 && <EmptyState compact text={t('No recorded meetings with {name} yet. Send the notetaker to your next call with them (Meet, Send bot).', { name: client.name })} />}
+            {clientMeetings.length === 0 && <EmptyState compact text={t('No recorded meetings with {name} yet. Send the notetaker to your next call with them (Meet, Send notetaker).', { name: client.name })} />}
             {clientMeetings.map((m) => (
               <button key={m.id} className="te-row simple" onClick={() => p.onOpenMeeting(m.id)}>
                 <span className="kpi-icon">

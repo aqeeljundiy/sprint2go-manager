@@ -457,6 +457,11 @@ const id: Record<string, string> = {
   // Month: a day with more than fits ("+3 more" opens the day)
   '+{n} more': '+{n} lagi',
   'Calendars and views': 'Kalender dan tampilan',
+  // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
+  "Next year": "Tahun berikutnya",
+  "Previous year": "Tahun sebelumnya",
+  "Next month": "Bulan berikutnya",
+  "Previous month": "Bulan sebelumnya",
 };
 
 export default id;

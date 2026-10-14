@@ -465,7 +465,7 @@ export function ChatSidebar(p: SidebarProps) {
           <div className="segmented chat-switch" role="tablist" aria-label={t('Chat')}>
             {(
               [
-                ['home', t('Home'), homeUnread],
+                ['home', t('Channels'), homeUnread],
                 ['dms', t('DMs'), dmUnread],
                 ['activity', t('Activity'), activityUnread],
               ] as const

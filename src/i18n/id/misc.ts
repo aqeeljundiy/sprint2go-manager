@@ -65,6 +65,18 @@ const id: Record<string, string> = {
   Allow: 'Izinkan',
   'Signed in as {email}. {notYou}': 'Masuk sebagai {email}. {notYou}',
   'Not you?': 'Bukan Anda?',
+  // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
+  "A second address to sign in with, so leaving a company never locks you out.": "Alamat kedua untuk masuk, jadi keluar dari sebuah perusahaan tidak akan mengunci akun Anda.",
+  "Backup email added. You can sign in with it too.": "Email cadangan ditambahkan. Anda juga bisa masuk dengannya.",
+  "Backup email removed": "Email cadangan dihapus",
+  "Backup email": "Email cadangan",
+  "Backup sign-in email": "Email masuk cadangan",
+  "Couldn’t remove it. Try again.": "Tidak bisa dihapus. Coba lagi.",
+  "Couldn’t send the code. Try again.": "Kode tidak bisa dikirim. Coba lagi.",
+  "Test code: {code}": "Kode uji: {code}",
+  "Use a personal address that isn’t run by a company you work for.": "Gunakan alamat pribadi yang tidak dikelola oleh perusahaan tempat Anda bekerja.",
+  "We sent a 6-digit code to {email}.": "Kami mengirim kode 6 digit ke {email}.",
+  "{email} signs in and gets password codes too.": "{email} juga bisa masuk dan menerima kode kata sandi.",
 };
 
 export default id;

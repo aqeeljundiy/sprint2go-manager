@@ -189,26 +189,28 @@
     background: var(--danger);
     animation: mh-pulse 1.4s ease-in-out infinite;
   }
-  /* The notetaker for one call: a mic you tap (filled when it joins). */
+  /* The notetaker for one call: a quiet toggle, the icon coloured when it joins. Not a button-in-a-card, and not the
+     company colour as a fill: that stays for the create button, so the column of rows doesn't read as primary actions. */
   .mh-mic {
     flex: none;
     display: grid;
     place-items: center;
     width: var(--tap);
     height: var(--tap);
-    margin-right: 12px;
+    margin-right: 8px;
     border-radius: 50%;
-    border: 1.5px solid var(--border);
+    border: 0;
+    background: none;
     color: var(--text-3);
     transition:
       background 0.15s,
-      color 0.15s,
-      border-color 0.15s;
+      color 0.15s;
+  }
+  .mh-mic:active {
+    background: var(--hover);
   }
   .mh-mic.on {
-    border-color: transparent;
-    background: var(--accent);
-    color: #fff;
+    color: var(--accent-text, var(--accent));
   }
   .mh-all {
     display: block;

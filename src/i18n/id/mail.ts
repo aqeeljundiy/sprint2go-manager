@@ -624,6 +624,18 @@ const id: Record<string, string> = {
   'Hide the email you’re answering': 'Sembunyikan email yang Anda balas',
   'On {when}, {who} wrote:': 'Pada {when}, {who} menulis:',
   'Switched on for {company}. It starts working as soon as this server is ready for other mail apps (see above).': 'Sudah dinyalakan untuk {company}. Mulai berfungsi begitu server ini siap untuk aplikasi email lain (lihat di atas).',
+  // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
+  "Add rule": "Tambah aturan",
+  "Anyone at {domain}": "Siapa pun di {domain}",
+  "Couldn’t save the rule. Try again.": "Aturan tidak bisa disimpan. Coba lagi.",
+  "Mail from these senders always goes to the tab you pick. Use a whole domain (@shop.com) for every address there. Rules come first, before the built-in sorting.": "Email dari pengirim ini selalu masuk ke tab yang Anda pilih. Gunakan seluruh domain (@shop.com) untuk semua alamat di sana. Aturan dijalankan lebih dulu, sebelum penyortiran bawaan.",
+  "Move an email to another tab to add a rule for its sender.": "Pindahkan email ke tab lain untuk menambah aturan bagi pengirimnya.",
+  "No rules yet. Move an email to another tab, or add one here.": "Belum ada aturan. Pindahkan email ke tab lain, atau tambahkan di sini.",
+  "Remove rule for {sender}": "Hapus aturan untuk {sender}",
+  "Remove rule": "Hapus aturan",
+  "Sender or domain": "Pengirim atau domain",
+  "Sorting rules": "Aturan penyortiran",
+  "name@shop.com or @shop.com": "nama@toko.com atau @toko.com",
 };
 
 export default id;

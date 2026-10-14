@@ -1,32 +1,437 @@
 {
-  "updated": "2026-10-16T00:10:00Z",
-  "items": [
-    { "id": "G1", "round": "Requested", "area": "Mail", "title": "Mailbox status says what actually works", "detail": "One rule (src/mailStatus.ts) using the server's readiness check: Working, Receiving only, No mail arriving yet, Not set up, Sign in needed.", "priority": "high", "status": "done" },
-    { "id": "G2", "round": "Requested", "area": "Mail", "title": "All mail folder", "detail": "Every account and tab in one list, archived too, never spam or trash. /mail/all.", "priority": "high", "status": "done" },
-    { "id": "G3", "round": "Requested", "area": "Mail", "title": "Sorting rules editor", "detail": "Settings, Mail: taught senders, change or remove, add for an address or @domain. Phone: in Inbox settings.", "priority": "high", "status": "done" },
-    { "id": "G4", "round": "Requested", "area": "Mail", "title": "Shared inbox access levels", "detail": "Can read / Can read and send per person, enforced on the server and for mail apps. 'Private from admins' left out: admins control the list, so it can't be promised.", "priority": "high", "status": "done" },
-    { "id": "G5", "round": "Requested", "area": "Account", "title": "Backup sign-in email", "detail": "Settings, Account, Security. Signs in and gets reset codes; a reset keeps the main email.", "priority": "high", "status": "done" },
-    { "id": "G9", "round": "Requested", "area": "Chat", "title": "Chat summary: one brief you can update", "detail": "Overview, Urgent, Decided, Open questions, Next steps; Update button, 'N new messages since'. Dated summaries folded below.", "priority": "high", "status": "doing" },
-    { "id": "G10", "round": "Requested", "area": "Home", "title": "Home layout fully customizable", "detail": "Exact card sizes, more columns, add any card, balanced spacing.", "priority": "high", "status": "todo" },
-    { "id": "G11", "round": "Requested", "area": "Phone", "title": "Bottom bar: margins, safe areas, rounded", "detail": "Floating bar, inset from edges, follows phone corner curves, rethink labels.", "priority": "high", "status": "todo" },
-    { "id": "G12", "round": "Requested", "area": "Landing", "title": "Landing page audit and rewrite", "detail": "Who it's for in the hero, two CTAs, agency and free guests up front, no endless marquee.", "priority": "medium", "status": "todo" },
-    { "id": "G6", "round": "Requested", "area": "Workspace", "title": "Brands inside a workspace", "detail": "Name, logo, colour, signature and sending domain per brand.", "priority": "medium", "status": "todo" },
-    { "id": "G7", "round": "Requested", "area": "Onboarding", "title": "Domain step: connect or buy", "detail": "Sign up with any email, then connect your domain.", "priority": "low", "status": "todo" },
-    { "id": "G8", "round": "Requested", "area": "Guests", "title": "One interface for guests and team", "detail": "Workspace switcher lists the workspaces you're a guest in.", "priority": "low", "status": "todo" },
-
-    { "id": "R1", "round": "Inbox", "area": "Brand", "title": "Own persona, not copied. Look like the landing page / elkiya.com / elkiyagroup.com", "detail": "Raw: Settings feels copied from Apple settings. No persona yet. Brand consistent across the whole app, like the landing page or Elkiya.", "priority": "high", "status": "todo" },
-    { "id": "R2", "round": "Inbox", "area": "Brand", "title": "No dead grey background: white, bright", "detail": "Raw: don't like the grey background, makes the app look dead. Likes white and bright colours.", "priority": "high", "status": "todo" },
-    { "id": "R3", "round": "Inbox", "area": "Research", "title": "Research each app against its reference", "detail": "Raw: Mail = Gmail/Proton UI, Chat = Slack + Discord, Tasks = Todoist, Calendar = Google Calendar, Projects = ?, Meet = Read AI, Drive = Google Drive, Notes = notes, Tables = Notion database, Teams = team management, Vault = passwords, Settings = settings.", "priority": "high", "status": "todo" },
-    { "id": "R4", "round": "Inbox", "area": "Everywhere", "title": "Right-click on everything", "detail": "Raw: right-click a feature to hide it (e.g. hide Chat if not used), then a menu to show it again. Most things should have a right-click menu, only a few do now.", "priority": "high", "status": "todo" },
-    { "id": "R5", "round": "Inbox", "area": "Mail", "title": "Inbox tabs should be removable (like Gmail labels)", "detail": "Raw: Primary/Promotions/Social/Updates feel default, should be able to cancel them out if not wanted.", "priority": "medium", "status": "todo" },
-    { "id": "R6", "round": "Inbox", "area": "Mail", "title": "Filter chips cropped (Attachments cut off)", "detail": "Raw: Unread / Needs reply / Assigned to me / Attachments row gets cropped when the list isn't wide, can't reach Attachments.", "priority": "high", "status": "todo" },
-    { "id": "R7", "round": "Inbox", "area": "Mail", "title": "Signature designer with ~5 templates", "detail": "Raw: design a signature, add logo etc. 5 templates. Free plan has a watermark, paid removes it.", "priority": "medium", "status": "todo" },
-    { "id": "R8", "round": "Inbox", "area": "Mail", "title": "Amazon SES: cost, what customers get free", "detail": "Raw: we talked about SES but don't use it. How much does it cost us, is it expensive to provide, how many free per month? Back-end logic needed (message cut off).", "priority": "medium", "status": "todo" },
-    { "id": "R9", "round": "Inbox", "area": "Support", "title": "Submit a ticket, queue in the admin backend", "detail": "Raw: feature to submit a ticket that goes to the backend, see which tickets need processing.", "priority": "medium", "status": "todo" },
-    { "id": "R10", "round": "Inbox", "area": "Security", "title": "Final: full security audit (vibe-coded app risks) + Dokploy", "detail": "Raw: make sure ENVs, APIs etc. never reach the front end. List the usual vibe-code security mistakes and check all. Look at Dokploy for what else to protect. Research GitHub/Google. Final backlog after the 5 rounds.", "priority": "high", "status": "todo" },
-    { "id": "R11", "round": "Inbox", "area": "Process", "title": "Five audit rounds, 15+ items each, UX/UI first", "detail": "Raw: audit, 15-20 backlog items, fix, audit again, five times (75+). Customer-centric, UX/UI first, features second. Question every placement against common habits on phone and desktop. Open to removing features nobody uses.", "priority": "high", "status": "todo" },
-    { "id": "R13", "round": "Inbox", "area": "Brand", "title": "Same background on phone and desktop (white, not reversed)", "detail": "Raw: white is better than grey. On mobile the background is white, on desktop a grey off-white, reversed, feels inconsistent.", "priority": "high", "status": "todo" },
-    { "id": "R14", "round": "Inbox", "area": "Phone", "title": "Phone should feel as clean as desktop", "detail": "Raw: desktop UI is pretty clean but the phone doesn't reflect its similarities.", "priority": "high", "status": "todo" },
-    { "id": "R12", "round": "Inbox", "area": "Home", "title": "Keep the 'Try it' demo", "detail": "Raw: thought about removing the demo, decided to keep it.", "priority": "low", "status": "done" }
-  ]
+    "updated":  "2026-10-14T22:16:57Z",
+    "items":  [
+                  {
+                      "id":  "G1",
+                      "round":  "Requested",
+                      "area":  "Mail",
+                      "title":  "Mailbox status says what actually works",
+                      "detail":  "One rule (src/mailStatus.ts) using the server\u0027s readiness check: Working, Receiving only, No mail arriving yet, Not set up, Sign in needed.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "G2",
+                      "round":  "Requested",
+                      "area":  "Mail",
+                      "title":  "All mail folder",
+                      "detail":  "Every account and tab in one list, archived too, never spam or trash. /mail/all.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "G3",
+                      "round":  "Requested",
+                      "area":  "Mail",
+                      "title":  "Sorting rules editor",
+                      "detail":  "Settings, Mail: taught senders, change or remove, add for an address or @domain. Phone: in Inbox settings.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "G4",
+                      "round":  "Requested",
+                      "area":  "Mail",
+                      "title":  "Shared inbox access levels",
+                      "detail":  "Can read / Can read and send per person, enforced on the server and for mail apps. \u0027Private from admins\u0027 left out: admins control the list, so it can\u0027t be promised.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "G5",
+                      "round":  "Requested",
+                      "area":  "Account",
+                      "title":  "Backup sign-in email",
+                      "detail":  "Settings, Account, Security. Signs in and gets reset codes; a reset keeps the main email.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "G9",
+                      "round":  "Requested",
+                      "area":  "Chat",
+                      "title":  "Chat summary: one brief you can update",
+                      "detail":  "Overview, Urgent, Decided, Open questions, Next steps; Update button, \u0027N new messages since\u0027. Dated summaries folded below.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "G10",
+                      "round":  "Requested",
+                      "area":  "Home",
+                      "title":  "Home layout fully customizable",
+                      "detail":  "Exact card sizes, more columns, add any card, balanced spacing.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "G11",
+                      "round":  "Requested",
+                      "area":  "Phone",
+                      "title":  "Bottom bar: margins, safe areas, rounded",
+                      "detail":  "Floating bar, inset from edges, follows phone corner curves, rethink labels.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "G12",
+                      "round":  "Requested",
+                      "area":  "Landing",
+                      "title":  "Landing page audit and rewrite",
+                      "detail":  "Who it\u0027s for in the hero, two CTAs, agency and free guests up front, no endless marquee.",
+                      "priority":  "medium",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "G6",
+                      "round":  "Requested",
+                      "area":  "Workspace",
+                      "title":  "Brands inside a workspace",
+                      "detail":  "Settings, General \u0026 email, Brands: name, colour, logo, domains. Mailboxes on a brand\u0027s domains get its colour dot; compose names the brand. Next: brand signatures (with R7).",
+                      "priority":  "medium",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "G7",
+                      "round":  "Requested",
+                      "area":  "Onboarding",
+                      "title":  "Domain step: buying a domain (needs your call)",
+                      "detail":  "Connecting your own domain already works in onboarding (keep / mix / hosted with live DNS checks). Buying one needs a registrar account (e.g. a reseller API) and payments: your decision.",
+                      "priority":  "low",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "G8",
+                      "round":  "Requested",
+                      "area":  "Guests",
+                      "title":  "One interface for guests and team (needs your call)",
+                      "detail":  "Changes how the client portal walls off client data. Proposal in docs/GAMEPLAN.md section 8; worth deciding together before building.",
+                      "priority":  "low",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "R1",
+                      "round":  "Inbox",
+                      "area":  "Brand",
+                      "title":  "Own persona, not copied. Look like the landing page / elkiya.com / elkiyagroup.com",
+                      "detail":  "Raw: Settings feels copied from Apple settings. No persona yet. Brand consistent across the whole app, like the landing page or Elkiya.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "R2",
+                      "round":  "Inbox",
+                      "area":  "Brand",
+                      "title":  "No dead grey background: white, bright",
+                      "detail":  "Raw: don\u0027t like the grey background, makes the app look dead. Likes white and bright colours.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "R3",
+                      "round":  "Inbox",
+                      "area":  "Research",
+                      "title":  "Research each app against its reference",
+                      "detail":  "Raw: Mail = Gmail/Proton UI, Chat = Slack + Discord, Tasks = Todoist, Calendar = Google Calendar, Projects = ?, Meet = Read AI, Drive = Google Drive, Notes = notes, Tables = Notion database, Teams = team management, Vault = passwords, Settings = settings.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "R4",
+                      "round":  "Inbox",
+                      "area":  "Everywhere",
+                      "title":  "Right-click on everything",
+                      "detail":  "Raw: right-click a feature to hide it (e.g. hide Chat if not used), then a menu to show it again. Most things should have a right-click menu, only a few do now.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "R5",
+                      "round":  "Inbox",
+                      "area":  "Mail",
+                      "title":  "Inbox tabs should be removable (like Gmail labels)",
+                      "detail":  "Raw: Primary/Promotions/Social/Updates feel default, should be able to cancel them out if not wanted.",
+                      "priority":  "medium",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "R6",
+                      "round":  "Inbox",
+                      "area":  "Mail",
+                      "title":  "Filter chips cropped (Attachments cut off)",
+                      "detail":  "Raw: Unread / Needs reply / Assigned to me / Attachments row gets cropped when the list isn\u0027t wide, can\u0027t reach Attachments.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "R7",
+                      "round":  "Inbox",
+                      "area":  "Mail",
+                      "title":  "Signature designer with ~5 templates",
+                      "detail":  "Raw: design a signature, add logo etc. 5 templates. Free plan has a watermark, paid removes it.",
+                      "priority":  "medium",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "R8",
+                      "round":  "Inbox",
+                      "area":  "Mail",
+                      "title":  "Amazon SES: cost, what customers get free",
+                      "detail":  "Raw: we talked about SES but don\u0027t use it. How much does it cost us, is it expensive to provide, how many free per month? Back-end logic needed (message cut off).",
+                      "priority":  "medium",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "R9",
+                      "round":  "Inbox",
+                      "area":  "Support",
+                      "title":  "Submit a ticket, queue in the admin backend",
+                      "detail":  "Raw: feature to submit a ticket that goes to the backend, see which tickets need processing.",
+                      "priority":  "medium",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "R10",
+                      "round":  "Inbox",
+                      "area":  "Security",
+                      "title":  "Final: full security audit (vibe-coded app risks) + Dokploy",
+                      "detail":  "Raw: make sure ENVs, APIs etc. never reach the front end. List the usual vibe-code security mistakes and check all. Look at Dokploy for what else to protect. Research GitHub/Google. Final backlog after the 5 rounds.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "R11",
+                      "round":  "Inbox",
+                      "area":  "Process",
+                      "title":  "Five audit rounds, 15+ items each, UX/UI first",
+                      "detail":  "Raw: audit, 15-20 backlog items, fix, audit again, five times (75+). Customer-centric, UX/UI first, features second. Question every placement against common habits on phone and desktop. Open to removing features nobody uses.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "R13",
+                      "round":  "Inbox",
+                      "area":  "Brand",
+                      "title":  "Same background on phone and desktop (white, not reversed)",
+                      "detail":  "Raw: white is better than grey. On mobile the background is white, on desktop a grey off-white, reversed, feels inconsistent.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "R14",
+                      "round":  "Inbox",
+                      "area":  "Phone",
+                      "title":  "Phone should feel as clean as desktop",
+                      "detail":  "Raw: desktop UI is pretty clean but the phone doesn\u0027t reflect its similarities.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "R12",
+                      "round":  "Inbox",
+                      "area":  "Home",
+                      "title":  "Keep the \u0027Try it\u0027 demo",
+                      "detail":  "Raw: thought about removing the demo, decided to keep it.",
+                      "priority":  "low",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "A1",
+                      "round":  "Audit 1",
+                      "area":  "Phone",
+                      "title":  "Side drawer slides out the way it came in",
+                      "detail":  "Duplicate s2gDrawerOut keyframes made the left drawer fade right on close.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "A2",
+                      "round":  "Audit 1",
+                      "area":  "Phone",
+                      "title":  "Home shows the launcher button, not a back arrow",
+                      "detail":  "Home is a main screen; a back chevron implied it was pushed.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "A3",
+                      "round":  "Audit 1",
+                      "area":  "Chat",
+                      "title":  "Chat bottom tab: Channels, not Home",
+                      "detail":  "\"Home\" clashed with the Home app.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "A4",
+                      "round":  "Audit 1",
+                      "area":  "Drive",
+                      "title":  "Drive: Recent, not Home",
+                      "detail":  "Two different screens named Home inside one app.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "A5",
+                      "round":  "Audit 1",
+                      "area":  "Meet",
+                      "title":  "Meet rows: quiet notetaker toggle, distinct create button",
+                      "detail":  "Stacks of identical orange mic circles; unclear which one does what.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "A6",
+                      "round":  "Audit 1",
+                      "area":  "Phone",
+                      "title":  "Bottom bar and create button on the z-index tokens",
+                      "detail":  "Hard-coded 34/35; the bar could draw over the button mid-animation.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "A7",
+                      "round":  "Audit 1",
+                      "area":  "Calendar",
+                      "title":  "Month picker shows neighbouring days, muted",
+                      "detail":  "First and last rows looked broken with blank cells.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "A8",
+                      "round":  "Audit 1",
+                      "area":  "Mail",
+                      "title":  "Filter chips never cropped",
+                      "detail":  "Attachments chip was cut off in a narrow list (R6).",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "A9",
+                      "round":  "Audit 1",
+                      "area":  "Mail",
+                      "title":  "Inbox tabs keep one width; new-mail dot takes no space",
+                      "detail":  "Tabs resized when you picked one; the highlight jumped.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "A10",
+                      "round":  "Audit 1",
+                      "area":  "Mail",
+                      "title":  "Read and unread rows keep the same width",
+                      "detail":  "Bold-on-unread shifted text when an email was opened.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "A11",
+                      "round":  "Audit 1",
+                      "area":  "Mail",
+                      "title":  "Row hover actions without a box, date not hidden",
+                      "detail":  "Box inside a box covering the date.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "A12",
+                      "round":  "Audit 1",
+                      "area":  "Mail",
+                      "title":  "Done has one icon everywhere",
+                      "detail":  "Check in some places, archive box in others.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "A13",
+                      "round":  "Audit 1",
+                      "area":  "Mail",
+                      "title":  "Empty list says why, with the right icon",
+                      "detail":  "A big tick showed for searches that found nothing.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "A14",
+                      "round":  "Audit 1",
+                      "area":  "Mail",
+                      "title":  "Discarding a draft can be undone",
+                      "detail":  "One tap lost everything typed.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "A15",
+                      "round":  "Audit 1",
+                      "area":  "Tasks",
+                      "title":  "Today agrees with Home",
+                      "detail":  "\"All done for today\" while Home listed things that need you.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "A16",
+                      "round":  "Audit 1",
+                      "area":  "Meet",
+                      "title":  "One name for the notetaker; real call icons",
+                      "detail":  "Five names for one feature; every non-Zoom call labelled GM.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "A17",
+                      "round":  "Audit 1",
+                      "area":  "Projects",
+                      "title":  "One primary button per empty screen",
+                      "detail":  "Header and empty state both had the same primary button.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "A18",
+                      "round":  "Audit 1",
+                      "area":  "Vault",
+                      "title":  "No developer instructions shown to users",
+                      "detail":  "Vault told end users to run npm run server.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "A19",
+                      "round":  "Audit 1",
+                      "area":  "Settings",
+                      "title":  "Unknown Settings page says so, not \"Ask an admin\"",
+                      "detail":  "/settings/general showed a permission message.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "A20",
+                      "round":  "Audit 1",
+                      "area":  "Chat",
+                      "title":  "Dated summaries never hang on an AI error",
+                      "detail":  "An AI failure left it on \"Writing…\" forever.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "R15",
+                      "round":  "Inbox",
+                      "area":  "Process",
+                      "title":  "After the 5 rounds: audit every app twice (15-20 items each)",
+                      "detail":  "Raw: audit mail 2x, chat 2x, tasks 2x, vault 2x, projects 2x, every menu, 15-20 backlog each time. Customer experience on mobile, desktop and iPad (portrait and landscape). Very comprehensive.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "R16",
+                      "round":  "Inbox",
+                      "area":  "Mail",
+                      "title":  "Inboxes as a dropdown account switcher",
+                      "detail":  "Raw: instead of every email listed under Inboxes, a dropdown to pick which account to see (All or one), plus Add temporary address and Add a (non-temporary) address in the same dropdown.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  }
+              ]
 }

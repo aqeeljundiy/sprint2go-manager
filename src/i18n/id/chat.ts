@@ -805,6 +805,23 @@ const id: Record<string, string> = {
   '{name} is sharing their screen. One screen at a time.': '{name} sedang berbagi layar. Satu layar dalam satu waktu.',
   '{name}’s screen': 'Layar {name}',
   // (end of chat)
+  // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
+  "A short brief of this channel: the big picture, what’s urgent, what’s decided and what’s still open.": "Ringkasan singkat kanal ini: gambaran besarnya, yang mendesak, yang sudah diputuskan, dan yang masih terbuka.",
+  "Dated summaries ({n})": "Ringkasan bertanggal ({n})",
+  "Dated summaries": "Ringkasan bertanggal",
+  "Decided": "Diputuskan",
+  "No brief yet": "Belum ada ringkasan",
+  "Nothing urgent, decided or open yet.": "Belum ada yang mendesak, diputuskan, atau terbuka.",
+  "The brief couldn’t be written. Try again.": "Ringkasan tidak bisa ditulis. Coba lagi.",
+  "Update": "Perbarui",
+  "Updating…": "Memperbarui…",
+  "Urgent": "Mendesak",
+  "Write the brief": "Tulis ringkasan",
+  "{n} new messages since": "{n} pesan baru sejak itu",
+  "{n} new message since": "{n} pesan baru sejak itu",
+  "Open questions": "Pertanyaan terbuka",
+  "Next steps": "Langkah berikutnya",
+  "Updated {when}": "Diperbarui {when}",
 };
 
 export default id;

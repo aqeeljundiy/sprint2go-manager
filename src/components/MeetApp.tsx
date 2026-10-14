@@ -106,9 +106,9 @@ export function MeetSidebar({ page, meetings, clients, canSend, onPage, onSend, 
   return (
     <>
       {canSend && (
-        <button className="compose-btn" onClick={onSend} title={t('Send the notetaker to a meeting')}>
+        <button className="compose-btn" onClick={onSend} title={t('Send notetaker')}>
           <Bot size={16} />
-          <span className="sb-label">{t('Send bot to a meeting')}</span>
+          <span className="sb-label">{t('Send notetaker')}</span>
         </button>
       )}
       <nav className="nav">
@@ -218,7 +218,7 @@ export function MeetView(p: MeetProps & { part?: 'meetings' | 'notes'; embedded?
   const pg = p.page;
   const phone = usePhone();
   // Phones: Google Meet's "Take notes" (send the notetaker to a call). Embedded (Calendar's Meetings) leaves Calendar's own.
-  useCreateAction(p.embedded ? 'calendar' : 'meet', p.canSendBot !== false && (phone ? { label: t('Take notes'), icon: Mic, run: p.onSend } : { label: t('Send the notetaker'), icon: Bot, run: p.onSend }));
+  useCreateAction(p.embedded ? 'calendar' : 'meet', p.canSendBot !== false && { label: t('Send notetaker'), icon: Bot, run: p.onSend });
   const [settingsOpen, setSettingsOpen] = useState(false);
   // Calendar's Meetings section: the same list as Meet's Meetings.
   if (p.embedded) return <MeetComing {...p} />;
@@ -317,7 +317,7 @@ function MeetingRows({ list, clients, tasks, onOpen, onFile, showStatusDone = fa
         const open = tasks.filter((tk) => tk.meetingId === m.id && !tk.done).length;
         return (
           <div key={m.id} className="m-row" role="button" tabIndex={0} onClick={(e) => !(e.target as HTMLElement).closest('.sel, .pop') && onOpen(m.id)} onKeyDown={(e) => e.key === 'Enter' && onOpen(m.id)}>
-            <span className={`plat ${m.platform ?? 'meet'}`}>{m.platform === 'zoom' ? 'Zm' : 'GM'}</span>
+            <CallMark kind={m.platform ?? 'meet'} size={28} />
             <span className="m-main">
               <strong>{m.title}</strong>
               <small>
@@ -373,13 +373,13 @@ function MeetingList(p: MeetProps & { unfiled: boolean }) {
     <section className="meet-pane view-enter">
       <Head title={p.unfiled ? t('Unfiled') : t('Meetings')} sub={p.unfiled ? t('Meetings that didn’t fit a {project} yet.', { project: term.one }) : t('Every meeting the notetaker has joined in this workspace.')} onMenu={p.onMenu}>
         <button className="primary-btn sm" onClick={p.onSend}>
-          <Bot size={14} /> {t('Send bot')}
+          <Bot size={14} /> {t('Send notetaker')}
         </button>
       </Head>
       <div className="tracking-scroll">
         {bar(t('Search titles, notes and transcripts'))}
         <MeetingRows list={shown} clients={p.clients} tasks={p.tasks} onOpen={(id) => p.onPage({ kind: 'meeting', id })} onFile={(id, cid) => p.onFolder(id, cid, false)} />
-        {shown.length === 0 && <EmptyState compact text={filtering ? t('Nothing matches.') : t('No meetings here yet. Use “{send}”.', { send: t('Send bot to a meeting') })} />}
+        {shown.length === 0 && <EmptyState compact text={filtering ? t('Nothing matches.') : t('No meetings here yet. Use “{send}”.', { send: t('Send notetaker') })} />}
       </div>
     </section>
   );
@@ -1203,7 +1203,7 @@ function Upcoming(p: MeetProps) {
       <div className="tracking-scroll">
         <div className="side-card upcoming-set">
           <span>
-            <strong>{t('Bot joins automatically')}</strong>
+            <strong>{t('Notetaker joins automatically')}</strong>
             <small>
               {p.autoJoin === 'off'
                 ? t('The notetaker isn’t available on this server yet, so it can’t join meetings. Recordings and notes start working as soon as it is.')
@@ -1212,7 +1212,7 @@ function Upcoming(p: MeetProps) {
                   : t('{mode}, for everyone in the company. An admin can change it in Settings, Meetings. Use the switch on a meeting to change just that one.', { mode: modeLabel })}
             </small>
           </span>
-          {p.autoJoin !== 'off' && admin && <Select value={mode} onChange={p.onJoinMode} label={t('Bot joins automatically')} width={280} options={JOIN_MODES.map((x) => ({ value: x.value, label: t(x.label), hint: t(x.hint) }))} />}
+          {p.autoJoin !== 'off' && admin && <Select value={mode} onChange={p.onJoinMode} label={t('Notetaker joins automatically')} width={280} options={JOIN_MODES.map((x) => ({ value: x.value, label: t(x.label), hint: t(x.hint) }))} />}
         </div>
         {days.map((d) => (
           <div key={d} className="todo-group">
@@ -1267,8 +1267,8 @@ function Upcoming(p: MeetProps) {
                       </a>
                     )}
                     {bot && !mt && (
-                      <label className="ev-switch" title={t('Bot joins')}>
-                        <span className="muted small">{t('Bot joins')}</span>
+                      <label className="ev-switch" title={t('Notetaker joins')}>
+                        <span className="muted small">{t('Notetaker joins')}</span>
                         <button
                           type="button"
                           role="switch"
@@ -1294,7 +1294,7 @@ function Upcoming(p: MeetProps) {
   );
 }
 
-/* ---------------- Send bot ---------------- */
+/* ---------------- Send notetaker ---------------- */
 
 export function SendBotDialog({ clients, botName, languages, real, workspaceId, isOwner, seed, upcoming, demo, onSendEvent, onSend, onClose }: { clients: Client[]; botName: string; languages?: string[]; real?: boolean; workspaceId?: string; isOwner?: boolean; seed?: { title: string; note?: string }; upcoming?: CalEvent[]; demo?: boolean; onSendEvent?: (e: CalEvent) => void; onSend: (d: { url: string; title: string; botName: string; clientId: string; language?: string }) => void; onClose: () => void }) {
   const phone = usePhone();
@@ -1351,7 +1351,7 @@ export function SendBotDialog({ clients, botName, languages, real, workspaceId, 
     return (
       <Sheet
         onClose={onClose}
-        label={t('Take notes')}
+        label={t('Send notetaker')}
         className="tn-sheet"
         size="tall"
         head={
@@ -1359,7 +1359,7 @@ export function SendBotDialog({ clients, botName, languages, real, workspaceId, 
             <button type="button" className="icon-btn qc-x" onClick={onClose} aria-label={t('Close')}>
               <X size={22} />
             </button>
-            <h2 className="sheet-title tn-title">{t('Take notes')}</h2>
+            <h2 className="sheet-title tn-title">{t('Send notetaker')}</h2>
             <span className="spacer" />
             <button type="button" className="primary-btn qc-save" onClick={send} disabled={usedUp || !url.trim()}>
               {t('Send')}
@@ -1500,7 +1500,7 @@ export function SendBotDialog({ clients, botName, languages, real, workspaceId, 
             {t('Cancel')}
           </button>
           <button className="primary-btn" onClick={send} disabled={usedUp}>
-            <Send size={14} /> {t('Send bot')}
+            <Send size={14} /> {t('Send notetaker')}
           </button>
         </footer>
       </div>

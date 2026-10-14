@@ -134,6 +134,8 @@
   --tabbar-h: 56px; /* the bar: five labelled tabs */
   --bar-inset: 12px; /* the bar floats this far in from the screen's sides */
   --bar-bottom: max(12px, env(safe-area-inset-bottom)); /* and sits on the home indicator's line, or 12 px up without one */
+  --z-chrome: 30; /* the phone's bottom bar: above the page, below panels (--z-panel) */
+  --z-fab: 31; /* the create button: always above the bar, also while either animates */
   --bar-r: 28px; /* its corners: the phone's screen corners less the inset, so the curves run side by side */
   --fab-bottom: calc(var(--tabbar-h) + var(--bar-bottom) + 12px); /* the create button's one spot, bar or not */
   --bar-space: 0px; /* how much of the bottom the bar takes (phones only) */
