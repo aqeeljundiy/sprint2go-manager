@@ -182,9 +182,6 @@ export function DriveView(props: Props) {
       ...(own ? [{ label: t('Move to trash'), icon: Trash2, danger: true, group: 'end', run: () => props.onTrash(i.id) }] : []),
     ];
   };
-  // Computers: "New" opens upload or a new folder (Google Drive's button), not straight to Upload.
-  const newBtn = useRef<HTMLButtonElement>(null);
-  const deskNew = useActionMenu(() => newActions.filter((a) => a.icon !== Camera), { title: t('New') });
 
   const name = (i: DriveItem) =>
     props.renamingId === i.id ? (
@@ -349,11 +346,7 @@ export function DriveView(props: Props) {
             <List size={15} />
           </button>
         </div>
-        {section !== 'trash' && (
-          <button ref={newBtn} className="primary-btn hide-mobile" onClick={() => deskNew.openFrom(newBtn)} aria-haspopup="menu">
-            <Plus size={15} /> {t('New')}
-          </button>
-        )}
+        {/* No Upload or New here on computers: the sidebar has Upload and New folder already (one primary per screen). */}
       </header>
 
       <div className="drive-scroll" key={`${section}:${folderId}:${layout}`}>
@@ -447,7 +440,6 @@ export function DriveView(props: Props) {
           <span>{section === 'my' && crumbs.length ? t('to {folder}', { folder: crumbs[crumbs.length - 1].name }) : t('to My Drive')}</span>
         </div>
       )}
-      {deskNew.menu}
       {naming && (
         <NameSheet
           title={naming.kind === 'new' ? t('New folder') : t('Rename')}

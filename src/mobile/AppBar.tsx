@@ -61,7 +61,11 @@ export function CreateFab({ create, off }: { create: CreateAction | null; off?: 
   const btn = useRef<HTMLButtonElement>(null);
   const hold = useLongPress(() => create?.more?.length && setMore(true));
   const visible = !!create && !create.hidden && !off;
-  const small = useShrinkOnScroll(!!create?.extended && visible);
+  // Scrolling down: an extended button shrinks to its icon (Gmail's Compose); a round one slides away (Material's rule),
+  // so it never sits on a row's own controls while you read. Scrolling up, or reaching the top, brings it back.
+  const down = useShrinkOnScroll(visible);
+  const small = down && !!create?.extended;
+  const away = down && !create?.extended;
   // Toasts and docked things make room for it (src/mobile/shell.css, `.has-fab`).
   useEffect(() => {
     const root = document.documentElement;
@@ -74,7 +78,7 @@ export function CreateFab({ create, off }: { create: CreateAction | null; off?: 
       <button
         ref={btn}
         type="button"
-        className={`fab lp${visible ? ' on' : ''}${shown?.extended ? ' extended' : ''}${small ? ' small' : ''}`}
+        className={`fab lp${visible ? ' on' : ''}${shown?.extended ? ' extended' : ''}${small ? ' small' : ''}${away ? ' scroll-away' : ''}`}
         onClick={() => create?.run()}
         aria-label={shown?.label}
         title={shown?.label}

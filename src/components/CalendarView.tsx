@@ -406,9 +406,7 @@ export function CalendarView(props: Props) {
                 ))}
               </div>
             )}
-            <button className="primary-btn cal-new" onClick={() => props.onCreate(nextSlot(cursor))} title={t('New event (C)')}>
-              <Plus size={15} /> <span>{t('New event')}</span>
-            </button>
+            {/* "New event" is the sidebar's button (and C); not repeated here, one primary per screen. */}
           </>
       </header>
       )}

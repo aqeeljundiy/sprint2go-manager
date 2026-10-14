@@ -15,7 +15,7 @@ import { ProjectsCtx } from './components/ProjectPicker';
 import { ProjectsSidebar } from './components/ProjectsSidebar';
 import { ProjectsHome } from './components/ProjectsHome';
 import { Popover } from './components/ui/Popover';
-import { Brain, Briefcase, Building2, CalendarPlus, Copy, FileText, Hash, ListChecks, Mail, PenLine, Send, Sparkles, Timer, Trash2, Undo2, Upload, User as UserIcon, Video, Table2, MessagesSquare, AlertTriangle, Menu, Inbox, Search as Paperclip, Contact, Clock, MessageCircle, Bell, Sun, CalendarRange, CircleCheck, Layers, List, CalendarDays, Users, Star, Folder, UserRound, Archive, NotebookText } from 'lucide-react';
+import { Brain, Briefcase, Building2, CalendarPlus, Copy, FileText, Hash, ListChecks, Mail, PenLine, Send, Sparkles, Timer, Trash2, Undo2, Upload, User as UserIcon, Video, Table2, MessagesSquare, AlertTriangle, Menu, Inbox, Search as Paperclip, Contact, Clock, History, MessageCircle, Bell, Sun, CalendarRange, CircleCheck, Layers, List, CalendarDays, Users, Star, Folder, UserRound, Archive, NotebookText } from 'lucide-react';
 import { DEFAULT_PERMISSIONS } from './types';
 import type { Quote, Team, Note, Account, AppId, Attachment, BlockRule, CalEvent, Channel, ChannelCategory, Client, ClientPerson, ChatFile, ChatMessage, CommentFile, Meeting, Message, Notice, RsvpStatus, TaskEvent, TaskStatus, Todo, DriveItem, DriveSection, Location, Person, Thread, User, View, Workspace, FolderId } from './types';
 import { useMailOrganize } from './components/mail/Organize';
@@ -4363,7 +4363,8 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
       case 'meet':
         return bar([
           { id: 'meetings', label: t('Meetings'), icon: Video },
-          { id: 'notes', label: t('Notes'), icon: FileText },
+          // "Past": the meetings that happened, with their notes ("Notes" clashed with the Notes app).
+          { id: 'notes', label: t('Past'), icon: History },
           { id: 'folders', label: t('Folders'), icon: Folder },
         ]);
       case 'teams':

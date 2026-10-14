@@ -388,11 +388,8 @@ function MeetingList(p: MeetProps & { unfiled: boolean }) {
   const { shown, bar, filtering } = useFilter(list);
   return (
     <section className="meet-pane view-enter">
-      <Head title={p.unfiled ? t('Unfiled') : t('Meetings')} sub={p.unfiled ? t('Meetings that didn’t fit a {project} yet.', { project: term.one }) : t('Every meeting the notetaker has joined in this workspace.')} onMenu={p.onMenu}>
-        <button className="primary-btn sm" onClick={p.onSend}>
-          <Bot size={14} /> {t('Send notetaker')}
-        </button>
-      </Head>
+      {/* "Send notetaker" is the sidebar's button; not repeated here (one primary per screen). */}
+      <Head title={p.unfiled ? t('Unfiled') : t('Meetings')} sub={p.unfiled ? t('Meetings that didn’t fit a {project} yet.', { project: term.one }) : undefined} onMenu={p.onMenu} />
       <div className="tracking-scroll">
         {bar(t('Search titles, notes and transcripts'))}
         <MeetingRows list={shown} clients={p.clients} tasks={p.tasks} onOpen={(id) => p.onPage({ kind: 'meeting', id })} onFile={(id, cid) => p.onFolder(id, cid, false)} />
