@@ -4,7 +4,8 @@ import { IconTile } from './ui/IconTile';
 import { useRef, useState } from 'react';
 import { usePersisted } from '../settings';
 import { Popover } from './ui/Popover';
-import { Archive, ArrowRight, Check, Menu, Plus, SlidersHorizontal } from 'lucide-react';
+import { Archive, ArrowRight, Check, FolderOpen, ListChecks, Mail, Menu, MessagesSquare, Pause, Play, Plus, SlidersHorizontal } from 'lucide-react';
+import { useActionMenu } from './ui/ActionSheet';
 import type { Client, Todo, User } from '../types';
 import { PROJECT_TYPES, term } from '../terms';
 import { localDay, relative } from '../utils';
@@ -24,9 +25,28 @@ import { fmtDay } from '../i18n/format';
  * The Projects app's home: every project, the ones that need something first. Each card says what's wrong (late,
  * nobody on it, waiting on a guest) or that it's on track, and opens the project's hub.
  */
-export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu, startAdding, onPast }: { startAdding?: boolean; projects: Client[]; tasks: Todo[]; users: User[]; onOpen: (id: string) => void; onCreate?: (name: string, type?: string) => void; onPast?: () => void; onMenu: () => void }) {
+export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu, startAdding, onPast, onOpenPart, onPause, onEnd }: { startAdding?: boolean; projects: Client[]; tasks: Todo[]; users: User[]; onOpen: (id: string) => void; onCreate?: (name: string, type?: string) => void; onPast?: () => void; onMenu: () => void; onOpenPart?: (id: string, part: 'tasks' | 'chat' | 'emails' | 'files') => void; onPause?: (id: string, paused: boolean) => void; onEnd?: (id: string) => void }) {
   const [adding, setAdding] = useState(!!startAdding);
   const phone = usePhone();
+  // Right-click a card (long-press on touch): the same things the project's own menu does, without opening it first.
+  const [hit, setHit] = useState<Client | null>(null);
+  const cardMenu = useActionMenu(() =>
+    !hit
+      ? []
+      : [
+          { label: t('Open'), icon: ArrowRight, run: () => onOpen(hit.id) },
+          ...(onOpenPart
+            ? [
+                { label: t('Tasks'), icon: ListChecks, group: 'parts', run: () => onOpenPart(hit.id, 'tasks') },
+                { label: t('Chat'), icon: MessagesSquare, group: 'parts', run: () => onOpenPart(hit.id, 'chat') },
+                { label: t('Emails'), icon: Mail, group: 'parts', run: () => onOpenPart(hit.id, 'emails') },
+                { label: t('Files'), icon: FolderOpen, group: 'parts', run: () => onOpenPart(hit.id, 'files') },
+              ]
+            : []),
+          ...(onPause ? [{ label: hit.status === 'paused' ? t('Resume') : t('Pause'), icon: hit.status === 'paused' ? Play : Pause, group: 'manage', run: () => onPause(hit.id, hit.status !== 'paused') }] : []),
+          ...(onEnd ? [{ label: t('End work'), icon: Archive, danger: true, group: 'manage', run: () => onEnd(hit.id) }] : []),
+        ],
+  );
   useCreateAction('projects', !!onCreate && { label: t('New {project}', { project: term.one }), icon: Plus, run: () => setAdding(true) });
   const [name, setName] = useState('');
   const [type, setType] = useState('');
@@ -187,7 +207,7 @@ export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu,
               const owner = users.find((u) => u.id === c.ownerId);
               const issues = [s.late && tn(s.late, '{n} late', '{n} late'), s.nobody && tn(s.nobody, '{n} not picked up', '{n} not picked up'), s.guest && tn(s.guest, '{n} waiting on {who}', '{n} waiting on {who}', { who: term.who })].filter(Boolean) as string[];
               return (
-                <button key={c.id} className="proj-card" style={{ ['--i' as string]: i }} onClick={() => onOpen(c.id)}>
+                <button key={c.id} className="proj-card" style={{ ['--i' as string]: i }} onClick={() => onOpen(c.id)} {...cardMenu.bind} onContextMenu={(e) => (setHit(c), cardMenu.bind.onContextMenu(e))} onPointerDown={(e) => (setHit(c), cardMenu.bind.onPointerDown?.(e))}>
                   <span className="proj-top">
                     <ProjectBadge p={c} kind="client-badge" />
                     <span className="proj-name">
@@ -232,6 +252,7 @@ export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu,
           </div>
         )}
       </div>
+      {cardMenu.menu}
     </section>
   );
 }

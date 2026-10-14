@@ -76,7 +76,7 @@ const draftExtras = (m: Message) => ({
   ...(m.plain ? { plain: true } : {}),
 });
 // Search operators, inbox tabs, Important, mute, multiple inboxes, auto-advance, conversation view, shortcuts.
-import { advanceTo, rowOf, sortInbox, splitRows, tabOf, tabsOn, useMailPrefs, categoryName } from './components/mail/sortPrefs';
+import { advanceTo, rowOf, sortInbox, splitRows, tabOf, tabsOn, useMailPrefs, categoryName, changeThreads } from './components/mail/sortPrefs';
 import { InboxSections, InboxSettings, InboxTabs, KeepNotice, QueryBar, SavedSearches, TabNav, TabRows } from './components/mail/Sorting';
 import { MailShortcuts } from './components/mail/Shortcuts';
 import { matchThread, parseQuery, type Category } from './mailQuery';
@@ -4921,6 +4921,11 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
         accountState={accountState}
         brandColor={(ws.brands?.length ?? 0) > 1 ? (email) => mailBrandOf(ws, email)?.color : undefined}
         onAddAccount={imAdmin && !inSandbox ? () => setNewAcct(true) : undefined}
+        onFolderRead={(id) => {
+          const ids = scoped.filter((x) => x.unread && inView(x, { kind: 'folder', id }, { me: user.id, tabs: [] })).map((x) => x.id);
+          if (!ids.length) return showToast({ text: t('Nothing unread in {folder}', { folder: folderName(id) }) });
+          changeThreads(ids, () => ({ unread: false }), tn(ids.length, '{n} email marked read', '{n} emails marked read'));
+        }}
         onNewTemp={() => setTempDialog({})}
         onNewProject={enabled.has('projects') ? () => (newProjectFlow(), setSidebarOpen(false)) : undefined}
         onTempMenu={(a, el) => ((tempAnchor.current = el), setTempMenu(a))}
@@ -5234,6 +5239,9 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
             tasks={wsTasks}
             users={members}
             onOpen={(id) => (setClientTab(undefined), setProjScope({ kind: 'client', id }))}
+            onOpenPart={(id, part) => (setClientTab(part), setProjScope({ kind: 'client', id }))}
+            onPause={canCreateProjects ? (id, paused) => (patchClient(id, { status: paused ? 'paused' : 'active' }), showToast({ text: paused ? t('Paused') : t('Resumed') })) : undefined}
+            onEnd={canCreateProjects ? setEnding : undefined}
             onPast={mobile ? undefined : () => setProjScope({ kind: 'past' })}
             onCreate={
               canCreateProjects

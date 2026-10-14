@@ -1,5 +1,5 @@
 {
-    "updated":  "2026-10-14T22:26:11Z",
+    "updated":  "2026-10-14T22:30:54Z",
     "items":  [
                   {
                       "id":  "G1",
@@ -125,7 +125,7 @@
                       "title":  "No dead grey background: white, bright",
                       "detail":  "Raw: don\u0027t like the grey background, makes the app look dead. Likes white and bright colours.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "R3",
@@ -215,7 +215,7 @@
                       "title":  "Same background on phone and desktop (white, not reversed)",
                       "detail":  "Raw: white is better than grey. On mobile the background is white, on desktop a grey off-white, reversed, feels inconsistent.",
                       "priority":  "high",
-                      "status":  "todo"
+                      "status":  "done"
                   },
                   {
                       "id":  "R14",
@@ -430,6 +430,177 @@
                       "area":  "Mail",
                       "title":  "Inboxes as a dropdown account switcher",
                       "detail":  "Raw: instead of every email listed under Inboxes, a dropdown to pick which account to see (All or one), plus Add temporary address and Add a (non-temporary) address in the same dropdown.",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "B1",
+                      "round":  "Audit 2",
+                      "area":  "Brand",
+                      "title":  "White pages everywhere, panels set apart by fine edges",
+                      "detail":  "Same white on phone and desktop; Elkiya ink and soft blue glow. (R2, R13)",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "B2",
+                      "round":  "Audit 2",
+                      "area":  "Everywhere",
+                      "title":  "Right-click an app to hide it; + brings hidden apps back",
+                      "detail":  "The rail menu: Open, Hide; a \"+N hidden\" button lists hidden apps. (R4)",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "B3",
+                      "round":  "Audit 2",
+                      "area":  "Mail",
+                      "title":  "Inbox picker instead of a long list",
+                      "detail":  "All inboxes, each mailbox with unread and problems, temporary addresses, add an address. (R16)",
+                      "priority":  "high",
+                      "status":  "done"
+                  },
+                  {
+                      "id":  "B4",
+                      "round":  "Audit 2",
+                      "area":  "Projects",
+                      "title":  "Right-click a project card",
+                      "detail":  "Open, Open tasks, Email the project, Pause, End.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "B5",
+                      "round":  "Audit 2",
+                      "area":  "Teams",
+                      "title":  "Right-click a team card",
+                      "detail":  "Open, Open team tasks, Rename, Delete.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "B6",
+                      "round":  "Audit 2",
+                      "area":  "Meet",
+                      "title":  "Right-click a meeting row",
+                      "detail":  "Open, Share, Ask about it, File in project, Delete: the detail screen\u0027s actions.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "B7",
+                      "round":  "Audit 2",
+                      "area":  "Tables",
+                      "title":  "Right-click a table card, and board cards on desktop",
+                      "detail":  "Board card menu was phone-only.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "B8",
+                      "round":  "Audit 2",
+                      "area":  "Mail",
+                      "title":  "Right-click a folder",
+                      "detail":  "Mark all read, Empty (Trash, Spam).",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "B9",
+                      "round":  "Audit 2",
+                      "area":  "Settings",
+                      "title":  "One header style, sentence case, phone and desktop",
+                      "detail":  "11px uppercase on desktop, 13px uppercase on phone; the system says 15/600 sentence case.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "B10",
+                      "round":  "Audit 2",
+                      "area":  "Settings",
+                      "title":  "Phone Settings: our look, not iOS\u0027s coloured tiles",
+                      "detail":  "Plain icons like desktop; no rainbow of tiles.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "B11",
+                      "round":  "Audit 2",
+                      "area":  "Settings",
+                      "title":  "Phone Settings opens with the company card",
+                      "detail":  "Logo, name, plan: what you are setting, at the top.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "B12",
+                      "round":  "Audit 2",
+                      "area":  "Settings",
+                      "title":  "Grouped cards follow the theme tokens in dark mode",
+                      "detail":  "Hard-coded #1c1c1f.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "B13",
+                      "round":  "Audit 2",
+                      "area":  "Settings",
+                      "title":  "Settings nav and blocks on the spacing scale",
+                      "detail":  "9px radius, 26px gaps: off the scale.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "B14",
+                      "round":  "Audit 2",
+                      "area":  "Settings",
+                      "title":  "Phone shows each section\u0027s intro",
+                      "detail":  "The explanatory line was hidden on phones.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "B15",
+                      "round":  "Audit 2",
+                      "area":  "iPad",
+                      "title":  "One tablet breakpoint in JS and CSS",
+                      "detail":  "JS 1099 vs CSS 1100: at 1100 px both rules applied.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "B16",
+                      "round":  "Audit 2",
+                      "area":  "iPad",
+                      "title":  "iPad landscape: room for the reader in Mail",
+                      "detail":  "248 sidebar + 72 rail + 400 list left ~470 px.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "B17",
+                      "round":  "Audit 2",
+                      "area":  "Home",
+                      "title":  "Home cards go full width on every phone width",
+                      "detail":  "760 vs 767: half-width cards on some phones.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "B18",
+                      "round":  "Audit 2",
+                      "area":  "Chat",
+                      "title":  "Chat details dock beside the conversation from 1024 px",
+                      "detail":  "It covered the conversation up to 1100 px.",
+                      "priority":  "high",
+                      "status":  "todo"
+                  },
+                  {
+                      "id":  "B19",
+                      "round":  "Audit 2",
+                      "area":  "iPad",
+                      "title":  "Side panels leave room on iPad portrait",
+                      "detail":  "520 px panel left a 176 px sliver.",
                       "priority":  "high",
                       "status":  "todo"
                   }

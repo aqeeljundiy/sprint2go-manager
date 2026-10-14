@@ -128,6 +128,19 @@ export function TeamsHome({ teams, users, tasks, me, canCreate, actions, onOpen,
   const sorted = [...teams].sort((a, b) => Number(b.members.includes(me)) - Number(a.members.includes(me)) || a.name.localeCompare(b.name));
   useCreateAction('teams', canCreate && { label: t('New team'), icon: Plus, run: onNew });
   const phone = usePhone();
+  // Right-click a team card: open it, join or leave, or (admins) delete it.
+  const [hit, setHit] = useState<Team | null>(null);
+  const cardMenu = useActionMenu(() =>
+    !hit
+      ? []
+      : [
+          { label: t('Open'), icon: ChevronRight, run: () => onOpen(hit.id) },
+          hit.members.includes(me)
+            ? { label: t('Leave team'), icon: LogOut, group: 'me', run: () => actions.leave(hit) }
+            : { label: actions.direct(hit) ? t('Join') : t('Ask to join'), icon: UserPlus, group: 'me', run: () => actions.join(hit) },
+          ...(canCreate ? [{ label: t('Delete team'), icon: Trash2, danger: true, group: 'manage', run: () => actions.remove(hit) }] : []),
+        ],
+  );
   if (phone && teams.length)
     return (
       <section className="tasks-pane view-enter tdir-pane">
@@ -183,7 +196,7 @@ export function TeamsHome({ teams, users, tasks, me, canCreate, actions, onOpen,
               const lead = users.find((u) => u.id === tm.leadId);
               const s = teamState(tm, tasks);
               return (
-                <div key={tm.id} className="proj-card team-card-x" role="button" tabIndex={0} style={{ ['--i' as string]: i }} onClick={() => onOpen(tm.id)} onKeyDown={(e) => e.key === 'Enter' && e.target === e.currentTarget && onOpen(tm.id)}>
+                <div key={tm.id} className="proj-card team-card-x" role="button" tabIndex={0} style={{ ['--i' as string]: i }} onClick={() => onOpen(tm.id)} onKeyDown={(e) => e.key === 'Enter' && e.target === e.currentTarget && onOpen(tm.id)} {...cardMenu.bind} onContextMenu={(e) => (setHit(tm), cardMenu.bind.onContextMenu(e))} onPointerDown={(e) => (setHit(tm), cardMenu.bind.onPointerDown?.(e))}>
                   <span className="proj-top">
                     <span className="team-square big" style={{ background: tm.color }} />
                     <span className="proj-name">
@@ -219,6 +232,7 @@ export function TeamsHome({ teams, users, tasks, me, canCreate, actions, onOpen,
           </div>
         )}
       </div>
+      {cardMenu.menu}
     </section>
   );
 }

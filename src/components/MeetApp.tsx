@@ -40,6 +40,8 @@ import {
   Users,
   CircleCheck,
   Languages,
+  ChevronRight,
+  FolderInput,
 } from 'lucide-react';
 import type { CalEvent, Client, Meeting, MeetingSettings, MeetingType, Role, Todo, User, Workspace } from '../types';
 import { relative, fullDate } from '../utils';
@@ -310,13 +312,28 @@ function StatusPill({ m }: { m: Meeting }) {
 }
 
 function MeetingRows({ list, clients, tasks, onOpen, onFile, showStatusDone = false }: { list: Meeting[]; clients: Client[]; tasks: Todo[]; onOpen: (id: string) => void; onFile?: (id: string, clientId: string) => void; showStatusDone?: boolean }) {
+  // Right-click a meeting (or "File…" on an unfiled one): open it, or file it under a project. Filing used to be a
+  // dropdown inside every unfiled row, a box inside a box that made the list noisy.
+  const [hit, setHit] = useState<Meeting | null>(null);
+  const fileBtn = useRef<HTMLElement | null>(null);
+  const menu = useActionMenu(() =>
+    !hit
+      ? []
+      : [
+          { label: t('Open'), icon: ChevronRight, run: () => onOpen(hit.id) },
+          ...(onFile && (!hit.status || hit.status === 'done')
+            ? clients.filter((x) => x.id !== hit.clientId).slice(0, 8).map((x) => ({ label: t('File under {project}', { project: x.name }), icon: FolderInput, group: 'file', run: () => onFile(hit.id, x.id) }))
+            : []),
+        ],
+    { title: hit?.title },
+  );
   return (
     <div className="m-rows">
       {list.map((m) => {
         const c = clients.find((x) => x.id === m.clientId);
         const open = tasks.filter((tk) => tk.meetingId === m.id && !tk.done).length;
         return (
-          <div key={m.id} className="m-row" role="button" tabIndex={0} onClick={(e) => !(e.target as HTMLElement).closest('.sel, .pop') && onOpen(m.id)} onKeyDown={(e) => e.key === 'Enter' && onOpen(m.id)}>
+          <div key={m.id} className="m-row" role="button" tabIndex={0} onClick={(e) => !(e.target as HTMLElement).closest('.sel, .pop, .m-file') && onOpen(m.id)} onKeyDown={(e) => e.key === 'Enter' && onOpen(m.id)} {...menu.bind} onContextMenu={(e) => (setHit(m), menu.bind.onContextMenu(e))} onPointerDown={(e) => (setHit(m), menu.bind.onPointerDown?.(e))}>
             <CallMark kind={m.platform ?? 'meet'} size={28} />
             <span className="m-main">
               <strong>{m.title}</strong>
@@ -332,16 +349,16 @@ function MeetingRows({ list, clients, tasks, onOpen, onFile, showStatusDone = fa
                 {c.name}
               </span>
             )}
-            {!c && onFile && (!m.status || m.status === 'done') && (
-              // Not filed yet: file it right here.
-              <span onClick={(e) => e.stopPropagation()}>
-                <Select value="" onChange={(v) => onFile(m.id, v)} label={t('File under')} placeholder={t('File under…')} className="sel-flat" options={clients.map((x) => ({ value: x.id, label: x.name }))} />
-              </span>
+            {!c && onFile && (!m.status || m.status === 'done') && clients.length > 0 && (
+              <button type="button" className="link-btn m-file" onClick={(e) => (e.stopPropagation(), setHit(m), (fileBtn.current = e.currentTarget), menu.openFrom(fileBtn))}>
+                {t('File…')}
+              </button>
             )}
             {(showStatusDone || m.status !== 'done') && m.status && <StatusPill m={m} />}
           </div>
         );
       })}
+      {menu.menu}
     </div>
   );
 }

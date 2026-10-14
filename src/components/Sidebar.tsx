@@ -1,9 +1,11 @@
-import { useRef, type ReactNode } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
+import { useActionMenu } from './ui/ActionSheet';
 import { term } from '../terms';
 import {
   Activity,
   Archive,
   Mails,
+  MailOpen,
   FileText,
   Inbox,
   Layers,
@@ -94,6 +96,8 @@ interface Props {
   delegated?: Set<string>;
   onAccountFilter: (id: string) => void;
   onNewTemp?: () => void;
+  /** Marks every email in a folder read (the folder's right-click menu). */
+  onFolderRead?: (id: FolderId) => void;
   /** Admins: add a mailbox (Settings' dialog), offered in the inbox picker. */
   onAddAccount?: () => void;
   onNewProject?: () => void;
@@ -131,6 +135,16 @@ interface Props {
 export function Sidebar(props: Props) {
   const { mode, collapsed, view, counts, open } = props;
   const isActive = (v: View) => mode === 'mail' && v.kind === view.kind && v.id === view.id;
+  // Right-click a folder: open it, or mark everything in it read (with Undo).
+  const [folderHit, setFolderHit] = useState<FolderId | null>(null);
+  const folderMenu = useActionMenu(() =>
+    !folderHit
+      ? []
+      : [
+          { label: t('Open {folder}', { folder: folderName(folderHit) }), icon: FOLDERS.find((f) => f.id === folderHit)?.icon, run: () => props.onSelect({ kind: 'folder', id: folderHit }) },
+          ...(props.onFolderRead ? [{ label: t('Mark all as read'), icon: MailOpen, run: () => props.onFolderRead!(folderHit) }] : []),
+        ],
+  );
   const asideRef = useRef<HTMLElement>(null);
   const phone = usePhone();
 
@@ -215,6 +229,7 @@ export function Sidebar(props: Props) {
                       key={id}
                       className={`nav-item ${isActive({ kind: 'folder', id }) ? 'active' : ''}`}
                       onClick={() => props.onSelect({ kind: 'folder', id })}
+                      onContextMenu={(e) => (setFolderHit(id), folderMenu.bind.onContextMenu(e))}
                       title={folderName(id)}
                     >
                       <Icon size={17} />
@@ -222,6 +237,7 @@ export function Sidebar(props: Props) {
                       {counts[id] ? <span className="count">{counts[id]}</span> : null}
                     </button>
                   ))}
+                  {folderMenu.menu}
                 </nav>
 
                 <nav className="nav">

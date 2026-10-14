@@ -1,6 +1,8 @@
 import { Sheet } from '../ui/Sheet';
 import { useState } from 'react';
-import { ChevronRight, Menu, Plus, Table2, X } from 'lucide-react';
+import { ChevronRight, Link2, Menu, Plus, Table2, X } from 'lucide-react';
+import { useActionMenu } from '../ui/ActionSheet';
+import { toast } from '../../toast';
 import { Group } from '../ui/Grouped';
 import { usePhone } from '../../mobile/media';
 import type { Client, DataTable, TableRow } from '../../types';
@@ -12,7 +14,7 @@ import { TABLE_COLORS, TEMPLATES, templateFields, type TemplateId } from './fiel
 import { EmptyState } from '../ui/EmptyState';
 import { IconTile } from '../ui/IconTile';
 import { useCreateAction } from '../../mobile/chrome';
-import { useTableLinkOpen } from './hooks';
+import { tableLink, useTableLinkOpen } from './hooks';
 import { t, tn } from '../../i18n';
 
 /* ---------- sidebar ---------- */
@@ -134,6 +136,17 @@ export function makeTable(d: { name: string; clientId?: string; template: Templa
 /* ---------- a project's tables (its Tables tab) ---------- */
 
 export function ProjectTables({ tables, rows, onOpen, onNew, bare }: { tables: DataTable[]; rows: TableRow[]; onOpen: (id: string) => void; onNew: () => void; bare?: boolean }) {
+  // Right-click a table's card: open it, or copy a link to it to paste in chat or mail.
+  const [hit, setHit] = useState<DataTable | null>(null);
+  const cardMenu = useActionMenu(() =>
+    !hit
+      ? []
+      : [
+          { label: t('Open'), icon: ChevronRight, run: () => onOpen(hit.id) },
+          { label: t('Copy link'), icon: Link2, run: () => void navigator.clipboard?.writeText(tableLink(hit.id)).then(() => toast({ text: t('Link copied') })) },
+        ],
+    { title: hit?.name },
+  );
   if (!tables.length)
     return (
       <EmptyState
@@ -159,7 +172,7 @@ export function ProjectTables({ tables, rows, onOpen, onNew, bare }: { tables: D
         {tables.map((tb, i) => {
           const n = rows.filter((r) => r.tableId === tb.id).length;
           return (
-            <button key={tb.id} className="tb-table-card" style={{ ['--i' as string]: i }} onClick={() => onOpen(tb.id)}>
+            <button key={tb.id} className="tb-table-card" style={{ ['--i' as string]: i }} onClick={() => onOpen(tb.id)} {...cardMenu.bind} onContextMenu={(e) => (setHit(tb), cardMenu.bind.onContextMenu(e))} onPointerDown={(e) => (setHit(tb), cardMenu.bind.onPointerDown?.(e))}>
               <span className="client-badge" style={{ background: tb.color }}>
                 {tb.name.charAt(0).toUpperCase()}
               </span>
@@ -171,6 +184,7 @@ export function ProjectTables({ tables, rows, onOpen, onNew, bare }: { tables: D
           );
         })}
       </div>
+      {cardMenu.menu}
     </div>
   );
 }
