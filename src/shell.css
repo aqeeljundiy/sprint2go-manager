@@ -2771,6 +2771,72 @@ body.resizing-x .pane-resize::after {
 }
 
 /* Inboxes (multiple accounts) */
+/* Mail's inbox picker (mail/InboxSwitcher.tsx): one button for which inbox you're in, a menu for the rest. */
+.inbox-switch {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 12px 0 4px;
+}
+.inbox-switch-btn {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.18s var(--ease), background 0.18s var(--ease);
+}
+.inbox-switch-btn:hover,
+.inbox-switch-btn[aria-expanded='true'] {
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+}
+.inbox-switch-icon {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+.inbox-switch-icon .brand-dot {
+  left: auto;
+  right: -2px;
+  top: -2px;
+}
+.inbox-switch-text {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+}
+.inbox-switch-text strong,
+.inbox-switch-text small {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.inbox-switch-text strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+.inbox-switch-text small {
+  font-size: 12px;
+  color: var(--text-3);
+}
+.inbox-switch-chev {
+  flex: none;
+  color: var(--text-3);
+}
 /* Settings, Brands (admin/Brands.tsx) */
 .brand-row {
   width: 100%;

@@ -4920,6 +4920,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
         accountUnread={accountUnread}
         accountState={accountState}
         brandColor={(ws.brands?.length ?? 0) > 1 ? (email) => mailBrandOf(ws, email)?.color : undefined}
+        onAddAccount={imAdmin && !inSandbox ? () => setNewAcct(true) : undefined}
         onNewTemp={() => setTempDialog({})}
         onNewProject={enabled.has('projects') ? () => (newProjectFlow(), setSidebarOpen(false)) : undefined}
         onTempMenu={(a, el) => ((tempAnchor.current = el), setTempMenu(a))}

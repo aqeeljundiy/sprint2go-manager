@@ -15,14 +15,13 @@ import {
   ShieldAlert,
   Star,
   Trash2,
-  type LucideIcon, Clock, CalendarClock, UserCheck, Timer, MoreHorizontal, Plus, ListChecks, Inbox as InboxIcon, Hourglass, ListTodo, File, Tag, Folder, Settings, HelpCircle, Paperclip, Contact as ContactIcon, UserRoundCheck } from 'lucide-react';
+  type LucideIcon, Clock, CalendarClock, UserCheck, Timer, Plus, ListChecks, Inbox as InboxIcon, Hourglass, ListTodo, File, Tag, Folder, Settings, HelpCircle, Paperclip, Contact as ContactIcon, UserRoundCheck } from 'lucide-react';
 import type { Account, AppId, FolderId, Label, View, Workspace } from '../types';
 import { usePhone } from '../mobile/media';
 import { WorkspaceLogo } from './WorkspaceLogo';
-import { providerName } from './Onboarding';
-import { lifeLeft } from './TempAddress';
 import { t, tx } from '../i18n';
 import type { MailState } from '../mailStatus';
+import { InboxSwitcher } from './mail/InboxSwitcher';
 
 export const FOLDERS: { id: FolderId; icon: LucideIcon }[] = [
   { id: 'inbox', icon: Inbox },
@@ -95,6 +94,8 @@ interface Props {
   delegated?: Set<string>;
   onAccountFilter: (id: string) => void;
   onNewTemp?: () => void;
+  /** Admins: add a mailbox (Settings' dialog), offered in the inbox picker. */
+  onAddAccount?: () => void;
   onNewProject?: () => void;
   onTempMenu?: (a: Account, anchor: HTMLElement) => void;
   view: View;
@@ -195,66 +196,19 @@ export function Sidebar(props: Props) {
                   <kbd className="sb-label">C</kbd>
                 </button>
 
-                {props.accounts.filter((a) => !a.temp).length > 1 && (
-                  <>
-                    <div className="nav-heading sb-label">{t('Inboxes')}</div>
-                    <nav className="nav inbox-nav">
-                      {[{ id: 'all', name: t('All inboxes'), email: '', kind: 'all' as const }, ...props.accounts.filter((a) => !a.temp)].map((a) => (
-                        <button
-                          key={a.id}
-                          className={`nav-item acct ${props.activeAccount === a.id ? 'active' : ''}`}
-                          onClick={() => props.onAccountFilter(a.id)}
-                          title={a.email || a.name}
-                        >
-                          {a.kind === 'all' ? <Layers size={17} /> : a.kind === 'shared' ? <Users size={17} /> : props.delegated?.has(a.id) ? <UserRoundCheck size={17} /> : <Inbox size={17} />}
-                          {a.kind !== 'all' && props.brandColor?.(a.email) && <span className="brand-dot" style={{ background: props.brandColor(a.email) }} aria-hidden />}
-                          <span className="sb-label acct-text">
-                            <span>{a.kind === 'all' ? a.name : a.email.split('@')[0] + '@'}</span>
-                            {props.delegated?.has(a.id) ? (
-                              <small>{t('Delegated to you')}</small>
-                            ) : props.accountState?.[a.id] && !props.accountState[a.id].ok ? (
-                              <small title={props.accountState[a.id].hint}>{props.accountState[a.id].label}</small>
-                            ) : 'provider' in a && a.provider && a.provider !== 'sprint2go' ? (
-                              <small className="via">{t('via {provider}', { provider: providerName(a.provider) })}</small>
-                            ) : null}
-                          </span>
-                          {props.accountUnread[a.id] ? <span className="count">{props.accountUnread[a.id]}</span> : null}
-                        </button>
-                      ))}
-                    </nav>
-                  </>
-                )}
-                {(props.onNewTemp || props.accounts.some((a) => a.temp)) && (
-                  <>
-                    {props.accounts.some((a) => a.temp) && <div className="nav-heading sb-label">{t('Temporary')}</div>}
-                    <nav className="nav temp-nav">
-                      {props.accounts
-                        .filter((a) => a.temp)
-                        .map((a) => (
-                          <div key={a.id} className={`nav-item acct temp-row ${props.activeAccount === a.id ? 'active' : ''}`}>
-                            <button className="temp-open" onClick={() => props.onAccountFilter(a.id)} title={a.email}>
-                              <Timer size={17} />
-                              <span className="sb-label acct-text">
-                                <span>{a.email.split('@')[0]}@</span>
-                                <small>{lifeLeft(a)}</small>
-                              </span>
-                            </button>
-                            {props.accountUnread[a.id] ? <span className="count">{props.accountUnread[a.id]}</span> : null}
-                            <button className="icon-btn sm temp-more sb-label" title={t('Copy, share or delete')} onClick={(e) => props.onTempMenu?.(a, e.currentTarget)}>
-                              <MoreHorizontal size={15} />
-                            </button>
-                          </div>
-                        ))}
-                      {props.onNewTemp && (
-                        <button className="nav-item temp-add" onClick={props.onNewTemp} title={t('Temporary address')}>
-                          <Plus size={16} />
-                          <span className="sb-label">{t('Temporary address')}</span>
-                        </button>
-                      )}
-                    </nav>
-                  </>
-                )}
-                {(props.accounts.filter((a) => !a.temp).length > 1 || props.accounts.some((a) => a.temp)) && <div className="nav-heading sb-label">{t('Folders')}</div>}
+                <InboxSwitcher
+                  accounts={props.accounts}
+                  active={props.activeAccount}
+                  unread={props.accountUnread}
+                  state={props.accountState}
+                  delegated={props.delegated}
+                  brandColor={props.brandColor}
+                  onPick={props.onAccountFilter}
+                  onNewTemp={props.onNewTemp}
+                  onAddAccount={props.onAddAccount}
+                  onTempMenu={props.onTempMenu}
+                />
+                <div className="nav-heading sb-label">{t('Folders')}</div>
                 <nav className="nav">
                   {FOLDERS.map(({ id, icon: Icon }) => (
                     <button
