@@ -21,6 +21,12 @@ function serviceWorker(): Plugin {
         res.setHeader('content-type', 'text/javascript');
         res.end(source('dev'));
       });
+      // Our work board (public/backlog) at /backlog, like the server does.
+      server.middlewares.use((req, res, next) => {
+        if (req.url !== '/backlog' && req.url !== '/backlog/') return next();
+        res.setHeader('content-type', 'text/html');
+        res.end(readFileSync('public/backlog/index.html'));
+      });
     },
   };
 }

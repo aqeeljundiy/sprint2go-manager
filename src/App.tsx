@@ -7,6 +7,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { term, setTermWord, brand as product, setBrandName, brandOf, portalOrigin } from './terms';
 import { setPhotos } from './photos';
+import { mailState } from './mailStatus';
 import { TempAddressDialog, lifeLeft } from './components/TempAddress';
 import { AppSetupCard } from './components/AppSetupCard';
 import { ProjectsCtx } from './components/ProjectPicker';
@@ -776,6 +777,13 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
     }
     return r;
   }, [wsThreads]);
+
+  // Each mailbox's state for the sidebar and Settings: mail already arriving counts as receiving.
+  const accountState = useMemo(() => {
+    // Received mail: the server checks every arrival (auth); mail we sent carries delivery instead.
+    const got = new Set(threads.filter((t) => t.location !== 'drafts' && t.messages.some((m) => m.auth || !m.delivery)).map((t) => t.accountId));
+    return Object.fromEntries(ws.accounts.map((a) => [a.id, mailState(a, ws, got.has(a.id))]));
+  }, [threads, ws]);
 
   const wsUnread = useMemo(() => {
     const r: Record<string, number> = {};
@@ -4886,6 +4894,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
         delegated={delegatedIds}
         activeAccount={activeAccount}
         accountUnread={accountUnread}
+        accountState={accountState}
         onNewTemp={() => setTempDialog({})}
         onNewProject={enabled.has('projects') ? () => (newProjectFlow(), setSidebarOpen(false)) : undefined}
         onTempMenu={(a, el) => ((tempAnchor.current = el), setTempMenu(a))}
@@ -5872,6 +5881,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
           <PushedSettings push={mode === 'settings' ? null : pushed} onBack={() => setPushed(null)}>
           <SettingsPage
             embedded={mode !== 'settings'}
+            accountState={accountState}
             demo={
               demo && server.on
                 ? { inDemo: inSandbox, allowed: demo.allowed, state: demo.state, listOff: !!sandboxWs?.sandbox?.listOff, busy: demoBusy, onOpen: () => void openDemo(), onList: showTryList, realWorkspaceId: workspaces.find((w) => !isSandbox(w))?.id }

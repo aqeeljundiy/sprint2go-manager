@@ -21,6 +21,7 @@ import { WorkspaceLogo } from './WorkspaceLogo';
 import { providerName } from './Onboarding';
 import { lifeLeft } from './TempAddress';
 import { t, tx } from '../i18n';
+import type { MailState } from '../mailStatus';
 
 export const FOLDERS: { id: FolderId; icon: LucideIcon }[] = [
   { id: 'inbox', icon: Inbox },
@@ -82,6 +83,8 @@ interface Props {
   accounts: Account[];
   activeAccount: string; // 'all' or an account id
   accountUnread: Record<string, number>;
+  /** Each mailbox's state (src/mailStatus.ts): only problems show under its name. */
+  accountState?: Record<string, MailState>;
   /** Mailboxes someone gave you access to (delegation): marked as theirs in the list. */
   delegated?: Set<string>;
   onAccountFilter: (id: string) => void;
@@ -202,8 +205,8 @@ export function Sidebar(props: Props) {
                             <span>{a.kind === 'all' ? a.name : a.email.split('@')[0] + '@'}</span>
                             {props.delegated?.has(a.id) ? (
                               <small>{t('Delegated to you')}</small>
-                            ) : 'connected' in a && !a.connected ? (
-                              <small>{t('Not connected')}</small>
+                            ) : props.accountState?.[a.id] && !props.accountState[a.id].ok ? (
+                              <small title={props.accountState[a.id].hint}>{props.accountState[a.id].label}</small>
                             ) : 'provider' in a && a.provider && a.provider !== 'sprint2go' ? (
                               <small className="via">{t('via {provider}', { provider: providerName(a.provider) })}</small>
                             ) : null}

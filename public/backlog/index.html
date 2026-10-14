@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Backlog · sprint2go</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #f4f5f7; --card: #fff; --text: #16181d; --muted: #646b78; --line: #e3e6eb; --col: #eceef2;
+    --accent: #1f7a4d; --high: #c2410c; --medium: #a16207; --low: #4b5563; --done: #1f7a4d;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f1114; --card: #1a1d22; --text: #eceef1; --muted: #9aa1ad; --line: #2a2e35; --col: #15181c;
+      --accent: #4ade80; --high: #fb923c; --medium: #facc15; --low: #9ca3af; --done: #4ade80;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 400 14px/1.45 'Plus Jakarta Sans', system-ui, sans-serif; }
+  header { padding: 24px 16px 8px; max-width: 1280px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 12px; align-items: end; justify-content: space-between; }
+  h1 { margin: 0; font-size: 24px; font-weight: 700; }
+  .sub { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .filters { display: flex; gap: 4px; flex-wrap: wrap; background: var(--col); padding: 4px; border-radius: 999px; }
+  .filters button { border: 0; background: transparent; color: var(--muted); font: 600 13px 'Plus Jakarta Sans', sans-serif; padding: 6px 12px; border-radius: 999px; cursor: pointer; transition: background .18s, color .18s; min-height: 32px; }
+  .filters button.on { background: var(--card); color: var(--text); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+  main { max-width: 1280px; margin: 0 auto; padding: 16px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; align-items: start; }
+  @media (max-width: 860px) { main { grid-template-columns: 1fr; } }
+  .col { background: var(--col); border-radius: 16px; padding: 12px; }
+  .col h2 { margin: 0 4px 12px; font-size: 15px; font-weight: 600; display: flex; justify-content: space-between; }
+  .col h2 span { color: var(--muted); font-weight: 600; }
+  .card { background: var(--card); border-radius: 10px; padding: 12px; margin-bottom: 8px; box-shadow: 0 1px 2px rgba(0,0,0,.05); animation: in .22s ease-out backwards; cursor: pointer; transition: box-shadow .18s; }
+  .card:hover { box-shadow: 0 2px 10px rgba(0,0,0,.09); }
+  .card .top { display: flex; gap: 6px; align-items: center; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .card strong { font-weight: 600; display: block; }
+  .card .detail { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .22s ease-out; color: var(--muted); font-size: 13px; }
+  .card .detail > div { overflow: hidden; }
+  .card.open .detail { grid-template-rows: 1fr; }
+  .card.open .detail > div { padding-top: 6px; }
+  .pill { padding: 1px 8px; border-radius: 999px; background: var(--col); font-weight: 600; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .high { background: var(--high); } .medium { background: var(--medium); } .low { background: var(--low); }
+  .empty { color: var(--muted); font-size: 13px; padding: 8px 4px; }
+  @keyframes in { from { opacity: 0; transform: translateY(4px); } }
+  @media (prefers-reduced-motion: reduce) { .card { animation: none; } .card .detail, .filters button { transition: none; } }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Backlog</h1>
+    <div class="sub" id="sub">Loading…</div>
+  </div>
+  <div class="filters" id="filters"></div>
+</header>
+<main id="board"></main>
+<script>
+  const COLS = [['todo', 'To do'], ['doing', 'In progress'], ['done', 'Done']];
+  let data = { items: [] }, round = 'All';
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  function render() {
+    const rounds = ['All', ...new Set(data.items.map((i) => i.round))];
+    document.getElementById('filters').innerHTML = rounds.map((r) => `<button class="${r === round ? 'on' : ''}" data-r="${esc(r)}">${esc(r)}</button>`).join('');
+    const list = data.items.filter((i) => round === 'All' || i.round === round);
+    const done = list.filter((i) => i.status === 'done').length;
+    document.getElementById('sub').textContent = `${done} of ${list.length} done · updated ${new Date(data.updated).toLocaleString()}`;
+    document.getElementById('board').innerHTML = COLS.map(([k, name]) => {
+      const cards = list.filter((i) => i.status === k);
+      return `<section class="col"><h2>${name} <span>${cards.length}</span></h2>${cards.map((i, n) => `
+        <article class="card" style="animation-delay:${Math.min(n, 8) * 25}ms">
+          <div class="top"><span class="dot ${esc(i.priority)}" title="${esc(i.priority)} priority"></span><span>${esc(i.id)}</span><span class="pill">${esc(i.area)}</span></div>
+          <strong>${esc(i.title)}</strong>
+          <div class="detail"><div>${esc(i.detail || '')}</div></div>
+        </article>`).join('') || '<div class="empty">Nothing here.</div>'}</section>`;
+    }).join('');
+  }
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-r]'); if (b) { round = b.dataset.r; render(); return; }
+    const c = e.target.closest('.card'); if (c) c.classList.toggle('open');
+  });
+  fetch('/backlog/data.json', { cache: 'no-store' }).then((r) => r.json()).then((d) => { data = d; render(); }).catch(() => (document.getElementById('sub').textContent = 'Could not load the backlog.'));
+</script>
+</body>
+</html>

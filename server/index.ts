@@ -1237,6 +1237,8 @@ function serveStatic(req: IncomingMessage, res: ServerResponse, site = false) {
   // The front door: people who aren't signed in see the landing page; /welcome always shows it.
   // At a company's own address there's no landing page: its clients go straight to the branded sign-in.
   const signedIn = !!db.sessionUser(cookie(req, 's2g'));
+  // Our own work board (public/backlog): for people signed in, never at a company's address.
+  if ((path === '/backlog' || path === '/backlog/') && signedIn && !branded && !site) file = join(DIST, 'backlog', 'index.html');
   // With a separate marketing site, the app's own address opens on sign-in, not the landing page.
   if (((path === '/' && (site || (!SITE_HOST && !signedIn))) || path === '/welcome') && !branded) {
     file = join(DIST, 'landing.html');

@@ -3,6 +3,7 @@ import { useState, type ReactNode } from 'react';
 import { Ban, Inbox, Plus, UserPlus, Users } from 'lucide-react';
 import type { Account, BlockRule, CalendarDef, Role, User, Workspace } from '../types';
 import { ACCENTS, type Settings } from '../settings';
+import type { MailState } from '../mailStatus';
 import { HOLIDAY_COUNTRIES } from '../data/holidays';
 import { companyTz } from '../jobTimes';
 import { zoneOptions } from './ui/zones';
@@ -150,7 +151,7 @@ export function MembersPhone({ ws, users, me, canManage, onRole, onRemove, onInv
 }
 
 /** Email accounts: a row per mailbox; its screen has who opens it (shared inboxes), its state and Remove. */
-export function MailboxesPhone({ ws, users, me, canManage, nameOf, onAccess, onAdd, onRemove }: { ws: Workspace; users: User[]; me: string; canManage: boolean; nameOf: (id: string) => string; onAccess: (accountId: string, users: string[]) => void; onAdd: () => void; onRemove: (id: string) => void }) {
+export function MailboxesPhone({ ws, users, me, canManage, nameOf, onAccess, onAdd, onRemove, stateOf }: { ws: Workspace; users: User[]; me: string; canManage: boolean; nameOf: (id: string) => string; onAccess: (accountId: string, users: string[]) => void; onAdd: () => void; onRemove: (id: string) => void; stateOf: (a: Account) => MailState }) {
   const list = ws.accounts.filter((a) => !a.temp);
   const rows = useLeaving(list, (a) => a.id);
   const [open, setOpen] = useState<string | null>(null);
@@ -166,7 +167,7 @@ export function MailboxesPhone({ ws, users, me, canManage, nameOf, onAccess, onA
             pic={pic(x)}
             label={x.email}
             sub={x.kind === 'shared' ? t('Shared inbox') : t('Personal')}
-            value={x.connected ? undefined : t('Not connected')}
+            value={stateOf(x).ok ? undefined : stateOf(x).label}
             onClick={() => setOpen(x.id)}
           />
         ))}
@@ -175,9 +176,11 @@ export function MailboxesPhone({ ws, users, me, canManage, nameOf, onAccess, onA
       {a && (
         <PushScreen title={a.email} onBack={() => setOpen(null)} className="g-page g-edit">
           <div className="g-body">
+            <Group footer={stateOf(a).hint}>
+              <GRow label={t('Status')} value={stateOf(a).label} />
+            </Group>
             <Group footer={a.users.length ? t('opened by {names}', { names: a.users.map(nameOf).join(', ') }) : t('opened by nobody')}>
               <GRow label={t('Kind')} value={a.kind === 'shared' ? t('Shared inbox') : t('Personal')} />
-              <GRow label={t('Status')} value={a.connected ? t('Connected') : t('Not connected')} />
             </Group>
             {canManage && a.kind === 'shared' && (
               <Group title={t('Who can read and send from {email}', { email: a.email })} footer={t('At least one person needs access')}>

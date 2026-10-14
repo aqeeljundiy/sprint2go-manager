@@ -6,8 +6,9 @@ import { doneSettingsList, takeSettingsList } from './settingsList';
 import { term, brand as product } from '../terms';
 import { Handshake, Ban, Bell, Building2, ChevronDown, ChevronRight, Columns3, CreditCard, HardDrive, KeyRound, KeySquare, Stamp, LayoutGrid, UserPlus, Inbox, Plus, Sparkles, Trash2, Users, Keyboard, Menu, Palette, PenLine, ShieldCheck, UserRound, Video, type LucideIcon, FlaskConical, Send, LifeBuoy, FolderInput } from 'lucide-react';
 import { ACCENTS, type Settings } from '../settings';
+import { mailState, type MailState } from '../mailStatus';
 import { DEFAULT_PERMISSIONS } from '../types';
-import type { AISettings, AppId, BlockRule, CalendarDef, DriveItem, HomeTemplateId, MeetingSettings, Plan, Role, StorageSettings, Team, Todo, User, Workspace } from '../types';
+import type { Account, AISettings, AppId, BlockRule, CalendarDef, DriveItem, HomeTemplateId, MeetingSettings, Plan, Role, StorageSettings, Team, Todo, User, Workspace } from '../types';
 import { TaskStagesSection } from './admin/TaskStages';
 import { HOLIDAY_COUNTRIES } from '../data/holidays';
 import { AISection } from './admin/AISection';
@@ -160,6 +161,8 @@ interface Props {
   /** Their own demo company: Help & support and Your apps bring it back; inside it, money, keys and mail setup stay out. */
   demo?: DemoSettings;
   /** Mail storage's cleanup: delete conversations for good, empty Spam or Trash, open one in Mail. */
+  /** Each mailbox's state (src/mailStatus.ts), worked out in App where the mail is. */
+  accountState?: Record<string, MailState>;
   mailTeams?: { onDelete: (threadIds: string[]) => void; onEmpty: (where: 'spam' | 'trash') => void; onOpen: (threadId: string) => void };
 }
 
@@ -263,10 +266,11 @@ function SectionScreen({ phone, open, title, onBack, children }: { phone: boolea
   ) : null;
 }
 
-export function SettingsPage({ email, settings: s, update, section, onSection, usage, onMenu, workspace: ws, onWorkspace, onHolidays, holidayCal, onAddAccount, onRemoveAccount, mailExtras, users, me, onPhoto, onPreviewOnboarding, myApps, myRole, onInvite, onRole, onRemoveMember, onAccess, blocked, onUnblock, admin, demo, embedded, mailTeams }: Props & { embedded?: boolean }) {
+export function SettingsPage({ email, settings: s, update, section, onSection, usage, onMenu, workspace: ws, onWorkspace, onHolidays, holidayCal, onAddAccount, onRemoveAccount, mailExtras, users, me, onPhoto, onPreviewOnboarding, myApps, myRole, onInvite, onRole, onRemoveMember, onAccess, blocked, onUnblock, admin, demo, embedded, mailTeams, accountState }: Props & { embedded?: boolean }) {
   // Phones: the list of sections, and the one open over it (Settings opened for one section starts on it).
   const onPhone = usePhone();
   const phone = onPhone && !embedded;
+  const stateOf = (a: Account) => accountState?.[a.id] ?? mailState(a, ws);
   const [sectionOpen, setSectionOpen] = useState(() => !embedded && !takeSettingsList());
   useEffect(() => void (!embedded && doneSettingsList()), []); // eslint-disable-line react-hooks/exhaustive-deps
   const wsUsers = users.filter((u) => ws.members.some((m) => m.userId === u.id));
@@ -383,7 +387,7 @@ export function SettingsPage({ email, settings: s, update, section, onSection, u
                       <GRow label={t('Mail routing')} value={ws.mailRouting?.lastCheck ? (ws.mailRouting.lastCheck.ok ? t('Working') : t('Check the rule')) : ws.mailRouting?.verifiedAt ? t('Working') : t('Not checked yet')} onClick={() => setRoutingOpen(true)} />
                     </Group>
                   )}
-                  <MailboxesPhone ws={ws} users={users} me={me} canManage={canManage} nameOf={nameOf} onAccess={onAccess} onAdd={onAddAccount} onRemove={onRemoveAccount} />
+                  <MailboxesPhone ws={ws} users={users} me={me} canManage={canManage} nameOf={nameOf} onAccess={onAccess} onAdd={onAddAccount} onRemove={onRemoveAccount} stateOf={stateOf} />
                   {routingOpen && (
                     <PushScreen title={t('Mail routing')} onBack={() => setRoutingOpen(false)} className="settings-push set-routing">
                       <div className="settings-content">{routingBlock}</div>
@@ -539,7 +543,7 @@ export function SettingsPage({ email, settings: s, update, section, onSection, u
                         {a.kind === 'shared' ? t('Shared inbox') : t('Personal')} · {a.users.length ? t('opened by {names}', { names: a.users.map(nameOf).join(', ') }) : t('opened by nobody')}
                       </small>
                     </span>
-                    <Badge tone={a.connected ? 'good' : 'warn'}>{a.connected ? t('Connected') : t('Not connected')}</Badge>
+                    <span title={stateOf(a).hint}><Badge tone={stateOf(a).ok ? 'good' : 'warn'}>{stateOf(a).label}</Badge></span>
                     {canManage && a.kind === 'shared' && (
                       <button
                         className={`ghost-btn outline sm access-btn ${accessOpen === a.id ? 'on' : ''}`}

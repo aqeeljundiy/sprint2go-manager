@@ -1,0 +1,13 @@
+{
+  "updated": "2026-10-15T22:00:00Z",
+  "items": [
+    { "id": "G1", "round": "Plan", "area": "Mail", "title": "Mailbox status says what actually works", "detail": "Replaced the saved 'Not connected' flag with one rule (src/mailStatus.ts): Working, Receiving only, No mail arriving yet, Not set up, Sign in needed.", "priority": "high", "status": "done" },
+    { "id": "G2", "round": "Plan", "area": "Mail", "title": "All mail view", "detail": "Every account and tab in one list, no grouping.", "priority": "high", "status": "todo" },
+    { "id": "G3", "round": "Plan", "area": "Mail", "title": "Sorting rules editor", "detail": "Taught senders and own rules for Primary, Promotions, Social, Updates, Forums.", "priority": "medium", "status": "todo" },
+    { "id": "G4", "round": "Plan", "area": "Mail", "title": "Shared inbox levels and groups", "detail": "Read, Reply, Manage per person or group; private inboxes hidden from admins.", "priority": "medium", "status": "todo" },
+    { "id": "G5", "round": "Plan", "area": "Account", "title": "Backup sign-in email", "detail": "So losing a company mailbox never locks you out of your other workspaces.", "priority": "medium", "status": "todo" },
+    { "id": "G6", "round": "Plan", "area": "Workspace", "title": "Brands inside a workspace", "detail": "Name, logo, colour, signature and sending domain per brand.", "priority": "medium", "status": "todo" },
+    { "id": "G7", "round": "Plan", "area": "Onboarding", "title": "Domain step: connect or buy", "detail": "Sign up with any email, then connect your domain or buy one.", "priority": "low", "status": "todo" },
+    { "id": "G8", "round": "Plan", "area": "Guests", "title": "One interface for guests and team", "detail": "Workspace switcher lists the workspaces you're a guest in.", "priority": "low", "status": "todo" }
+  ]
+}
