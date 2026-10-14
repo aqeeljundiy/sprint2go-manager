@@ -67,7 +67,7 @@ function useReveal(lang: Lang) {
   }, [lang]);
 }
 
-const SECTIONS = ['product', 'partners', 'ai', 'pricing', 'about'] as const;
+const SECTIONS = ['product', 'agency', 'partners', 'pricing', 'faq'] as const;
 
 function LangSwitch() {
   const { lang, setLang } = useT();
@@ -293,7 +293,7 @@ function GuestMock() {
             <small>{g.guest}</small>
           </span>
           <span className="av" style={{ background: '#0f766e' }}>
-            YH
+            EB
           </span>
           <span>
             <strong>Ethan Brooks</strong>
@@ -501,10 +501,7 @@ function Page() {
               </a>
             </div>
             <small className="ln-fine a" style={{ ['--d' as string]: '.52s' }}>
-              {t.hero.fine}{' '}
-              <a href="#product" className="ln-fine-link">
-                {t.hero.tour}
-              </a>
+              {t.hero.fine}
             </small>
           </div>
           <div className="ln-hero-art a" style={{ ['--d' as string]: '.3s' }}>
@@ -524,9 +521,10 @@ function Page() {
 
       <section className="ln-strip" aria-label="Works with">
         <p className="rv">{t.strip}</p>
-        <div className="ln-marquee rv" style={{ ['--i' as string]: 1 }}>
+        {/* A still row: nothing on the page moves by itself (CLAUDE.md, Calm). */}
+        <div className="ln-marquee still rv" style={{ ['--i' as string]: 1 }}>
           <div className="ln-marquee-track">
-            {[...WORKS_WITH, ...WORKS_WITH].map((w, i) => (
+            {WORKS_WITH.map((w, i) => (
               <span key={i}>{w}</span>
             ))}
           </div>
@@ -708,7 +706,7 @@ function Page() {
           <article className="ln-founder rv" style={{ ['--i' as string]: 1 }}>
             <span className="ln-founder-av">AJ</span>
             <div>
-              <h3>Aqeel</h3>
+              <h3>Aqilla Abdurrahman Jundiy (Aqeel)</h3>
               <p className="ln-founder-role">{t.about.role}</p>
               <p>{t.about.p1}</p>
               <p>{t.about.p2}</p>
@@ -730,7 +728,7 @@ function Page() {
         </div>
       </section>
 
-      <section className="ln-sec">
+      <section id="faq" className="ln-sec">
         <div className="ln-wrap ln-faq-wrap">
           <h2 className="rv">{t.faq.h}</h2>
           <div className="ln-faq">
@@ -844,7 +842,7 @@ export function Landing() {
   );
   useEffect(() => {
     document.documentElement.lang = lang;
-    document.title = lang === 'id' ? 'sprint2go · Satu aplikasi untuk seluruh hari kerja' : 'sprint2go · One app for the whole workday';
+    document.title = lang === 'id' ? 'sprint2go · Satu aplikasi untuk agensi dan kliennya' : 'sprint2go · One app for agencies and their clients';
   }, [lang]);
   return (
     <LangCtx.Provider value={ctx}>

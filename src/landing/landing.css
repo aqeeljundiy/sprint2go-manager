@@ -1142,6 +1142,7 @@ button {
   display: block;
 }
 .ln-hero h1 em {
+  white-space: nowrap; /* "in one app." stays together: no word left alone on the last line */
   font-style: normal;
   background: linear-gradient(100deg, #2448ff, #6a5bff 55%, #2448ff);
   background-size: 200% 100%;
@@ -1274,6 +1275,19 @@ button {
 }
 .ln-marquee:hover .ln-marquee-track {
   animation-play-state: paused;
+}
+/* Still: the names wrap in a centred row instead of scrolling past forever. */
+.ln-marquee.still {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+.ln-marquee.still .ln-marquee-track {
+  animation: none;
+  width: auto;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px 40px;
+  padding: 6px 16px;
 }
 .ln-marquee-track span {
   color: var(--text-3);

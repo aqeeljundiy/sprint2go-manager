@@ -3,16 +3,16 @@ import { createContext, useContext } from 'react';
 export type Lang = 'en' | 'id';
 
 const en = {
-  nav: { product: 'Product', partners: 'Clients & partners', ai: 'AI', pricing: 'Pricing', about: 'About', signin: 'Sign in', start: 'Start free', open: 'Open menu', close: 'Close menu' },
+  nav: { product: 'Product', agency: 'For agencies', partners: 'Clients', ai: 'AI', pricing: 'Pricing', faq: 'FAQ', about: 'About', signin: 'Sign in', start: 'Start free', open: 'Open menu', close: 'Close menu' },
   hero: {
-    eyebrow: 'Mail, chat, tasks and meetings in one app',
-    line1: 'One app for the',
-    line2: 'whole ',
-    em: 'workday.',
-    lead: 'sprint2go brings your team’s email, chat, tasks, calendar, files, meetings and passwords together, and opens every morning on what needs you.',
+    eyebrow: 'For agencies, groups of brands and remote teams',
+    line1: 'Run your team and',
+    line2: 'your clients ',
+    em: 'in one app.',
+    lead: 'Email, chat, tasks, meetings and files for your team, plus a free space where every client reviews and approves work. Every morning it opens on what needs you.',
     tour: 'Take the tour',
-    try: 'Try it without signing up',
-    fine: 'Free for up to 5 people. No card needed.',
+    try: 'See a live demo',
+    fine: 'Free for up to 5 people. No card needed. Clients join free. The demo needs no account.',
     f1: 'Laura approved the Q4 concepts',
     f2: 'Meeting notes ready · 3 action items',
     f3: '2 to-dos found in your email',
@@ -114,7 +114,7 @@ const en = {
   },
   about: {
     quote: 'We build the systems we need to run our own companies, with AI where it actually saves time. When something works for us, we share it, so other teams don’t have to start from zero.',
-    role: 'Aqilla Abdurrahman Jundiy · Founder of Elkiya Group',
+    role: 'Founder of Elkiya Group',
     p1: 'sprint2go started as the tool we wanted for ourselves: one place for an agency, a group of brands and the remote teams behind them. We’re building AI systems to solve our own problems first, then putting them in other people’s hands.',
     p2: 'Parts of what we build are open source. If you want to look under the hood or play with it, it’s on GitHub.',
     chips: ['Built in Indonesia', 'Made for our own teams first', 'Open source parts on GitHub', 'Your AI keys, your choice'],
@@ -196,16 +196,16 @@ const en = {
 export type Dict = typeof en;
 
 const id: Dict = {
-  nav: { product: 'Produk', partners: 'Klien & partner', ai: 'AI', pricing: 'Harga', about: 'Tentang', signin: 'Masuk', start: 'Mulai gratis', open: 'Buka menu', close: 'Tutup menu' },
+  nav: { product: 'Produk', agency: 'Untuk agensi', partners: 'Klien', ai: 'AI', pricing: 'Harga', faq: 'FAQ', about: 'Tentang', signin: 'Masuk', start: 'Mulai gratis', open: 'Buka menu', close: 'Tutup menu' },
   hero: {
-    eyebrow: 'Email, chat, tugas, dan rapat dalam satu aplikasi',
-    line1: 'Satu aplikasi untuk',
-    line2: 'seluruh ',
-    em: 'hari kerja.',
-    lead: 'sprint2go menyatukan email, chat, tugas, kalender, file, rapat, dan kata sandi tim Anda, lalu setiap pagi langsung menampilkan apa yang perlu Anda kerjakan.',
+    eyebrow: 'Untuk agensi, grup brand, dan tim remote',
+    line1: 'Kelola tim dan',
+    line2: 'klien Anda ',
+    em: 'dalam satu aplikasi.',
+    lead: 'Email, chat, tugas, rapat, dan file untuk tim Anda, plus ruang gratis tempat setiap klien meninjau dan menyetujui pekerjaan. Setiap pagi langsung menampilkan apa yang perlu Anda kerjakan.',
     tour: 'Lihat isinya',
-    try: 'Coba tanpa mendaftar',
-    fine: 'Gratis untuk hingga 5 orang. Tanpa kartu kredit.',
+    try: 'Lihat demo langsung',
+    fine: 'Gratis untuk hingga 5 orang. Tanpa kartu kredit. Klien bergabung gratis. Demo tanpa akun.',
     f1: 'Laura menyetujui konsep Q4',
     f2: 'Notulen rapat siap · 3 tugas',
     f3: '2 tugas ditemukan di email Anda',
@@ -324,7 +324,7 @@ const id: Dict = {
   },
   about: {
     quote: 'Kami membangun sistem yang kami butuhkan untuk menjalankan perusahaan kami sendiri, dengan AI di tempat yang benar-benar menghemat waktu. Kalau sesuatu berhasil untuk kami, kami bagikan, supaya tim lain tidak perlu mulai dari nol.',
-    role: 'Aqilla Abdurrahman Jundiy · Pendiri Elkiya Group',
+    role: 'Pendiri Elkiya Group',
     p1: 'sprint2go berawal dari alat yang kami inginkan untuk diri sendiri: satu tempat untuk agensi, sekelompok brand, dan tim remote di baliknya. Kami membangun sistem AI untuk menyelesaikan masalah kami sendiri dulu, lalu menyerahkannya ke tangan orang lain.',
     p2: 'Sebagian dari yang kami bangun bersifat open source. Kalau Anda ingin melihat isinya atau mencoba-coba, ada di GitHub.',
     chips: ['Dibuat di Indonesia', 'Dibuat untuk tim kami sendiri dulu', 'Sebagian open source di GitHub', 'API key Anda, pilihan Anda'],
