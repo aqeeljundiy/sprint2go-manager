@@ -423,6 +423,12 @@ export function VaultView({
             <Users size={14} /> {t('Re-share all')}
           </button>
         )}
+        {shown.length > 0 && (
+          <label className="search vault-search">
+            <Search size={15} />
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('Search logins')} aria-label={t('Search logins')} />
+          </label>
+        )}
         {priv && (
           <button className="ghost-btn sm" onClick={lock} title={t('Lock the Vault: your passphrase is needed to open it again')}>
             <Lock size={14} /> {t('Lock')}
@@ -441,7 +447,8 @@ export function VaultView({
           />
         )}
         <div className="todo-group">
-          {shown.map((it) => {
+          {/* The same search as on phones (1Password and Bitwarden open on search). */}
+          {shown.filter((it) => !q.trim() || `${it.meta.title} ${it.meta.username ?? ''} ${it.meta.url ?? ''}`.toLowerCase().includes(q.trim().toLowerCase())).map((it) => {
             const c = clients.find((x) => x.id === it.meta.clientId);
             return (
               <div key={it.id} className="task vault-row">

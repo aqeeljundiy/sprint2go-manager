@@ -1,5 +1,5 @@
 import { TopBar } from '../../mobile/TopBar';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronRight, ListTodo, Lock, MoreHorizontal, Pin, PinOff, Plus, RotateCcw, Search, SquarePen, Trash2, Users, X } from 'lucide-react';
 import type { Note } from '../../types';
 import { term } from '../../terms';
@@ -105,6 +105,16 @@ export function NotesList({
   const pinned = rows.filter((r) => r.item.pinned);
   const rest = rows.filter((r) => !r.item.pinned);
   const looking = !!(query || facet);
+  const byDate = (list: typeof rows) => {
+    const out: { key: string; label: string; rows: typeof rows }[] = [];
+    for (const r of list) {
+      const s = sectionOf(r.item.updatedAt);
+      const last = out[out.length - 1];
+      if (last && last.key === s.key) last.rows.push(r);
+      else out.push({ ...s, rows: [r] });
+    }
+    return out;
+  };
 
   // Phones: Apple's folder list is the title switcher (All notes, Only me, Shared with me, each project, Recently deleted).
   useTitleMenu(
@@ -128,8 +138,14 @@ export function NotesList({
     <>
       {pinned.length > 0 && !looking && <div className="nl-head">{t('Pinned')}</div>}
       {(looking ? rows : pinned).map(row)}
-      {pinned.length > 0 && rest.length > 0 && !looking && <div className="nl-head">{t('Notes')}</div>}
-      {!looking && rest.map(row)}
+      {/* The rest under date headings, as on the phone and in Apple Notes (Today, Previous 7 days, months). */}
+      {!looking &&
+        byDate(rest).map((s) => (
+          <Fragment key={s.key}>
+            <div className="nl-head">{s.label}</div>
+            {s.rows.map(row)}
+          </Fragment>
+        ))}
       {!shown.length &&
         (looking ? (
           <p className="nl-none">{query ? t('No notes with “{query}”.', { query }) : t('No notes here.')}</p>
@@ -232,7 +248,7 @@ export function NotesList({
       </section>
     ))
   ) : (
-    <EmptyState icon={<SquarePen size={22} />} title={filter === 'all' ? t('No notes yet') : t('No notes here yet')} text={t('Tap the pen to write one. The first line is its title.')} />
+    <EmptyState icon={<SquarePen size={22} />} title={filter === 'all' ? t('No notes yet') : t('No notes here yet')} text={t('Tap the pen to write one.')} />
   );
   const people = [...new Set(live.filter((n) => n.ownerId !== me).map((n) => n.ownerId))].map((id) => api.users.find((u) => u.id === id)).filter(Boolean).slice(0, 4);
   const facets: { f: Facet; label: string; icon: React.ReactNode }[] = [

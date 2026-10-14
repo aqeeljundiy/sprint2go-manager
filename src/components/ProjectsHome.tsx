@@ -4,7 +4,7 @@ import { IconTile } from './ui/IconTile';
 import { useRef, useState } from 'react';
 import { usePersisted } from '../settings';
 import { Popover } from './ui/Popover';
-import { Archive, ArrowRight, Check, FolderOpen, ListChecks, Mail, Menu, MessagesSquare, Pause, Play, Plus, SlidersHorizontal } from 'lucide-react';
+import { Archive, ArrowRight, Check, FolderOpen, ListChecks, Mail, Menu, MessagesSquare, Pause, Play, Plus, Search, SlidersHorizontal } from 'lucide-react';
 import { useActionMenu } from './ui/ActionSheet';
 import type { Client, Todo, User } from '../types';
 import { PROJECT_TYPES, term } from '../terms';
@@ -28,6 +28,7 @@ import { fmtDay } from '../i18n/format';
 export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu, startAdding, onPast, onOpenPart, onPause, onEnd }: { startAdding?: boolean; projects: Client[]; tasks: Todo[]; users: User[]; onOpen: (id: string) => void; onCreate?: (name: string, type?: string) => void; onPast?: () => void; onMenu: () => void; onOpenPart?: (id: string, part: 'tasks' | 'chat' | 'emails' | 'files') => void; onPause?: (id: string, paused: boolean) => void; onEnd?: (id: string) => void }) {
   const [adding, setAdding] = useState(!!startAdding);
   const phone = usePhone();
+  const [find, setFind] = useState(''); // desktop: "Find a project"
   // Right-click a card (long-press on touch): the same things the project's own menu does, without opening it first.
   const [hit, setHit] = useState<Client | null>(null);
   const cardMenu = useActionMenu(() =>
@@ -156,8 +157,13 @@ export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu,
         </button>
         <div className="th-text">
           <h1>{term.Many}</h1>
-          <p>{t('Everything about each one, in one place: tasks, chat, mail, meetings, files, notes and logins.')}</p>
         </div>
+        {rows.length > 6 && (
+          <label className="search proj-search">
+            <Search size={15} />
+            <input value={find} onChange={(e) => setFind(e.target.value)} placeholder={t('Find a {project}', { project: term.one })} aria-label={t('Find a {project}', { project: term.one })} />
+          </label>
+        )}
         <button ref={fieldsBtn} className="icon-btn" onClick={() => setFieldsOpen(true)} title={t('What cards show')} aria-label={t('What cards show')}>
           <SlidersHorizontal size={16} />
         </button>
@@ -180,11 +186,7 @@ export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu,
             ))}
           </div>
         </Popover>
-        {onCreate && (rows.length > 0 || adding) && (
-          <button className="primary-btn sm" onClick={() => setAdding((a) => !a)}>
-            <Plus size={14} /> {t('New {project}', { project: term.one })}
-          </button>
-        )}
+        {/* No "New project" here: the sidebar's button is on screen already (one primary action per screen). */}
       </header>
       <div className="tracking-scroll">
         {newForm}
@@ -202,8 +204,21 @@ export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu,
             }
           />
         ) : (
+          // Grouped like the phone (Active, Leads, Paused) and in name order inside each, so cards stay where you left
+          // them (Basecamp's way); trouble shows on each card's line, not by reshuffling the grid.
+          ([
+            ['active', t('Active')],
+            ['lead', t('Leads')],
+            ['paused', t('Paused')],
+          ] as const).map(([status, heading]) => {
+            const q = find.trim().toLowerCase();
+            const list = rows.filter((r) => r.c.status === status && (!q || r.c.name.toLowerCase().includes(q))).sort((a, b) => a.c.name.localeCompare(b.c.name));
+            if (!list.length) return null;
+            return (
+          <section key={status} className="proj-group">
+          <h2 className="proj-group-h">{heading} <span>{list.length}</span></h2>
           <div className="proj-grid">
-            {rows.map(({ c, s }, i) => {
+            {list.map(({ c, s }, i) => {
               const owner = users.find((u) => u.id === c.ownerId);
               const issues = [s.late && tn(s.late, '{n} late', '{n} late'), s.nobody && tn(s.nobody, '{n} not picked up', '{n} not picked up'), s.guest && tn(s.guest, '{n} waiting on {who}', '{n} waiting on {who}', { who: term.who })].filter(Boolean) as string[];
               return (
@@ -250,7 +265,11 @@ export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu,
               );
             })}
           </div>
+          </section>
+            );
+          })
         )}
+        {rows.length > 0 && find.trim() && !rows.some((r) => r.c.name.toLowerCase().includes(find.trim().toLowerCase())) && <p className="muted">{t('No {projects} match “{q}”.', { projects: term.many, q: find.trim() })}</p>}
       </div>
       {cardMenu.menu}
     </section>

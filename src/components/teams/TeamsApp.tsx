@@ -169,12 +169,7 @@ export function TeamsHome({ teams, users, tasks, me, canCreate, actions, onOpen,
         <div className="th-text">
           <h1>{t('Teams')}</h1>
         </div>
-        {/* One primary action per screen: while there are no teams, the empty state has it. */}
-        {canCreate && teams.length > 0 && (
-          <button className="primary-btn sm" onClick={onNew}>
-            <Plus size={14} /> {t('New team')}
-          </button>
-        )}
+        {/* No "New team" here: the sidebar has it (and the empty state, while there are none). One primary per screen. */}
       </header>
       <div className="tracking-scroll">
         {!teams.length ? (
@@ -406,8 +401,9 @@ export function TeamPage({
   const [tab, setTab] = useState<TeamTab>('members');
   const tabs: { id: TeamTab; label: string }[] = [
     { id: 'members', label: t('People') },
-    { id: 'work', label: tx('team', 'Work') },
-    { id: 'workload', label: t('Workload') },
+    // "Tasks" and "Who's busy" (it was "Work" next to "Workload", two words for nearly the same thing).
+    { id: 'work', label: t('Tasks') },
+    { id: 'workload', label: t('Who’s busy') },
     ...(manage ? [{ id: 'settings' as const, label: t('Settings') }] : []),
   ];
   const lead = users.find((u) => u.id === tm.leadId);
