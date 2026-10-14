@@ -1221,7 +1221,8 @@
   text-align: left;
 }
 .mention-pop button:hover,
-.mention-pop button:first-child {
+.mention-pop button.hi,
+.mention-pop:not(:has(.hi)) button:first-child {
   background: var(--accent-soft);
 }
 .chat-empty {

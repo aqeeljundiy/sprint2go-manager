@@ -1118,6 +1118,16 @@
   background: var(--warn-soft);
   transition: border-color 0.15s, box-shadow 0.15s;
 }
+.mc-box:not(.docked) {
+  flex-wrap: wrap;
+}
+.mc-box .cb-label {
+  flex-basis: 100%;
+  padding: 2px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--warn);
+}
 .mc-box:focus-within {
   border-color: var(--warn-solid);
   box-shadow: 0 0 0 3px color-mix(in oklab, var(--warn-solid) 18%, transparent);

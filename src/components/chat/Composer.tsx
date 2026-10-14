@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useMemo, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ArrowUp, AtSign, Bold, Camera, Check, ChevronDown, Code, FileText, HardDrive, Image as ImageIcon, Italic, Link2, List, ListOrdered, Mic, Paperclip, Plus, Quote, SendHorizontal, Smile, SquareCheck, SquareCode, Strikethrough, Table2, Type, Video } from 'lucide-react';
 import type { ChatFile, ChatMessage, DataTable, DriveItem, Note, TableRow, Todo, User } from '../../types';
 import { Avatar } from '../Avatar';
@@ -54,6 +54,8 @@ export function Composer(p: {
   setText: (t: string | ((t: string) => string)) => void;
   placeholder: string;
   users: User[];
+  /** The conversation's people: they come first in @mention suggestions (Slack's order). */
+  members?: string[];
   me: string;
   phone: boolean;
   guest?: boolean;
@@ -119,8 +121,20 @@ export function Composer(p: {
   }, [rec?.start]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const before = text.slice(0, caret);
-  const mention = /(?:^|\s)@(\w*)$/.exec(before)?.[1] ?? null;
-  const suggestions = mention === null ? [] : p.users.filter((u) => u.id !== p.me && u.name.toLowerCase().startsWith(mention.toLowerCase())).slice(0, 5);
+  // @mentions: any letter (Unicode, so "@Ádám" works), matching the start of any word of a name ("@smith" finds Ana
+  // Smith), the conversation's people first. Arrow keys move, Enter or Tab picks.
+  const mention = /(?:^|\s)@([\p{L}\p{N}]*)$/u.exec(before)?.[1] ?? null;
+  const suggestions = useMemo(() => {
+    if (mention === null) return [];
+    const q = mention.toLowerCase();
+    const inHere = new Set(p.members ?? []);
+    return p.users
+      .filter((u) => u.id !== p.me && u.name.toLowerCase().split(/\s+/).some((w) => w.startsWith(q)))
+      .sort((a, b) => Number(inHere.has(b.id)) - Number(inHere.has(a.id)) || a.name.localeCompare(b.name))
+      .slice(0, 6);
+  }, [mention, p.users, p.members, p.me]);
+  const [hi, setHi] = useState(0);
+  useEffect(() => setHi(0), [mention]);
   const slash = !p.guest && p.commands && text.startsWith('/') && !text.includes(' ') ? p.commands.filter((c) => c.cmd.startsWith(text.toLowerCase())) : [];
   const track = () => setCaret(input.current?.selectionStart ?? text.length);
 
@@ -279,8 +293,8 @@ export function Composer(p: {
       )}
       {(suggestions.length > 0 || slash.length > 0) && (
         <div className="mention-pop" role="listbox" aria-label={suggestions.length ? t('People') : t('Commands')}>
-          {suggestions.map((u) => (
-            <button key={u.id} type="button" role="option" aria-selected={false} onPointerDown={keep} onClick={() => pickMention(u)}>
+          {suggestions.map((u, i) => (
+            <button key={u.id} type="button" role="option" aria-selected={i === hi} className={i === hi ? 'hi' : ''} onPointerDown={keep} onMouseEnter={() => setHi(i)} onClick={() => pickMention(u)}>
               <Avatar person={u} size={phone ? 28 : 22} /> {u.name}
             </button>
           ))}
@@ -331,9 +345,17 @@ export function Composer(p: {
               void sendFiles(e.clipboardData.files);
             }}
             onKeyDown={(e) => {
+              if (suggestions.length && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+                e.preventDefault();
+                return setHi((h) => (h + (e.key === 'ArrowDown' ? 1 : suggestions.length - 1)) % suggestions.length);
+              }
+              if (suggestions.length && e.key === 'Tab') {
+                e.preventDefault();
+                return pickMention(suggestions[hi] ?? suggestions[0]);
+              }
               if (e.key === 'Enter' && !e.shiftKey && !phone) {
                 e.preventDefault();
-                if (suggestions.length) pickMention(suggestions[0]);
+                if (suggestions.length) pickMention(suggestions[hi] ?? suggestions[0]);
                 else if (slash.length === 1 && text.trim() !== slash[0].cmd) setText(slash[0].cmd + ' ');
                 else send();
               }

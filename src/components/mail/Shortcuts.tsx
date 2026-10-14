@@ -66,6 +66,7 @@ const SHORTCUTS = (): { group: string; keys: [string, string][] }[] => [
     keys: [
       ['c', t('Compose')],
       ['r', t('Reply')],
+      ['a', t('Reply all')],
       ['f', t('Forward')],
       ['⌘ Enter', t('Send')],
     ],
@@ -74,6 +75,7 @@ const SHORTCUTS = (): { group: string; keys: [string, string][] }[] => [
     group: t('The open email'),
     keys: [
       ['e', t('Archive')],
+      ['l', t('Label')],
       ['#', t('Delete')],
       ['!', t('Report spam')],
       ['v', t('Move to…')],

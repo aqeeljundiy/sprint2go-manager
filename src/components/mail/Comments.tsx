@@ -85,6 +85,8 @@ export function CommentBox({ people, onPost, bar, onFocusChange, autoFocus }: { 
   };
   return (
     <div className={`mc-box${bar ? ' docked' : ''}`}>
+      {/* Said out loud, next to the reply buttons: this never goes to the sender (Front's and Missive's internal notes). */}
+      {!bar && <span className="cb-label">{t('Internal note · only your team sees it')}</span>}
       {matches.length > 0 && (
         <div className="cb-mentions" role="listbox" aria-label={t('Mention someone')}>
           {matches.map((u, i) => (

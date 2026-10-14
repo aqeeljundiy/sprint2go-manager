@@ -305,11 +305,12 @@ export function Reader(props: Props) {
   };
 
   useEffect(() => {
+    // R replies (or replies to all, when that's the default); A always replies to all (Gmail's keys).
     const onKey = (e: KeyboardEvent) => {
-      if (e.key !== 'r' || !thread || e.metaKey || e.ctrlKey) return;
+      if ((e.key !== 'r' && e.key !== 'a') || !thread || e.metaKey || e.ctrlKey || e.altKey) return;
       if ((e.target as HTMLElement).closest?.('input, textarea, [contenteditable]')) return;
       e.preventDefault();
-      startReply(undefined, props.defaultReply === 'all');
+      startReply(undefined, e.key === 'a' || props.defaultReply === 'all');
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);

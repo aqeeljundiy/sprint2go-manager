@@ -593,6 +593,7 @@ export function ChatView(p: ViewProps) {
 
   const composer = canPost ? (
     <Composer
+      members={channel.members}
       chat={chat}
       draftKey={draftKey(channel.id)}
       text={text}
@@ -1260,6 +1261,7 @@ function ThreadView(p: {
   );
   const composer = p.canPost ? (
     <Composer
+      members={p.channel.members}
       chat={chat}
       draftKey={draftKey(p.channel.id, root.id)}
       text={text}
