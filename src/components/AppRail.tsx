@@ -1,7 +1,8 @@
-import { Fragment, useContext, useState, type ReactNode } from 'react';
+import { Fragment, useContext, useRef, useState, type ReactNode } from 'react';
+import { useActionMenu } from './ui/ActionSheet';
 import { usePersisted } from '../settings';
 import { TabDefaultsCtx, arrange, type TabPrefs } from './ui/TabBar';
-import { Briefcase, UsersRound, KeyRound, Table2, NotebookPen, Bell, CalendarDays, HardDrive, House, ListChecks, Mail, MessagesSquare, Search, Sparkles, Video, type LucideIcon } from 'lucide-react';
+import { Briefcase, UsersRound, KeyRound, Table2, NotebookPen, Bell, CalendarDays, EyeOff, HardDrive, House, ListChecks, Mail, MessagesSquare, Plus, Search, Sparkles, Video, type LucideIcon } from 'lucide-react';
 import { term } from '../terms';
 import { t } from '../i18n';
 import type { AppId } from '../types';
@@ -49,6 +50,10 @@ interface Props {
   /** Tablets: the phone bar's apps, pinned on top in the same order, with the rest under a line. */
   pinned?: AppId[];
   onPinned?: (bar: AppId[]) => void;
+  /** Apps this person hid (the company has them on): right-click an app to hide it, the + under the apps shows them again. */
+  hidden?: AppId[];
+  onHide?: (id: AppId) => void;
+  onShow?: (id: AppId) => void;
 }
 
 /** The apps in this person's order (drag them in the rail, or use Settings → Your apps), else the company's. */
@@ -67,6 +72,20 @@ export function AppRail(p: Props) {
   const apps = [...pinned, ...arranged(on.filter((a) => !pinned.includes(a)))];
   const [drag, setDrag] = useState<string | null>(null);
   const [over, setOver] = useState<{ id: string; after: boolean } | null>(null);
+  // Right-click an app (long-press on touch): open it, hide it, or bring back one that's hidden.
+  const [hit, setHit] = useState<AppId | null>(null);
+  const hiddenApps = APPS.filter((a) => p.hidden?.includes(a.id));
+  const showList = () => hiddenApps.map((a) => ({ label: t('Show {app}', { app: a.name }), icon: a.icon, group: 'show', run: () => p.onShow?.(a.id) }));
+  const appMenu = useActionMenu(() => {
+    const a = APPS.find((x) => x.id === hit);
+    return [
+      ...(a ? [{ label: t('Open {app}', { app: a.name }), icon: a.icon, run: () => p.onApp(a.id) }] : []),
+      ...(a && a.id !== 'home' && p.onHide ? [{ label: t('Hide {app}', { app: a.name }), icon: EyeOff, run: () => p.onHide!(a.id) }] : []),
+      ...showList(),
+    ];
+  });
+  const moreBtn = useRef<HTMLButtonElement>(null);
+  const moreMenu = useActionMenu(showList, { title: t('Hidden apps') });
   const drop = () => {
     if (drag && over && drag !== over.id && pinned.length) {
       // Tablets: whatever ends up above the line is the bar (the same four as on the phone).
@@ -92,6 +111,7 @@ export function AppRail(p: Props) {
           <button
             className={`rail-app ${p.current === id ? 'on' : ''}${drag === id ? ' tab-dragging' : ''}${over?.id === id && drag !== id ? (over.after ? ' drop-below' : ' drop-above') : ''}`}
             onClick={() => p.onApp(id)}
+            onContextMenu={(e) => (setHit(id), appMenu.bind.onContextMenu(e))}
             title={name}
             aria-current={p.current === id ? 'page' : undefined}
             draggable
@@ -114,6 +134,16 @@ export function AppRail(p: Props) {
           </button>
           </Fragment>
         ))}
+        {hiddenApps.length > 0 && (
+          <button ref={moreBtn} type="button" className="rail-app rail-more" onClick={() => moreMenu.openFrom(moreBtn)} title={t('Show a hidden app')} aria-label={t('Show a hidden app')}>
+            <span className="rail-icon">
+              <Plus size={18} />
+            </span>
+            <span className="rail-label">{t('{n} hidden', { n: hiddenApps.length })}</span>
+          </button>
+        )}
+        {appMenu.menu}
+        {moreMenu.menu}
       </div>
       <div className="rail-foot">
         <button className="rail-tool" onClick={p.onSearch} title={t('Search everything (⌘K)')}>

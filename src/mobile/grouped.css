@@ -23,6 +23,8 @@
 .g-card {
   margin: 0 16px;
   border-radius: var(--r-card);
+  /* On the white page a card shows by its fine edge (our look, not iOS's grey grouped lists). */
+  border: 1px solid var(--border);
   background: var(--surface);
   overflow: hidden;
 }

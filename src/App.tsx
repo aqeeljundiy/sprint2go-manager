@@ -789,8 +789,9 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
   const accountState = useMemo(() => {
     // Received mail: the server checks every arrival (auth); mail we sent carries delivery instead.
     const got = new Set(threads.filter((t) => t.location !== 'drafts' && t.messages.some((m) => m.auth || !m.delivery)).map((t) => t.accountId));
-    return Object.fromEntries(ws.accounts.map((a) => [a.id, mailState(a, ws, got.has(a.id))]));
-  }, [threads, ws]);
+    // The demo (no server, demo servers, the demo company) has everything on: nothing to warn about.
+    return Object.fromEntries(ws.accounts.map((a) => [a.id, demoOk ? { ok: true, label: t('Working') } : mailState(a, ws, got.has(a.id))]));
+  }, [threads, ws, demoOk]);
 
   const wsUnread = useMemo(() => {
     const r: Record<string, number> = {};
@@ -4698,6 +4699,12 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
         enabled={enabledApps}
         pinned={tablet ? tabApps : undefined}
         onPinned={setTabApps}
+        hidden={companyApps.filter((a) => a !== 'home' && myHidden.includes(a))}
+        onHide={(id) => {
+          setMyHidden([...myHidden, id]);
+          showToast({ text: t('{app} hidden. Right-click the apps, or the + under them, to show it again.', { app: APPS.find((a) => a.id === id)?.name ?? '' }), action: { label: t('Undo'), run: () => setMyHidden(myHidden.filter((x) => x !== id)) } });
+        }}
+        onShow={(id) => setMyHidden(myHidden.filter((x) => x !== id))}
         badges={{ mail: accountUnread.all, chat: chatUnreadTotal, tasks: wsTasks.filter((t) => t.userId === user.id && !t.done && t.due && t.due <= localDay()).length }}
         workspace={
           <WorkspaceSwitcher onHome={myPortals.length > 1 ? () => setPortalKey('*') : undefined}

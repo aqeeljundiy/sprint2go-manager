@@ -105,6 +105,13 @@
 .rail-app:hover .rail-icon {
   background: var(--hover);
 }
+/* Apps this person hid: one quiet + under the others brings them back. */
+.rail-app.rail-more {
+  color: var(--text-3);
+}
+.rail-app.rail-more .rail-label {
+  font-weight: 500;
+}
 .rail-app.on {
   color: var(--text);
 }
