@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { primaryDomain } from '../domains';
 import { Bell, Check, ChevronDown, ChevronLeft, ChevronRight, FlaskConical, LayoutGrid, Loader2, Menu, Plus, Search, Settings } from 'lucide-react';
 import type { Client, Person, Workspace } from '../types';
 import { Avatar } from './Avatar';
@@ -240,7 +241,7 @@ export function CompanySheet({
                     </Badge>
                   )}
                 </span>
-                <small>{isSandbox(w) ? t('Your own copy to try things in') : (w.domains[0] ?? '')}</small>
+                <small>{isSandbox(w) ? t('Your own copy to try things in') : (primaryDomain(w) || '')}</small>
               </span>
               {n > 0 && (
                 <b className="ws-unread">{n > 99 ? t('99+ new') : tn(n, '{n} new', '{n} new')}</b>

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { primaryDomain } from '../domains';
 import { Check, ChevronsUpDown, FlaskConical, LayoutGrid, Loader2, Plus, Settings2 } from 'lucide-react';
 import type { Client, Workspace } from '../types';
 import { WorkspaceLogo } from './WorkspaceLogo';
@@ -53,7 +54,7 @@ export function WorkspaceSwitcher({ workspaces, current, unread, onSwitch, onAdd
         <WorkspaceLogo ws={current} size={30} />
         <span className="sb-label ws-name">
           <strong>{current.name}</strong>
-          <small>{currentPortal ? t('Shared space') : isSandbox(current) ? t('Demo company') : (current.domains[0] ?? t('Workspace'))}</small>
+          <small>{currentPortal ? t('Shared space') : isSandbox(current) ? t('Demo company') : (primaryDomain(current) || t('Workspace'))}</small>
         </span>
         <ChevronsUpDown size={15} className="sb-label ws-chev" />
       </button>
@@ -76,7 +77,7 @@ export function WorkspaceSwitcher({ workspaces, current, unread, onSwitch, onAdd
                 <small>
                   {isSandbox(w)
                     ? t('Your own copy to try things in')
-                    : `${tn(w.accounts.filter((a) => !a.temp).length, '{n} account', '{n} accounts')} · ${w.domains[0] ?? t('no domain')}`}
+                    : `${tn(w.accounts.filter((a) => !a.temp).length, '{n} account', '{n} accounts')} · ${primaryDomain(w) || t('no domain')}`}
                 </small>
               </span>
               {unread[w.id] ? <span className="ws-unread">{unread[w.id]}</span> : null}

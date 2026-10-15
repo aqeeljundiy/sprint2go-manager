@@ -7,6 +7,7 @@ import { PROVIDERS } from './Onboarding';
 import { notAtProvider, providerLabel } from './EmailSetupGuide';
 import { WORKSPACE_COLORS } from '../data/workspaces';
 import { uid } from '../utils';
+import { primaryDomain, usableDomains } from '../domains';
 import { readLogo, WorkspaceLogo } from './WorkspaceLogo';
 import { brand as product } from '../terms';
 import { deviceTz } from '../jobTimes';
@@ -104,6 +105,7 @@ export function NewWorkspace({ userId, userName, onCreate, onClose }: { userId: 
       logo: ws.logo,
       color: ws.color,
       domains: domain ? [domain.toLowerCase()] : [],
+      primaryDomain: domain ? domain.toLowerCase() : undefined,
       accounts: [{ id: uid(), email: email.trim().toLowerCase(), name: name.trim() || email, kind: 'personal', connected: false, users: [userId] }],
       members: [{ userId, role: 'owner' }],
       timeZone: deviceTz(), // where its creator is; Settings, General changes it
@@ -143,10 +145,17 @@ export function NewWorkspace({ userId, userName, onCreate, onClose }: { userId: 
 }
 
 export function NewAccount({ workspace, userId, onAdd, onClose }: { workspace: Workspace; userId: string; onAdd: (a: Account) => void; onClose: () => void }) {
-  const [email, setEmail] = useState(workspace.domains[0] ? `@${workspace.domains[0]}` : '');
+  // A new mailbox here goes on any of the company's domains (primary first); one at another provider is typed in full.
+  const doms = usableDomains(workspace);
+  const [typed, setTyped] = useState(primaryDomain(workspace) ? `@${primaryDomain(workspace)}` : '');
+  const [local, setLocal] = useState('');
+  const [domain, setDomain] = useState(doms[0] ?? '');
   const [name, setName] = useState('');
   const [kind, setKind] = useState<Account['kind']>('personal');
   const [provider, setProvider] = useState<MailProvider>(workspace.emailSetup === 'keep' && workspace.emailProvider ? workspace.emailProvider : 'sprint2go');
+  const split = provider === 'sprint2go' && doms.length > 0;
+  const email = split ? `${local.trim().toLowerCase()}@${domain}` : typed;
+  const setEmail = setTyped;
   const taken = workspace.accounts.some((a) => a.email === email.trim().toLowerCase());
   const valid = isEmail(email) && !taken;
 
@@ -189,6 +198,12 @@ export function NewAccount({ workspace, userId, onAdd, onClose }: { workspace: W
         </div>
         <div className="field">
           <label>{t('Email address')}</label>
+          {split ? (
+            <div className="email-split">
+              <input autoFocus value={local} onChange={(e) => setLocal(e.target.value.replace(/s/g, ''))} onKeyDown={(e) => e.key === 'Enter' && add()} placeholder={kind === 'shared' ? 'hello' : 'isabel'} aria-label={t('Name before the @')} />
+              {doms.length > 1 ? <Select<string> value={domain} onChange={setDomain} label={t('Domain')} title={t('Domain')} className="sel-flat" width={220} options={doms.map((d) => ({ value: d, label: `@${d}` }))} /> : <span>@{domain}</span>}
+            </div>
+          ) : (
           <input
             autoFocus
             value={email}
@@ -197,6 +212,7 @@ export function NewAccount({ workspace, userId, onAdd, onClose }: { workspace: W
             onKeyDown={(e) => e.key === 'Enter' && add()}
             placeholder={t('name@business.com')}
           />
+          )}
           {taken && <small className="err">{t('That account is already added.')}</small>}
         </div>
         <div className="field">
@@ -239,7 +255,8 @@ export function InviteMember({
   onInvite: (u: User, role: Role, mailbox: Account | null, shared: string[]) => void;
   onClose: () => void;
 }) {
-  const domain = workspace.domains[0] ?? '';
+  const doms = usableDomains(workspace); // primary first: the address starts there
+  const [domain, setDomain] = useState(doms[0] ?? '');
   const [name, setName] = useState('');
   const [local, setLocal] = useState('');
   const [role, setRole] = useState<Role>('member');
@@ -277,7 +294,7 @@ export function InviteMember({
           <label>{t('Their email address')}</label>
           <div className="email-split">
             <input value={local} onChange={(e) => setLocal(e.target.value)} placeholder="isabel" onKeyDown={(e) => e.key === 'Enter' && invite()} />
-            <span>@{domain || t('add a domain in settings')}</span>
+            {doms.length > 1 ? <Select<string> value={domain} onChange={setDomain} label={t('Domain')} title={t('Domain')} className="sel-flat" width={220} options={doms.map((d) => ({ value: d, label: `@${d}` }))} /> : <span>@{domain || t('add a domain in settings')}</span>}
           </div>
           {exists && <small className="err">{t('Someone already uses that address.')}</small>}
         </div>
@@ -405,7 +422,7 @@ export function RemoveMailbox({ account, workspace, conversations, onRemove, onC
  * shared inbox. With "Some of each", the provider must not have the address, or it keeps the mail.
  */
 export function AliasDialog({ workspace, alias, onSave, onClose }: { workspace: Workspace; alias?: MailAlias; onSave: (a: MailAlias) => Promise<string | null>; onClose: () => void }) {
-  const domains = workspace.domains;
+  const domains = usableDomains(workspace); // primary first
   const [local, setLocal] = useState(alias?.address.split('@')[0] ?? '');
   const [domain, setDomain] = useState(alias?.address.split('@')[1] ?? domains[0] ?? '');
   const boxes = workspace.accounts.filter((a) => !a.temp && (!a.provider || a.provider === 'sprint2go'));

@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
+import { primaryDomain } from '../domains';
 import { SmoothHeight, useLeaving } from './ui/Smooth';
 import { PushScreen } from './ui/PushScreen';
 import { usePhone } from '../mobile/media';
@@ -13,6 +14,8 @@ import { BrandsSettings } from './admin/Brands';
 import { DEFAULT_PERMISSIONS } from '../types';
 import type { Account, AISettings, AppId, BlockRule, CalendarDef, DriveItem, HomeTemplateId, MeetingSettings, Plan, Role, StorageSettings, Team, Todo, User, Workspace } from '../types';
 import { TaskStagesSection } from './admin/TaskStages';
+import { DomainsSection } from './admin/Domains';
+import { Globe } from 'lucide-react';
 import { HOLIDAY_COUNTRIES } from '../data/holidays';
 import { AISection } from './admin/AISection';
 import { BillingSection } from './admin/BillingSection';
@@ -41,7 +44,7 @@ import { HelpSection } from './HelpSection';
 import { NotificationSettings } from './NotificationSettings';
 import { TwoStepRow } from './TwoStep';
 import { DemoCompanyBlock, type DemoSettings } from './DemoCompany';
-import { ConnectedApps } from './ConnectedApps';
+import { AI_APPS_SECTION, AiAppsPage } from './AiAppsPage';
 import { ImportSection } from './imports/ImportSection';
 import { BarDefaults } from '../mobile/BarDefaults';
 import { MAIL_APPS_SECTION, PhoneMailApps } from './PhoneMailApps';
@@ -51,6 +54,8 @@ import { MAIL_STORAGE_SECTION, MailStorage } from './mail/MailStorage';
 import { MAIL_GROUPS_SECTION, MailGroups } from './mail/MailGroups';
 import { MAIL_RULES_SECTION, MailRules } from './mail/MailRules';
 import { Avatar } from './Avatar';
+import { SettingsSearch } from './SettingsSearch';
+import { registerSettings } from '../settingsIndex';
 import { ChoiceRow, Group, GRow } from './ui/Grouped';
 import { AccountPhone, DeleteAccountPhone, MailPhone, MailboxesPhone, MembersPhone, PasswordPhone, WorkspacePhone } from './SettingsPhone';
 import { SignaturesDesktop, WritingDesktop } from './mail/MailWriting';
@@ -61,6 +66,7 @@ import { fmtDate, fmtTime } from '../i18n/format';
 
 const SECTIONS: { id: SettingsSection; name: string; icon: LucideIcon; group: 'Company' | 'You' }[] = [
   { id: 'workspace', name: mark('General & email'), icon: Building2, group: 'Company' },
+  { id: 'domains', name: mark('Domains'), icon: Globe, group: 'Company' },
   { id: 'email', name: mark('Email delivery'), icon: Send, group: 'Company' },
   { id: 'permissions', name: mark('Permissions'), icon: KeySquare, group: 'Company' },
   { id: 'agency', name: mark('Client portal & brand'), icon: Stamp, group: 'Company' },
@@ -83,11 +89,13 @@ const SECTIONS: { id: SettingsSection; name: string; icon: LucideIcon; group: 'C
   MAIL_APPS_SECTION,
   MAIL_ACCESS_SECTION,
   MAIL_STORAGE_SECTION,
+  AI_APPS_SECTION,
   { id: 'notifications', name: mark('Notifications'), icon: Bell, group: 'You' },
   { id: 'help', name: mark('Help & support'), icon: LifeBuoy, group: 'You' },
   { id: 'shortcuts', name: mark('Shortcuts'), icon: Keyboard, group: 'You' },
   { id: 'developer', name: mark('Developer'), icon: FlaskConical, group: 'You' },
 ];
+registerSettings(SECTIONS); // Settings search and ⌘K: which pages exist
 
 
 /** Settings the demo company leaves out: they reach the real world (billing, AI keys, mail delivery, brand, security). */
@@ -192,10 +200,10 @@ const roleName = (r: Role) => (r === 'owner' ? t('Owner') : r === 'admin' ? t('A
  * on the right. Each section opens full screen over the list with Back. Keyboard shortcuts stay a desktop thing.
  */
 const PHONE_GROUPS: { id: string; head: () => string; rows: SettingsSection[] }[] = [
-  { id: 'you', head: () => t('You'), rows: ['notifications', 'appearance', 'myapps', 'mail', 'mailaccess', 'mailapps', 'mailstorage'] },
+  { id: 'you', head: () => t('You'), rows: ['notifications', 'appearance', 'myapps', 'mail', 'mailaccess', 'mailapps', 'mailstorage', 'ai-apps'] },
   { id: 'company', head: () => '', rows: ['workspace', 'teams', 'permissions', 'clients', 'agency'] },
   { id: 'work', head: () => t('Work'), rows: ['stages', 'apps', 'meetings', 'ai'] },
-  { id: 'email', head: () => t('Email'), rows: ['email', 'mailgroups', 'mailrules', 'import'] },
+  { id: 'email', head: () => t('Email'), rows: ['domains', 'email', 'mailgroups', 'mailrules', 'import'] },
   { id: 'plan', head: () => t('Plan and data'), rows: ['billing', 'storage', 'security'] },
   { id: 'support', head: () => t('Support'), rows: ['help', 'developer'] },
 ];
@@ -264,13 +272,13 @@ export function SettingsPage({ email, settings: s, update, section, onSection, u
   const perms = { ...DEFAULT_PERMISSIONS, ...ws.permissions };
   // Members see the company's money (plan, billing, AI costs) only when the company allows it.
   // The demo company has no money, keys, mail delivery or sign-in rules of its own: those are the real company's.
-  const sections = SECTIONS.filter((x) => (canManage || perms.seeBilling || (x.id !== 'billing' && x.id !== 'ai' && x.id !== 'storage')) && (canManage || (x.id !== 'import' && x.id !== 'mailrules')) && !(demo?.inDemo && DEMO_OUT.includes(x.id)));
+  const sections = SECTIONS.filter((x) => (canManage || perms.seeBilling || (x.id !== 'billing' && x.id !== 'ai' && x.id !== 'storage')) && (canManage || (x.id !== 'import' && x.id !== 'mailrules' && x.id !== 'domains')) && !(demo?.inDemo && DEMO_OUT.includes(x.id)));
   const [routingOpen, setRoutingOpen] = useState(false);
   // Mail routing (some mail stays with Google or Microsoft): in place on desktop, its own screen on phones.
   const routingBlock = (
   <div className="set-block routing-block">
     <p className="small">
-      {t('{domain} stays with {provider}, which passes mail for addresses it doesn’t know on to {product}.', { domain: ws.domains[0] ?? t('Your domain'), provider: providerLabel(ws.emailProvider), product: product.name })}{' '}
+      {t('{domain} stays with {provider}, which passes mail for addresses it doesn’t know on to {product}.', { domain: primaryDomain(ws) || t('Your domain'), provider: providerLabel(ws.emailProvider), product: product.name })}{' '}
       {ws.mailRouting?.lastCheck
         ? ws.mailRouting.lastCheck.ok
           ? t('Last check {when}: working.', { when: relative(ws.mailRouting.lastCheck.at) })
@@ -287,7 +295,7 @@ export function SettingsPage({ email, settings: s, update, section, onSection, u
         label={t('Check every day')}
         hint={
           realMail
-            ? t('Once a day we send a test to an address at {domain} that only {product} knows. If two tests in a row don’t arrive, admins get a notice and an email.', { domain: ws.domains[0] ?? t('your domain'), product: product.name }) +
+            ? t('Once a day we send a test to an address at {domain} that only {product} knows. If two tests in a row don’t arrive, admins get a notice and an email.', { domain: primaryDomain(ws) || t('your domain'), product: product.name }) +
               (ws.mailRouting?.verifiedAt ? '' : ` ${t('It starts once routing has worked.')}`)
             : t('A test email each morning. If it stops arriving, admins hear about it straight away. Runs once {product} mail is live.', { product: product.name })
         }
@@ -303,7 +311,7 @@ export function SettingsPage({ email, settings: s, update, section, onSection, u
             workspaceId={ws.id}
             mode="split"
             provider={ws.emailProvider ?? 'google'}
-            domain={ws.domains[0] ?? ''}
+            domain={primaryDomain(ws) || ''}
             first={(users.find((u) => u.id === me)?.name ?? '').split(' ')[0].toLowerCase()}
             onAddMailbox={canManage ? onAddAccount : undefined}
             onVerified={() => onWorkspace({ mailRouting: { ...(ws.mailRouting ?? { dailyCheck: true }), verifiedAt: new Date().toISOString(), lastCheck: { at: new Date().toISOString(), ok: true } } })}
@@ -325,6 +333,7 @@ export function SettingsPage({ email, settings: s, update, section, onSection, u
       </header>
       <div className="settings-body">
         <nav className="settings-nav">
+          <SettingsSearch pages={sections} phone={false} onOpen={(id) => onSection(id as SettingsSection)}>
           {sections.map(({ id, name, icon: Icon, group }, i) => (
             <span key={id} className="settings-nav-item">
               {(i === 0 || sections[i - 1].group !== group) && <span className="settings-group">{group === 'Company' ? ws.name || t('Company') : t('You')}</span>}
@@ -333,8 +342,10 @@ export function SettingsPage({ email, settings: s, update, section, onSection, u
               </button>
             </span>
           ))}
+          </SettingsSearch>
         </nav>
         {phone && (
+          <SettingsSearch pages={sections} phone onOpen={(id) => (onSection(id as SettingsSection), setSectionOpen(true))}>
           <SettingsList
             sections={sections}
             company={ws.name || t('Company')}
@@ -346,6 +357,7 @@ export function SettingsPage({ email, settings: s, update, section, onSection, u
             }}
             onOpen={(id) => (onSection(id), setSectionOpen(true))}
           />
+          </SettingsSearch>
         )}
 
         <SectionScreen phone={phone} open={sectionOpen} title={t(SECTIONS.find((x) => x.id === section)?.name ?? 'Settings')} onBack={() => setSectionOpen(false)}>
@@ -358,10 +370,10 @@ export function SettingsPage({ email, settings: s, update, section, onSection, u
               </p>
               {onPhone ? (
                 <div className="set-rows">
-                  <WorkspacePhone ws={ws} canManage={canManage} onWorkspace={onWorkspace} onHolidays={onHolidays} holidayCal={holidayCal} />
+                  <WorkspacePhone ws={ws} canManage={canManage} onWorkspace={onWorkspace} onHolidays={onHolidays} holidayCal={holidayCal} onDomains={canManage ? () => onSection('domains') : undefined} />
                   <MembersPhone ws={ws} users={users} me={me} canManage={canManage} onRole={onRole} onRemove={onRemoveMember} onInvite={onInvite} />
                   {ws.emailSetup === 'mix' && !demo?.inDemo && (
-                    <Group footer={t('{domain} stays with {provider}, which passes mail for addresses it doesn’t know on to {product}.', { domain: ws.domains[0] ?? t('Your domain'), provider: providerLabel(ws.emailProvider), product: product.name })}>
+                    <Group footer={t('{domain} stays with {provider}, which passes mail for addresses it doesn’t know on to {product}.', { domain: primaryDomain(ws) || t('Your domain'), provider: providerLabel(ws.emailProvider), product: product.name })}>
                       <GRow label={t('Mail routing')} value={ws.mailRouting?.lastCheck ? (ws.mailRouting.lastCheck.ok ? t('Working') : t('Check the rule')) : ws.mailRouting?.verifiedAt ? t('Working') : t('Not checked yet')} onClick={() => setRoutingOpen(true)} />
                     </Group>
                   )}
@@ -393,19 +405,14 @@ export function SettingsPage({ email, settings: s, update, section, onSection, u
               <BrandFields value={ws} onChange={onWorkspace} />
               <div className="field">
                 <label>{t('Email domains')}</label>
-                <input
-                  defaultValue={ws.domains.join(', ')}
-                  key={ws.id}
-                  onBlur={(e) =>
-                    onWorkspace({
-                      domains: e.target.value
-                        .split(/[,\s]+/)
-                        .map((d) => d.replace(/^@/, '').toLowerCase())
-                        .filter(Boolean),
-                    })
-                  }
-                  placeholder={t('business.com')}
-                />
+                <span className="dm-summary">
+                  <span>{ws.domains.length ? ws.domains.join(', ') : t('None yet')}</span>
+                  {canManage && (
+                    <button type="button" className="link-btn" onClick={() => onSection('domains')}>
+                      {t('Manage domains')}
+                    </button>
+                  )}
+                </span>
                 <small>{t('People at these domains are your team, so their email is never tracked.')}</small>
               </div>
               <div className="field">
@@ -580,7 +587,7 @@ export function SettingsPage({ email, settings: s, update, section, onSection, u
                   </button>
                 )}
               </div>
-              {(canManage || (ws.brands?.length ?? 0) > 0) && <BrandsSettings ws={ws} canManage={canManage} onWorkspace={onWorkspace} />}
+              {(canManage || (ws.brands?.length ?? 0) > 0) && <BrandsSettings ws={ws} canManage={canManage} onWorkspace={onWorkspace} onDomains={canManage ? () => onSection('domains') : undefined} />}
               </>
               )}
             </>
@@ -612,7 +619,11 @@ export function SettingsPage({ email, settings: s, update, section, onSection, u
                           <BackupEmailRow toast={admin.toast} />
                           <TwoStepRow toast={admin.toast} />
                         </Group>
-                        <ConnectedApps toast={admin.toast} />
+                        {server.on && (
+                          <Group>
+                            <GRow label={t('Connected AI apps')} sub={t('Claude, ChatGPT and others: connect and disconnect them')} onClick={() => onSection('ai-apps')} />
+                          </Group>
+                        )}
                         {server.on && <DeleteAccountPhone go={deleteAccount} />}
                       </>
                     }
@@ -660,7 +671,17 @@ export function SettingsPage({ email, settings: s, update, section, onSection, u
               <PasswordRow />
               <BackupEmailRow toast={admin.toast} />
               <TwoStepRow toast={admin.toast} />
-              <ConnectedApps toast={admin.toast} />
+              {server.on && (
+                <div className="set-row">
+                  <span>
+                    <strong>{t('Connected AI apps')}</strong>
+                    <small>{t('Claude, ChatGPT and others: connect and disconnect them')}</small>
+                  </span>
+                  <button type="button" className="ghost-btn outline sm" onClick={() => onSection('ai-apps')}>
+                    {t('Open')}
+                  </button>
+                </div>
+              )}
               <DeleteAccountRow />
               </>
               )}
@@ -819,6 +840,7 @@ export function SettingsPage({ email, settings: s, update, section, onSection, u
 
           {section === 'notifications' && <NotificationSettings s={s} update={update} />}
           {section === 'mailapps' && <PhoneMailApps ws={ws} canManage={canManage} onWorkspace={onWorkspace} toast={admin.toast} />}
+          {section === 'ai-apps' && <AiAppsPage ws={ws} toast={admin.toast} />}
           {section === 'mailaccess' && <MailAccess ws={ws} users={wsUsers} me={me} isAdmin={canManage} onImport={canManage ? () => onSection('import') : undefined} toast={admin.toast} />}
           {section === 'mailstorage' && <MailStorage ws={ws} onDelete={(ids) => mailTeams?.onDelete(ids)} onEmpty={(w) => mailTeams?.onEmpty(w)} onOpen={mailTeams ? (id) => mailTeams.onOpen(id) : undefined} />}
           {section === 'mailgroups' && <MailGroups ws={ws} users={wsUsers} me={me} toast={admin.toast} />}
@@ -910,6 +932,7 @@ export function SettingsPage({ email, settings: s, update, section, onSection, u
           {section === 'agency' && <AgencySection ws={ws} canManage={canManage} onWorkspace={onWorkspace} brandingAddon={hasBranding(plan)} onBilling={() => onSection('billing')} toast={admin.toast} />}
           {section === 'permissions' && <PermissionsSection ws={ws} canManage={canManage} onWorkspace={onWorkspace} />}
           {section === 'teams' && <TeamsLink teams={admin.teams} users={wsUsers} onOpen={admin.onOpenTeams} />}
+          {section === 'domains' && canManage && <DomainsSection ws={ws} canManage={canManage} onWorkspace={onWorkspace} />}
           {section === 'stages' && <TaskStagesSection ws={ws} canManage={canManage} tasks={admin.tasks} teams={admin.teams} me={me} onWorkspace={onWorkspace} onMoveTasks={admin.onMoveTasks} />}
           {section === 'apps' && <AppsSection ws={ws} canManage={canManage} onWorkspace={onWorkspace} projects={admin.projects} />}
           {section === 'apps' && <BarDefaults ws={ws} teams={admin.teams} canManage={canManage} onWorkspace={onWorkspace} />}

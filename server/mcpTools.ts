@@ -342,6 +342,14 @@ class View {
     if (audit && !this.ctx.demo) db.audit(String(this.user(this.me)?.email || this.me), `ai-app.${coll}`, this.ctx.wsId, `via ${this.ctx.app}: ${audit}`.slice(0, 300));
     return r.body.why;
   }
+  /** Deletes as the person, through the same rules; refused when it's still there afterwards. */
+  remove(coll: string, id: string, audit: string) {
+    const r = this.deps.write(this.me, coll, [], [id]);
+    if (r.status !== 200) no(r.body.error ?? 'sprint2go couldn’t do that. Try again.');
+    const still = this.ctx.demo ? sandbox.getDoc(this.me, coll, id) : db.getDoc(coll, id);
+    if (still) no(r.body.why ?? 'sprint2go didn’t delete that: it isn’t something you can change here.');
+    if (!this.ctx.demo) db.audit(String(this.user(this.me)?.email || this.me), `ai-app.${coll}`, this.ctx.wsId, `via ${this.ctx.app}: ${audit}`.slice(0, 300));
+  }
   /** Notices in teammates' bells (the same kinds the app sends). Never to guests, and never stops the change itself. */
   notify(userIds: string[], kind: string, text: { text: string; tr?: unknown }, link: Doc) {
     const team = new Set(this.members().map((u) => u.id));
@@ -513,6 +521,27 @@ function toCell(v: View, f: Doc, given: unknown, rows: Doc[], tables: Doc[]): un
 
 const READ = { readOnlyHint: true, openWorldHint: false } as const;
 const WRITE = { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false } as const;
+const DESTRUCTIVE = { readOnlyHint: false, destructiveHint: true, idempotentHint: false, openWorldHint: false } as const;
+
+/** Files whose words can be read as text (by type or by name). */
+const TEXT_NAME = /\.(txt|md|markdown|csv|tsv|json|ya?ml|xml|html?|css|js|ts|tsx|jsx|log|ini|toml|srt|vtt|ics|svg|rtf)$/i;
+const isTextLike = (name: string, type: string) => /^text\//.test(type) || /(json|xml|yaml|csv|javascript|svg)/.test(type) || TEXT_NAME.test(name);
+/** A Drive file's bytes, when they're kept by sprint2go in this company (an upload, or a small data: address). */
+function fileBytes(v: View, url: unknown): Buffer | null {
+  const u = String(url ?? '');
+  const data = /^data:([^;,]*)(;base64)?,(.*)$/s.exec(u);
+  if (data) return data[2] ? Buffer.from(data[3], 'base64') : Buffer.from(decodeURIComponent(data[3]));
+  const id = /^\/api\/files\/([a-f0-9]{32})$/.exec(u)?.[1];
+  if (!id) return null;
+  const info = db.fileInfo(id);
+  if (!info || (!v.ctx.demo && info.workspaceId !== v.ctx.wsId) || info.size > 5 * 1024 * 1024) return null;
+  return db.fileData(id);
+}
+/** "12:30" into a meeting. */
+const mmss = (ms: number) => {
+  const s = Math.max(0, Math.round(ms / 1000));
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+};
 const day = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Use YYYY-MM-DD');
 const limit = (max: number, dflt: number) => z.number().int().min(1).max(max).optional().describe(`How many at most (default ${dflt}, up to ${max})`);
 
@@ -1064,6 +1093,368 @@ export function registerTools(server: McpServer, deps: ToolDeps, ctx: ToolCtx) {
     },
   );
 
+  /* ---------- Drive ---------- */
+
+  const driveItems = (v: View) => v.docs('drive').filter((f) => !f.trashed);
+  const pathOf = (v: View, f: Doc) => {
+    const all = new Map(v.docs('drive').map((x) => [x.id, x]));
+    const names: string[] = [];
+    for (let cur = f.parentId ? all.get(f.parentId) : null, i = 0; cur && i < 20; cur = cur.parentId ? all.get(cur.parentId) : null, i++) names.unshift(cur.name);
+    return names.length ? names.join(' / ') : 'Drive';
+  };
+  const fileLine = (v: View, f: Doc) => ({
+    id: f.id,
+    name: f.name,
+    kind: f.kind,
+    ...(f.kind !== 'folder' ? { size: fileSize(Number(f.size) || 0) } : {}),
+    modified: v.when(f.modified),
+    folder: pathOf(v, f),
+    ...(f.clientId ? { project: v.docs('clients').find((c) => c.id === f.clientId)?.name } : {}),
+    ...(f.sharedWithClient ? { guests_see_it: true } : {}),
+    ...(f.starred ? { starred: true } : {}),
+    link: v.link('drive', f.id),
+  });
+  tool(
+    'list_files',
+    {
+      title: 'List files',
+      description: 'Files and folders in Drive that you can see: one folder’s contents (default the top of Drive), or every file whose name has these words. Folders first, then newest. Read a file’s details and text with read_file.',
+      inputSchema: {
+        folder: z.string().optional().describe('A folder’s name or id (default the top of Drive)'),
+        query: z.string().max(200).optional().describe('Words in the file’s name; searches every folder'),
+        project: z.string().optional().describe('Only files filed under this project'),
+        limit: limit(200, 50),
+      },
+      annotations: READ,
+    },
+    (a, v) => {
+      const all = driveItems(v);
+      const words = lower(a.query).split(/\s+/).filter(Boolean);
+      const project = a.project ? v.project(a.project) : null;
+      let folder: Doc | null = null;
+      if (a.folder) {
+        const s = lower(a.folder).trim();
+        const folders = all.filter((f) => f.kind === 'folder');
+        folder = folders.find((f) => f.id === a.folder) ?? folders.find((f) => lower(f.name) === s) ?? (folders.filter((f) => lower(f.name).includes(s)).length === 1 ? folders.find((f) => lower(f.name).includes(s))! : no(`No folder called “${a.folder}” that you can see.`));
+      }
+      const ids = new Set(all.map((f) => f.id));
+      const list = all
+        .filter((f) => (words.length ? f.kind !== 'folder' || !!folder : true))
+        .filter((f) => (words.length && !folder ? true : folder ? f.parentId === folder.id : !f.parentId || !ids.has(f.parentId)))
+        .filter((f) => !words.length || words.every((w) => lower(f.name).includes(w)))
+        .filter((f) => !project || f.clientId === project.id)
+        .sort((x, y) => Number(y.kind === 'folder') - Number(x.kind === 'folder') || String(y.modified ?? '').localeCompare(String(x.modified ?? '')));
+      const max = a.limit ?? 50;
+      return { folder: folder ? `${pathOf(v, folder)} / ${folder.name}`.replace(/^Drive \/ /, '') : words.length ? 'every folder' : 'Drive', files: list.slice(0, max).map((f) => fileLine(v, f)), ...(list.length > max ? { more: list.length - max } : {}), ...(list.length ? {} : { note: 'No files here.' }) };
+    },
+  );
+
+  tool(
+    'read_file',
+    {
+      title: 'Read a file',
+      description: 'One Drive file: its details (type, size, folder, project, who uploaded it, the mail it came from) and, for text files (txt, md, csv, json, html and the like), its text. Other files (images, PDFs, Office files) give their details and a link to open them in sprint2go.',
+      inputSchema: { file_id: z.string().describe('The file’s id (from list_files or search)') },
+      annotations: READ,
+    },
+    (a, v) => {
+      const f = driveItems(v).find((x) => x.id === a.file_id) ?? no(`No file ${a.file_id} that you can see in ${v.ctx.company}.`);
+      if (f.kind === 'folder') {
+        const inside = driveItems(v).filter((x) => x.parentId === f.id);
+        return { ...fileLine(v, f), holds: inside.length, note: 'This is a folder: list_files with its id lists what’s in it.' };
+      }
+      const type = String(f.type ?? '');
+      const base = {
+        ...fileLine(v, f),
+        ...(type ? { type } : {}),
+        ...(f.uploadedBy ? { uploaded_by: f.uploadedBy.includes('@') ? `${f.uploadedBy} (guest)` : v.nameOf(f.uploadedBy) } : f.ownerId ? { owner: v.nameOf(f.ownerId) } : {}),
+        ...(f.threadId ? { from_mail: f.threadId } : {}),
+        ...(f.duration ? { duration: f.duration } : {}),
+      };
+      if (!isTextLike(f.name, type)) return { ...base, note: 'Only text files can be read here. Open it in sprint2go with the link.' };
+      const bytes = fileBytes(v, f.url);
+      if (!bytes) return { ...base, note: 'Its text isn’t kept in sprint2go (or it’s too large to read here). Open it with the link.' };
+      const raw = bytes.toString('utf8');
+      const text = /\.html?$/i.test(f.name) || /html/.test(type) ? htmlToText(raw) : raw;
+      return { ...base, text: text.length > 30_000 ? `${text.slice(0, 30_000)}…` : text, ...(text.length > 30_000 ? { cut_at_characters: 30_000 } : {}) };
+    },
+  );
+
+  /* ---------- Meet ---------- */
+
+  const meetingLine = (v: View, m: Doc) => ({
+    id: m.id,
+    title: m.title,
+    at: v.when(m.at),
+    ...(m.minutes ? { minutes: m.minutes } : {}),
+    ...(m.status && m.status !== 'done' ? { status: m.status } : {}),
+    ...(m.clientId ? { project: v.docs('clients').find((c) => c.id === m.clientId)?.name } : {}),
+    attendees: m.attendees ?? [],
+    ...(m.summary ? { summary: clip(m.summary, 200) } : {}),
+    ...((m.actions ?? []).length ? { action_items: m.actions.length } : {}),
+    link: v.link('meet', m.id),
+  });
+  tool(
+    'list_meetings',
+    {
+      title: 'List meetings',
+      description: 'Meetings with notes from sprint2go’s notetaker that you can see (yours, ones you were in, and your projects’), newest first, each with a short summary.',
+      inputSchema: {
+        query: z.string().max(200).optional().describe('Words in the title, summary or notes'),
+        project: z.string().optional().describe('Only this project’s meetings'),
+        from: day.optional().describe('Only meetings on or after this day, YYYY-MM-DD'),
+        to: day.optional().describe('Only meetings on or before this day, YYYY-MM-DD'),
+        limit: limit(100, 20),
+      },
+      annotations: READ,
+    },
+    (a, v) => {
+      if ((a.from && !validDay(a.from)) || (a.to && !validDay(a.to))) no('Use real dates as YYYY-MM-DD.');
+      const project = a.project ? v.project(a.project) : null;
+      const words = lower(a.query).split(/\s+/).filter(Boolean);
+      const list = v
+        .docs('meetings')
+        .filter((m) => !project || m.clientId === project.id)
+        .filter((m) => (!a.from || v.dayOf(m.at) >= a.from) && (!a.to || v.dayOf(m.at) <= a.to))
+        .filter((m) => !words.length || words.every((w) => lower(`${m.title} ${m.summary ?? ''} ${(m.keyPoints ?? []).join(' ')} ${(m.decisions ?? []).join(' ')} ${(m.attendees ?? []).join(' ')}`).includes(w)))
+        .sort((x, y) => String(y.at).localeCompare(String(x.at)));
+      const max = a.limit ?? 20;
+      return { meetings: list.slice(0, max).map((m) => meetingLine(v, m)), ...(list.length > max ? { more: list.length - max } : {}), ...(list.length ? {} : { note: 'No meetings with notes here.' }) };
+    },
+  );
+
+  tool(
+    'read_meeting',
+    {
+      title: 'Read a meeting',
+      description: 'One meeting’s notes: summary, key points, decisions, open questions, action items (who, when, and the task each became) and part of the transcript with times. Read further into the transcript with from_minute.',
+      inputSchema: {
+        meeting_id: z.string().describe('The meeting’s id (from list_meetings or search)'),
+        from_minute: z.number().int().min(0).max(1440).optional().describe('Start the transcript at this minute (default the start)'),
+      },
+      annotations: READ,
+    },
+    (a, v) => {
+      const m = v.docs('meetings').find((x) => x.id === a.meeting_id) ?? no(`No meeting ${a.meeting_id} that you can see.`);
+      const myName = v.user(v.me)?.name;
+      const wasThere = m.createdBy === v.me || (!!myName && (m.attendees ?? []).includes(myName)) || ['owner', 'admin'].includes(v.role());
+      // The meeting's own setting: the transcript only for the people who were in it.
+      const transcriptOk = (m.access?.transcript ?? 'everyone') === 'everyone' || wasThere;
+      const lines = (m.transcript ?? []) as Doc[];
+      const fromMs = (a.from_minute ?? 0) * 60_000;
+      const shown: string[] = [];
+      let size = 0;
+      let nextAt: number | null = null;
+      for (const l of lines) {
+        if (Number(l.at) < fromMs) continue;
+        const line = `[${mmss(Number(l.at))}] ${l.speaker}: ${l.text}`;
+        if (size + line.length > 12_000) {
+          nextAt = Number(l.at);
+          break;
+        }
+        shown.push(line);
+        size += line.length;
+      }
+      return {
+        ...meetingLine(v, m),
+        ...(m.summary ? { summary: m.summary } : {}),
+        ...(m.keyPoints?.length ? { key_points: m.keyPoints } : {}),
+        ...(m.decisions?.length ? { decisions: m.decisions } : {}),
+        ...(m.openQuestions?.length ? { open_questions: m.openQuestions } : {}),
+        action_items: (m.actions ?? []).map((x: Doc) => ({ title: x.title, ...(x.owner ? { owner: x.owner } : {}), ...(x.due ? { due: x.due } : {}), ...(x.taskId ? { task_id: x.taskId } : {}) })),
+        ...(m.sharedWithClient ? { guests_see_notes: true } : {}),
+        ...(!lines.length
+          ? { transcript: 'No transcript for this meeting.' }
+          : !transcriptOk
+            ? { transcript: 'Only the people who were in this meeting can read its transcript.' }
+            : { transcript: shown, ...(nextAt !== null ? { transcript_continues: true, read_more_with_from_minute: Math.floor(nextAt / 60_000) } : {}) }),
+      };
+    },
+  );
+
+  /* ---------- Projects ---------- */
+
+  const projectStats = (v: View, c: Doc) => {
+    const today = v.today();
+    const tasks = v.docs('todos').filter((t) => t.clientId === c.id);
+    const open = tasks.filter((t) => !t.done);
+    return { open, late: open.filter((t) => t.due && t.due < today), done: tasks.length - open.length };
+  };
+  tool(
+    'list_projects',
+    {
+      title: 'List projects',
+      description: 'The projects (or clients, per company) you can see, with their status, lead, open and late tasks. Default: active ones and leads.',
+      inputSchema: {
+        status: z.enum(['active', 'lead', 'paused', 'ended', 'all']).optional().describe('Default active and lead'),
+        query: z.string().max(200).optional(),
+      },
+      annotations: READ,
+    },
+    (a, v) => {
+      const words = lower(a.query).split(/\s+/).filter(Boolean);
+      const list = v
+        .docs('clients')
+        .filter((c) => (a.status === 'all' ? true : a.status ? c.status === a.status : c.status === 'active' || c.status === 'lead'))
+        .filter((c) => !words.length || words.every((w) => lower(`${c.name} ${c.type ?? ''} ${c.domain ?? ''}`).includes(w)))
+        .sort((x, y) => String(x.name).localeCompare(String(y.name)));
+      return {
+        projects: list.map((c) => {
+          const s = projectStats(v, c);
+          return { id: c.id, name: c.name, status: c.status, ...(c.type ? { type: c.type } : {}), lead: v.nameOf(c.ownerId), open_tasks: s.open.length, ...(s.late.length ? { late_tasks: s.late.length } : {}), link: v.link('projects', c.id) };
+        }),
+        ...(list.length ? {} : { note: 'No projects here.' }),
+      };
+    },
+  );
+
+  tool(
+    'read_project',
+    {
+      title: 'Read a project',
+      description: 'One project: status, lead, the team on it, its guests, late tasks, what’s due in the next 14 days, recent meetings and its latest overview.',
+      inputSchema: { project: z.string().describe('The project’s name or id') },
+      annotations: READ,
+    },
+    (a, v) => {
+      const c = v.project(a.project);
+      const s = projectStats(v, c);
+      const today = v.today();
+      const soon = addDays(today, 14);
+      const byDue = (x: Doc, y: Doc) => String(x.due ?? '9999').localeCompare(String(y.due ?? '9999'));
+      const team = [...new Set([c.ownerId, ...(c.members ?? []).map((m: Doc) => m.userId)].filter(Boolean))];
+      const meetings = v.docs('meetings').filter((m) => m.clientId === c.id).sort((x, y) => String(y.at).localeCompare(String(x.at))).slice(0, 5);
+      return {
+        id: c.id,
+        name: c.name,
+        status: c.status,
+        ...(c.type ? { type: c.type } : {}),
+        ...(c.domain ? { email_domain: c.domain } : {}),
+        ...(c.since ? { since: c.since.slice(0, 10) } : {}),
+        ...(c.status === 'ended' && c.endReason ? { ended_because: c.endReason } : {}),
+        lead: v.nameOf(c.ownerId),
+        people: team.map((id) => ({ name: v.nameOf(id), ...(id === c.ownerId ? { role: 'lead' } : { role: (c.members ?? []).find((m: Doc) => m.userId === id)?.role ?? 'member' }) })),
+        guests: (c.people ?? []).filter((p: Doc) => p.status !== 'pending').map((p: Doc) => ({ name: p.name, email: p.email, role: p.role, ...(p.status === 'invited' ? { invited: true } : {}) })),
+        tasks: { open: s.open.length, late: s.late.length, done: s.done },
+        late: s.late.sort(byDue).slice(0, 30).map((t) => taskLine(v, t)),
+        due_soon: s.open.filter((t) => t.due && t.due >= today && t.due <= soon).sort(byDue).slice(0, 30).map((t) => taskLine(v, t)),
+        ...(meetings.length ? { recent_meetings: meetings.map((m) => ({ id: m.id, title: m.title, at: v.when(m.at) })) } : {}),
+        ...(c.overview ? { overview: { headline: c.overview.headline, progress: c.overview.progress, risks: c.overview.risks, next: c.overview.next, written: v.when(c.overview.at) } } : {}),
+        link: v.link('projects', c.id),
+      };
+    },
+  );
+
+  /* ---------- Teams and people ---------- */
+
+  tool(
+    'list_teams',
+    {
+      title: 'List teams',
+      description: 'The company’s teams: what each does, its lead, its people and how many tasks wait in its queue.',
+      inputSchema: {},
+      annotations: READ,
+    },
+    (_a, v) => {
+      const tasks = v.docs('todos').filter((t) => !t.done);
+      return {
+        teams: v.docs('teams').map((t) => ({
+          id: t.id,
+          name: t.name,
+          ...(t.about ? { about: t.about } : {}),
+          ...(t.leadId ? { lead: v.nameOf(t.leadId) } : {}),
+          members: (t.members ?? []).map(v.nameOf),
+          ...((t.members ?? []).includes(v.me) || t.leadId === v.me ? { yours: true } : {}),
+          open_tasks: tasks.filter((x) => x.teamId === t.id).length,
+          in_queue: tasks.filter((x) => x.teamId === t.id && !doers(x).length).length,
+          link: v.link('teams', t.id),
+        })),
+      };
+    },
+  );
+
+  tool(
+    'read_team',
+    {
+      title: 'Read a team',
+      description: 'One team: what it does, its lead and people (with titles), whether finished work is reviewed, its queue of unassigned tasks, its late work and who asked to join.',
+      inputSchema: { team: z.string().describe('The team’s name or id') },
+      annotations: READ,
+    },
+    (a, v) => {
+      const t = v.team(a.team);
+      const today = v.today();
+      const open = v.docs('todos').filter((x) => x.teamId === t.id && !x.done);
+      const ids = [...new Set([t.leadId, ...(t.members ?? [])].filter(Boolean))] as string[];
+      return {
+        id: t.id,
+        name: t.name,
+        ...(t.about ? { about: t.about } : {}),
+        ...(t.leadId ? { lead: v.nameOf(t.leadId) } : {}),
+        people: ids.map((id) => ({ id, name: v.nameOf(id), ...(v.user(id)?.title ? { title: v.user(id)!.title } : {}), ...(id === t.leadId ? { lead: true } : {}) })),
+        ...(t.review ? { reviews_finished_work: true } : {}),
+        joining: t.join === 'open' ? 'anyone can join' : 'the lead or an admin adds people',
+        ...((t.requests ?? []).length && (t.leadId === v.me || ['owner', 'admin'].includes(v.role())) ? { asked_to_join: t.requests.map((r: Doc) => v.nameOf(r.userId)) } : {}),
+        queue: open.filter((x) => !doers(x).length).slice(0, 30).map((x) => taskLine(v, x)),
+        late: open.filter((x) => x.due && x.due < today).slice(0, 30).map((x) => taskLine(v, x)),
+        open_tasks: open.length,
+        link: v.link('teams', t.id),
+      };
+    },
+  );
+
+  const personLine = (v: View, u: Doc) => ({
+    id: u.id,
+    name: u.name,
+    ...(u.title ? { title: u.title } : {}),
+    email: u.email,
+    role: u.role,
+    teams: v.docs('teams').filter((t) => (t.members ?? []).includes(u.id) || t.leadId === u.id).map((t) => t.name),
+    ...(u.id === v.me ? { you: true } : {}),
+  });
+  tool(
+    'find_person',
+    {
+      title: 'Find people',
+      description: 'The company directory: its people with title, email, role and teams. Give words to find someone by name, title, email or team; leave it out for everyone.',
+      inputSchema: { query: z.string().max(200).optional().describe('Words in a name, title, email or team'), limit: limit(200, 50) },
+      annotations: READ,
+    },
+    (a, v) => {
+      const words = lower(a.query).split(/\s+/).filter(Boolean);
+      const list = v
+        .members()
+        .map((u) => personLine(v, u))
+        .filter((p) => !words.length || words.every((w) => lower(`${p.name} ${p.title ?? ''} ${p.email} ${p.teams.join(' ')}`).includes(w)))
+        .sort((x, y) => String(x.name).localeCompare(String(y.name)));
+      const max = a.limit ?? 50;
+      return { people: list.slice(0, max), ...(list.length > max ? { more: list.length - max } : {}), ...(list.length ? {} : { note: `Nobody at ${v.ctx.company} matches that.` }) };
+    },
+  );
+
+  tool(
+    'read_person',
+    {
+      title: 'Read a person',
+      description: 'One teammate: name, title, email, role, teams (and which they lead), the projects of theirs you can see, and how much open work they have.',
+      inputSchema: { person: z.string().describe('Their name, email or id, or “me”') },
+      annotations: READ,
+    },
+    (a, v) => {
+      const u = v.person(a.person);
+      const today = v.today();
+      const open = v.docs('todos').filter((t) => !t.done && doers(t).includes(u.id));
+      const projects = v.docs('clients').filter((c) => c.status !== 'ended' && (c.ownerId === u.id || (c.members ?? []).some((m: Doc) => m.userId === u.id)));
+      return {
+        ...personLine(v, u),
+        ...(v.docs('teams').some((t) => t.leadId === u.id) ? { leads: v.docs('teams').filter((t) => t.leadId === u.id).map((t) => t.name) } : {}),
+        projects: projects.map((c) => ({ name: c.name, ...(c.ownerId === u.id ? { lead: true } : {}) })),
+        open_tasks: open.length,
+        ...(open.some((t) => t.due && t.due < today) ? { late_tasks: open.filter((t) => t.due && t.due < today).length } : {}),
+      };
+    },
+  );
+
   /* ---------- doing ---------- */
 
   const via = ` via ${ctx.app}`;
@@ -1468,6 +1859,144 @@ export function registerTools(server: McpServer, deps: ToolDeps, ctx: ToolCtx) {
         created: { id: ev.id, title: ev.title, ...(allDay ? { date: v.dayOf(ev.start), all_day: true } : { start: v.when(ev.start), end: v.time(ev.end) }), ...(words ? { repeats: words } : {}), ...(guests.length ? { guests: guests.map((g) => g.name) } : {}), link: v.link('calendar', ev.id) },
         ...(outside.length ? { not_added: outside, note: `${outside.join(', ')} ${outside.length === 1 ? 'is' : 'are'} outside the company, so not added. Invite them from sprint2go.` } : {}),
       };
+    },
+  );
+
+  /** One of your own events that sprint2go keeps (not a holiday, not one from an outside calendar it only shows). */
+  const ownEvent = (v: View, id: string): Doc => {
+    const e = v.docs('events').find((x) => x.id === id) ?? no(`No event ${id} on your calendar in ${v.ctx.company}.`);
+    if (e.feed === 'holidays') no('That’s a public holiday on the company’s calendar; it can’t be changed from here.');
+    if (v.ownerOf(e) !== v.me) no(`That event is on ${v.nameOf(v.ownerOf(e))}’s calendar, not yours.`);
+    if (v.docs('calendars').find((c) => c.id === e.calendarId)?.ownerId) no('That event comes from an outside calendar you linked. Change it there.');
+    return e;
+  };
+  /** A time the AI gave, as add_event takes it. */
+  const parseWhen = (v: View, s: string, field: string): { at: number; allDay: boolean } => {
+    const tz = v.tz();
+    const t = s.trim();
+    if (DAY_RE.test(t)) return validDay(t) ? { at: zonedTime(t, 0, tz), allDay: true } : no(`${field} isn’t a real date.`);
+    const local = /^(\d{4}-\d{2}-\d{2})[T ](\d{2}):(\d{2})$/.exec(t);
+    if (local) return validDay(local[1]) && Number(local[2]) < 24 && Number(local[3]) < 60 ? { at: zonedTime(local[1], Number(local[2]), tz) + Number(local[3]) * 60_000, allDay: false } : no(`${field} isn’t a real time.`);
+    const at = Date.parse(t);
+    return Number.isNaN(at) || !/[zZ]|[+-]\d{2}:?\d{2}$/.test(t) ? no(`${field}: use YYYY-MM-DDTHH:MM, an ISO time with offset, or YYYY-MM-DD.`) : { at, allDay: false };
+  };
+  /** The date of a repeating event that falls on this day (its original start), or a refusal. */
+  const occurrenceOn = (v: View, e: Doc, dayStr: string): string => {
+    if (!validDay(dayStr)) no('Use a real date as YYYY-MM-DD.');
+    const tz = v.tz();
+    const hits = expandEvents([e] as unknown as CalEvent[], zonedTime(dayStr, 0, tz), zonedTime(addDays(dayStr, 1), 0, tz)) as unknown as Doc[];
+    const hit = hits.find((x) => v.dayOf(x.occurrence ?? x.start) === dayStr) ?? hits[0];
+    return String(hit?.occurrence ?? hit?.start ?? no(`“${e.title}” doesn’t happen on ${dayStr}.`));
+  };
+
+  tool(
+    'update_event',
+    {
+      title: 'Change a calendar event',
+      description:
+        'Changes one of your own events in sprint2go: title, time, place, video link, notes or teammate guests (only what you name). For a repeating event it changes every date, unless you give only_date to move or rename just that one. Guests can only be teammates. No invitations are emailed.',
+      inputSchema: {
+        event_id: z.string().describe('The event’s id (from calendar_agenda or search)'),
+        title: z.string().min(1).max(200).optional(),
+        start: z.string().optional().describe('YYYY-MM-DDTHH:MM (company time), an ISO time with offset, or YYYY-MM-DD for all day'),
+        end: z.string().optional().describe('Same forms as start (default: keeps how long it was)'),
+        location: z.string().max(300).optional().describe('"" clears it'),
+        video_link: z.string().max(500).optional().describe('"" clears it'),
+        notes: z.string().max(5000).optional().describe('Replaces the notes; "" clears them'),
+        guests: z.array(z.string()).max(30).optional().describe('The full new list of teammate guests (names or emails)'),
+        only_date: day.optional().describe('A repeating event: change only its date on this day, YYYY-MM-DD'),
+      },
+      annotations: WRITE,
+    },
+    (a, v) => {
+      const before = ownEvent(v, a.event_id);
+      if (a.video_link && !/^https:\/\/\S+$/.test(a.video_link)) no('The video link must start with https://.');
+      const changed: string[] = [];
+      const oldLen = Date.parse(before.end) - Date.parse(before.start);
+      const tz = v.tz();
+      // New times, keeping how long it was when only the start moves.
+      let times: { start: string; end: string; allDay?: boolean } | null = null;
+      if (a.start || a.end) {
+        const s = a.start ? parseWhen(v, a.start, 'start') : { at: Date.parse(before.start), allDay: !!before.allDay };
+        const e = a.end ? parseWhen(v, a.end, 'end') : null;
+        const end = s.allDay ? zonedTime(addDays(v.dayOf(new Date(e ? e.at : s.at).toISOString()), 1), 0, tz) : (e?.at ?? s.at + (before.allDay ? 60 * 60_000 : oldLen));
+        if (end <= s.at) no('The event has to end after it starts.');
+        times = { start: new Date(s.at).toISOString(), end: new Date(end).toISOString(), ...(s.allDay ? { allDay: true } : {}) };
+        changed.push('time');
+      }
+      let guests: Doc[] | undefined;
+      const outside: string[] = [];
+      if (a.guests) {
+        const team = new Map(v.members().map((u) => [lower(u.email), u]));
+        guests = [];
+        for (const g of a.guests) {
+          if (g.includes('@') && !team.has(lower(g))) {
+            outside.push(g);
+            continue;
+          }
+          const p = g.includes('@') ? team.get(lower(g))! : v.person(g);
+          if (p.id !== v.me && !guests.some((x) => x.email === p.email)) guests.push({ name: p.name, email: p.email });
+        }
+        // Outside guests already on it stay (they were invited from sprint2go).
+        const kept = (before.guests ?? []).filter((g: Doc) => !team.has(lower(g.email)));
+        guests = [...kept, ...guests];
+        changed.push('guests');
+      }
+      const fields: Doc = {
+        ...(a.title !== undefined ? { title: a.title.trim() } : {}),
+        ...(a.location !== undefined ? { location: a.location || undefined } : {}),
+        ...(a.video_link !== undefined ? { meetUrl: a.video_link || undefined } : {}),
+        ...(a.notes !== undefined ? { notes: a.notes || undefined } : {}),
+      };
+      for (const k of Object.keys(fields)) if ((fields[k] ?? '') !== (before[k] ?? '')) changed.push(k === 'meetUrl' ? 'video_link' : k);
+      if (!changed.length) return { unchanged: { id: before.id, title: before.title }, note: 'Nothing to change.' };
+      let ev: Doc;
+      if (a.only_date) {
+        if (!before.rrule) no('only_date is for repeating events; this one happens once.');
+        if (a.guests) no('Guests are the same on every date of a repeating event. Leave out only_date to change them.');
+        const occ = occurrenceOn(v, before, a.only_date);
+        const len = oldLen;
+        const prev = (before.overrides ?? []).find((o: Doc) => o.occurrence === occ) ?? { occurrence: occ, start: occ, end: new Date(Date.parse(occ) + len).toISOString() };
+        const o = { ...prev, ...(times ? { start: times.start, end: times.end } : {}), ...fields };
+        ev = { ...before, overrides: [...(before.overrides ?? []).filter((x: Doc) => x.occurrence !== occ), o] };
+      } else {
+        ev = { ...before, ...fields, ...(times ? { start: times.start, end: times.end, allDay: times.allDay || undefined } : {}), ...(guests ? { guests } : {}) };
+        // A repeating event that moves: its rule moves with it, so dates left out or moved before no longer match.
+        if (times && before.rrule) ev = { ...ev, ...startOnRule({ start: ev.start, end: ev.end, rrule: ev.rrule, timeZone: ev.timeZone ?? tz }) };
+      }
+      for (const k of Object.keys(ev)) if (ev[k] === undefined) delete ev[k];
+      v.save('events', [ev], `changed the event “${clip(ev.title, 100)}” (${changed.join(', ')})${a.only_date ? ` on ${a.only_date}` : ''}`);
+      const shownStart = a.only_date ? (times?.start ?? occurrenceOn(v, before, a.only_date)) : ev.start;
+      return {
+        updated: { id: ev.id, title: fields.title ?? ev.title, ...(ev.allDay && !a.only_date ? { date: v.dayOf(ev.start), all_day: true } : { start: v.when(shownStart) }), ...(a.only_date ? { only_date: a.only_date } : ev.rrule ? { repeats: repeatWords(ev as any) } : {}), link: v.link('calendar', ev.id) },
+        changed,
+        ...(outside.length ? { not_added: outside, note: `${outside.join(', ')} ${outside.length === 1 ? 'is' : 'are'} outside the company, so not added. Invite them from sprint2go.` } : {}),
+      };
+    },
+  );
+
+  tool(
+    'cancel_event',
+    {
+      title: 'Cancel a calendar event',
+      description: 'Deletes one of your own events from your sprint2go calendar. For a repeating event it deletes every date, unless you give only_date to drop just that one. This can’t be undone from here, so confirm with the person first. No cancellations are emailed.',
+      inputSchema: {
+        event_id: z.string().describe('The event’s id (from calendar_agenda or search)'),
+        only_date: day.optional().describe('A repeating event: cancel only its date on this day, YYYY-MM-DD'),
+      },
+      annotations: DESTRUCTIVE,
+    },
+    (a, v) => {
+      const e = ownEvent(v, a.event_id);
+      if (a.only_date) {
+        if (!e.rrule) no('only_date is for repeating events; this one happens once. Leave it out to cancel it.');
+        const occ = occurrenceOn(v, e, a.only_date);
+        const ev = { ...e, exdates: [...new Set([...(e.exdates ?? []), occ])], overrides: (e.overrides ?? []).filter((o: Doc) => o.occurrence !== occ) };
+        v.save('events', [ev], `cancelled “${clip(e.title, 100)}” on ${a.only_date}`);
+        return { cancelled: { id: e.id, title: e.title, only_date: a.only_date }, note: 'The other dates stay on the calendar.' };
+      }
+      v.remove('events', e.id, `cancelled the event “${clip(e.title, 100)}” on ${v.when(e.start, e.allDay)}${e.rrule ? ' (every date)' : ''}`);
+      return { cancelled: { id: e.id, title: e.title, ...(e.allDay ? { date: v.dayOf(e.start) } : { start: v.when(e.start) }), ...(e.rrule ? { every_date: true } : {}) }, ...((e.guests ?? []).length ? { note: 'Its guests weren’t told. Let them know if they need to.' } : {}) };
     },
   );
 

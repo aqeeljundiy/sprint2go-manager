@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { primaryDomain } from '../../domains';
 import { usePhone } from '../../mobile/media';
 import { GRow, Group } from '../ui/Grouped';
 import { PushScreen } from '../ui/PushScreen';
@@ -183,7 +184,7 @@ export function EmailDeliverySection({
   const recordsBlock = (
   <div className="set-block">
     <div className="ed-head">
-      <h3>{t('Records for {domain}', { domain: info?.domain ?? ws.domains[0] ?? t('your domain') })}</h3>
+      <h3>{t('Records for {domain}', { domain: info?.domain || primaryDomain(ws) || t('your domain') })}</h3>
       {info?.ownDomain && (
         <button type="button" className="ghost-btn sm outline" disabled={checking} onClick={() => void check()}>
           {checking ? <Loader2 size={14} className="spin" /> : <RefreshCw size={14} />} {checking ? t('Checking…') : checks ? t('Check again') : t('Check the records')}
@@ -319,7 +320,7 @@ export function EmailDeliverySection({
                 })}
               </p>
             )}
-            {setup === 'hosted' && ws.domains[0] && <p className="small muted">{t('When the MX record below points here, new mail for {domain} arrives in {product}. Old mail stays where it is for now: bringing it over isn’t available yet.', { domain: ws.domains[0], product: product.name })}</p>}
+            {setup === 'hosted' && primaryDomain(ws) && <p className="small muted">{t('When the MX record below points here, new mail for {domain} arrives in {product}. Old mail stays where it is for now: bringing it over isn’t available yet.', { domain: primaryDomain(ws), product: product.name })}</p>}
             {setup !== 'none' && setup !== 'hosted' && (
               <>
                 <button type="button" className="link-btn small" onClick={() => setGuide((g) => !g)}>
@@ -331,7 +332,7 @@ export function EmailDeliverySection({
                       workspaceId={ws.id}
                       mode={setup === 'mix' ? 'split' : 'forward'}
                       provider={provider}
-                      domain={ws.domains[0] ?? ''}
+                      domain={primaryDomain(ws) || ''}
                       first={firstName.toLowerCase()}
                       company={ws.name}
                       address={myEmail}
@@ -446,7 +447,7 @@ export function EmailDeliverySection({
 
         {phone ? (
           <div className="set-rows">
-            <Group title={t('Records for {domain}', { domain: info?.domain ?? ws.domains[0] ?? t('your domain') })} footer={info && !info.ownDomain ? t('Your addresses live at our address, so there is nothing to add.') : t('Changes can take up to an hour to show.')}>
+            <Group title={t('Records for {domain}', { domain: info?.domain || primaryDomain(ws) || t('your domain') })} footer={info && !info.ownDomain ? t('Your addresses live at our address, so there is nothing to add.') : t('Changes can take up to an hour to show.')}>
               <GRow
                 label={t('DNS records')}
                 value={!info ? t('Checking…') : !info.ownDomain ? t('Nothing to add') : checks ? (checks.allOk ? t('All in place') : t('{missing} of {total} still missing.', { missing: checks.checks.filter((c) => !c.ok).length, total: checks.checks.length }).replace(/\.$/, '')) : t('Not checked yet')}
@@ -713,7 +714,7 @@ export function EmailDeliverySection({
         ) : null}
       </fieldset>
       {pane === 'records' && (
-        <PushScreen title={t('Records for {domain}', { domain: info?.domain ?? ws.domains[0] ?? t('your domain') })} onBack={() => setPane(null)} className="settings-push ed-push">
+        <PushScreen title={t('Records for {domain}', { domain: info?.domain || primaryDomain(ws) || t('your domain') })} onBack={() => setPane(null)} className="settings-push ed-push">
           <div className="settings-content">
             <fieldset className="plain" disabled={!canManage}>
         {recordsBlock}

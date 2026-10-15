@@ -1,0 +1,156 @@
+/* Settings search (src/components/SettingsSearch.tsx): a field over the list, results in its place. */
+.set-search {
+  display: contents;
+}
+.set-search-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  margin: 0 2px 8px;
+  padding: 0 10px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--text-3);
+  border: 1px solid transparent;
+  transition: border-color 0.15s, background 0.15s;
+}
+.set-search-field:focus-within {
+  border-color: var(--accent);
+  background: var(--surface);
+}
+.set-search-field input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  outline: none;
+  font: inherit;
+  font-size: 14px;
+  color: var(--text);
+}
+.set-search-field input::-webkit-search-cancel-button {
+  display: none;
+}
+.set-search-field kbd {
+  font: inherit;
+  font-size: 12px;
+  padding: 0 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  color: var(--text-3);
+}
+.set-search-clear {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: var(--text-3);
+  transition: background 0.15s, color 0.15s;
+}
+.set-search-clear:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+.set-search-list {
+  display: contents;
+}
+.set-search-list > *,
+.set-search-results {
+  animation: set-search-in 0.2s ease-out backwards;
+}
+.set-search-list > .settings-nav-item {
+  animation: none;
+}
+.set-search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.settings-nav .set-search-hit {
+  align-items: flex-start;
+  white-space: normal;
+}
+.set-search-hit > svg {
+  flex: none;
+  margin-top: 2px;
+}
+.set-search-hit span {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.set-search-hit strong {
+  font-weight: 500;
+  color: var(--text);
+}
+.set-search-hit small {
+  font-size: 12px;
+  color: var(--text-3);
+}
+@keyframes set-search-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+/* The option a search jumped to: a soft flash where it is. */
+.set-hit {
+  border-radius: 10px;
+  animation: set-hit 1.6s ease-out;
+}
+@keyframes set-hit {
+  0%,
+  40% {
+    background: var(--accent-soft);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+  }
+}
+
+/* Phones: the field sits over the list and stays put while the list scrolls. */
+@media (max-width: 767px) {
+  .settings-body > .set-search {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+  .settings-body > .set-search .set-search-field {
+    flex: none;
+    height: var(--tap);
+    margin: 8px 16px 0;
+    border-radius: 10px;
+  }
+  .settings-body > .set-search .set-search-field input {
+    font-size: 16px;
+  }
+  .settings-body > .set-search .set-search-list {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+  .settings-body > .set-search .set-search-results {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 12px 0 var(--fab-space);
+  }
+  .set-search-clear {
+    width: var(--tap);
+    height: var(--tap);
+    margin-right: -10px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .set-search-list > *,
+  .set-search-results,
+  .set-hit {
+    animation: none;
+  }
+  .set-hit {
+    background: var(--accent-soft);
+  }
+}

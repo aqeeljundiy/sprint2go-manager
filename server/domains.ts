@@ -135,3 +135,47 @@ export function settle(ws: DomainWs, domain: string, proof: Proof): Ownership {
   db.db.prepare('UPDATE mail_domains SET workspace_id = ?, verified_at = ?, verified_how = ? WHERE domain = ?').run(ws.id, now(), how, d);
   return ownership(ws, d);
 }
+
+/** A hostname a domain can be: labels of letters, digits and hyphens, then a TLD of letters. */
+export const validDomain = (d: string) => /^(?=.{3,253}$)([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/.test(d);
+
+/**
+ * A company's domains as saved (Settings, Domains; the save path checks who may save). Only real hostnames, each once;
+ * a domain another company proved is refused; a domain that mailboxes, groups or addresses still use stays. The
+ * primary domain must be one of them. `why` says what was refused, in English (the caller translates).
+ */
+export function domainsOnSave(next: { domains?: unknown; primaryDomain?: unknown; accounts?: Acct[]; mailAliases?: { address?: string }[]; mailGroups?: { address?: string }[] }, before: (DomainWs & { primaryDomain?: string; mailAliases?: { address?: string }[]; mailGroups?: { address?: string }[] }) | undefined, wsId: string): { domains: string[]; primaryDomain?: string; why: string | null } {
+  const was = (before?.domains ?? []).map(lower);
+  const asked = Array.isArray(next.domains) ? (next.domains as unknown[]).map((d) => lower(String(d ?? '')).replace(/^@/, '')) : was;
+  const why: string[] = [];
+  const out: string[] = [];
+  for (const d of asked) {
+    if (!d || out.includes(d)) continue;
+    if (!validDomain(d)) {
+      if (!was.includes(d)) why.push(`${d} isn’t a domain.`);
+      else out.push(d);
+      continue;
+    }
+    if (!was.includes(d)) {
+      const o = ownerOf(d);
+      if (o && o.id !== wsId && o.verifiedAt) {
+        why.push(`Another company uses ${d}.`);
+        continue;
+      }
+    }
+    out.push(d);
+  }
+  // Removing a domain that's still in use: it stays until its mailboxes, groups and addresses move or go.
+  const at = (a?: string) => lower(String(a ?? '').split('@')[1] ?? '');
+  const users = [...(next.accounts ?? before?.accounts ?? []).filter((a) => !a.temp).map((a) => a.email), ...(next.mailAliases ?? before?.mailAliases ?? []).map((a) => a.address), ...(next.mailGroups ?? before?.mailGroups ?? []).map((g) => g.address)];
+  for (const d of was) {
+    if (out.includes(d)) continue;
+    const n = users.filter((u) => at(u) === d).length;
+    if (n) {
+      out.push(d);
+      why.push(`${d} still has ${n} ${n === 1 ? 'address' : 'addresses'} on it. Move or remove ${n === 1 ? 'it' : 'them'} first.`);
+    }
+  }
+  const p = lower(String(next.primaryDomain ?? ''));
+  return { domains: out, primaryDomain: p && out.includes(p) ? p : undefined, why: why.length ? why.join(' ') : null };
+}

@@ -379,6 +379,9 @@ export interface Workspace {
   color: string; // brand colour, used as the app accent
   logo?: string; // data URL of an uploaded logo
   domains: string[];
+  primaryDomain?: string; // the main domain (one of domains); missing means domains[0]. Read it with primaryDomain(ws), src/domains.ts
+  /** Per domain, what the server's record check last saw: who holds it and whether the mail records are in place. Set by the server. */
+  domainChecks?: Record<string, { at: string; owner: 'verified' | 'pending' | 'held' | 'taken'; allOk: boolean; checks?: { key: string; ok: boolean; found: string; want: string }[] }>;
   brands?: Brand[]; // brands inside this company, each owning some of its domains
   accounts: Account[];
   members: Member[];

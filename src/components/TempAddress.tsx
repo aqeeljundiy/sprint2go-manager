@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { primaryDomain, usableDomains } from '../domains';
 import { Check, Copy, Dices, Timer, X } from 'lucide-react';
 import type { Account, User, Workspace } from '../types';
 import { uid } from '../utils';
@@ -9,7 +10,7 @@ import { mark, t, tn } from '../i18n';
 
 /** Throwaway addresses live on a sprint2go domain, so they work at once whatever the company's own email setup. */
 export const tempDomain = (ws: Workspace) => {
-  const base = (ws.domains[0]?.split('.')[0] ?? ws.name).toLowerCase().replace(/[^a-z0-9]/g, '') || 'team';
+  const base = ((primaryDomain(ws) || ws.name).split('.')[0]).toLowerCase().replace(/[^a-z0-9]/g, '') || 'team';
   return `${base}.s2g.email`;
 };
 
@@ -35,7 +36,7 @@ export function lifeLeft(a: Account) {
  * hosted with us, it can also be on the company's own domain.
  */
 export function TempAddressDialog({ ws, me, people, editing, onSave, onClose }: { ws: Workspace; me: string; people: User[]; editing?: Account; onSave: (a: Account) => void; onClose: () => void }) {
-  const ownDomain = ws.emailSetup === 'hosted' && ws.domains[0] ? ws.domains[0] : null;
+  const ownDomains = ws.emailSetup === 'hosted' ? usableDomains(ws) : []; // any of the company's domains, primary first
   const [name, setName] = useState(editing ? editing.email.split('@')[0] : '');
   const [domain, setDomain] = useState(editing ? editing.email.split('@')[1] : tempDomain(ws));
   const [who, setWho] = useState<string[]>(editing?.users ?? [me]);
@@ -76,8 +77,8 @@ export function TempAddressDialog({ ws, me, people, editing, onSave, onClose }: 
                   <span className="temp-addr">
                     <input autoFocus value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && save()} placeholder="tiktok-test" />
                     <span className="temp-at">@</span>
-                    {ownDomain ? (
-                      <Select<string> value={domain} onChange={setDomain} label={t('Domain')} className="sel-flat temp-domain-sel" options={[{ value: tempDomain(ws), label: tempDomain(ws), hint: t('Works straight away') }, { value: ownDomain, label: ownDomain, hint: t('Your company’s domain') }]} />
+                    {ownDomains.length ? (
+                      <Select<string> value={domain} onChange={setDomain} label={t('Domain')} className="sel-flat temp-domain-sel" options={[{ value: tempDomain(ws), label: tempDomain(ws), hint: t('Works straight away') }, ...ownDomains.map((d) => ({ value: d, label: d, hint: d === primaryDomain(ws) ? t('Your primary domain') : t('Your company’s domain') }))]} />
                     ) : (
                       <span className="temp-domain">{domain}</span>
                     )}

@@ -502,6 +502,8 @@ const id: Record<string, string> = {
   "Use an address (name@shop.com) or a whole domain (@shop.com).": "Gunakan alamat (nama@toko.com) atau seluruh domain (@toko.com).",
   "You can read this inbox but not send from it. Ask an admin for send access.": "Anda bisa membaca kotak masuk ini tapi tidak bisa mengirim darinya. Minta akses kirim ke admin.",
   "{code} is your code to add this backup sign-in email.": "{code} adalah kode Anda untuk menambahkan email masuk cadangan ini.",
+  // Settings, Domains (src/components/admin/Domains.tsx) and picking a domain for new addresses
+  "That isn’t one of your domains.": "Itu bukan salah satu domain Anda.",
 };
 
 export default id;

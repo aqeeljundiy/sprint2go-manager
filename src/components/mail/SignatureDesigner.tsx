@@ -5,6 +5,7 @@
 import { useMemo, useState } from 'react';
 import { PenLine, X } from 'lucide-react';
 import type { Workspace } from '../../types';
+import { primaryDomain } from '../../domains';
 import { brandOf } from '../../brands';
 import { Layer } from '../ui/Layer';
 import { uploadFile } from '../../sync';
@@ -75,7 +76,7 @@ const WATERMARK = `<div style="${FONT};font-size:11px;color:#9aa0ab;padding-top:
 export function SignatureDesigner({ ws, address, me, onUse, onClose }: { ws: Workspace; address: string; me: { name: string; title?: string }; onUse: (html: string) => void; onClose: () => void }) {
   const brand = brandOf(ws, address);
   const [tpl, setTpl] = useState('side');
-  const [f, setF] = useState<Fields>({ name: me.name, title: me.title ?? '', company: brand?.name ?? ws.name, phone: '', website: brand?.domains[0] ?? ws.domains[0] ?? '' });
+  const [f, setF] = useState<Fields>({ name: me.name, title: me.title ?? '', company: brand?.name ?? ws.name, phone: '', website: brand?.domains[0] ?? (primaryDomain(ws) || '') });
   // The brand's (or company's) logo as the picture itself: the mail engine sends pictures inside an email as attached
   // images, which Gmail and Outlook show (a link to another site would be stripped, sanitize.ts).
   // Only PNG, JPG, GIF or WebP: mail apps don't show SVG pictures, so an SVG logo would preview here and vanish there.

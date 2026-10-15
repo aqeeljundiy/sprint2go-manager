@@ -25,9 +25,9 @@ interface Grant {
 
 /**
  * Settings, Account: the AI apps this person connected (Claude, ChatGPT…), which company each reaches, when it was
- * last used, and Disconnect. Under them, the address to add in Claude. The server keeps the list (server/connector.ts).
+ * last used, and Disconnect. Under them, the address to add in Claude (listOnly: just the list, for Connect AI apps). The server keeps the list (server/connector.ts).
  */
-export function ConnectedApps({ toast }: { toast?: (t: string) => void }) {
+export function ConnectedApps({ toast, listOnly }: { toast?: (t: string) => void; listOnly?: boolean }) {
   const [data, setData] = useState<{ url: string; grants: Grant[] } | null>(null);
   const [copied, setCopied] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
@@ -51,7 +51,11 @@ export function ConnectedApps({ toast }: { toast?: (t: string) => void }) {
     );
   const disconnect = async (g: Grant) => {
     setBusy(g.id);
-    const r = await fetch('/api/oauth/grants/revoke', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id: g.id }) }).catch(() => null);
+    const r = await fetch('/api/oauth/grants/revoke', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ id: g.id }),
+    }).catch(() => null);
     setBusy(null);
     if (!r?.ok) return toast?.(t('Couldn’t disconnect it. Try again.'));
     setData((d) => d && { ...d, grants: d.grants.filter((x) => x.id !== g.id) });
@@ -72,16 +76,18 @@ export function ConnectedApps({ toast }: { toast?: (t: string) => void }) {
             rows.map(({ item: x, leaving }) => <GRow key={x.id} className={leaving ? 'row-leaving' : ''} label={x.app} sub={x.company} value={x.off ? t('Not working') : undefined} onClick={() => setOpened(x.id)} />)
           )}
         </Group>
-        <Group title={t('Add sprint2go to Claude')} footer={t('In Claude, open Settings, Connectors, Add custom connector, and paste this address. ChatGPT and other apps that connect to MCP servers use the same one.')}>
-          <GRow
-            label={<code className="cn-url">{url}</code>}
-            accessory={
-              <button type="button" className="g-btn" onClick={copy} aria-label={t('Copy the address')}>
-                {copied ? <Check size={20} /> : <Copy size={20} />}
-              </button>
-            }
-          />
-        </Group>
+        {!listOnly && (
+          <Group title={t('Add sprint2go to Claude')} footer={t('In Claude, open Settings, Connectors, Add custom connector, and paste this address. ChatGPT and other apps that connect to MCP servers use the same one.')}>
+            <GRow
+              label={<code className="cn-url">{url}</code>}
+              accessory={
+                <button type="button" className="g-btn" onClick={copy} aria-label={t('Copy the address')}>
+                  {copied ? <Check size={20} /> : <Copy size={20} />}
+                </button>
+              }
+            />
+          </Group>
+        )}
         {g && (
           <PushScreen title={g.app} onBack={() => setOpened(null)} className="g-page g-edit">
             <div className="g-body">
@@ -114,7 +120,12 @@ export function ConnectedApps({ toast }: { toast?: (t: string) => void }) {
             <div key={g.id} className={`set-row cn-grant ${leaving ? 'row-leaving' : ''}`}>
               <span>
                 <strong>
-                  {g.app} {g.demo && <Badge small>{t('Demo')}</Badge>} {g.off && <Badge small tone="warn">{t('Not working')}</Badge>}
+                  {g.app} {g.demo && <Badge small>{t('Demo')}</Badge>}{' '}
+                  {g.off && (
+                    <Badge small tone="warn">
+                      {t('Not working')}
+                    </Badge>
+                  )}
                 </strong>
                 <small>
                   {g.company}
@@ -129,16 +140,18 @@ export function ConnectedApps({ toast }: { toast?: (t: string) => void }) {
           ))
         )}
       </SmoothHeight>
-      <div className="set-row cn-add">
-        <span>
-          <strong>{t('Add sprint2go to Claude')}</strong>
-          <small>{t('In Claude, open Settings, Connectors, Add custom connector, and paste this address. ChatGPT and other apps that connect to MCP servers use the same one.')}</small>
-          <code className="cn-url">{url}</code>
-        </span>
-        <button type="button" className="ghost-btn outline sm cn-copy" onClick={copy} aria-label={t('Copy the address')}>
-          {copied ? <Check size={14} /> : <Copy size={14} />} {copied ? t('Copied') : t('Copy')}
-        </button>
-      </div>
+      {!listOnly && (
+        <div className="set-row cn-add">
+          <span>
+            <strong>{t('Add sprint2go to Claude')}</strong>
+            <small>{t('In Claude, open Settings, Connectors, Add custom connector, and paste this address. ChatGPT and other apps that connect to MCP servers use the same one.')}</small>
+            <code className="cn-url">{url}</code>
+          </span>
+          <button type="button" className="ghost-btn outline sm cn-copy" onClick={copy} aria-label={t('Copy the address')}>
+            {copied ? <Check size={14} /> : <Copy size={14} />} {copied ? t('Copied') : t('Copy')}
+          </button>
+        </div>
+      )}
     </>
   );
 }

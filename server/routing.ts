@@ -46,7 +46,7 @@ const wsOf = (id: string) => db.getDoc('workspaces', id) as unknown as Ws | unde
 /** The domain a company's routing is checked on, or why it can't be checked. */
 export function probeDomain(ws: Ws): { domain: string } | { why: string } {
   if (ws.emailSetup !== 'mix') return { why: 'Routing is checked only for “Some of each”.' };
-  const domain = lower(ws.domains?.[0] ?? '');
+  const domain = mailer.mailDomainOf(ws as Parameters<typeof mailer.mailDomainOf>[0]); // the primary domain
   if (!domain || domain === mailer.MAIL_HOST) return { why: 'Add your company’s domain first.' };
   if (!mayUse(ws, domain)) return { why: `Another company uses ${domain}. Prove it’s yours in Settings, Email delivery, first.` };
   if (mailer.systemMailPath() === 'log') return { why: 'This server can’t send mail yet, so it can’t send the test.' };

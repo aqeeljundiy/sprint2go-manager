@@ -15,7 +15,7 @@ import { ProjectsCtx } from './components/ProjectPicker';
 import { ProjectsSidebar } from './components/ProjectsSidebar';
 import { ProjectsHome } from './components/ProjectsHome';
 import { Popover } from './components/ui/Popover';
-import { Brain, Briefcase, Building2, CalendarPlus, Copy, FileText, Hash, ListChecks, Mail, PenLine, Send, Sparkles, Timer, Trash2, Undo2, Upload, User as UserIcon, Video, Table2, MessagesSquare, AlertTriangle, Menu, Inbox, Search as Paperclip, Contact, Clock, History, MessageCircle, Bell, Sun, CalendarRange, CircleCheck, Layers, List, CalendarDays, Users, Star, Folder, UserRound, Archive, NotebookText, LayoutGrid, type LucideIcon, type LucideProps } from 'lucide-react';
+import { Brain, SlidersHorizontal, Briefcase, Building2, CalendarPlus, Copy, FileText, Hash, ListChecks, Mail, PenLine, Send, Sparkles, Timer, Trash2, Undo2, Upload, User as UserIcon, Video, Table2, MessagesSquare, AlertTriangle, Menu, Inbox, Search as Paperclip, Contact, Clock, History, MessageCircle, Bell, Sun, CalendarRange, CircleCheck, Layers, List, CalendarDays, Users, Star, Folder, UserRound, Archive, NotebookText, LayoutGrid, type LucideIcon, type LucideProps } from 'lucide-react';
 import { DEFAULT_PERMISSIONS } from './types';
 import type { Quote, Team, Note, Account, AppId, Attachment, BlockRule, CalEvent, Channel, ChannelCategory, Client, ClientPerson, ChatFile, ChatMessage, CommentFile, Meeting, Message, Notice, RsvpStatus, TaskEvent, TaskStatus, Todo, DriveItem, DriveSection, Location, Person, Thread, User, View, Workspace, FolderId } from './types';
 import { useMailOrganize } from './components/mail/Organize';
@@ -93,6 +93,7 @@ import { AppSettingsButton, appSettingsLinks } from './components/AppSettings';
 import { Avatar } from './components/Avatar';
 import { Notifications, NoticesScreen } from './components/Notifications';
 import { CommandPalette, type PaletteItem } from './components/CommandPalette';
+import { flashOption, settingsEntries } from './settingsIndex';
 import { HomeView } from './components/HomeView';
 import { TaskDrawer } from './components/TaskDrawer';
 import { TasksView, dueLabel, isBrief, type TaskScope } from './components/TasksView';
@@ -4535,6 +4536,8 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
     { id: 'a-task', group: 'Actions', title: t('New task'), icon: ListChecks, app: 'tasks' as const, run: () => (openTasks({ kind: 'mine' }), setTaskAdd((n) => n + 1)) },
     ...(enabled.has('calendar') ? [{ id: 'a-event', group: 'Actions', title: t('New event'), icon: CalendarPlus, app: 'calendar' as const, run: () => { go('calendar'); openNewEvent(); } }] : []),
     ...APPS.filter((a) => enabled.has(a.id)).map((a) => ({ id: 'go-' + a.id, group: 'Go to', title: a.name, icon: a.icon, run: () => go(a.id) })),
+    // Settings pages and the options inside them (src/settingsIndex.ts): "signature" opens Mail & signature.
+    ...settingsEntries().map((e) => ({ id: 'set-' + e.key, group: 'Settings', title: e.option ?? e.page, sub: e.option ? e.page : undefined, icon: SlidersHorizontal, run: () => { setSettingsSection(e.id as SettingsSection); go('settings'); if (e.option) flashOption(e.option); } })),
     ...wsClientsAll.map((c) => ({ id: 'c-' + c.id, group: `${term.Many}`, title: c.name, sub: c.status === 'ended' ? t('Past {project}', { project: term.one }) : c.domain, icon: Building2, run: () => openClient(c.id) })),
     ...wsTasks.filter((task) => !task.done).map((task) => ({ id: 't-' + task.id, group: 'Tasks', title: task.title, sub: [wsClients.find((c) => c.id === task.clientId)?.name, task.userId ? firstOf(task.userId) : t('nobody yet')].filter(Boolean).join(' · '), icon: ListChecks, keywords: [task.notes, task.context].filter(Boolean).join(' ').slice(0, 1500), run: () => openTask(task.id) })),
     ...members.filter((u) => u.id !== user.id).map((u) => ({ id: 'p-' + u.id, group: 'People', title: u.name, sub: u.title || u.email, icon: UserIcon, run: () => openChannel(dmWith(u.id)) })),

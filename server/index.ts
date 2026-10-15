@@ -35,7 +35,7 @@ import { wakeThread } from '../src/mailRules.ts';
 import * as routing from './routing.ts';
 import * as offsite from './offsite.ts';
 import { certState } from './mailcert.ts';
-import { ownership as domainOwnership } from './domains.ts';
+import { ownership as domainOwnership, domainsOnSave } from './domains.ts';
 import * as invites from './invites.ts';
 import { buildReply } from './ics.ts';
 import * as platform from './platform.ts';
@@ -1545,10 +1545,20 @@ function applySync(me: string, incoming: any, from: { conn?: string; operator?: 
         say(boxes.whyWords ?? boxes.why);
         // The company's time zone: one the clock knows, else it stays as it was.
         const timeZone = isZone((d as any).timeZone) ? (d as any).timeZone : before.timeZone;
-        return { ...d, ...own, timeZone, accounts: boxes.accounts, plan, taskStages, chat: chat.chat, whiteLabel: ownAddress((d as any).whiteLabel, before.whiteLabel), security: sec.security } as db.Doc;
+        // Its domains: real hostnames, not another company's, none dropped while addresses use it (server/domains.ts).
+        const doms = domainsOnSave(d as any, before, String(d.id));
+        say(doms.why);
+        return { ...d, ...own, domains: doms.domains, primaryDomain: doms.primaryDomain, domainChecks: before.domainChecks, timeZone, accounts: boxes.accounts, plan, taskStages, chat: chat.chat, whiteLabel: ownAddress((d as any).whiteLabel, before.whiteLabel), security: sec.security } as db.Doc;
       }
       const { mailReady: _r, mailCredits: _c, mailCreditsNotified: _n, suspended: _s, whatsapp: _wa, mailAliases: _al, bimi: _bimi, mailGroups: _mg, mailPolicy: _mp, ...fresh } = d as any;
       if (Array.isArray(fresh.accounts)) fresh.accounts = delegation.keepServerFields(fresh.accounts, []);
+      {
+        const doms = domainsOnSave(fresh, undefined, String(fresh.id));
+        say(doms.why);
+        fresh.domains = doms.domains;
+        fresh.primaryDomain = doms.primaryDomain;
+        delete fresh.domainChecks;
+      }
       if (!isZone(fresh.timeZone)) delete fresh.timeZone; // the creator's browser said one the clock doesn't know
       // One free trial per person and per company domain, as for /api/workspace.
       const trial = billing.trialOnCreate(planFromApp(fresh.plan, undefined).plan, { id: me, email: String(person.email ?? '') }, { id: String(fresh.id), name: String(fresh.name ?? ''), domains: fresh.domains });
@@ -2321,7 +2331,10 @@ const handle = async (req: IncomingMessage, res: ServerResponse) => {
       // The records follow what the screen shows: a choice made a moment ago may not be saved yet.
       const setupQ = url.searchParams.get('setup') ?? '';
       const providerQ = url.searchParams.get('provider') ?? '';
-      const ws = { ...saved, ...(['keep', 'mix', 'hosted', 'none'].includes(setupQ) ? { emailSetup: setupQ } : {}), ...(['google', 'microsoft', 'zoho', 'imap'].includes(providerQ) ? { emailProvider: providerQ } : {}) };
+      // One of the company's domains (Settings, Domains), else its primary one.
+      const domainQ = String(url.searchParams.get('domain') ?? '').toLowerCase();
+      const pickD = domainQ && (saved.domains ?? []).some((x: string) => String(x).toLowerCase() === domainQ) ? { primaryDomain: domainQ } : {};
+      const ws = { ...saved, ...pickD, ...(['keep', 'mix', 'hosted', 'none'].includes(setupQ) ? { emailSetup: setupQ } : {}), ...(['google', 'microsoft', 'zoho', 'imap'].includes(providerQ) ? { emailProvider: providerQ } : {}) };
       const domain = mailer.mailDomainOf(ws);
       const ownDomain = domain !== mailer.MAIL_HOST;
       const [records, health, dns] = await Promise.all([mailer.expectedRecords(ws), mailer.serverHealth(), ownDomain ? mailer.dnsHostOf(domain) : Promise.resolve({ dnsHost: null, nameservers: [] as string[] })]);
@@ -2333,7 +2346,7 @@ const handle = async (req: IncomingMessage, res: ServerResponse) => {
       // Unlimited: Boosted sending has a monthly limit instead of credits.
       const wl = whitelist.on(saved) ? whitelist.entry(saved.id) : null;
       const unlimited = wl ? { limit: wl.sesLimit, used: whitelist.sesUsed(saved.id), mine: whitelist.featureOn(saved, me, 'boosted') } : null;
-      return json(res, 200, { host: mailer.MAIL_HOST, ip: mailer.MAIL_IP, domain, ownDomain, route: ws.mailRoute ?? 'own', boostedAvailable: mailer.boostedAvailable(), credits: ws.mailCredits ?? 0, creditOrders: credits, unlimited, records, checks: ws.mailChecks ?? null, stats: mailer.mailStats(ws.id, monthStart()), health, dnsHost: dns.dnsHost, nameservers: dns.nameservers, ownership, cert });
+      return json(res, 200, { host: mailer.MAIL_HOST, ip: mailer.MAIL_IP, domain, ownDomain, route: ws.mailRoute ?? 'own', boostedAvailable: mailer.boostedAvailable(), credits: ws.mailCredits ?? 0, creditOrders: credits, unlimited, records, checks: domain !== mailer.mailDomainOf(saved) ? (saved.domainChecks?.[domain]?.checks ? saved.domainChecks[domain] : null) : (ws.mailChecks ?? null), stats: mailer.mailStats(ws.id, monthStart()), health, dnsHost: dns.dnsHost, nameservers: dns.nameservers, ownership, cert });
     }
     // Search with Gmail's operators over your mailboxes in a company (server/mailSmart.ts, src/mailQuery.ts).
     if (p === '/api/mail/search' && req.method === 'GET') {
@@ -2426,13 +2439,27 @@ const handle = async (req: IncomingMessage, res: ServerResponse) => {
       return json(res, 200, { whiteLabel: (db.getDoc('workspaces', wsId) as any)?.whiteLabel ?? null });
     }
     if (p === '/api/mail/check' && req.method === 'POST') {
-      const { workspaceId } = await body(req);
+      const { workspaceId, domain: askedDomain } = await body(req);
       const ws = memberOf(me).find((w) => w.id === workspaceId) as any;
       if (!ws || !isAdminOf(me, ws.id)) return json(res, 403, { error: mark('Only admins can check the records.') });
+      const primary = mailer.mailDomainOf(ws);
+      const dq = String(askedDomain ?? '').toLowerCase();
+      if (dq && !(ws.domains ?? []).some((x: string) => String(x).toLowerCase() === dq)) return json(res, 400, { error: mark('That isn’t one of your domains.') });
+      // Another domain than the primary (Settings, Domains): its result is kept per domain, and the mailboxes don't change.
+      if (dq && dq !== primary) {
+        const result = await mailer.checkDomain({ ...ws, primaryDomain: dq });
+        const o = domainOwnership(ws, dq);
+        const fresh = db.getDoc('workspaces', ws.id) as any;
+        const next = { ...fresh, domainChecks: { ...(fresh.domainChecks ?? {}), [dq]: { at: result.at, owner: o.state, allOk: result.allOk, checks: result.checks } } };
+        db.writeDocs('workspaces', [next], [], me);
+        broadcast('workspaces', [next], []);
+        return json(res, 200, result);
+      }
       const result = await mailer.checkDomain(ws);
       soonReadiness(ws.id);
       const own = result.domain === mailer.MAIL_HOST;
-      const next = { ...ws, mailChecks: { at: result.at, allOk: result.allOk, checks: result.checks }, accounts: (ws.accounts ?? []).map((a: any) => (!a.provider || a.provider === 'sprint2go' ? { ...a, connected: own || result.allOk || result.checks.filter((c) => c.key !== 'dmarc').every((c) => c.ok) } : a)) };
+      const ownP = own ? null : domainOwnership(ws, result.domain);
+      const next = { ...ws, ...(ownP ? { domainChecks: { ...(ws.domainChecks ?? {}), [result.domain]: { at: result.at, owner: ownP.state, allOk: result.allOk, checks: result.checks } } } : {}), mailChecks: { at: result.at, allOk: result.allOk, checks: result.checks }, accounts: (ws.accounts ?? []).map((a: any) => (!a.provider || a.provider === 'sprint2go' ? { ...a, connected: own || result.allOk || result.checks.filter((c) => c.key !== 'dmarc').every((c) => c.ok) } : a)) };
       db.writeDocs('workspaces', [next], [], me);
       broadcast('workspaces', [next], []);
       return json(res, 200, result);

@@ -1,10 +1,12 @@
 // Settings, General & email, Brands: a group's brands, each with its own name, colour, logo and domains.
 // Mailboxes on a brand's domains are that brand's (src/brands.ts): the inbox list marks them, compose names the brand.
 import { useState } from 'react';
-import { ImagePlus, Plus, Trash2, X } from 'lucide-react';
+import { ImagePlus, Plus, Trash2 } from 'lucide-react';
 import type { Brand, Workspace } from '../../types';
 import { ACCENTS } from '../../settings';
 import { freeDomains } from '../../brands';
+import { orderedDomains } from '../../domains';
+import { MultiSelect } from '../ui/MultiSelect';
 import { SmoothHeight, useLeaving } from '../ui/Smooth';
 import { toast } from '../../toast';
 import { t } from '../../i18n';
@@ -22,7 +24,7 @@ function readLogo(file: File): Promise<string | null> {
   });
 }
 
-export function BrandsSettings({ ws, canManage, onWorkspace }: { ws: Workspace; canManage: boolean; onWorkspace: (p: Partial<Workspace>) => void }) {
+export function BrandsSettings({ ws, canManage, onWorkspace, onDomains }: { ws: Workspace; canManage: boolean; onWorkspace: (p: Partial<Workspace>) => void; onDomains?: () => void }) {
   const brands = ws.brands ?? [];
   const rows = useLeaving(brands, (b) => b.id);
   const [open, setOpen] = useState<string | null>(null);
@@ -36,7 +38,7 @@ export function BrandsSettings({ ws, canManage, onWorkspace }: { ws: Workspace; 
   return (
     <>
       <h3>{t('Brands')}</h3>
-      <small className="set-hint">{t('For a group with several brands under one company. Each brand sends from its own domains with its own name and logo; mailboxes on those domains are marked with its colour. One team, one bill.')}</small>
+      <small className="set-hint">{t('Optional, for a group with several brands under one company. Each brand sends from some of the company’s domains with its own name and logo; mailboxes on those domains are marked with its colour. One team, one bill.')}</small>
       {brands.length > 0 && (
         <div className="acct-list brand-list">
           {rows.map(({ item: b, leaving }) => (
@@ -79,24 +81,25 @@ export function BrandsSettings({ ws, canManage, onWorkspace }: { ws: Workspace; 
                     </div>
                     <div className="field">
                       <span>{t('Domains')}</span>
-                      <div className="brand-domains">
-                        {b.domains.map((d) => (
-                          <span key={d} className="mail-chip on">
-                            {d}
-                            <button type="button" aria-label={t('Remove {domain}', { domain: d })} onClick={() => patch(b.id, { domains: b.domains.filter((x) => x !== d) })}>
-                              <X size={12} />
-                            </button>
-                          </span>
-                        ))}
-                        {freeDomains(ws, b.id)
-                          .filter((d) => !b.domains.includes(d))
-                          .map((d) => (
-                            <button key={d} type="button" className="mail-chip" onClick={() => patch(b.id, { domains: [...b.domains, d] })}>
-                              <Plus size={12} /> {d}
-                            </button>
-                          ))}
-                      </div>
-                      {!ws.domains.length && <small className="set-hint">{t('Add the company’s domains in Email delivery first.')}</small>}
+                      {/* A pick-list of the company's own domains: domains are added in Settings, Domains, never here. */}
+                      <MultiSelect<string>
+                        values={b.domains}
+                        onChange={(next) => patch(b.id, { domains: next })}
+                        label={t('Domains')}
+                        title={t('Domains')}
+                        none={t('No domain yet')}
+                        options={orderedDomains(ws)
+                          .filter((d) => b.domains.includes(d) || freeDomains(ws, b.id).includes(d))
+                          .map((d) => ({ value: d, label: d }))}
+                      />
+                      <small className="set-hint">
+                        {ws.domains.length ? t('A domain belongs to one brand at most.') : t('Add the company’s domains first.')}{' '}
+                        {onDomains && (
+                          <button type="button" className="link-btn" onClick={onDomains}>
+                            {t('Settings, Domains')}
+                          </button>
+                        )}
+                      </small>
                     </div>
                     <div className="brand-actions">
                       <button type="button" className="ghost-btn sm danger" onClick={() => (setOpen(null), save(brands.filter((x) => x.id !== b.id)), toast({ text: t('Brand removed') }))}>

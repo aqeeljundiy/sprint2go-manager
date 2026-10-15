@@ -1324,3 +1324,94 @@
   color: #0b0c10;
   overflow-x: auto;
 }
+/* Settings, Domains (src/components/admin/Domains.tsx): one row per domain; it opens to its records and actions. */
+.dm-row .acct-info strong {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.dm-toggle .rot-chev {
+  transition: transform 0.2s var(--ease);
+}
+.dm-body {
+  display: grid;
+  gap: 12px;
+  padding: 0 12px 12px 56px;
+}
+.dm-records {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.dm-check,
+.dm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.dm-actions {
+  justify-content: flex-start;
+}
+.dm-modal {
+  width: min(640px, calc(100vw - 32px));
+}
+@container (max-width: 520px) {
+  .dm-body {
+    padding-left: 12px;
+  }
+}
+@media (max-width: 640px) {
+  .dm-body {
+    padding-left: 12px;
+  }
+  .dm-row .acct-status,
+  .dm-row .badge {
+    flex-shrink: 0;
+  }
+  .dm-actions .ghost-btn,
+  .dm-check .ghost-btn {
+    min-height: var(--tap);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dm-toggle .rot-chev {
+    transition: none;
+  }
+}
+.dm-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.dm-wait {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 120px;
+  align-content: start;
+}
+.dm-row .acct-info strong {
+  flex-wrap: wrap;
+  overflow-wrap: anywhere;
+}
+.dm-status-inline {
+  display: none;
+}
+@media (max-width: 640px) {
+  .dm-status {
+    display: none;
+  }
+  .dm-status-inline {
+    display: block;
+    margin-top: 4px;
+  }
+}
+.dm-wait {
+  align-items: flex-start;
+}

@@ -32,7 +32,7 @@ const roleOptions = () => [
 ];
 
 /** General & email: the business, its words, its calendar and language. */
-export function WorkspacePhone({ ws, canManage, onWorkspace, onHolidays, holidayCal }: { ws: Workspace; canManage: boolean; onWorkspace: (p: Partial<Workspace>) => void; onHolidays: (country: string | null) => void; holidayCal?: CalendarDef }) {
+export function WorkspacePhone({ ws, canManage, onWorkspace, onHolidays, holidayCal, onDomains }: { ws: Workspace; canManage: boolean; onWorkspace: (p: Partial<Workspace>) => void; onHolidays: (country: string | null) => void; holidayCal?: CalendarDef; onDomains?: () => void }) {
   const [brand, setBrand] = useState(false);
   const holidayNote = !ws.holidays
     ? t('Show your country’s public holidays as all-day items in everyone’s calendar here. Tasks due on a holiday get a note.')
@@ -56,16 +56,20 @@ export function WorkspacePhone({ ws, canManage, onWorkspace, onHolidays, holiday
           chevron={canManage}
           onClick={canManage ? () => setBrand(true) : undefined}
         />
-        <TextRow
-          label={t('Email domains')}
-          value={ws.domains.join(', ')}
-          empty={t('None yet')}
-          disabled={edit}
-          placeholder={t('business.com')}
-          inputMode="url"
-          footer={t('People at these domains are your team, so their email is never tracked. Separate them with commas.')}
-          onSave={(v) => onWorkspace({ domains: v.split(/[,\s]+/).map((d) => d.replace(/^@/, '').toLowerCase()).filter(Boolean) })}
-        />
+        {onDomains ? (
+          <GRow label={t('Email domains')} value={ws.domains.join(', ') || t('None yet')} onClick={onDomains} chevron />
+        ) : (
+          <TextRow
+            label={t('Email domains')}
+            value={ws.domains.join(', ')}
+            empty={t('None yet')}
+            disabled={edit}
+            placeholder={t('business.com')}
+            inputMode="url"
+            footer={t('People at these domains are your team, so their email is never tracked. Separate them with commas.')}
+            onSave={(v) => onWorkspace({ domains: v.split(/[,\s]+/).map((d) => d.replace(/^@/, '').toLowerCase()).filter(Boolean) })}
+          />
+        )}
       </Group>
       <Group footer={t('Changes the word everywhere in the app. With Projects, the people you invite are called guests.')}>
         <ChoiceRow<'project' | 'client'>

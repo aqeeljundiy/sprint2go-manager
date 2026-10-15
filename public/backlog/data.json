@@ -2537,7 +2537,7 @@
       "title": "Tapping a person avatar should open their profile card (role, email, local time, Message/Call) like Slack, not jump to the thread",
       "detail": "From the user, 15 Oct. Applies everywhere a person appears (Chat, Mail, Tasks, Teams).",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "R-M9",
@@ -8539,6 +8539,42 @@
       "area": "people",
       "title": "Search people directly",
       "detail": "Reference: Slack has a People directory and lets you search people in the quick switcher, with results opening the profile. Today: The Teams directory search lists members, but tapping a row opens an action menu instead of a profile (src/components/teams/TeamsApp.tsx:305,341). Proposal: Show people in global search or the quick switcher. Selecting one opens PersonCard, and the team row tap opens the same card with team actions below. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "R-D1",
+      "round": "Inbox (raw)",
+      "area": "Workspace",
+      "title": "Multiple domains per company (Google Workspace model): Settings > Domains with primary + secondary, aliases per person, From picker; brands optional on top",
+      "detail": "From the user, 15 Oct: brand was only an example; companies have several domains. Today ws.domains is a list but no UI adds a second one and 21 places read domains[0].",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "R-S1",
+      "round": "Inbox (raw)",
+      "area": "Settings",
+      "title": "Search bar in Settings (and in every app) that jumps straight to a page or setting",
+      "detail": "From the user, 15 Oct: just a thought, search in everything to go directly to certain pages. Today: global palette (Cmd+K / magnifier) finds apps, people, items but not settings; Settings has no search field.",
+      "priority": "medium",
+      "status": "done"
+    },
+    {
+      "id": "R-A1",
+      "round": "Inbox (raw)",
+      "area": "Platform",
+      "title": "MCP connector exists (23 tools): add Drive, Meet, Projects, Teams, people tools; edit/cancel events; a visible Connect to Claude/ChatGPT page",
+      "detail": "From the user, 15 Oct. Exists: server/connector.ts, server/mcpTools.ts (OAuth, per-person permissions, admin switch). Missing: Drive, Meet, Projects, Teams, people tools; update/cancel event; discoverable setup page.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "R-D2",
+      "round": "Inbox (raw)",
+      "area": "Workspace",
+      "title": "Domains follow-up: delivery, readiness and daily routing check for non-primary domains; real send/receive test per domain",
+      "detail": "From the domains build, 15 Oct.",
       "priority": "medium",
       "status": "todo"
     }

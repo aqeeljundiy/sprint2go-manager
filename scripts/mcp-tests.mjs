@@ -16,12 +16,13 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { DatabaseSync } from 'node:sqlite';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import { UnauthorizedError } from '@modelcontextprotocol/sdk/client/auth.js';
 
-const ROOT = new URL('..', import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const freePort = () =>
   new Promise((res, rej) => {
     const s = createServer();
@@ -182,6 +183,15 @@ try {
   // A repeating one: every day at 09:00 Jakarta since ten days ago, one date left out, one moved and renamed.
   const jk = (n, hh = '02') => `${new Date(Date.now() + n * 86_400_000 + 7 * 3_600_000).toISOString().slice(0, 10)}T${hh}:00:00.000Z`;
   put('events', { id: 'e-daily', title: 'Banana daily', calendarId: 'work', start: jk(-10), end: jk(-10).replace(':00:00.', ':15:00.'), rrule: 'FREQ=DAILY', timeZone: 'Asia/Jakarta', exdates: [jk(2)], overrides: [{ occurrence: jk(3), start: jk(3, '06'), end: jk(3, '07'), title: 'Banana daily (long one)' }], workspaceId: 'w-acme', userId: 'u-alice' });
+  // Drive: a folder with a text file and a picture, a file in the secret project. Meetings: one on Open, one on Secret.
+  put('drive', { id: 'd-folder', workspaceId: 'w-acme', name: 'Briefs', kind: 'folder', parentId: null, size: 0, modified: now(), ownerId: 'u-alice', clientId: 'c-open' });
+  put('drive', { id: 'd-text', workspaceId: 'w-acme', name: 'lychee-brief.md', kind: 'doc', type: 'text/markdown', parentId: 'd-folder', size: 40, modified: now(), ownerId: 'u-alice', url: `data:text/markdown;base64,${Buffer.from('# Lychee brief\nShoot on Tuesday.').toString('base64')}` });
+  put('drive', { id: 'd-pic', workspaceId: 'w-acme', name: 'lychee.png', kind: 'image', type: 'image/png', parentId: 'd-folder', size: 120_000, modified: now(), ownerId: 'u-alice' });
+  put('drive', { id: 'd-secret', workspaceId: 'w-acme', name: 'pineapple-terms.txt', kind: 'doc', parentId: null, size: 10, modified: now(), ownerId: 'u-alice', clientId: 'c-secret', url: 'data:text/plain,secret' });
+  put('meetings', { id: 'mt-open', workspaceId: 'w-acme', title: 'Lychee kickoff', at: now(), minutes: 30, clientId: 'c-open', attendees: ['Alice Martin', 'Bob Stone'], summary: 'We agreed the lychee shoot plan.', actions: [{ title: 'Book the studio', owner: 'Bob Stone', due: day(2) }], decisions: ['Shoot on Tuesday'], transcript: [{ speaker: 'Alice Martin', text: 'Lychee shoot on Tuesday?', at: 1000 }, { speaker: 'Bob Stone', text: 'Works for me.', at: 65_000 }], createdBy: 'u-alice' });
+  put('meetings', { id: 'mt-secret', workspaceId: 'w-acme', title: 'Pineapple board call', at: now(), minutes: 45, clientId: 'c-secret', attendees: ['Alice Martin'], summary: 'Pineapple price talk.', actions: [], createdBy: 'u-alice' });
+  put('events', { id: 'e-move', title: 'Lychee call', calendarId: 'work', start: jk(4), end: jk(4).replace(':00:00.', ':30:00.'), workspaceId: 'w-acme', userId: 'u-alice' });
+  put('events', { id: 'e-drop', title: 'Lychee drop', calendarId: 'work', start: jk(5), end: jk(5).replace(':00:00.', ':30:00.'), workspaceId: 'w-acme', userId: 'u-alice' });
 
   /* ---------- signing in to the app (cookies), as the consent screen does ---------- */
   const signIn = async (email) => {
@@ -272,7 +282,8 @@ try {
 
   const tools = (await a.client.listTools()).tools;
   const names = tools.map((t) => t.name).sort();
-  const want = ['about_company', 'add_event', 'add_table_row', 'calendar_agenda', 'create_task', 'draft_mail', 'draft_reply', 'list_channels', 'list_mail', 'list_notes', 'list_tables', 'list_tasks', 'needs_me', 'post_message', 'query_rows', 'read_channel', 'read_mail', 'read_note', 'read_task', 'search', 'update_table_row', 'update_task', 'write_note'];
+  const want = ['about_company', 'add_event', 'add_table_row', 'calendar_agenda', 'cancel_event', 'create_task', 'draft_mail', 'draft_reply', 'find_person', 'list_channels', 'list_files', 'list_mail', 'list_meetings', 'list_notes', 'list_projects', 'list_tables', 'list_tasks', 'list_teams', 'needs_me', 'post_message', 'query_rows', 'read_channel', 'read_file', 'read_mail', 'read_meeting', 'read_note', 'read_person', 'read_project', 'read_task', 'read_team', 'search', 'update_event', 'update_table_row', 'update_task', 'write_note'];
+  check(tools.find((t) => t.name === 'cancel_event')?.annotations?.destructiveHint === true && !tools.some((t) => /vault|password|send_mail/.test(t.name)), 'cancel_event says it destroys; no Vault, password or send tools');
   check(JSON.stringify(names) === JSON.stringify(want), `the tools are listed (${names.length})`);
   check(tools.every((t) => t.description && t.description.length > 40 && t.inputSchema?.type === 'object' && typeof t.annotations?.readOnlyHint === 'boolean'), 'each tool has a description, an input schema and says whether it only reads');
 
@@ -392,6 +403,41 @@ try {
   const drt = doc('threads', dr.data?.id);
   check(drt?.location === 'drafts' && drt.subject === 'Re: Banana launch dates' && drt.messages[0].to[0].email === 'laura@client.test' && drt.replyTo?.mid === '<abc@client.test>', 'draft_reply: a reply draft to the sender, keeping the conversation’s thread');
   check(outbox() === ob, 'nothing went out: the mail engine’s outbox is untouched');
+
+  console.log('\n(files, meetings, projects, teams, people, changing events)');
+  const top = await A('list_files');
+  check(top.data?.files?.[0]?.id === 'd-folder' && top.data.files.some((f) => f.id === 'd-secret'), 'list_files: the top of Drive, folders first');
+  const inFolder = await A('list_files', { folder: 'Briefs' });
+  check(inFolder.data?.files?.length === 2 && inFolder.data.files.every((f) => f.folder === 'Briefs'), 'list_files: one folder’s contents');
+  check((await A('list_files', { query: 'lychee' })).data?.files?.length === 2, 'list_files: by name across folders');
+  const rf = await A('read_file', { file_id: 'd-text' });
+  check(rf.data?.text?.includes('Shoot on Tuesday') && rf.data.folder === 'Briefs', 'read_file: a text file’s words and where it is');
+  const rp = await A('read_file', { file_id: 'd-pic' });
+  check(!rp.data?.text && /text files/.test(rp.data?.note ?? '') && !!rp.data.size, 'read_file: a picture gives its details, not its bytes');
+  check((await A('list_meetings')).data?.meetings?.length === 2, 'list_meetings: hers');
+  const rm = await A('read_meeting', { meeting_id: 'mt-open' });
+  check(rm.data?.action_items?.[0]?.title === 'Book the studio' && rm.data.transcript?.[1] === '[1:05] Bob Stone: Works for me.' && rm.data.decisions?.length === 1, 'read_meeting: summary, action items, decisions, transcript with times');
+  check((await A('list_projects')).data?.projects?.find((p) => p.id === 'c-open')?.late_tasks === 1, 'list_projects: with open and late tasks');
+  const rpj = await A('read_project', { project: 'Open Project' });
+  check(rpj.data?.late?.[0]?.id === 't-late' && rpj.data.guests?.[0]?.email === 'gina@client.test' && rpj.data.people.some((x) => x.name === 'Bob Stone'), 'read_project: late work, its people and guests');
+  check((await A('list_teams')).data?.teams?.[0]?.name === 'Design', 'list_teams');
+  const rtm = await A('read_team', { team: 'design' });
+  check(rtm.data?.people?.length === 2 && rtm.data.reviews_finished_work === true, 'read_team: its people and how it works');
+  const fp = await A('find_person', { query: 'design' });
+  check(fp.data?.people?.length === 2 && fp.data.people.every((x) => x.teams.includes('Design')), 'find_person: the directory, by team');
+  const rpe = await A('read_person', { person: 'Bob' });
+  check(rpe.data?.email === 'bob@acme.test' && rpe.data.late_tasks === 1, 'read_person: email, teams, open work');
+  const ue = await A('update_event', { event_id: 'e-move', start: `${day(6)}T15:00`, title: 'Lychee call (moved)' });
+  const ued = doc('events', 'e-move');
+  check(ue.data?.changed?.includes('time') && ued.title === 'Lychee call (moved)' && new Date(ued.start).toISOString().slice(11, 16) === '08:00' && Date.parse(ued.end) - Date.parse(ued.start) === 30 * 60_000, 'update_event: moved in company time, keeping its length');
+  const od = await A('update_event', { event_id: 'e-daily', only_date: day(5), title: 'Banana daily (once)' });
+  check(!od.error && doc('events', 'e-daily').overrides.some((o) => o.title === 'Banana daily (once)'), `update_event: one date of a repeating event ${od.error ? od.text : ''}`);
+  check((await A('update_event', { event_id: 'e-bob', title: 'mine' })).error && doc('events', 'e-bob').title === 'Bob dentist', 'update_event: not someone else’s event');
+  const co = await A('cancel_event', { event_id: 'e-daily', only_date: day(6) });
+  check(!co.error && doc('events', 'e-daily').exdates.length === 2, `cancel_event: one date of a repeating event ${co.error ? co.text : ''}`);
+  const cx = await A('cancel_event', { event_id: 'e-drop' });
+  check(!cx.error && !doc('events', 'e-drop'), `cancel_event: deleted ${cx.error ? cx.text : ''}`);
+  check((await A('cancel_event', { event_id: 'e-bob' })).error && !!doc('events', 'e-bob'), 'cancel_event: not someone else’s event');
   const audit = db.prepare("SELECT operator, action, target, detail FROM audit WHERE action LIKE 'ai-app.%' ORDER BY id").all();
   check(audit.length >= 8 && audit.every((x) => x.detail.startsWith('via Claude test:') && x.target === 'w-acme' && x.operator === 'alice@acme.test'), `the audit log has each change “via Claude test” (${audit.length} entries)`);
 
@@ -435,6 +481,11 @@ try {
   check(!(await BC('list_notes')).data.notes.some((n) => n.id === 'n-alice'), 'Bob doesn’t see Alice’s private notes');
   check((await BC('write_note', { note_id: 'n-alice', text: 'mine now' })).error && doc('notes', 'n-alice').html.includes('plum'), 'Bob can’t change Alice’s private note');
   check((await BC('draft_mail', { to: ['x@y.test'], subject: 's', text: 't', mailbox: 'alice@acme.test' })).error, 'Bob can’t write a draft from Alice’s mailbox');
+  check((await BC('read_file', { file_id: 'd-secret' })).error && !(await BC('list_files')).data?.files?.some((f) => f.id === 'd-secret'), 'Bob can’t see or read a file of the project he isn’t on');
+  check((await BC('read_file', { file_id: 'd-text' })).data?.text?.includes('Lychee'), 'Bob reads a file of his own project');
+  check((await BC('read_meeting', { meeting_id: 'mt-secret' })).error && !(await BC('list_meetings')).data?.meetings?.some((m) => m.id === 'mt-secret'), 'Bob can’t see that project’s meetings');
+  check((await BC('read_project', { project: 'c-secret' })).error && !(await BC('list_projects')).data?.projects?.some((p) => p.id === 'c-secret'), 'Bob can’t read the project itself');
+  check((await BC('cancel_event', { event_id: 'e-standup' })).error && !!doc('events', 'e-standup'), 'Bob can’t cancel Alice’s event');
 
   console.log('\n(guests, companies and two-step sign-in)');
   const ginaAsk = await gina.json('GET', `/api/oauth/request?${new URLSearchParams(bobConn.query)}`);

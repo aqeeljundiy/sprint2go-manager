@@ -22,7 +22,7 @@ export interface PaletteItem {
 /** Which app each kind of result belongs to, for searching inside one app and for grouping results by app. */
 const GROUP_APP: Record<string, AppId> = { Tasks: 'tasks', Emails: 'mail', Channels: 'chat', Messages: 'chat', Notes: 'notes', Meetings: 'meet', Rows: 'tables', Files: 'drive' };
 // The groups' words, for the language check (they're shown with t(group)).
-mark('Needs you'), mark('Actions'), mark('Go to'), mark('Recent'), mark('Recent searches'), mark('Recently opened'), mark('Apps'), mark('People'), mark('Emails'), mark('Channels'), mark('Messages'), mark('Meetings'), mark('Rows'), mark('Files');
+mark('Needs you'), mark('Actions'), mark('Go to'), mark('Recent'), mark('Recent searches'), mark('Recently opened'), mark('Apps'), mark('People'), mark('Emails'), mark('Channels'), mark('Messages'), mark('Meetings'), mark('Rows'), mark('Files'), mark('Settings');
 export const appOf = (i: PaletteItem): AppId | undefined => i.app ?? (i.group === term.Many ? 'projects' : GROUP_APP[i.group]);
 const appName = (id: AppId) => APPS.find((a) => a.id === id)?.name ?? id;
 /** Apps that have something to search in them (the others open search across all apps). */

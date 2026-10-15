@@ -45,7 +45,7 @@ db.db.exec(`
 type Person = { name: string; email: string };
 type Account = { id: string; email: string; name: string; kind: string; users: string[]; provider?: string; connected?: boolean; away?: Away };
 type Alias = { id: string; address: string; to: string[] };
-type Ws = { id: string; name: string; domains?: string[]; accounts?: Account[]; members: { userId: string; role: string }[]; emailSetup?: string; emailProvider?: string; mailRoute?: 'own' | 'boosted'; mailCredits?: number; mailCreditsNotified?: boolean; mailAliases?: Alias[]; mailGroups?: groups.MailGroup[] };
+type Ws = { id: string; name: string; domains?: string[]; primaryDomain?: string; accounts?: Account[]; members: { userId: string; role: string }[]; emailSetup?: string; emailProvider?: string; mailRoute?: 'own' | 'boosted'; mailCredits?: number; mailCreditsNotified?: boolean; mailAliases?: Alias[]; mailGroups?: groups.MailGroup[] };
 
 export interface MailerDeps {
   publicUrl: string;
@@ -119,8 +119,12 @@ export const supportAddresses = () => [SUPPORT_EMAIL, `abuse@${MAIL_HOST}`, `pos
 export type SupportMail = { to: string; parsed: ParsedMail; mid: string; refs: string[]; spam: boolean; attachments: { name: string; url: string; size: string }[] };
 let supportHandler: ((m: SupportMail) => Promise<void>) | null = null;
 export const onSupportMail = (fn: (m: SupportMail) => Promise<void>) => (supportHandler = fn);
-/** The company's own mail domain (its first domain), else addresses live at this server's name. */
-export const mailDomainOf = (ws: Ws) => lower(ws.domains?.[0] ?? '') || MAIL_HOST;
+/** The company's own mail domain (its primary domain, else its first), else addresses live at this server's name. */
+export const mailDomainOf = (ws: Ws) => {
+  const ds = (ws.domains ?? []).map(lower);
+  const p = lower(ws.primaryDomain ?? '');
+  return (p && ds.includes(p) ? p : ds[0]) || MAIL_HOST;
+};
 export const boostedAvailable = () => mailConfigured();
 
 /* ---------- DKIM keys, one per domain (kept with who holds the domain, in server/domains.ts) ---------- */

@@ -131,6 +131,7 @@ export function Onboarding({ me, existingEmails, onCreate, onClose, preview }: P
         logo: brand.logo,
         color: brand.color,
         domains: d ? [d] : [],
+        primaryDomain: d || undefined, // the signup's domain is the primary one
         accounts,
         members: [{ userId: me.id, role: 'owner' }, ...newUsers.map((u, i) => ({ userId: u.id, role: people[i].role }))],
         apps: mailOn ? apps : apps.filter((a) => a !== 'mail'),

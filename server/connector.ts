@@ -145,7 +145,7 @@ function instructionsFor(ctx: ToolCtx) {
   const me = db.getDoc('users', ctx.userId) as { name?: string } | undefined;
   const first = String(me?.name ?? 'the person').split(' ')[0];
   return [
-    `sprint2go is where ${first} works with their team at ${ctx.company}${ctx.demo ? ' (their private demo company: made-up data, nothing in it is real)' : ''}: mail, chat, tasks, projects, calendar, notes and tables.`,
+    `sprint2go is where ${first} works with their team at ${ctx.company}${ctx.demo ? ' (their private demo company: made-up data, nothing in it is real)' : ''}: mail, chat, tasks, projects, teams, calendar, meeting notes, files, notes and tables.`,
     `Every tool sees exactly what ${first} sees in sprint2go and changes things as ${first}, under the same rules as the app.`,
     'Start with needs_me for what to do now, or about_company for the people, projects, task stages and mailboxes (and their ids).',
     `Nothing leaves the company from here: email and messages to guests are saved as drafts that ${first} checks and sends in sprint2go. Say so when you make one.`,

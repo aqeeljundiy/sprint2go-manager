@@ -3,6 +3,7 @@ import { Inbox, Plus, Users, UsersRound, X } from 'lucide-react';
 import type { MailGroup, User, Workspace } from '../../types';
 import { server } from '../../sync';
 import { Layer } from '../ui/Layer';
+import { orderedDomains } from '../../domains';
 import { Select, type Option } from '../ui/Select';
 import { PeoplePicker } from '../ui/PeoplePicker';
 import { SmoothHeight, useLeaving } from '../ui/Smooth';
@@ -96,7 +97,7 @@ export function MailGroups({ ws, users, me, toast }: { ws: Workspace; users: Use
           <GroupDialog
             group={editing}
             admin={d.admin}
-            domains={d.domains}
+            domains={orderedDomains({ domains: d.domains, primaryDomain: ws.primaryDomain })}
             team={team}
             me={me}
             onClose={() => setEditing(null)}
