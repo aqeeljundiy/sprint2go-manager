@@ -120,10 +120,10 @@
     flex: none;
     height: var(--tap);
     margin: 8px 16px 0;
-    border-radius: 10px;
+    border-radius: var(--r-tile);
   }
   .settings-body > .set-search .set-search-field input {
-    font-size: 16px;
+    font-size: var(--fs-field);
   }
   .settings-body > .set-search .set-search-list {
     display: flex;
@@ -141,7 +141,7 @@
   .set-search-clear {
     width: var(--tap);
     height: var(--tap);
-    margin-right: -10px;
+    margin-right: -12px;
   }
 }
 @media (prefers-reduced-motion: reduce) {

@@ -506,6 +506,9 @@ const id: Record<string, string> = {
   "That isn’t one of your domains.": "Itu bukan salah satu domain Anda.",
   'You were mentioned on {row} in {table}: {text}': 'Anda disebut di {row} pada {table}: {text}',
   'New comment on {row} in {table}: {text}': 'Komentar baru di {row} pada {table}: {text}',
+  "That webhook address can’t be found.": "Alamat webhook itu tidak ditemukan.",
+  "Too many wrong codes. Try again in 15 minutes.": "Terlalu banyak kode salah. Coba lagi dalam 15 menit.",
+  "Webhooks can only go to addresses on the public internet.": "Webhook hanya bisa dikirim ke alamat di internet publik.",
 };
 
 export default id;

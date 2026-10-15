@@ -3065,7 +3065,7 @@
   }
   .gm-msg-to {
     min-height: var(--tap);
-    margin: -10px 0;
+    margin: -12px 0;
   }
   .gm-pill {
     font-size: var(--fs-secondary);

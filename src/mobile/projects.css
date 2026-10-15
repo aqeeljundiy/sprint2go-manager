@@ -32,7 +32,7 @@
   .project-pane .tasks-head .proj-people .avatar-stack .avatar[style] {
     width: 32px !important; /* Avatar sets its size inline */
     height: 32px !important;
-    font-size: 13px !important;
+    font-size: var(--fs-secondary) !important;
   }
   .project-pane .tasks-head .client-status button {
     padding-inline: 12px;

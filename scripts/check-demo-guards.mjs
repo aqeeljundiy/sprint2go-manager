@@ -1,4 +1,5 @@
 // Production must never pretend. Code that only exists for the demo carries a "DEMO ONLY" comment, and has to sit
+import { fileURLToPath } from 'node:url';
 // behind a guard that is false on a real server: demoOk, !real, caps.demo or !server.on. Inside someone's own demo
 // company (src/sandbox.ts) pretending is the point, so its check counts too: inSandbox, isSandbox(…) or
 // isSandboxId(…), all false for every real company. This fails when one doesn't:
@@ -8,7 +9,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
-const ROOT = new URL('..', import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL('..', import.meta.url)); // fileURLToPath, not .pathname: works on Windows too
 const GUARD = /\bdemoOk\b|!\s*real\b|\bcaps\.demo\b|!\s*server\.on\b|\binSandbox\b|\bisSandbox\(|\bisSandboxId\(/;
 const WITHIN = 6; // lines after the comment
 const files = [];

@@ -2314,7 +2314,7 @@ a.ghost-btn {
 @media (max-width: 767px) {
   .cal-search-field input {
     min-height: var(--tap);
-    font-size: 16px;
+    font-size: var(--fs-field);
   }
   .cal-search-hit {
     min-height: 56px;

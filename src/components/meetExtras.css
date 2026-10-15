@@ -215,19 +215,19 @@
 @media (max-width: 767px) {
   .m-talk-row {
     min-height: var(--tap);
-    font-size: 15px;
+    font-size: var(--fs-body);
   }
   .m-find input {
     height: var(--tap);
-    font-size: 16px;
+    font-size: var(--fs-field);
   }
   .m-find .icon-btn {
     width: var(--tap);
     height: var(--tap);
   }
   .m-at {
-    min-height: 28px;
-    padding: 2px 10px;
+    min-height: 32px;
+    padding: 4px 12px;
   }
   .m-recap-foot {
     flex-direction: column-reverse;
@@ -239,7 +239,7 @@
     justify-content: center;
   }
   .m-recap-text {
-    font-size: 16px;
+    font-size: var(--fs-body);
     min-height: 45vh;
   }
 }

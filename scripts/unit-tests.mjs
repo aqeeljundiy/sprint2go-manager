@@ -1637,7 +1637,7 @@ await test('Quick Add: reads the date and time, project, person and priority, an
     ['date', 'tomorrow 3pm', 'Tomorrow 15:00'],
     ['project', '#lereng', 'Lereng Coffee'],
     ['person', '+isabel', 'Isabel'],
-    ['priority', 'p1', 'P1'],
+    ['priority', 'p1', 'High priority'],
   ]);
   assert.equal(r.tokens[0].keys.length, 2, 'the date and its time are one highlight');
 });

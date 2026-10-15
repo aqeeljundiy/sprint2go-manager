@@ -203,7 +203,7 @@
      the sheet itself is 8 px in and the menu 1 px more, so the rows add 7. */
   .pop-sheet .cal-menu .sel-opt {
     min-height: 48px;
-    padding: 8px 7px;
+    padding: 8px;
     gap: 16px;
     font: var(--t-body);
   }
@@ -211,13 +211,13 @@
     font-size: var(--fs-secondary);
   }
   .pop-sheet .cal-menu .sel-group {
-    padding: 16px 7px 8px;
+    padding: 16px 8px 8px;
     font: var(--t-heading);
     color: var(--text);
   }
   .pop-sheet .cal-menu .cal-status {
-    padding-left: 7px;
-    padding-right: 7px;
+    padding-left: 8px;
+    padding-right: 8px;
   }
   /* An account's calendars step in under the account's name (its logo is 24 + 8 wide). */
   .ad-acc .ad-row .ad-icon {
@@ -920,7 +920,7 @@
 
 @media (max-width: 767px) {
   .is-phone .sch {
-    padding-bottom: calc(var(--fab-space) + 72px);
+    padding-bottom: calc(var(--fab-space) + 88px);
   }
   /* Another month's name in the list (the bar names the one on screen): a section header, not sticky. */
   .is-phone .sch-month {
@@ -933,23 +933,23 @@
     background: none;
   }
   .is-phone .sch-gap {
-    padding-left: 60px;
+    padding-left: 56px;
     font-size: var(--fs-secondary);
   }
   .is-phone .sch-week {
     display: flex;
     align-items: center;
     min-height: 32px;
-    padding: 0 16px 0 60px;
+    padding: 0 16px 0 56px;
     font-size: var(--fs-secondary);
     color: var(--text-3);
   }
   .is-phone .sch-day {
     grid-template-columns: 56px minmax(0, 1fr);
-    gap: 4px;
+    gap: 0;
     padding: 4px 12px 16px 0;
   }
-  /* The date column: its 32 circle at the 16 gutter, events from 60. */
+  /* The date column: its 32 circle at the 16 gutter, events from 56. */
   .is-phone .sch-date {
     gap: 0;
     align-items: flex-start;
@@ -1020,7 +1020,7 @@
   }
   .is-phone .sch-task-title {
     min-height: 48px;
-    padding: 6px 8px 6px 0;
+    padding: 4px 8px 4px 0;
     line-height: 18px;
     white-space: normal;
     display: -webkit-box;
@@ -1355,7 +1355,7 @@
     width: 16px;
     height: 16px;
     /* Centred on the rows' 20 px icons below (x 16 to 36), the title on their 56 px text line. */
-    margin: 8px 22px 0 18px;
+    margin: 8px 24px 0 16px;
     border-radius: var(--r-tile);
     background: var(--c, var(--accent));
   }
@@ -1779,7 +1779,7 @@
   }
   .tg-phone .block-event {
     max-width: calc(100% - 8px);
-    padding-left: 10px;
+    padding-left: 8px;
     background: color-mix(in srgb, var(--c) calc(var(--tile-tint) * 0.6), var(--surface));
     box-shadow: inset 4px 0 0 var(--c), 0 0 0 1px var(--surface);
     color: var(--text);
@@ -1790,14 +1790,14 @@
   /* Week on phones: seven ~44 px columns. The block uses the whole column and its title wraps (two lines at 12 px,
      broken mid-word when it must), the start time under it when there's room, rather than "Pic" cut to three letters. */
   .tg-week .tg-col {
-    padding-right: 2px;
+    padding-right: 4px;
   }
   .tg-phone.tg-week .block-event {
     max-width: 100%;
     flex-direction: column;
     align-items: stretch;
     gap: 0;
-    padding: 2px 2px 2px 6px;
+    padding: 4px 0 4px 8px;
     box-shadow: inset 3px 0 0 var(--c), 0 0 0 1px var(--surface);
     line-height: 1.25;
   }

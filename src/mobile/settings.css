@@ -614,7 +614,7 @@
   /* A group's header sits 20 from the edge, as on the root list (its footer and cards start at 16). */
   .settings-push .set-rows .g-head {
     margin: 0 0 8px;
-    padding: 0 20px;
+    padding: 0 16px;
   }
   .settings-push .set-rows .g-group:first-child {
     margin-top: 8px;
@@ -882,7 +882,7 @@
   }
   .set-swatches .swatch {
     width: 42px;
-    height: 42px;
+    height: 44px;
     border: 8px solid var(--surface);
     background-clip: padding-box;
     box-shadow: none;

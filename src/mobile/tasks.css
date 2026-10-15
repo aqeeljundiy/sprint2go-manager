@@ -1940,7 +1940,7 @@
   }
   .dump-sheet .dump-input textarea {
     resize: none;
-    font-size: 16px;
+    font-size: var(--fs-field);
   }
   .dump-sheet .sheet-body .modal-body {
     padding: 0 12px;
@@ -1965,7 +1965,7 @@
     margin: 8px 16px 0;
   }
   .tsr-field input {
-    font-size: 16px;
+    font-size: var(--fs-field);
   }
   .tasks-browse .tsr-results {
     margin: 16px 16px 0;

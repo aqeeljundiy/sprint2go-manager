@@ -1997,7 +1997,7 @@
     min-height: var(--tap);
   }
   .csr-field input {
-    font-size: 16px;
+    font-size: var(--fs-field);
   }
   .csr-chips {
     flex-wrap: nowrap;

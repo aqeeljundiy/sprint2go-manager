@@ -73,7 +73,7 @@
   .vault-health-row .row-act { min-height: var(--tap); }
   .vault-quick { margin: 8px 16px; }
   .vault-people-row { min-height: var(--tap); }
-  .vault-people-name { font-size: 15px; }
+  .vault-people-name { font-size: var(--fs-body); }
   .vault-import-list { max-height: none; }
   .vault-import-row { min-height: 64px; }
   .vault-import-pick .primary-btn, .vg-quick .primary-btn { min-height: var(--tap); }
@@ -94,5 +94,5 @@
 .vg-quick { margin: 0 0 12px; }
 @media (max-width: 767px) {
   .vault-health-row .row-act { background: none; color: var(--accent-text); padding: 0 8px; }
-  .vault-health-text small { font-size: 13px; }
+  .vault-health-text small { font-size: var(--fs-secondary); }
 }

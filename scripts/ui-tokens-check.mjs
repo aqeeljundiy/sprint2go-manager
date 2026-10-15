@@ -1,4 +1,5 @@
 // The phone layer keeps to the sprint2go system (src/tokens.css, docs/mobile-kit.md "The system"). Fails on a
+import { fileURLToPath } from 'node:url';
 // font-size, font, font-weight, padding, margin, gap, border-radius, height or min-height value in the phone layer
 // that is not a token or an allowed value. The phone layer is every rule in src/mobile/*.css (except inside a
 // min-width or tablet media query) and every rule inside an @media (max-width: 767px | 599px | 359px) block elsewhere
@@ -8,7 +9,7 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
-const ROOT = new URL('..', import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL('..', import.meta.url)); // fileURLToPath, not .pathname: works on Windows too
 const SRC = join(ROOT, 'src');
 
 const SPACE = [0, 4, 8, 12, 16, 24, 32, 48];

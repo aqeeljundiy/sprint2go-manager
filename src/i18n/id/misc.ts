@@ -133,6 +133,7 @@ const id: Record<string, string> = {
   Upgrade: 'Tingkatkan paket',
   'Verify DNS': 'Verifikasi DNS',
   'Who can see billing': 'Siapa yang bisa melihat tagihan',
+  "Domain look": "Tampilan domain",
 };
 
 export default id;
