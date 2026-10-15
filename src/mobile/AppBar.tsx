@@ -25,12 +25,11 @@ export function AppBar({ bar, label }: { bar: AppSections; label: string }) {
         {sections.map(({ id, label: name, icon: Icon, badge, dot, run }) => {
           const on = current === id;
           return (
-            <button key={id} type="button" className={on ? 'on' : ''} aria-current={on ? 'page' : undefined} onClick={() => (run ? run() : on ? reselect(bar, id) : bar.onChange(id))}>
+            <button key={id} type="button" className={on ? 'on' : ''} aria-current={on ? 'page' : undefined} aria-label={name} title={name} onClick={() => (run ? run() : on ? reselect(bar, id) : bar.onChange(id))}>
               <span className="tab-icon">
                 <Icon size={24} strokeWidth={on ? 2.25 : 1.75} />
                 {badge ? <i aria-label={tn(badge, '{n} new', '{n} new')}>{count(badge)}</i> : dot ? <i className="dot" aria-hidden="true" /> : null}
               </span>
-              <span className="tab-label">{name}</span>
             </button>
           );
         })}

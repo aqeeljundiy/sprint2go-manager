@@ -133,7 +133,7 @@
 
   /* ---------- Shell ---------- */
   --topbar-h: 52px;
-  --tabbar-h: 56px; /* the bar: five labelled tabs */
+  --tabbar-h: 56px; /* the bar: icon tabs, 56 tall for a comfortable reach */
   --bar-inset: 12px; /* the bar floats this far in from the screen's sides */
   --bar-bottom: max(12px, env(safe-area-inset-bottom)); /* and sits on the home indicator's line, or 12 px up without one */
   --z-chrome: 30; /* the phone's bottom bar: above the page, below panels (--z-panel) */
