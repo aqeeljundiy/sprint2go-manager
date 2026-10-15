@@ -131,6 +131,7 @@ import { useKeyboard } from './mobile/keyboard';
 import { SEARCHABLE } from './components/CommandPalette';
 import type { ToastMsg } from './toast';
 import { clientActions } from './clientActions';
+import { PersonCardProvider } from './components/ui/PersonCard';
 import { accessFor, afterEnd, clientInbox, clientPeople, portalsFor, requestStatus, teamLabel } from './clientView';
 import { firstOf as firstStage, kindOf as stageKind, registerStages, stageAfterMove, stageIdFor, stageName, stageOf, stagePhrase, stagesForTask } from './stages';
 import { celebrate } from './components/ui/confetti';
@@ -1904,6 +1905,8 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
   const dmGuests: GuestOption[] = wsClients
     .filter((c) => c.status !== 'ended' && (isAdmin || perms.inviteGuests || c.ownerId === user.id || (c.members ?? []).some((m) => m.userId === user.id && m.role === 'lead')))
     .flatMap((c) => clientPeople(c, channels).filter((x) => x.status === 'joined').map((x) => ({ email: x.email, name: x.name, clientId: c.id, project: c.name })));
+  /** Guests on the profile card: their phone and company, from every project's people. */
+  const cardGuests = useMemo(() => wsClientsAll.flatMap((c) => clientPeople(c, channels)), [wsClientsAll, channels]);
   /** A group message becomes a private channel: the same people and history, more people may come in (Slack). */
   const convertToChannel = (id: string, name: string, add: string[]) => {
     const c = channels.find((x) => x.id === id);
@@ -4701,6 +4704,20 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
   return (
     <TabDefaultsCtx.Provider value={tabDefaults}>
     <ProjectsCtx.Provider value={projectsCtx}>
+    <PersonCardProvider
+      me={user.id}
+      users={allUsers}
+      memberIds={ws.members.map((m) => m.userId)}
+      teams={wsTeams}
+      statuses={statuses}
+      presence={presence}
+      contacts={contacts}
+      guests={cardGuests}
+      onMessage={(id) => openChannel(dmWith(id))}
+      onEmail={(to) => openCompose({ initial: { to: [to], cc: [], subject: '', html: settings.signature, text: '', files: [], track: settings.trackByDefault, trackOptions: DEFAULT_TRACK_OPTIONS, fromId: (sendable.find((a) => a.kind === 'personal') ?? sendable[0] ?? myAccounts[0])?.id ?? '' } })}
+      onEmailsWith={(email) => (selectView({ kind: 'folder', id: 'inbox' }), setQuery(`from:${email} OR to:${email}`))}
+      onTasks={(id) => openTasks({ kind: 'person', id })}
+    >
     {inSandbox ? <DemoCompanyBar busy={demoBusy} onReset={() => setResettingDemo(true)} onHide={() => void hideDemo()} /> : topBar}
     <div className={`app mode-${mode} ${readerOpen ? 'reading' : ''} ${collapsed ? 'sb-collapsed' : ''} ${['home', 'settings'].includes(mode) ? 'no-sidebar' : ''} ${inSandbox || topBar ? 'with-demo-bar' : ''}`}>
       <AppRail
@@ -6586,6 +6603,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
         onNew={() => setNewOpen(true)}
       />
     )}
+    </PersonCardProvider>
     </ProjectsCtx.Provider>
     </TabDefaultsCtx.Provider>
   );

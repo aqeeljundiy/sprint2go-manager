@@ -291,7 +291,7 @@ function TeamsPhone({ teams, users, tasks, me, actions, onOpen, people: everyone
               const theirs = teams.filter((tm) => tm.members.includes(u.id));
               return (
                 <div key={u.id} className="tdir-row" role={theirs[0] ? 'button' : undefined} onClick={theirs[0] ? () => onOpen(theirs[0].id) : undefined}>
-                  <Avatar person={u} size={36} />
+                  <Avatar person={u} size={36} card={u.id} />
                   <span className="tdir-text">
                     <strong>{u.name}</strong>
                     <small>{[u.title, theirs.map((x) => x.name).join(', ')].filter(Boolean).join(' · ') || u.email}</small>
@@ -336,7 +336,7 @@ function MemberRow({ u, tm, teams, me, manage, actions }: { u: User; tm: Team; t
   return (
     <>
       <div className="tdir-row tdir-member lp" role="button" tabIndex={0} {...menu.bind} onClick={(e) => menu.openAt(e.clientX, e.clientY)} onKeyDown={(e) => e.key === 'Enter' && menu.openAt(0, 0)}>
-        <Avatar person={u} size={36} />
+        <Avatar person={u} size={36} card={u.id} />
         <span className="tdir-text">
           <strong>
             {u.name}
@@ -457,7 +457,7 @@ function MembersTab({ tm, teams, users, me, manage, actions }: { tm: Team; teams
           <h3>{t('Asked to join')}</h3>
           {requests.map(({ r, u }) => (
             <div key={u.id} className="team-row">
-              <PersonCell person={u} sub={[u.title, t('asked {when}', { when: relative(r.at) })].filter(Boolean).join(' · ')} />
+              <PersonCell person={u} card={u.id} sub={[u.title, t('asked {when}', { when: relative(r.at) })].filter(Boolean).join(' · ')} />
               <button className="ghost-btn sm" onClick={() => decline(u.id)}>
                 {t('Decline')}
               </button>
@@ -481,6 +481,7 @@ function MembersTab({ tm, teams, users, me, manage, actions }: { tm: Team; teams
             <div key={u.id} className="team-row">
               <PersonCell
                 person={u}
+                card={u.id}
                 badges={
                   <>
                     {u.id === me && <Badge tone="accent">{t('You')}</Badge>}
@@ -616,7 +617,7 @@ function WorkloadTab({ tm, tasks, users, onOpenTask }: { tm: Team; tasks: Todo[]
         {rows.map(({ u, mine, late, week, here }) => (
           <div key={u.id} className="team-load">
             <button type="button" className="team-row" onClick={() => setOpenId(openId === u.id ? null : u.id)} aria-expanded={openId === u.id}>
-              <PersonCell person={u} sub={[late && tn(late, '{n} late', '{n} late'), week && tn(week, '{n} due this week', '{n} due this week'), tn(here, '{n} in {team}', '{n} in {team}', { team: tm.name })].filter(Boolean).join(' · ')} />
+              <PersonCell person={u} card={u.id} sub={[late && tn(late, '{n} late', '{n} late'), week && tn(week, '{n} due this week', '{n} due this week'), tn(here, '{n} in {team}', '{n} in {team}', { team: tm.name })].filter(Boolean).join(' · ')} />
               <span className="team-bar" aria-label={tn(mine.length, '{n} open', '{n} open')}>
                 <i style={{ width: `${(mine.length / most) * 100}%` }} className={late ? 'bad' : mine.length > 8 ? 'warn' : ''} />
               </span>

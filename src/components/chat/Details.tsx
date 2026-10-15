@@ -282,7 +282,7 @@ export function ChannelAbout(p: {
       {showAbout &&
         (other ? (
           <div className="profile">
-            <Avatar person={other} size={64} />
+            <Avatar person={other} size={64} card />
             <strong>{other.name}</strong>
             <span className="muted">{other.title}</span>
             {p.statuses[other.id] && (
@@ -354,7 +354,7 @@ export function ChannelAbout(p: {
             const last = th.messages[th.messages.length - 1];
             return (
               <button key={th.id} className="te-row simple" onClick={() => p.onOpenMail(th.id)}>
-                <Avatar person={last.from} size={28} />
+                <Avatar person={last.from} size={28} card />
                 <div className="te-main">
                   <strong>{th.subject}</strong>
                   <small>
@@ -383,7 +383,7 @@ export function ChannelAbout(p: {
                     person={u}
                     avatar={
                       <span className="dm-av">
-                        <Avatar person={u} size={28} />
+                        <Avatar person={u} size={28} card={u.id} />
                         <i className={`presence ${p.presence(id)}`} />
                       </span>
                     }
@@ -406,13 +406,13 @@ export function ChannelAbout(p: {
           )}
           {channel.guests?.map((g) => (
             <div key={g.email} className="pl-row">
-              <PersonCell person={g} size={28} badges={<Badge tone="warn">{t('Guest')}</Badge>} sub={[companyOf(g.email, client?.people?.find((x) => x.email === g.email)?.company, client), g.email, g.status === 'joined' ? t('joined') : t('invite sent')].filter(Boolean).join(' · ')} />
+              <PersonCell person={g} size={28} card badges={<Badge tone="warn">{t('Guest')}</Badge>} sub={[companyOf(g.email, client?.people?.find((x) => x.email === g.email)?.company, client), g.email, g.status === 'joined' ? t('joined') : t('invite sent')].filter(Boolean).join(' · ')} />
             </div>
           ))}
           {contacts.length > 0 && <div className="sel-group">{t('Contacts at {name} · from emails', { name: client?.name ?? '' })}</div>}
           {contacts.map((c) => (
             <div key={c.email} className="pl-row">
-              <PersonCell person={c} size={28} sub={lastContact(c.email.toLowerCase()) ? `${c.email} · ${t('last email {when}', { when: relative(lastContact(c.email.toLowerCase())!) })}` : c.email} />
+              <PersonCell person={c} size={28} card sub={lastContact(c.email.toLowerCase()) ? `${c.email} · ${t('last email {when}', { when: relative(lastContact(c.email.toLowerCase())!) })}` : c.email} />
               <a className="icon-btn sm" href={`mailto:${c.email}`} title={t('Email')} aria-label={t('Email {name}', { name: c.name })}>
                 <Mail size={14} />
               </a>

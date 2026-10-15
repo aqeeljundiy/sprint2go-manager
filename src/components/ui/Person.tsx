@@ -36,6 +36,7 @@ export function PersonCell({
   size = 32,
   avatar,
   className = '',
+  card,
 }: {
   person: PersonLike;
   name?: ReactNode;
@@ -44,11 +45,12 @@ export function PersonCell({
   size?: number;
   avatar?: ReactNode;
   className?: string;
+  card?: boolean | string; // the face opens the profile card (Avatar's card)
 }) {
   const second = sub === undefined ? person.email : sub;
   return (
     <span className={`person-cell ${className}`}>
-      {avatar ?? <Avatar person={{ name: person.name || person.email || '?', email: person.email ?? person.name, color: person.color ?? undefined, photo: person.photo }} size={size} />}
+      {avatar ?? <Avatar person={{ name: person.name || person.email || '?', email: person.email ?? person.name, color: person.color ?? undefined, photo: person.photo }} size={size} card={card} />}
       <span className="person-text">
         <span className="person-name">
           <span className="person-name-text">{name ?? person.name}</span>

@@ -7,6 +7,7 @@ import { companyOf } from '../../clientView';
 import { stageName, stageOf } from '../../stages';
 import { Avatar } from '../Avatar';
 import { Badge } from '../ui/Person';
+import { PersonName } from '../ui/PersonCard';
 import { useLongPress } from '../ui/useLongPress';
 import { shortTime, statusText, whenText, type SavedItem } from './chatPrefs';
 import { t, textOf, tn } from '../../i18n';
@@ -246,7 +247,7 @@ export function Msg({ m, grouped, inThread = false, ctx }: { m: ChatMessage; gro
         ctx.onMenu(m, { x: e.clientX, y: e.clientY });
       }}
     >
-      {grouped ? <span className="cm-gutter" /> : a.person ? <Avatar person={a.person} size={ctx.phone ? 36 : 34} /> : <span className="cm-gutter" />}
+      {grouped ? <span className="cm-gutter" /> : a.person ? <Avatar person={a.person} size={ctx.phone ? 36 : 34} card /> : <span className="cm-gutter" />}
       <div className="cm-body">
         {saved && (
           <div className="cm-saved">
@@ -255,7 +256,7 @@ export function Msg({ m, grouped, inThread = false, ctx }: { m: ChatMessage; gro
         )}
         {!grouped && (
           <div className="cm-head">
-            <strong>{a.name}</strong>
+            <strong>{a.person ? <PersonName who={a.person}>{a.name}</PersonName> : a.name}</strong>
             {a.former && <Badge small>{m.userId.startsWith('former:bot:') ? t('App') : t('Former member')}</Badge>}
             {a.guest && (
               <Badge small tone="warn">

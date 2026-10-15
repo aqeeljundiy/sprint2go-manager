@@ -159,7 +159,7 @@ function ActivityRow({ it, users, me, myFirst, onOpen, onMenu }: { it: Item; use
       </span>
       <span className="act-main">
         {it.who ? (
-          <Avatar person={it.who} size={36} />
+          <Avatar person={it.who} size={36} card />
         ) : (
           <span className="act-ico" aria-hidden>
             <Icon size={18} />

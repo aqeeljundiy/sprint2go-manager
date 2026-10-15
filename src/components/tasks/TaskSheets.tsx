@@ -235,7 +235,7 @@ export function Doer({ task, ops, size = 22 }: { task: Todo; ops: Pick<TaskOps, 
     );
   return (
     <span className="doer" title={ids.map((id) => ops.users.find((x) => x.id === id)?.name).filter(Boolean).join(', ')}>
-      <Avatar person={u} size={size} />
+      <Avatar person={u} size={size} card={u.id} />
       {ids.length > 1 && <i className="doer-more">+{ids.length - 1}</i>}
     </span>
   );

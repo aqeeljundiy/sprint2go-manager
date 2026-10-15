@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { flushSync } from 'react-dom';
 import { SmoothHeight, TabPane } from './ui/Smooth';
 import { brand as product, term } from '../terms';
@@ -43,6 +43,7 @@ import type { CalEvent, Message, Person, Thread, User, Client } from '../types';
 import { fmtTimeRange } from '../calendarUtils';
 import { fullDate, relative, snippet } from '../utils';
 import { Avatar } from './Avatar';
+import { PersonName } from './ui/PersonCard';
 import { Wordmark } from './Logo';
 import { RichEditor } from './RichEditor';
 import { TrackingPanel } from './TrackingPanel';
@@ -555,10 +556,10 @@ export function Reader(props: Props) {
           </span>
         )}
         <button className="message-head" onClick={() => toggle(m.id)} aria-expanded={open}>
-          <Avatar person={m.from} size={phone ? 34 : 38} />
+          <Avatar person={m.from} size={phone ? 34 : 38} card />
           <div className="message-who">
             <div className="message-from">
-              <strong>{isMine(m.from.email) ? t('You') : m.from.name}</strong>
+              <strong>{isMine(m.from.email) ? t('You') : <PersonName who={m.from}>{m.from.name}</PersonName>}</strong>
               {open && <span className="email">&lt;{m.from.email}&gt;</span>}
               {m.priority === 'high' && <span className="prio-chip">{t('High priority')}</span>}
             </div>
@@ -950,7 +951,7 @@ export function Reader(props: Props) {
         return (
           <article key={m.id} className="message gm-msg">
             <button type="button" className="gm-msg-collapsed" onClick={() => toggle(m.id)} aria-expanded={false}>
-              <Avatar person={m.from} size={40} />
+              <Avatar person={m.from} size={40} card />
               <span className="gm-msg-lines">
                 <span className="gm-msg-l1">
                   <strong>{who}</strong>
@@ -966,7 +967,7 @@ export function Reader(props: Props) {
         <article key={m.id} className="message gm-msg open">
           <div className="gm-msg-head">
             <button type="button" className="gm-msg-av" onClick={() => toggle(m.id)} aria-label={t('Fold this message')} tabIndex={-1}>
-              <Avatar person={m.from} size={40} />
+              <Avatar person={m.from} size={40} card />
             </button>
             <button type="button" className="gm-msg-name" onClick={() => toggle(m.id)} aria-expanded>
               <strong>{who}</strong>
@@ -999,14 +1000,14 @@ export function Reader(props: Props) {
               <dl className="gm-msg-details">
                 <dt>{tx('mail', 'From')}</dt>
                 <dd>
-                  {m.from.name} <span>{m.from.email}</span>
+                  <PersonName who={m.from}>{m.from.name}</PersonName> <span>{m.from.email}</span>
                 </dd>
                 <dt>{t('To')}</dt>
-                <dd>{m.to.map((p) => `${p.name ? p.name + ' ' : ''}<${p.email}>`).join(', ')}</dd>
+                <dd>{m.to.map((p, i) => <Fragment key={p.email + i}>{i ? ', ' : ''}<PersonName who={p}>{`${p.name ? p.name + ' ' : ''}<${p.email}>`}</PersonName></Fragment>)}</dd>
                 {m.cc?.length ? (
                   <>
                     <dt>Cc</dt>
-                    <dd>{m.cc.map((p) => `${p.name ? p.name + ' ' : ''}<${p.email}>`).join(', ')}</dd>
+                    <dd>{m.cc.map((p, i) => <Fragment key={p.email + i}>{i ? ', ' : ''}<PersonName who={p}>{`${p.name ? p.name + ' ' : ''}<${p.email}>`}</PersonName></Fragment>)}</dd>
                   </>
                 ) : null}
                 {m.replyTo?.length ? (

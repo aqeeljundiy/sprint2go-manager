@@ -212,7 +212,7 @@ export function WhoReactedSheet({ m, first, users, me, channel, onClose }: { m: 
           {who.map((id) => {
             const u = users.find((x) => x.id === id);
             const g = !u ? channel.guests?.find((x) => x.email === id) : undefined;
-            return <div key={id} className="pl-row">{u ? <PersonCell person={u} size={28} sub={id === me ? t('You') : u.title} /> : <PersonCell person={{ name: g?.name ?? t('Someone'), email: g?.email ?? '' }} size={28} />}</div>;
+            return <div key={id} className="pl-row">{u ? <PersonCell person={u} size={28} card={u.id} sub={id === me ? t('You') : u.title} /> : <PersonCell person={{ name: g?.name ?? t('Someone'), email: g?.email ?? '' }} size={28} />}</div>;
           })}
         </section>
       ))}

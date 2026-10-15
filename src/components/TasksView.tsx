@@ -54,6 +54,7 @@ export type TaskScope =
   | { kind: 'grid' }
   | { kind: 'client'; id: string; teamId?: string }
   | { kind: 'team'; id: string }
+  | { kind: 'person'; id: string } // someone's tasks (from their profile card)
   | { kind: 'past' } // past clients and clients over time
   | { kind: 'projects' }; // every project (the Projects app's home)
 
@@ -272,6 +273,8 @@ export function TasksView(p: Props) {
         return work.filter((t) => t.clientId === scope.id && (!scope.teamId || t.teamId === scope.teamId));
       case 'team':
         return work.filter((t) => t.teamId === scope.id);
+      case 'person':
+        return work.filter((t) => doers(t).includes(scope.id));
       default:
         return work;
     }
@@ -413,7 +416,9 @@ export function TasksView(p: Props) {
               ? t('{Projects} × teams', { projects: term.many })
               : scope.kind === 'team'
                 ? (team?.name ?? t('Team'))
-                : `${client?.name ?? term.One}${cellTeam ? ` · ${cellTeam.name}` : ''}`;
+                : scope.kind === 'person'
+                  ? t('{name}’s tasks', { name: person(scope.id)?.name.split(' ')[0] ?? '' })
+                  : `${client?.name ?? term.One}${cellTeam ? ` · ${cellTeam.name}` : ''}`;
 
   const briefCard = (b: Todo) => {
     const subs = p.tasks.filter((x) => x.briefId === b.id);
@@ -440,7 +445,7 @@ export function TasksView(p: Props) {
         <div className="bc-foot">
           {owner && (
             <span className="bc-owner">
-              <Avatar person={owner} size={20} /> {owner.id === p.me ? t('You’re in charge') : t('{name} in charge', { name: owner.name.split(' ')[0] })}
+              <Avatar person={owner} size={20} card={owner.id} /> {owner.id === p.me ? t('You’re in charge') : t('{name} in charge', { name: owner.name.split(' ')[0] })}
             </span>
           )}
           <span className="bc-teams">
@@ -599,6 +604,8 @@ export function TasksView(p: Props) {
         ? { clientId: scope.id, teamId: scope.teamId }
         : scope.kind === 'project'
           ? { clientId: scope.id }
+          : scope.kind === 'person'
+            ? { userId: scope.id }
           : scope.kind === 'today'
             ? { due: today }
             : {};
@@ -821,7 +828,7 @@ export function TasksView(p: Props) {
           <div className="workload">
             {workload.map((w) => (
               <button key={w.u.id} className="wl" onClick={() => p.onScope({ kind: 'team', id: team.id })}>
-                <Avatar person={w.u} size={28} />
+                <Avatar person={w.u} size={28} card={w.u.id} />
                 <span className="wl-text">
                   <strong>
                     {w.u.id === p.me ? t('You') : w.u.name.split(' ')[0]}
@@ -887,7 +894,7 @@ export function TasksView(p: Props) {
             <div className="workload wl-sheet">
               {workload.map((w) => (
                 <div key={w.u.id} className="wl">
-                  <Avatar person={w.u} size={32} />
+                  <Avatar person={w.u} size={32} card={w.u.id} />
                   <span className="wl-text">
                     <strong>
                       {w.u.id === p.me ? t('You') : w.u.name.split(' ')[0]}
@@ -1058,7 +1065,7 @@ export function TasksView(p: Props) {
                     const who = g ? { name: g.name, email: g.email } : u ? u : { name: t('Someone'), email: '' };
                     return (
                       <div key={m.id} className="hub-msg">
-                        <Avatar person={who} size={28} />
+                        <Avatar person={who} size={28} card />
                         <div className="hm-body">
                           <div className="hm-head">
                             <b>{who.name.split(' ')[0]}</b>
@@ -1306,7 +1313,7 @@ export function TasksView(p: Props) {
                   {people.length === 0 && <p className="muted small">{t('Nobody yet. Invite the people you work with on {name}. They get a free account.', { name: client.name })}</p>}
                   {people.map((g) => (
                     <div key={g.email} className="pa-row person-row">
-                      <PersonCell person={{ name: g.name, email: g.email, color: client.color }} sub={[companyOf(g.email, g.company, client), g.email].filter(Boolean).join(' · ')} />
+                      <PersonCell person={{ name: g.name, email: g.email, color: client.color }} card sub={[companyOf(g.email, g.company, client), g.email].filter(Boolean).join(' · ')} />
                       {g.status === 'pending' ? (
                         <>
                           <Badge tone="warn">{t('Asked to join')}</Badge>
@@ -1426,7 +1433,7 @@ function ProjectWorkload({ tasks, people, users, me, onOpenTask }: { tasks: Todo
         {rows.map(({ u, mine, late, soon }) => (
           <div key={u.id} className="team-load">
             <button type="button" className="team-row" onClick={() => setOpenId(openId === u.id ? null : u.id)} aria-expanded={openId === u.id}>
-              <PersonCell person={u} badges={u.id === me && <Badge tone="accent">{t('You')}</Badge>} sub={[late && tn(late, '{n} late', '{n} late'), soon && tn(soon, '{n} due this week', '{n} due this week'), !mine.length && t('Nothing open here')].filter(Boolean).join(' · ') || tn(mine.length, '{n} open', '{n} open')} />
+              <PersonCell person={u} card={u.id} badges={u.id === me && <Badge tone="accent">{t('You')}</Badge>} sub={[late && tn(late, '{n} late', '{n} late'), soon && tn(soon, '{n} due this week', '{n} due this week'), !mine.length && t('Nothing open here')].filter(Boolean).join(' · ') || tn(mine.length, '{n} open', '{n} open')} />
               <span className="team-bar" aria-hidden>
                 <i style={{ width: `${(mine.length / most) * 100}%` }} className={late ? 'bad' : ''} />
               </span>

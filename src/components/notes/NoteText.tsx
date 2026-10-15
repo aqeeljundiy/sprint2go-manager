@@ -2,6 +2,7 @@ import { forwardRef, useCallback, useEffect, useImperativeHandle, useLayoutEffec
 import type { Todo } from '../../types';
 import { addPill, blockOf, cleanStyles, decorate, findText, lineText, sanitizeNote } from './noteHtml';
 import { t } from '../../i18n';
+import { usePersonCard } from '../ui/PersonCard';
 
 /** Where the caret is, for the keyboard bar and the toolbar: it changes with the cursor. */
 export interface Caret {
@@ -70,6 +71,7 @@ export const NoteText = forwardRef<NoteTextHandle, {
   /** Reading view on touch: hold a line for its menu. */
   onLineMenu?: (block: HTMLElement, x: number, y: number) => void;
 }>(function NoteText(p, ref) {
+  const card = usePersonCard();
   const el = useRef<HTMLDivElement>(null);
   const saved = useRef<Range | null>(null);
   const cb = useRef(p);
@@ -410,6 +412,12 @@ export const NoteText = forwardRef<NoteTextHandle, {
         const t = e.target as HTMLElement;
         const pill = t.closest<HTMLElement>('.note-task');
         if (pill?.dataset.task) return void (e.preventDefault(), p.onOpenTask?.(pill.dataset.task));
+        // An @mention opens the person's profile card, not a mail app.
+        const at = t.closest<HTMLAnchorElement>('a[href^="mailto:"]');
+        if (at && card && (at.textContent ?? '').startsWith('@')) {
+          e.preventDefault();
+          return card.open(decodeURIComponent(at.getAttribute('href')!.slice(7)), at);
+        }
         const a = t.closest<HTMLAnchorElement>('a[href^="/notes/"]');
         if (a && (!p.editable || e.metaKey || e.ctrlKey)) {
           e.preventDefault();

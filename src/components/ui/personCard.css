@@ -1,0 +1,196 @@
+/* The shared profile card (PersonCard.tsx): a popover next to the face on wider screens, a bottom sheet on phones.
+   Both surfaces bring their own entrance and exit (.pop, .sheet-scrim in exitAnimations.ts). */
+
+.avatar-btn,
+.person-link {
+  cursor: pointer;
+  border-radius: 50%;
+  outline-offset: 2px;
+  transition: opacity 0.15s ease, box-shadow 0.15s ease;
+}
+.person-link {
+  border-radius: 4px;
+}
+.avatar-btn {
+  position: relative;
+  display: inline-grid;
+  flex: none;
+}
+/* A small face still gets a 44 px tap target on phones without growing the row. */
+.avatar-btn::after {
+  content: '';
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: max(100%, var(--tap));
+  height: max(100%, var(--tap));
+  transform: translate(-50%, -50%);
+}
+.avatar-btn:hover > .avatar {
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+.person-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.avatar-btn:focus-visible,
+.person-link:focus-visible {
+  outline: 2px solid var(--accent);
+}
+
+.pcard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+}
+.pcard-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+.pcard-face {
+  position: relative;
+  flex: none;
+  display: inline-grid;
+}
+.pcard-dot {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--surface);
+  background: var(--text-3);
+}
+.pcard-dot.is-active {
+  background: var(--ok-solid);
+}
+.pcard-dot.is-meeting {
+  background: var(--warn-solid);
+}
+.pcard-who {
+  min-width: 0;
+}
+.pcard-name {
+  font: var(--t-title);
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+.pcard-sub {
+  font: var(--t-secondary);
+  color: var(--text-3);
+}
+.pcard-status {
+  font: var(--t-secondary);
+  color: var(--text-2);
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+.pcard-facts {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+.pcard-fact {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  border-top: 1px solid var(--line);
+}
+.pcard-fact dt {
+  font: var(--t-secondary);
+  color: var(--text-3);
+}
+.pcard-fact dd {
+  margin: 0;
+  min-width: 0;
+  font: var(--t-body);
+  color: var(--text);
+}
+.pcard-val {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: inherit;
+}
+a.pcard-val {
+  color: var(--accent-text);
+}
+.pcard-copy {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 40px;
+  text-align: left;
+  color: var(--text);
+  font: inherit;
+}
+.pcard-copied {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  color: var(--text-3);
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+.pcard-copy:hover .pcard-copied {
+  color: var(--text);
+}
+.pcard-copied.on {
+  color: var(--ok);
+  transform: scale(1.1);
+}
+.pcard-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pcard-primary {
+  flex: 1;
+  justify-content: center;
+  min-height: 40px;
+}
+.pcard-icons {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+.pcard-icons .icon-btn {
+  width: 40px;
+  height: 40px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+/* Phones: the sheet holds the card; big enough taps. */
+.pcard-sheet .pcard {
+  padding: 0 16px 8px;
+}
+@media (max-width: 767px) {
+  .pcard-fact {
+    min-height: var(--tap);
+  }
+  .pcard-copy,
+  .pcard-primary,
+  .pcard-icons .icon-btn {
+    min-height: var(--tap);
+  }
+  .pcard-icons .icon-btn {
+    width: var(--tap);
+    height: var(--tap);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avatar-btn,
+  .person-link,
+  .pcard-copied,
+  .pcard-icons .icon-btn {
+    transition: none;
+  }
+}

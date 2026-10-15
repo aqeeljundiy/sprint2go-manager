@@ -86,7 +86,7 @@ export function CellView({ f, v, ctx, wrap }: { f: TableField; v: CellValue | un
       const u = ctx.users.find((x) => x.id === v);
       return u ? (
         <span className="tb-person">
-          <Avatar person={u} size={20} />
+          <Avatar person={u} size={20} card={u.id} />
           <span>{u.name}</span>
         </span>
       ) : null;
@@ -156,7 +156,7 @@ export function CellView({ f, v, ctx, wrap }: { f: TableField; v: CellValue | un
       const u = ctx.users.find((x) => x.id === v);
       return u ? (
         <span className="tb-person">
-          <Avatar person={u} size={20} />
+          <Avatar person={u} size={20} card={u.id} />
           <span>{u.name}</span>
         </span>
       ) : (

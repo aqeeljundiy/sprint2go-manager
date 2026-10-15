@@ -10,6 +10,7 @@ import { EmptyState } from '../ui/EmptyState';
 import { TabPane } from '../ui/Smooth';
 import { useActionMenu, type SheetAction } from '../ui/ActionSheet';
 import { Avatar } from '../Avatar';
+import { PersonName } from '../ui/PersonCard';
 import { ConfirmSheet, WhenSheet, chanName } from './Sheets';
 import { authorOf, preview, Text } from './Message';
 import { dmOther, followedThreads, readFallback, TILE_NAMES, useChatState, whenText, type ChatState, type SavedItem } from './chatPrefs';
@@ -289,10 +290,10 @@ function CatchUp(p: PagesProps & { chat: ChatState }) {
               const a = authorOf(m, { me: p.me, users: p.users, channel: card.c });
               return (
                 <div key={m.id} className="cu-msg">
-                  {a.person ? <Avatar person={a.person} size={p.phone ? 32 : 28} /> : <span className="cm-gutter" />}
+                  {a.person ? <Avatar person={a.person} size={p.phone ? 32 : 28} card /> : <span className="cm-gutter" />}
                   <div>
                     <div className="cu-msg-head">
-                      <strong>{a.name}</strong>
+                      <strong>{a.person ? <PersonName who={a.person}>{a.name}</PersonName> : a.name}</strong>
                       <time>{relative(m.at)}</time>
                     </div>
                     <div className="cm-text">{m.text ? <Text text={m.text} users={p.users} short={p.phone} /> : preview(m)}</div>

@@ -214,7 +214,7 @@ function DetailBody(p: DetailProps) {
               const a = p.answers?.[g.email.toLowerCase()];
               return (
                 <div key={g.email} className="ev-guest">
-                  <Avatar person={g} size={24} />
+                  <Avatar person={g} size={24} card />
                   <span className="ev-guest-name">{g.name}</span>
                   {a && (
                     <Badge tone={ANSWER[a].tone} small>
@@ -481,7 +481,7 @@ function PhoneDetail(p: DetailProps & { rsvp: ReactNode }) {
                 return (
                   <div key={g.email} className="dr-guest">
                     <span className="dr-guest-av">
-                      <Avatar person={g} size={32} />
+                      <Avatar person={g} size={32} card />
                       {B && (
                         <i className={`dr-badge ${B.tone}`} aria-label={t(ANSWER[a!].label)}>
                           <B.icon size={9} strokeWidth={3.5} />

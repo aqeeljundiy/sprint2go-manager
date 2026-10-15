@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-15T07:19:11.162Z",
+  "updated": "2026-10-15T07:23:47.836Z",
   "items": [
     {
       "id": "G1",
@@ -7036,6 +7036,1509 @@
       "area": "?",
       "title": "Skipped: iPad 768 settings nav clipping and order",
       "detail": "Not done in this pass: it means reordering the nav in SettingsPage.tsx and the tablet layout, and I could not check it at 768 in the time. Separately, the Empty Spam/Trash action still runs without an ActionSheet confirm, the same as before",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-home-1",
+      "round": "Feature gaps",
+      "area": "home",
+      "title": "Tapping a person's avatar opens a profile card",
+      "detail": "Reference: Slack, Teams, Google: tapping an avatar opens a profile card with name, title, team, email, local time, status, and Message, Call and Schedule buttons. Today: Avatars on Home are just pictures inside row buttons. In the Waiting card, the avatar sits inside the button that opens the thread (src/components/HomeView.tsx:599-600). Workload avatars do nothing (HomeView.tsx:468), and brief and task owner avatars do nothing either (HomeView.tsx:548, 713). Proposal: Add a shared PersonCard: a popover on desktop and a bottom sheet on phones. It shows the avatar, name, title, team, email, local time and status, with Message as the one main button and Call or Email as smaller icons. Every Avatar becomes its own button that stops the click from reaching the row, so tapping the face opens the profile and tapping the text still opens the item. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-home-2",
+      "round": "Feature gaps",
+      "area": "home",
+      "title": "Workload rows lead nowhere",
+      "detail": "Reference: Asana and Monday workload views: clicking a person opens a filtered list of their tasks. Today: Workload rows are plain divs with no click handler (HomeView.tsx:467). Proposal: Make each row a button that opens Tasks filtered to that person, with the late tasks shown first. A long press, or the avatar, opens the PersonCard. (effort small)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-home-3",
+      "round": "Feature gaps",
+      "area": "home",
+      "title": "No reply or archive straight from Home",
+      "detail": "Reference: Gmail and Outlook widgets and Slack Activity let you swipe to archive or mark done, and give you a quick-reply box. Today: Waiting rows can only open the thread (HomeView.tsx:599). Notices can only open (HomeView.tsx:622). Proposal: Phones: swipe left to mark read or done, swipe right to snooze. Desktop: a hover action. Keep opening the item as the one main tap. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-home-4",
+      "round": "Feature gaps",
+      "area": "home",
+      "title": "No Join button on meetings starting soon",
+      "detail": "Reference: Google Calendar, Outlook and the Microsoft 365 home show a Join button on a meeting about 5 minutes before it starts. Today: Home events open the calendar entry (HomeView.tsx:577). The MeetingStrip handles bot and notetaker actions (HomeView.tsx:1008), not a one-tap join. Proposal: When a meeting is within 10 minutes, its row's main action becomes Join, with a countdown chip, on both Home and the phone Launcher. (effort small)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-home-5",
+      "round": "Feature gaps",
+      "area": "home",
+      "title": "Recent items are too few and can't be pinned",
+      "detail": "Reference: Microsoft 365 home and Notion: recent files and pages with pin or favourite, plus a 'Shared with me' filter. Today: The Launcher shows only 3 recents (src/mobile/Launcher.tsx:161-167), with no pinning and no 'See all'. Desktop Home has no recents card. Proposal: Add a Recents card with pinned items on top and 'See all', available on desktop too. Long press to pin. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-home-6",
+      "round": "Feature gaps",
+      "area": "home",
+      "title": "Search shows no suggestions before you type",
+      "detail": "Reference: Google, Microsoft 365 and Notion search open with recent searches, people you work with and recent files already listed. Today: The search bar only opens the command palette (HomeView.tsx:998). On phones, the Launcher search does the same (Launcher.tsx:120). Proposal: Before you type, show recent queries, the 5 people you work with most (tap opens their PersonCard) and the last few files. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-home-7",
+      "round": "Feature gaps",
+      "area": "home",
+      "title": "Tasks can't be snoozed or rescheduled inline",
+      "detail": "Reference: Todoist and Microsoft To Do: swipe to reschedule to Today, Tomorrow or Next week. Today: A task row has only Done and Open (HomeView.tsx:347-348). Proposal: Swipe, or a hover button on desktop, opens a date chip sheet: Today, Tomorrow, Next week. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-home-8",
+      "round": "Feature gaps",
+      "area": "home",
+      "title": "Home is missing birthdays, out-of-office and new joiners",
+      "detail": "Reference: Teams and Workplace show who's out today, birthdays and new joiners. Today: Home has no people-presence card. The Workload card lists load only (HomeView.tsx:460-478). Proposal: Add an optional 'Who's out today' card that reads leave and calendar data. Tapping a person opens their PersonCard. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-home-9",
+      "round": "Feature gaps",
+      "area": "home",
+      "title": "No way to see who's online",
+      "detail": "Reference: Slack and Teams show green or away presence dots on avatars. Today: The Avatar component shows no presence (used at HomeView.tsx:468, 600). Proposal: Add a presence dot prop to Avatar, fed by the status from the status-setting gap above. (effort small)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "FG-home-10",
+      "round": "Feature gaps",
+      "area": "home",
+      "title": "Mail rows don't show when the message arrived or what it says",
+      "detail": "Reference: The Gmail widget shows the time and a snippet for each message. Today: Waiting rows show only the sender and subject (HomeView.tsx:601-604). Proposal: Add a relative time ('2h') and a one-line snippet, and mark messages that mention you. (effort small)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "FG-mail-1",
+      "round": "Feature gaps",
+      "area": "mail",
+      "title": "Tapping a sender's avatar or name opens their contact card, not a fold",
+      "detail": "Reference: Gmail on phone: tapping the sender's photo in an open email opens a contact card with name, email, phone, company, title, and Email, Chat, Meet, Schedule, Add to contacts. On desktop, hovering the name shows the same card. Superhuman keeps a right-hand sidebar with the sender's role, company, LinkedIn/X, recent threads and local time. Today: The avatar and the name both just fold the message. On desktop, src/components/Reader.tsx:557-558 puts the Avatar inside the message-head button, which calls toggle(m.id). On phones, Reader.tsx:968-970 gives the avatar a 'Fold this message' button, and :971-973 does the same for the name. No person card or hover card component exists anywhere in src (searched for HoverCard, PersonCard and ProfileCard: nothing found). Proposal: Build one shared PersonCard: a bottom sheet on phones and a popover on desktop (hover after 400ms or click). It shows the avatar, name, title and company (from the workspace directory or Contacts.tsx data), email, phone, local time, and presence for teammates. The primary button is 'Email'. Secondary buttons: Chat (teammates), Call/Meet, 'Emails with {name}', 'Add to contacts' or 'Edit', and Block. Open it from the reader avatar and name, recipient names in the 'to' details, compose recipient chips, Contacts rows and Chat. Folding stays on the rest of the message header. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-mail-2",
+      "round": "Feature gaps",
+      "area": "mail",
+      "title": "Recipient names and compose chips do nothing when tapped",
+      "detail": "Reference: Gmail: in an open email, tapping a recipient in the 'to me' details opens their card. In compose, tapping a chip lets you edit the address or open the contact card, and you can drag a chip between To, Cc and Bcc. Superhuman: Cmd+Shift+B moves the selected recipients to Bcc ('Instant Intro'). Today: src/components/RecipientInput.tsx:53-58 renders each chip as a plain span. The only button on it is the X that removes the recipient, so you can't fix a typo or move the person to Cc or Bcc. The 'to' line in the reader is joined text (Reader.tsx:566-572) with no tappable names. Proposal: Make each chip a button that opens a small menu: the PersonCard, Edit address, Move to Cc, Move to Bcc, Remove. Double-tap edits the address in place. On desktop, allow dragging a chip between fields. In the reader's expanded details, render each recipient as a tappable name that opens the PersonCard. (effort small)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-mail-3",
+      "round": "Feature gaps",
+      "area": "mail",
+      "title": "No one-tap 'all emails with this person'",
+      "detail": "Reference: Gmail's contact card has 'View recent emails' (from:/to: search). Superhuman's sidebar lists recent threads with the sender, and clicking one opens it. Today: The search screen exists (src/components/mail/MailSearch.tsx), but the reader has no path from a person to their history. The message ⋮ menu (Reader.tsx:450-494) offers reply, forward, translate, print, original and block, but no 'Emails from {name}'. Proposal: Add 'Emails with {name}' to the PersonCard and the message ⋮ menu. It runs MailSearch with a from:x OR to:x chip. On desktop, the card also previews the last 3 threads. (effort small)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-mail-4",
+      "round": "Feature gaps",
+      "area": "mail",
+      "title": "Desktop has no sender context panel next to the email",
+      "detail": "Reference: Superhuman shows a right rail on every open thread: who the person is, their company, social links, recent conversations and shared files. Gmail's side panel shows Contacts, Calendar and Tasks. Today: Reader.tsx has no side rail. Context about a person exists only in the separate Contacts screen (src/components/mail/Contacts.tsx:339-520, ContactPanel), which you can't reach from an open email. Proposal: On wide screens (over 1280px), add a collapsible right rail to the reader built from PersonCard data: role, company, notes from Contacts, recent threads, recent attachments (reuse FilesView), and upcoming shared calendar events. Keep it off on phones, where the PersonCard sheet covers this. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-mail-5",
+      "round": "Feature gaps",
+      "area": "mail",
+      "title": "Avatar in the inbox list always selects; no quick-peek of the sender",
+      "detail": "Reference: Gmail on phone: tapping the avatar selects the row, which is the same as here. On desktop, hovering the sender name in the list shows the contact hovercard. Superhuman shows the person in the sidebar as you move through the list. Today: src/components/MessageList.tsx:634-635: the row avatar is a select toggle on every screen size, and hovering the sender name does nothing on desktop. Proposal: Keep tap-to-select on phones. On desktop, attach the PersonCard hover to the sender name text in the row, after a 500ms delay so scanning the list stays calm. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-mail-6",
+      "round": "Feature gaps",
+      "area": "mail",
+      "title": "No split inbox driven by people or VIPs",
+      "detail": "Reference: Superhuman's Split Inbox: tabs such as VIP, Team, Calendar and News, defined by sender or domain, with unread counts that you cycle through with Tab. Gmail has categories and Priority Inbox. Today: Inbox tabs and multiple inboxes exist (src/components/mail/Sorting.tsx), built around categories and searches. There's no VIP or person-based split, and no way to mark a person as VIP from their card. Proposal: Add 'Mark as VIP' to the PersonCard. VIPs get their own split and their mail notifies even when notifications are quiet. Offer ready-made splits for Team (your workspace domain) and Calendar (invites). (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-mail-7",
+      "round": "Feature gaps",
+      "area": "mail",
+      "title": "Read status is only in the list summary, not on the sent message",
+      "detail": "Reference: Superhuman shows read status as a small eye icon on your sent messages, with a per-recipient timeline in a popover. Gmail Workspace offers read receipts. Today: src/components/MessageList.tsx:782-787 shows 'Opened by X of Y' in a summary line. In the open thread, your own sent messages in Reader.tsx carry no read indicator. Proposal: On each of your sent messages in the reader, add a small 'Seen 2h ago' tag. Tapping it opens a sheet listing each recipient with the time they opened it. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-mail-8",
+      "round": "Feature gaps",
+      "area": "mail",
+      "title": "No quick 'Message on Chat' or 'Call' from an email",
+      "detail": "Reference: Gmail's contact card has Chat and Meet buttons. Slack and Teams profile cards have Message and Call. This is the user's exact complaint. Today: Mail, Chat and Meet are separate apps. Reader.tsx has no route from a sender to a Chat DM or a Meet call. Proposal: In the PersonCard, show Chat (opens or creates the DM in the Chat app) and Meet (starts a call) for any workspace member. For external people, show 'Schedule a meeting'. (effort small)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-mail-9",
+      "round": "Feature gaps",
+      "area": "mail",
+      "title": "Contacts are separate from teammates, so profiles are thin",
+      "detail": "Reference: Gmail's card merges directory data (title, department, manager, phone) with personal contacts. Slack's profile shows title, pronouns, local time and status. Today: src/components/mail/Contacts.tsx:31 stores name, emails, phones, company, title, notes and labels for saved contacts only. Workspace members appear in a separate list (:247-255) with just name and email. Proposal: Add one people resolver: workspace profile (title, team, timezone, status) plus a saved contact plus the last-seen email signature (parse title and phone from the signature, as Superhuman does). The PersonCard and every avatar use it. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-mail-10",
+      "round": "Feature gaps",
+      "area": "mail",
+      "title": "No 'Reply all → Reply' guard and no recipient warnings",
+      "detail": "Reference: Gmail warns about external recipients and missing attachments ('you mentioned attached'). Superhuman flags long-dormant recipients. Today: Compose.tsx and DraftFiles.tsx handle files, but I found no check for words like 'attached' when no file is present, and no warning about external domains. Proposal: Before sending, show a single inline banner, not a modal: 'You wrote “attached” but nothing is attached' or 'This goes outside your company'. It has one primary button, Send anyway. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-chat-1",
+      "round": "Feature gaps",
+      "area": "chat",
+      "title": "Tapping an avatar or name opens a profile card",
+      "detail": "Reference: Slack: tap an avatar or display name and a profile sheet opens (phone) or a popover (desktop), with photo, title, pronouns, local time, status, email, and Message / Huddle buttons. Discord does the same with its user popout. Today: The avatar in Message.tsx:249 is a plain <Avatar> with no handler, so the tap falls through to the whole-row onClick at Message.tsx:238-240, which calls ctx.onOpenThread(m.id) on phone. The only way to see a profile is the DM 'View profile' button (Conversation.tsx:578) or Details > Profile (Conversation.tsx:862), and both exist only inside a DM. Proposal: Make the avatar and the name in .cm-head (Message.tsx:257) buttons that open a ProfileCard: a bottom sheet on phone, an anchored popover on desktop. Reuse the Details 'about' pane, which already formats timeZone. Show name, title, status, local time, email (tap to copy) and team. Message is the one primary button; Huddle and 'View full profile' go underneath. Stop propagation so a tap on the avatar never opens the thread. (effort small)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-chat-2",
+      "round": "Feature gaps",
+      "area": "chat",
+      "title": "@mentions are inert bold text",
+      "detail": "Reference: Slack and Discord: an @mention is a tappable chip that opens the same profile card. #channel mentions open the channel. Today: Message.tsx:43 renders a mention as <b className=\"mention\">, so it does nothing when tapped, and on phone the tap opens the thread. Proposal: Render mentions as buttons that open the ProfileCard from gap 1, and render #channel references as links that open the channel. Highlight mentions of me in a different colour. (effort small)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-chat-3",
+      "round": "Feature gaps",
+      "area": "chat",
+      "title": "Tapping a message on phone opens its thread",
+      "detail": "Reference: Slack mobile: a tap does nothing (or selects text) and a long-press opens the action sheet. You reply in a thread through the 'N replies' link or the action sheet. Discord: a tap does nothing and a swipe left replies. Today: Message.tsx:232-240 sets canOpen = ctx.phone and calls onOpenThread on any tap outside a button. This is the 'it jumps to the thread' complaint: reading or scrolling triggers navigation. Proposal: Remove the tap-to-thread behaviour. Keep long-press for the action sheet (actionsFor, Conversation.tsx:484) and the existing thread-link (Message.tsx:369). Optionally add swipe-to-reply. (effort small)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-chat-4",
+      "round": "Feature gaps",
+      "area": "chat",
+      "title": "No typing indicator",
+      "detail": "Reference: Slack and Discord both show 'Ana is typing…' above the composer, and Slack shows it in DM rows too. Today: No typing presence anywhere. The only match for 'typing' in chat/ and ChatApp.tsx is one hit in chatPrefs.ts, and nothing in Conversation.tsx or Composer.tsx sends or shows typing state. Proposal: Broadcast a throttled typing ping from Composer over the existing realtime net (chat/net.ts) and show a slim animated line above the composer that names up to 2 people. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-chat-5",
+      "round": "Feature gaps",
+      "area": "chat",
+      "title": "No 'seen' state in DMs",
+      "detail": "Reference: Discord has no read receipts, but WhatsApp-style apps and Teams show 'Seen'. Slack shows the unread line and nothing else. People expect to know whether a DM landed. Today: Unread is tracked per user for the NewLine (Message.tsx import, Conversation.tsx:27), but nothing tells the sender that their message was read. No readBy is shown. Proposal: In 1:1 DMs only, show a small 'Seen' with a time under my last message once the other person's read marker passes it. Add a setting to turn it off. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-chat-6",
+      "round": "Feature gaps",
+      "area": "chat",
+      "title": "Full-screen image viewer",
+      "detail": "Reference: Slack and Discord: tap an image to open a full-screen viewer with pinch-zoom, swipe between images, and save / share / forward. Today: Attachments are links that open in a new tab (Message.tsx:327, target=_blank). There is no in-app viewer. Proposal: Add a MediaViewer overlay: tap a thumbnail to open it full screen with pinch-zoom and swipe through the conversation's images. One primary action, Share/Save, with Forward in the overflow menu. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-chat-7",
+      "round": "Feature gaps",
+      "area": "chat",
+      "title": "Quote-reply inline (Discord 'Reply')",
+      "detail": "Reference: Discord: Reply quotes the original above your message in the main channel, and tapping the quote jumps to it. WhatsApp works the same way. Slack only has threads. Today: Replies go only to threads (actionsFor, Conversation.tsx:490). A Quote formatting option exists in Composer, but nothing links back to the source message. Proposal: Add 'Reply' (inline) beside 'Reply in thread' in the action sheet and as a swipe gesture. The composer shows a dismissible 'Replying to X' bar, and the sent message carries a tappable quote that calls the existing jumpTo. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-chat-8",
+      "round": "Feature gaps",
+      "area": "chat",
+      "title": "No workspace-wide message search",
+      "detail": "Reference: Slack: one search box covering all messages, files and people, with from:, in: and date filters and recent searches. Discord has the same filters per server. Today: Search lives only inside one conversation (Details 'search', Conversation.tsx:938 and :1021). The sidebar has no search across all chats. Proposal: Add a search entry at the top of the chat sidebar that searches every channel and DM, with filter chips (From, In, Has file, Date). Results jump to the message with jumpTo. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-chat-9",
+      "round": "Feature gaps",
+      "area": "chat",
+      "title": "Link previews",
+      "detail": "Reference: Slack and Discord show a card for pasted links with title, description, image, and inline video players. Today: Links render as plain anchors in the line renderer (Message.tsx:33-43). There is no preview card. Proposal: Fetch OpenGraph data server-side when a message is sent and show a compact card under it that the sender can dismiss. Add special cards for internal sprint2go links (task, note, file) that reuse the cm-ref style (Message.tsx:348). (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-chat-10",
+      "round": "Feature gaps",
+      "area": "chat",
+      "title": "Presence and local time missing from message headers and DM rows",
+      "detail": "Reference: Slack shows a presence dot on avatars and a 'local time is 11:40 PM' warning in the DM composer when the other person is outside working hours. Today: Presence is used in NewMessage (ChatApp.tsx:1373) and the DM subtitle shows status or title (Conversation.tsx:855). The message avatar (Message.tsx:249) has no dot, and the composer gives no 'it's late for them' hint, although timeZone data exists (Details.tsx). Proposal: Add a presence dot on message avatars. In DMs, show a one-line composer hint ('It's 11:40 PM for Ana') when their local time is outside 8am to 7pm, with a shortcut to Send later. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-chat-11",
+      "round": "Feature gaps",
+      "area": "chat",
+      "title": "Long-press a person in the sidebar or people list for quick actions",
+      "detail": "Reference: Slack: in the member list, tapping a person opens the profile and long-pressing a DM row gives mute, star and close. Discord opens a user sheet on tap anywhere. Today: ConvoRow (ChatApp.tsx:955) opens the chat or a conversation menu. The channel People pane lists members, but there is no profile entry point outside DMs. Proposal: Every person row (People pane, reactors, poll voters at Message.tsx:318, thread avatars at Message.tsx:372) opens the ProfileCard. Make it a single shared component. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-chat-12",
+      "round": "Feature gaps",
+      "area": "chat",
+      "title": "Edit history and delete-for-everyone feedback",
+      "detail": "Reference: Slack: '(edited)', and hovering it shows when. Discord shows '(edited)' with a timestamp tooltip, and a deleted message leaves a 'This message was deleted' tombstone in threads. Today: Message.tsx:301 shows '(edited)' with no time. Delete removes the message entirely (Conversation.tsx:503). Proposal: Make '(edited)' tappable to show the time it was edited. When a deleted message had thread replies, keep a 'Message deleted' tombstone so the replies still have context. (effort small)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "FG-chat-13",
+      "round": "Feature gaps",
+      "area": "chat",
+      "title": "Unread jump and 'mark all read' per conversation",
+      "detail": "Reference: Slack: a 'N new messages since 2:14 PM, Jump' pill at the top, and Esc marks a channel read. Discord shows a 'N new messages, Mark as read' bar. Today: There is a 'jump to recent' button (Conversation.tsx:587) and a NewLine marker, but no pill that jumps up to the first unread or marks the conversation read. Proposal: When opening a conversation scrolled away from the first unread, show a top pill 'N new since 2:14 PM' with Jump as the tap and Mark read as the secondary action. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-tasks-1",
+      "round": "Feature gaps",
+      "area": "tasks",
+      "title": "Tapping a person opens nothing about them",
+      "detail": "Reference: Asana: tap any avatar (assignee, commenter, follower) for a profile card with name, title, team, email, local time, and Message or 'View tasks'. Todoist shows the collaborator with their email. Today: Avatars are decoration or pickers. Phone row avatar src/components/tasks/TaskRow.tsx:158-160 sits inside the row, so a tap opens the task. Desktop avatar is a PeoplePicker (TaskRow.tsx:165), so a click reassigns. Comment avatars in TaskDrawer.tsx:353 and TaskDetail.tsx:557 do nothing. Proposal: Add one shared PersonCard (a sheet on phones, a popover on desktop) that opens from every avatar in Tasks: name, title, team, local time, and how many open or late tasks they have. One primary button, Message (opens a DM in Chat), with Email, Call and 'See their tasks' (goes to scope people:id) as secondary rows. On desktop rows, put the reassign picker behind a small chevron so a click on the avatar itself opens the card. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-tasks-2",
+      "round": "Feature gaps",
+      "area": "tasks",
+      "title": "No @mentions in task comments",
+      "detail": "Reference: Asana and Todoist: typing @ in a comment opens a people picker. The person mentioned gets notified and the name becomes a link to their profile. Today: Comment boxes are plain textareas (TaskDrawer.tsx:538, TaskDetail.tsx:588). Only doers, the supervisor and followers hear about a comment (TaskDetail.tsx:293). There is no way to pull someone else in. Proposal: Reuse QuickAdd's + or @ suggestion list (QuickAdd.tsx:101-104) in the comment field. A mention adds that person as a follower, notifies them, and shows as a chip that opens the PersonCard. The 'who will hear' line under the box should list them. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-tasks-3",
+      "round": "Feature gaps",
+      "area": "tasks",
+      "title": "Due dates have no time of day",
+      "detail": "Reference: Todoist: 'tomorrow 3pm' sets a due time, and Today sorts by it. Asana: due time, plus start dates and date ranges. Today: Todo.due is only YYYY-MM-DD (types.ts, Todo.due). QuickAdd reads a time (parsed.time, QuickAdd.tsx:275) but only puts it into the label or the reminder. Today cannot show what is due at 2pm. Proposal: Add an optional dueTime. Show it on the row's due chip and sort Today by time. The date picker gets a 'Add time' row. On phones, Today lists timed tasks first, in order. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-tasks-4",
+      "round": "Feature gaps",
+      "area": "tasks",
+      "title": "Checklist items aren't real subtasks",
+      "detail": "Reference: Asana subtasks have their own assignee, due date and comments, and show in the assignee's My Tasks. Todoist sub-tasks can have dates and labels and can be indented by dragging. Today: Checklist items are only text plus done: Todo.checklist {id,text,done} (types.ts; TaskDetail.tsx:271-288, 646-676). They can't be given to someone or dated. Briefs (briefId) are the only parent/child link. Proposal: Let a checklist item be promoted to a subtask: hold it and choose 'Make it a task', or give it a person or date. It then becomes a Todo with parentId, appears in that person's My tasks, and shows as 'Sub-task of X' with a link back. (effort large)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-tasks-5",
+      "round": "Feature gaps",
+      "area": "tasks",
+      "title": "No search inside Tasks",
+      "detail": "Reference: Todoist: search on phone and Cmd+K on desktop find tasks, comments and projects. Asana has a search bar with saved advanced searches. Today: The task list is rendered with search={false} (TaskViews.tsx:421). Browse (TasksView.tsx:315-380) has no search field. Finding an old task means scrolling through views. Proposal: Add a search field at the top of Browse on phones and a '/' shortcut on desktop. It matches titles, notes, checklist items and comments, done tasks included, grouped as Open and Done. (effort small)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-tasks-6",
+      "round": "Feature gaps",
+      "area": "tasks",
+      "title": "No labels or tags",
+      "detail": "Reference: Todoist labels (@errand, @waiting) can be used across projects, filtered, and added in Quick Add. Asana has tags and custom fields. Today: Todo has no labels field (types.ts). QuickAdd understands #project, +person, /stage, p1, reminders and repeats (QuickAdd.tsx:41) but has no labels. The Display filters (DisplaySheet.tsx:166-174) can only filter by who, stage and waiting. Proposal: Add workspace labels, typed in Quick Add with @label, shown as small chips on rows, and offered as a 'Label' filter in Display and in saved views. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-tasks-7",
+      "round": "Feature gaps",
+      "area": "tasks",
+      "title": "No 'blocked by' or dependencies",
+      "detail": "Reference: Asana: 'Blocked by' / 'Blocking' on a task. The waiting task shows a lock icon, and the assignee is notified when the blocker is done. Today: There is no dependency field on Todo (types.ts). A 'waiting' stage exists (DisplaySheet.tsx:174), but it doesn't say what the task is waiting on, and nothing happens when that work is finished. Proposal: Add a 'Waiting on' field that points to another task. Rows get a small lock icon. When the blocking task is done, notify the doer: 'X is done, you can start Y'. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-tasks-8",
+      "round": "Feature gaps",
+      "area": "tasks",
+      "title": "Files can only be attached through a comment",
+      "detail": "Reference: Asana: attachments on the task itself, with a paperclip at the top and a gallery of images. Todoist: a file on a comment, and attachments listed on the task. Today: Files only come in through comments (CommentFiles.tsx:86-118 used by TaskDetail.tsx:434, 581). The task itself has no Files row, so a brief's reference image is buried in the activity. Proposal: Add a 'Files' field chip to TaskDetail. It lists every file attached to the task or its comments as thumbnails, and shows a 'Files' count on the row. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-tasks-9",
+      "round": "Feature gaps",
+      "area": "tasks",
+      "title": "No reactions or likes on comments and tasks",
+      "detail": "Reference: Asana: like a task or comment (thumbs-up) to acknowledge without writing back. Slack-style emoji reactions are common. Today: History events are comments and logs only (TasksView.tsx:94-96, TaskDrawer.tsx:345-360). The only way to say 'seen' is to post another comment, which notifies everyone. Proposal: Hold a comment on phones, or hover it on desktop, to add a quick reaction (thumbs-up, check, eyes). It shows a small count and quietly notifies only the author. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-tasks-10",
+      "round": "Feature gaps",
+      "area": "tasks",
+      "title": "No start date or date range",
+      "detail": "Reference: Asana: start and due dates, so a task shows as a bar on the timeline or calendar. Todoist added 'deadline' alongside the date you plan to do it. Today: There is only Todo.due (types.ts). TaskCalendar.tsx shows each task on a single day, so a week-long piece of work looks like it is due that one day. Proposal: Add an optional start date in the date picker ('Starts'). The calendar draws a range, and Upcoming shows 'In progress' tasks on each day of the range. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-tasks-11",
+      "round": "Feature gaps",
+      "area": "tasks",
+      "title": "Repeat options are too limited",
+      "detail": "Reference: Todoist: 'every 2nd Monday', 'every 3 weeks', 'every last day', 'every! (from completion)'. Asana: custom periodic repeats. Today: Repeat is one of 'daily' | 'weekdays' | 'weekly' | 'monthly' (types.ts; TaskDetail.tsx:25-30; QuickAdd.tsx:32). Fortnightly reports or 'first Monday of the month' are impossible. Proposal: Add 'Custom…' to the repeat picker: every N days, weeks or months, which weekdays, and 'after I finish' versus 'on schedule'. Quick Add should parse 'every 2 weeks' and 'every mon, thu'. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-tasks-12",
+      "round": "Feature gaps",
+      "area": "tasks",
+      "title": "No keyboard shortcuts on desktop",
+      "detail": "Reference: Todoist: q quick add, t/m/y today/upcoming, e complete, Cmd+K, j/k navigation. Asana: Tab+Q, Tab+A assign, Tab+D due date. Today: Key handling exists only inside the QuickAdd field (QuickAdd.tsx:246-256). There are no global shortcuts in TasksView.tsx or TaskViews.tsx to add, complete or move between tasks. Proposal: Add desktop shortcuts: q or n new task, j/k move, Enter open, e or x done, d date, a assign, '/' search, and '?' to show the cheat sheet. Phones are unaffected. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-tasks-13",
+      "round": "Feature gaps",
+      "area": "tasks",
+      "title": "Can't see a teammate's task list in one tap",
+      "detail": "Reference: Asana: from a profile, 'View tasks' opens that person's My Tasks (filtered to what you can see). Used every day by leads. Today: The Display sheet can filter a view to one person (DisplaySheet.tsx:219, 264-273). That takes several taps inside a view. The workload rows (TasksView.tsx:823-833) go to the team scope, not to the person. Proposal: Add a 'people' scope, reached from the PersonCard ('See their tasks') and from the workload rows. It shows their open tasks grouped Late, Today and Later, with Reassign as the main action. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-tasks-14",
+      "round": "Feature gaps",
+      "area": "tasks",
+      "title": "No 'My tasks' inbox of new assignments",
+      "detail": "Reference: Asana: Inbox shows 'X assigned you Y' and 'Z commented'. My Tasks marks recently assigned tasks. Todoist shows collaboration notifications. Today: Today, Upcoming and My tasks (TasksView.tsx:319-321) filter by doer and date. A task someone just gave you with no date is buried in My tasks and nothing marks it new. Proposal: Add a 'New for you' strip at the top of My tasks, listing tasks assigned since you last looked, each with Accept (add a date) as its one action, and marking them seen once opened. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-projects-1",
+      "round": "Feature gaps",
+      "area": "projects",
+      "title": "Tapping a person opens nothing useful",
+      "detail": "Reference: Basecamp: tap any avatar to open a profile card with name, title, company, email, local time, and links to their activity and assignments. Monday: hovering or tapping an avatar shows a mini card with title, email, phone, local time and a Message button. Today: src/components/ProjectPeople.tsx:63-66 shows each member as a static PersonCell row (name only, sub={null}). The card avatars at ProjectsHome.tsx:236-242 sit inside the card's button, so tapping them just opens the project. Proposal: Use one shared PersonCard: a bottom sheet on phones and a popover on desktop. It shows the avatar, name, title, role on this project, email, phone, local time and their open tasks here. Message is the primary action; Call and Email are secondary. Make every Avatar in Projects open it, and stop the tap from bubbling up to the card. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-projects-2",
+      "round": "Feature gaps",
+      "area": "projects",
+      "title": "No project activity feed",
+      "detail": "Reference: Basecamp's Activity screen and per-project timeline list everything that happened today (tasks done, comments, files added). Monday has an Activity Log on each board. Today: The tab list at src/components/ProjectPhone.tsx:38-53 has Overview, Tasks, Workload, Chat, Mail, Meetings, Files, Notes, Tables, Logins and Guests, but no Activity tab. Proposal: Add an 'Activity' section to Overview: a list grouped by day, where each row names a person and what they did, and tapping a row opens that item. Add a filter for 'just me'. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-projects-3",
+      "round": "Feature gaps",
+      "area": "projects",
+      "title": "No 'My work' across projects",
+      "detail": "Reference: Monday's My Work and Basecamp's My Assignments and Hey! menu collect everything assigned to you and coming due across all projects. Today: ProjectsSidebar.tsx:28-115 lists projects and late counts only. Nothing shows my items across projects. Proposal: Add a 'Mine' scope to the Projects sidebar and phone home: my due items grouped by Today, This week and Later, each with a one-tap complete. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-projects-4",
+      "round": "Feature gaps",
+      "area": "projects",
+      "title": "Card avatars and the people stack are tap traps",
+      "detail": "Reference: In Monday, the people column is its own target: tapping it opens assignment or the person, not the item. Today: ProjectsHome.tsx:225 makes the whole card one button, so the owner and people avatars at lines 236-242 cannot be tapped on their own. Proposal: Make the avatar stack its own target that opens the People popover (desktop) or sheet (phone), with each person opening the PersonCard. (effort small)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-projects-5",
+      "round": "Feature gaps",
+      "area": "projects",
+      "title": "No status updates or project health",
+      "detail": "Reference: Monday has status updates and a project-health column, and Basecamp has a pinned project message. Stakeholders see 'On track / At risk' without digging. Today: The only states are active, lead, paused and ended (ProjectsHome.tsx:128-131). There is no health indicator or written update. Proposal: Add 'Post update' to Overview: pick a health colour, write a short note, and notify the team. Show the latest health on the card. (effort small)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-projects-6",
+      "round": "Feature gaps",
+      "area": "projects",
+      "title": "Search only matches project names",
+      "detail": "Reference: Basecamp and Monday search inside the project (tasks, comments, files) and filter by person or date. Today: ProjectsHome.tsx:215 filters cards by c.name.includes(q) only. Proposal: Make the search box match tasks, notes and files across projects, with results grouped by type. On phones it becomes a full-screen search. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-projects-7",
+      "round": "Feature gaps",
+      "area": "projects",
+      "title": "No progress signal",
+      "detail": "Reference: Basecamp hill charts show whether each piece of work is still being figured out or is getting done. Monday shows a progress (battery) column per group. Today: Project cards at ProjectsHome.tsx:223 only flag problems (late, not picked up, waiting). There is no percent-complete. Proposal: Add a progress bar to each card and to the Overview header (done ÷ total tasks). (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-projects-8",
+      "round": "Feature gaps",
+      "area": "projects",
+      "title": "No notification follow or mute per project",
+      "detail": "Reference: Basecamp lets you subscribe to or unsubscribe from each message board, to-do or file. Monday lets you mute boards. Today: Nothing in ProjectsHome.tsx, ProjectPhone.tsx or ProjectPeople.tsx controls notifications. Proposal: Add a bell button in the project header with three levels: All, Mentions only, Off. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-projects-9",
+      "round": "Feature gaps",
+      "area": "projects",
+      "title": "No pin or favourite projects",
+      "detail": "Reference: Basecamp pins projects to the top of Home, and Monday has Favorites. Today: The sidebar list at ProjectsSidebar.tsx:95-97 shows every live project in the same order. Proposal: Add a star on each card and sidebar row. Starred projects appear in a top 'Pinned' group. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-teams-1",
+      "round": "Feature gaps",
+      "area": "teams",
+      "title": "Tapping a person opens their team, not their profile",
+      "detail": "Reference: Slack: tapping any avatar or name opens a full profile (photo, title, pronouns, local time, status, email, phone, Message / Huddle / Call). Teams mobile: the profile card has Chat, Call, Email, org position. Today: People directory row jumps to the person's first team: src/components/teams/TeamsApp.tsx:293 (onClick={() => onOpen(theirs[0].id)}). People with no team are not tappable at all. Proposal: Add one shared PersonProfile sheet (a bottom sheet on phones, a popover on computers) showing avatar, name, title, email, teams, local time, and open/late task counts. The primary action is Message, which opens a Chat DM; Email and Call sit in a secondary row. Open it from every avatar and name in the app. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-teams-2",
+      "round": "Feature gaps",
+      "area": "teams",
+      "title": "Member row opens an action menu, not a real profile",
+      "detail": "Reference: Slack and Teams open a profile first. Admin actions such as remove or make owner are tucked away in an overflow menu. Today: MemberRow tap opens the action menu with a small header (name, title, email) and only Email, Make lead and Remove: TeamsApp.tsx:313-338. Proposal: Tapping a member opens the PersonProfile sheet, with Message as the primary action. Make lead and Remove move into the sheet's '...' overflow, and only managers see them. (effort small)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-teams-3",
+      "round": "Feature gaps",
+      "area": "teams",
+      "title": "No 'Message' or DM action anywhere in Teams",
+      "detail": "Reference: Slack: Message is the first button on a profile. MS Teams: a chat icon on every person card. Today: The member menu only offers mailto: TeamsApp.tsx:315. There is no link into the Chat app. Proposal: Add a Message action that opens or creates a Chat DM with that person (and a 'Message team' action that opens the team's channel). Use it as the profile's primary button. (effort small)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-teams-4",
+      "round": "Feature gaps",
+      "area": "teams",
+      "title": "Desktop member list rows are dead text",
+      "detail": "Reference: Slack desktop: clicking a name in the member list opens a profile popover. Linear: clicking a member shows their profile and issues. Today: Desktop PersonCell rows in the members tab have no click handler: TeamsApp.tsx:482-492. Proposal: Make the PersonCell clickable, opening the PersonProfile popover anchored to the row. The Make lead and remove buttons move into its overflow menu. (effort small)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-teams-5",
+      "round": "Feature gaps",
+      "area": "teams",
+      "title": "Avatar stacks are not tappable",
+      "detail": "Reference: Slack and Linear: hovering or tapping an avatar in a stack shows that person's card, and a '+N' opens the full list. Today: Team card avatar stack at TeamsApp.tsx:206 and task-row avatars at :585 are decorative only. Proposal: On a team card, tapping the stack opens the People tab. Tapping a single avatar in a task row opens that person's profile and does not open the task. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-teams-6",
+      "round": "Feature gaps",
+      "area": "teams",
+      "title": "No presence, status or local time",
+      "detail": "Reference: Slack: green or away dot, custom status emoji and text, 'Away until', local time on the profile. MS Teams: Available, Busy, In a meeting, Out of office. Today: Avatar shows no presence. User rows show only title or email: TeamsApp.tsx:294-297, 339-346. Proposal: Add a presence dot on Avatar (derived from Calendar busy time and Meet). Let people set a status message and 'out until' date in Settings. Show local time and status on the profile. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-teams-7",
+      "round": "Feature gaps",
+      "area": "teams",
+      "title": "Can't reassign straight from 'Who's busy'",
+      "detail": "Reference: Linear: drag or reassign issues from a member's view. Asana workload: drag tasks between people. Today: Expanded workload list only opens the task: TeamsApp.tsx:633. Proposal: Long-press (phone) or right-click (desktop) a mini task to get 'Give to...' with a people picker, plus Undo. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-teams-8",
+      "round": "Feature gaps",
+      "area": "teams",
+      "title": "No team channel or conversation",
+      "detail": "Reference: Slack user groups link to default channels. MS Teams: every team has channels as its core surface. Today: Team tabs are only People, Tasks, Who's busy and Settings: TeamsApp.tsx:405-411. Proposal: Auto-create a Chat channel per team. Put a 'Chat' button in the team header that opens it, and add new members to it automatically. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-teams-9",
+      "round": "Feature gaps",
+      "area": "teams",
+      "title": "Add people is a tick list with no invite or bulk paste",
+      "detail": "Reference: Slack: add by name or email, paste several emails, and invite external people. MS Teams: add a member or guest by email. Today: AddPeople shows existing users in a popover, ticking one at a time: TeamsApp.tsx:527-538. Proposal: Use a sheet with one search field that accepts names or pasted emails. Unknown emails become invites. The primary button is 'Add N people'. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-teams-10",
+      "round": "Feature gaps",
+      "area": "teams",
+      "title": "No contact actions: call or meet",
+      "detail": "Reference: Slack: Huddle. MS Teams: Video/Audio call on every card. Today: No call or meet entry exists in Teams. The only contact action is Email: TeamsApp.tsx:315. Proposal: Put 'Start a Meet' and 'Schedule' (which opens Calendar with the person pre-filled) as secondary actions on the profile and team header. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-teams-11",
+      "round": "Feature gaps",
+      "area": "teams",
+      "title": "Team page has no overview or activity",
+      "detail": "Reference: Linear: team page shows active cycle progress and recent activity. MS Teams: Posts feed. Today: Team opens on the People tab: TeamsApp.tsx:404. Proposal: Make the default tab an Overview: the late count, this week's work, done this week (already computed at :561), and recent activity. Its primary action is 'New task for this team'. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-teams-12",
+      "round": "Feature gaps",
+      "area": "teams",
+      "title": "No 'New task' inside a team",
+      "detail": "Reference: Linear: press C or tap + inside a team to create an issue already set to that team. Today: WorkTab lists tasks but has no create button: TeamsApp.tsx:543-590. Proposal: Add a floating + on phones (a header button on desktop) that creates a task with teamId preset. Keep it the single primary action on the Tasks tab. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-tables-1",
+      "round": "Feature gaps",
+      "area": "tables",
+      "title": "Tapping a person in a cell does nothing useful",
+      "detail": "Reference: Notion and Airtable open a hover or popover card for a Person/Collaborator value with avatar, name and email. Slack-style cards also show title, local time and Message/Call buttons. Today: src/components/tables/Cell.tsx:85-93 (person) and :153-160 (creator) render only an Avatar and name in a plain span. There is no click handler, so a click falls through to the cell or opens the row. Proposal: Make the person chip a button that opens a shared ProfileCard: a popover on desktop, a bottom sheet on phones. It shows name, role, email and local time, with one main button, Message (opens Chat DM), plus Email and Call. Reuse the same card for comment avatars and Created by. (effort small)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-tables-2",
+      "round": "Feature gaps",
+      "area": "tables",
+      "title": "No @mentions or notifications in row comments",
+      "detail": "Reference: In Airtable and Notion, typing @ in a record comment picks a teammate. That person gets notified with a link back to the record. You can also follow a record. Today: src/components/tables/RecordDrawer.tsx:197-235 has a plain input that posts text. There is no @ picker, no notification and no follow. Comment author avatars (line 207) can't be clicked either. Proposal: Add an @ picker to the comment box using PeoplePicker. On send, notify the mentioned people in Home with a deep link to the row. Commenting auto-follows the row. A bell toggle in the drawer header lets you follow or unfollow. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-tables-3",
+      "round": "Feature gaps",
+      "area": "tables",
+      "title": "Deleted rows are gone for good, with no trash",
+      "detail": "Reference: Airtable has record trash and base snapshots. Notion has a Trash where deleted pages can be restored for 30 days. Today: src/components/tables/TableScreen.tsx:546 deletes rows directly. Undo (TableScreen.tsx:138-142) lives only in memory, holds 40 steps, and is lost on reload or on another device. Proposal: Soft-delete rows into a 30-day 'Recently deleted' list, reached from the table's ⋯ menu, with Restore as the main action. After a delete, show a toast with Undo, which matters most on phones where Ctrl+Z doesn't exist. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-tables-4",
+      "round": "Feature gaps",
+      "area": "tables",
+      "title": "No form view to collect rows from people outside the table",
+      "detail": "Reference: Airtable Form view and Notion Forms give you a shareable public URL with chosen fields, required flags and a thank-you message. Each answer becomes a row. Today: src/components/tables/viewKinds.ts:7-14 lists only grid, board, list, gallery, calendar and timeline. The only outside intake is the webhook in Automations.tsx:529-530, which needs a developer. Proposal: Add a Form view kind. It lists fields with required toggles and help text, and has one primary button: Copy form link. The public page is phone-first and creates a row on submit, then any rules run as usual. (effort large)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-tables-5",
+      "round": "Feature gaps",
+      "area": "tables",
+      "title": "Photos and files in cells can't be opened full size",
+      "detail": "Reference: In Airtable, tapping an attachment opens a full-screen previewer you can swipe through, with download. Notion opens images in a lightbox. Today: src/components/tables/Cell.tsx:138-151 shows up to 4 thumbnails and +N. There is no viewer, so a tap opens the row or editor. Proposal: Tapping a thumbnail opens a full-screen viewer. Swipe between files on phones and use arrow keys on desktop. Download is the main action, Share the second. PDFs open in the browser viewer. (effort small)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-tables-6",
+      "round": "Feature gaps",
+      "area": "tables",
+      "title": "Comments can't be edited, deleted or reacted to",
+      "detail": "Reference: Notion and Airtable let you edit or delete your own comment, add emoji reactions, and resolve a thread. Today: src/components/tables/RecordDrawer.tsx:203-213 renders comments as read-only text with no menu. Proposal: Long-press on phones (a ⋯ menu on hover on desktop) gives Edit, Delete and React. Show reactions as small chips under the comment. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-tables-7",
+      "round": "Feature gaps",
+      "area": "tables",
+      "title": "No date reminders",
+      "detail": "Reference: Notion date properties have 'Remind: on day / 1 day before'. Airtable automations trigger when a date arrives. Today: Date cells only turn red when late (Cell.tsx:104-106). There is no reminder option on the field or in Automations triggers (a grep for reminder finds nothing). Proposal: In the date field menu, add 'Remind the Person field X days before/on the day', which sends a Home notification with a link to the row. Add a 'When a date arrives' trigger to Automations. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-tables-8",
+      "round": "Feature gaps",
+      "area": "tables",
+      "title": "No personal or private views",
+      "detail": "Reference: Airtable has personal views. In Notion, filters you apply stay yours until you choose 'Save for everyone'. Today: View changes go to the shared definition (TableScreen.tsx:168-180). Your own quick filter changes what teammates see. Proposal: Keep filter, sort and search changes local to each viewer by default. A 'Save for everyone' pill appears when the view differs. Add a 'My views' section to ViewTabs. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-tables-9",
+      "round": "Feature gaps",
+      "area": "tables",
+      "title": "Can't freeze columns or choose row height or wrapping",
+      "detail": "Reference: Airtable lets you drag the freeze line and pick short, medium, tall or extra-tall rows. Notion lets you wrap cells per view. Today: GridView.tsx has no freeze or row-height setting (a grep for freeze, frozen and rowHeight finds nothing). Only the first column sticks. Proposal: In the column ⌄ menu (ColumnMenu.tsx), add 'Freeze up to here'. In the view's settings, add a Row height choice (Short/Tall/Wrap) saved per view. On phones, keep cards as they are. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-tables-10",
+      "round": "Feature gaps",
+      "area": "tables",
+      "title": "No charts or summary dashboard",
+      "detail": "Reference: Airtable Interfaces show number tiles and bar/pie charts over a table. Notion added a Chart view in 2024. Today: Only footer calcs exist (core.ts:457-471: count, sum, avg and so on). There is no chart view (viewKinds.ts:7-14). Proposal: Add a Chart view: bar, line or donut, grouped by a choice, person or date field, showing count or sum. Tapping a bar opens the filtered rows. On phones it is one chart per screen with a big total on top. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-tables-11",
+      "round": "Feature gaps",
+      "area": "tables",
+      "title": "Can't share a single view publicly or lock it",
+      "detail": "Reference: Airtable has shared view links (read-only, optionally password-protected) and locked views. Notion has 'Publish to web' and locked databases. Today: Sharing is only the client-guest share (TableScreen.tsx:577, requires tb.clientId). Any edit to a view changes it for everyone (patchShared, TableScreen.tsx:168). Proposal: Add Share view in the view tab menu. Its main button copies a read-only link, with options to allow search and download. Also add 'Lock this view' so filters and sorts change only for you until you choose to save. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-tables-12",
+      "round": "Feature gaps",
+      "area": "tables",
+      "title": "Copy link to a row is hard to find on phones and doesn't land well",
+      "detail": "Reference: Airtable and Notion have Copy link to record on the record page. The link opens the record straight away on any device. Today: Copy link exists in RecordDrawer.tsx and TableScreen.tsx, but it is buried in a menu. There is no native share sheet in the row menu (around TableScreen.tsx:546). Proposal: In the phone row page header, add a Share button that calls navigator.share with the deep link, falling back to Copy. Make sure the link opens the row page directly, even when you're logged out (it asks you to log in and then opens the row). (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-tables-13",
+      "round": "Feature gaps",
+      "area": "tables",
+      "title": "No rich text body on a row",
+      "detail": "Reference: Every Notion database row is a full page with headings, checklists and images. Airtable has rich text long-text fields. Today: RecordDrawer.tsx:161 shows fields, links, comments and history. Long text is plain text. There is no page body. Proposal: Give the row page a Notes body under the fields, reusing the Notes app's editor, with checklists, headings and pasted images. On phones it sits below the fields as a 'Notes' section. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-tables-14",
+      "round": "Feature gaps",
+      "area": "tables",
+      "title": "No sub-items or dependencies between rows",
+      "detail": "Reference: Notion has sub-items and 'Blocked by' dependencies on a timeline. Airtable timeline shows dependency arrows. Today: There is no parent/child or dependency handling (a grep finds nothing). TimelineView.tsx draws independent bars only. Proposal: Add 'Sub-items' as a built-in self-link that indents children in grid and list and shows a progress count. On the timeline, add an optional 'Blocked by' link drawn as arrows, and warn when a bar is moved before its blocker ends. (effort large)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-calendar-1",
+      "round": "Feature gaps",
+      "area": "calendar",
+      "title": "Tapping a guest does nothing: no person card",
+      "detail": "Reference: Google Calendar: tap a guest to get a hover/sheet card with name, email, Email and Chat buttons, and their calendar. Notion Calendar shows the person card with local time and quick 'Schedule with'. Today: Guests render as plain rows with no handler: desktop src/components/calendar/EventDetail.tsx:216-224 (div.ev-guest), phone EventDetail.tsx:481-500 (div.dr-guest). Proposal: Make each guest row a button that opens the shared person sheet (same one Chat/Teams should use): avatar, name, title, email, local time. One primary action 'Message', secondary Email / Call / 'Find a time'. Bottom sheet on phones, popover on desktop. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-calendar-2",
+      "round": "Feature gaps",
+      "area": "calendar",
+      "title": "No search across events",
+      "detail": "Reference: Google Calendar has a search icon in the top bar (phone and desktop) finding events by title, guest, place, past and future. Notion Calendar has Cmd+K. Today: The Calendar top bar is mounted with search={false}, src/components/CalendarView.tsx:357; there is no event search anywhere in the calendar folder. Proposal: Turn on the top bar search: results as a schedule-style list grouped by date. Tapping one jumps the cursor to that day and opens the event. On desktop, '/' focuses it. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-calendar-3",
+      "round": "Feature gaps",
+      "area": "calendar",
+      "title": "No 'Find a time' / see guests' availability",
+      "detail": "Reference: Google 'Find a time' lays guests' calendars side by side and suggests free slots. Notion Calendar overlays a teammate's calendar and lets you share free slots. Today: GuestPicker.tsx:16-117 only adds or removes people; busyOf (CalendarView.tsx:203) feeds only the grid, so nobody's free/busy is visible while you pick a time in EventForm.tsx. Proposal: Once guests are added in EventForm, show a 'Find a time' row: a one-day strip with everyone's busy blocks and the first 3 free slots as chips. Tapping a chip sets start/end. (effort large)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-calendar-4",
+      "round": "Feature gaps",
+      "area": "calendar",
+      "title": "No 'Message guests' / 'Email guests' from an event",
+      "detail": "Reference: Google Calendar event detail has 'Email guests' (and Chat guests in Workspace). Today: The event overflow menu (CalendarView.tsx:276-312) has Open invite, Edit, Duplicate, Move to tomorrow, Copy link, Delete; the only mail link is 'Open related email' to an existing thread (EventDetail.tsx:272-273). Proposal: Add 'Message guests' to the More menu and next to the guests count: opens a Chat group or a Mail draft with all guests in To and the event title as subject. (effort small)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-calendar-5",
+      "round": "Feature gaps",
+      "area": "calendar",
+      "title": "Guests can't propose a new time",
+      "detail": "Reference: Google Calendar: 'Propose a new time' under RSVP; the organiser sees and accepts it. Outlook/Notion support the same. Today: Rsvp at EventDetail.tsx:94-118 has Yes / No / Maybe only. Proposal: Add a fourth choice 'Suggest a time' that opens a time picker and sends the proposal with a note; the organiser sees it as a chip on the guest row with 'Accept'. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-calendar-6",
+      "round": "Feature gaps",
+      "area": "calendar",
+      "title": "Guest list doesn't show who's optional or let organiser see emails",
+      "detail": "Reference: Google marks optional guests, shows each guest's email on hover, and lets you copy all guest emails. Today: Phone rows show name and 'Organiser' only (EventDetail.tsx:497-499); desktop only name and badge (EventDetail.tsx:218-223). GuestPicker has no optional flag. Proposal: Add an 'Optional' toggle per guest in GuestPicker, show 'Optional' under the name, and 'Copy all emails' in the guests row menu. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-calendar-7",
+      "round": "Feature gaps",
+      "area": "calendar",
+      "title": "No working hours / out-of-office auto-decline",
+      "detail": "Reference: Google Calendar: working hours and location per day, greyed hours outside them, warnings when inviting someone outside hours, and Out of office events that auto-decline. Today: EventForm has an 'ooo' kind (EventForm.tsx:488 disables all-day for it) but no working-hours setting and no greying in TimeGrid.tsx; no auto-decline. Proposal: Settings > Calendar: working hours per weekday. Shade outside hours in TimeGrid, warn in GuestPicker when a guest is outside theirs, and let OOO auto-decline new invites with a message. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-calendar-8",
+      "round": "Feature gaps",
+      "area": "calendar",
+      "title": "No second time zone on the grid",
+      "detail": "Reference: Google and Notion Calendar show a second (or more) time-zone column next to the hours; Notion also shows teammates' local times. Today: Time zone is only per event (EventForm.tsx:32, EventDetail.tsx:157-167); TimeGrid.tsx has a single hour gutter. Proposal: Settings toggle 'Show a second time zone': adds a narrow gutter on desktop and a tap-to-switch label on phones. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-calendar-9",
+      "round": "Feature gaps",
+      "area": "calendar",
+      "title": "Reminders: one only, no email or default per calendar",
+      "detail": "Reference: Google allows several notifications per event (e.g. 1 day and 10 min), as push or email, and default reminders per calendar. Today: A single 'remind' select, EventForm.tsx:310 and 569; detail shows one 'Reminder' row, EventDetail.tsx:233. Proposal: Allow up to 3 reminders with '+ Add reminder', and a default reminder per calendar in the Calendars drawer. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-calendar-10",
+      "round": "Feature gaps",
+      "area": "calendar",
+      "title": "Phone detail rows for place/reminder/notes jump to the edit form",
+      "detail": "Reference: Google: tapping the location opens Maps; tapping description links opens them; reminder editing is inline. Today: PhoneDetail rows MapPin, Bell, Users, notes all call p.onEdit (EventDetail.tsx:452, 457, 462, 507), so tapping an address opens the whole form. Proposal: Location row opens directions (maps link) with a copy button; empty rows keep 'Add …'; notes render links as tappable. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-calendar-11",
+      "round": "Feature gaps",
+      "area": "calendar",
+      "title": "Video call must be pasted; no one-tap Meet link",
+      "detail": "Reference: Google adds a Meet link with one tap 'Add Google Meet video conferencing'; Notion adds Zoom/Meet automatically. Today: The video field is a text input 'Paste a Meet, Zoom or Teams link', EventForm.tsx:280 and 550. Proposal: Primary chip 'Add sprint2go Meet call' that generates a Meet room link; keep paste as secondary. (effort small)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-calendar-12",
+      "round": "Feature gaps",
+      "area": "calendar",
+      "title": "No 'Up next' join reminder outside calendar",
+      "detail": "Reference: Notion Calendar's menu-bar shows the next meeting with Join; Google sends 'starting now' notifications with Join. Today: UpNext.tsx (52 lines) shows only inside the calendar view. Proposal: Surface the next meeting with a Join button on Home and as a push/notification one minute before start. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-notes-1",
+      "round": "Feature gaps",
+      "area": "notes",
+      "title": "Tapping an @person mention launches a mail client instead of opening their profile",
+      "detail": "Reference: Notion: hovering or tapping an @person mention shows a card with avatar, name, email and role. Slack and Teams open a profile sheet with title, local time, Message and Call. Today: MentionPanel onPick inserts a plain mailto link (src/components/notes/NoteEditor.tsx:362). NoteText's click handler only intercepts /notes/ links and task pills (NoteText.tsx:409-416), so tapping @Ana opens the device's mail app or does nothing. The sanitizer keeps only href/style/class/data-task (noteHtml.ts:13), so no user id is stored. Proposal: Store mentions as <a class=\"note-person\" data-user=\"id\">. A tap opens the shared person sheet used across the app: avatar, title, team, local time and email. Message is the primary button, Call and Email are secondary. On desktop the same card shows on hover or click. (effort small)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-notes-2",
+      "round": "Feature gaps",
+      "area": "notes",
+      "title": "No slash (/) command menu",
+      "detail": "Reference: In Notion, typing / opens a filterable menu of blocks (heading, to-do, table, callout, toggle, page, mention, date). In Apple Notes the Aa and checklist buttons sit above the keyboard. Today: Markdown shortcuts work at the start of a line (NoteText.tsx:352-376). Blocks are inserted from the toolbar or the Format sheet (NoteSheets.tsx:58-150). Typing / does nothing. Proposal: Typing / at the start of a line or after a space opens a small inline list with the same actions as FormatPanel plus Task, Mention, Date and Divider. It filters as you type and Enter inserts. On a phone it sits above the keyboard. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-notes-3",
+      "round": "Feature gaps",
+      "area": "notes",
+      "title": "Typing @ does not trigger mentions inline",
+      "detail": "Reference: In Notion, Slack and Apple Notes (shared notes), typing @ opens an inline people picker right at the caret. Today: Mentions open only from the toolbar's @ button, which brings up a full tall sheet (NoteBar.tsx:54, NoteSheets.tsx:184-215). Proposal: Typing @ opens a compact popover at the caret listing people first, then notes, filtered by the characters typed. Keep the sheet as a fallback for the toolbar button. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-notes-4",
+      "round": "Feature gaps",
+      "area": "notes",
+      "title": "No images, files, scans or attachments",
+      "detail": "Reference: Apple Notes: camera, photo library, document scanner and file attachments shown inline. Notion: image and file blocks, plus drag-and-drop. Today: The paste handler sanitizes HTML only (NoteText.tsx:405-407). The sanitizer has no img or src attribute (noteHtml.ts:13). Neither NoteBar nor FormatPanel has a photo or attach action. Proposal: Add a Photo/File button to NoteBar (camera and scan on phones) and support image paste and drop. Upload to Drive and insert an inline image or file chip that opens Drive's preview. (effort large)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-notes-5",
+      "round": "Feature gaps",
+      "area": "notes",
+      "title": "No folders, tags or nested pages",
+      "detail": "Reference: Apple Notes: folders, smart folders and #tags with a tag browser. Notion: nested pages in a sidebar tree. Today: The only grouping is the project (client) facet plus private/team/shared filters (NotesList.tsx:23-24, 254-259). MoveSheet moves a note only to a project (NoteSheets.tsx:220). Proposal: Make #word in a note a tag, and show tags as chips in the search facets (NotesList.tsx:254) and in the desktop filter. This avoids a full folder tree and keeps one primary action. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-notes-6",
+      "round": "Feature gaps",
+      "area": "notes",
+      "title": "No version history",
+      "detail": "Reference: Notion's Page history lets you view and restore earlier versions. Apple Notes shows 'Show Highlights' for edits by others in shared notes. Today: The footer shows only who last edited the note (NoteEditor.tsx:216). Nothing lists or restores earlier versions. Proposal: Add a 'History' item to the note menu (noteMenu.ts). It opens a sheet of snapshots (by person and time) with a preview and Restore as the primary action. (effort large)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-notes-7",
+      "round": "Feature gaps",
+      "area": "notes",
+      "title": "No comments on shared notes",
+      "detail": "Reference: Notion: select text, then Comment, with threads, resolve and @ notifications. Apple Notes shared notes show activity and highlights. Today: Team notes can be edited and mention people (NoteEditor.tsx:363), but there is no comment or discussion layer anywhere in src/components/notes. Proposal: Selecting text shows a 'Comment' action that anchors a thread to the selection. A count badge sits in the note top bar, and on a phone the threads open in a sheet. (effort large)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-notes-8",
+      "round": "Feature gaps",
+      "area": "notes",
+      "title": "Share sheet stops at private/everyone, with no per-person sharing",
+      "detail": "Reference: Apple Notes and Notion invite specific people with view or edit rights and show their avatars. Today: ShareSheet offers only 'Only me' or everyone in the company or project (NoteSheets.tsx:252-285). Proposal: Add 'Specific people' with a people picker and a can-edit/can-view toggle per person. Show the avatars of people who have access in the note-who chip (NoteEditor.tsx:374). (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-notes-9",
+      "round": "Feature gaps",
+      "area": "notes",
+      "title": "No presence or live collaborator indicator",
+      "detail": "Reference: Notion and Google Docs show avatars of who is viewing and their cursors. Apple Notes shows who is in a shared note. Today: Remote changes simply replace the content when the note is not focused (NoteText.tsx:86). Nothing shows who else has the note open. Proposal: Show a small avatar stack of current viewers in the note top bar. Tapping an avatar opens the same person sheet as mentions. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-notes-10",
+      "round": "Feature gaps",
+      "area": "notes",
+      "title": "No tables",
+      "detail": "Reference: Apple Notes and Notion both have tables (Notion also has databases). Today: Block options are P, H1-H3, quote, code and callout (NoteText.tsx:19, NoteSheets.tsx:114-120). There are no tables. Proposal: Add a simple table block (add a row or column from a cell menu), inserted from FormatPanel and the slash menu. Link out to the Tables app for anything heavier. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-notes-11",
+      "round": "Feature gaps",
+      "area": "notes",
+      "title": "No toggle or collapsible sections",
+      "detail": "Reference: Notion has toggle blocks and collapsible headings. Apple Notes can collapse sections under headings. Today: Headings are static blocks (NoteText.tsx:159-166). Long notes cannot be folded. Proposal: Add a chevron that collapses everything under an H1-H3 until the next heading of the same level, with the folded state saved per viewer. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-notes-12",
+      "round": "Feature gaps",
+      "area": "notes",
+      "title": "No templates",
+      "detail": "Reference: Notion has page templates and template buttons. Apple Notes has none, but its Quick Note can be launched from anywhere. Today: New note opens empty (NotesList.tsx:182). Duplicate (noteMenu.ts:28) is the only workaround. Proposal: Add a 'Save as template' menu item. The new-note button keeps its blank default, and a long-press on it offers templates (meeting notes, 1:1, brief). (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-notes-13",
+      "round": "Feature gaps",
+      "area": "notes",
+      "title": "No export, print or send-as-email",
+      "detail": "Reference: Notion exports to PDF, Markdown and HTML. Apple Notes has Share, Print, Export as PDF and Send copy. Today: The note menu has only Copy link and Duplicate besides pin, move, share and delete (noteMenu.ts:24-30). Proposal: Add 'Send a copy' (opens a Mail compose with the note's HTML) and 'Export PDF / Markdown' to the note menu's copy group. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-notes-14",
+      "round": "Feature gaps",
+      "area": "notes",
+      "title": "No dates or reminders in notes",
+      "detail": "Reference: Notion's @today and @remind put an inline date and send a notification. Apple Notes checklist items can turn into Reminders. Today: A line can become a task (NoteEditor.tsx:118-130), but there is no inline date chip or reminder. Proposal: Add @date and @remind in the mention picker. They insert a date chip, and a reminder fires a notification that opens the note at that line. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-notes-15",
+      "round": "Feature gaps",
+      "area": "notes",
+      "title": "Mention picker: people rows give no context",
+      "detail": "Reference: Slack and Notion pickers show avatar, title and online status so you pick the right person. Today: MentionPanel lists users with name only plus notes (NoteSheets.tsx:196-205). Proposal: Show each person's title and team on the second line and sort recent collaborators on this note first. (effort small)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "FG-drive-1",
+      "round": "Feature gaps",
+      "area": "drive",
+      "title": "Tapping the uploader/owner name or avatar opens nothing",
+      "detail": "Reference: Google Drive: owner avatar in Details/Activity opens a people card (name, email, Message/Email/Meet). Dropbox: member avatar shows name, email and actions. Today: Uploader is only text in the meta line ('{name} uploaded') built at src/components/DriveView.tsx:215-219; there is no profile card, and nothing on that line can be tapped. Proposal: Make the uploader name a tap target that opens the shared person card from Chat/Teams as a bottom sheet on phones and a popover on desktop. It shows name, title, email and local time, with Message as the primary action and Call as the secondary. (effort small)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-drive-2",
+      "round": "Feature gaps",
+      "area": "drive",
+      "title": "Real sharing (people + permissions) missing; only 'copy link'",
+      "detail": "Reference: Both apps: Share opens a sheet to add people/teams, set Viewer/Commenter/Editor, and set link access (restricted, anyone in org, anyone). Dropbox adds expiry and a password. Today: shareLink at DriveView.tsx:148-151 only copies a URL. It is hidden for folders and data: URLs (DriveView.tsx:173,176). Proposal: Add a Share sheet with a people picker drawn from Teams, a role dropdown and link access. Keep Copy link as the primary button. Allow sharing folders as well. (effort large)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-drive-3",
+      "round": "Feature gaps",
+      "area": "drive",
+      "title": "Details/info pane missing on desktop",
+      "detail": "Reference: Google Drive desktop: an 'i' toggles a right-side panel with Details and Activity (who, when, size, location, access). Dropbox has a similar side panel. Today: Details exists only in the phone sheet (DriveView.tsx:241). The desktop menu at DriveView.tsx:166-182 has no Details entry. Proposal: On desktop, add Details to the right-click and '...' menus, and an 'i' toggle in the toolbar that opens a side panel reusing the phone details content. (effort small)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-drive-4",
+      "round": "Feature gaps",
+      "area": "drive",
+      "title": "No sorting on desktop",
+      "detail": "Reference: Both apps let you sort by Name, Last modified and Size from the column headers or a sort menu, with folders kept first. Today: Sort (name/modified/size) exists only in the phone layout (DriveView.tsx:~492-500, 604). Desktop always sorts by name, or by date in fixed sections (DriveView.tsx:82-97). Proposal: Make the desktop list-view column headers clickable for sorting, add the same sort menu in grid view, and reuse the sorter(). (effort small)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-drive-5",
+      "round": "Feature gaps",
+      "area": "drive",
+      "title": "No multi-select / bulk actions",
+      "detail": "Reference: Long-press on phone, or Ctrl/Shift-click and checkboxes on desktop, then a bulk bar with Share, Download (as zip), Move, Star and Trash. Today: Every action works on one item at a time. Row actions are per item (DriveView.tsx:124-145), and Trash has no 'Empty trash'. Proposal: Long-press on phones enters selection mode, and checkboxes plus Shift and Ctrl work on desktop. A contextual top bar offers Move, Download, Trash and Star. Add an 'Empty trash' action in Trash. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-drive-6",
+      "round": "Feature gaps",
+      "area": "drive",
+      "title": "Document preview is a placeholder",
+      "detail": "Reference: Both apps render PDFs, Office files, text and code inline, with page scroll and search. Today: DrivePreview.tsx:108-112 shows 'Previews for documents arrive with the real file server.' Proposal: Render PDFs with pdf.js and text or code with a viewer. Show Office files through a converted PDF. Download stays the one primary action. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-drive-7",
+      "round": "Feature gaps",
+      "area": "drive",
+      "title": "Preview lacks Share/Details/Open-with actions",
+      "detail": "Reference: The Google Drive preview top bar has Share, Open with, Download, a details 'i' and a '...' menu (Rename, Move, Make a copy). Today: The DrivePreview.tsx:59-95 header has only email, Download, Star, Trash and Close. Proposal: Add Share as the primary action, plus Details and a '...' menu with Rename, Move and Copy link, reusing menuFor. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-drive-8",
+      "round": "Feature gaps",
+      "area": "drive",
+      "title": "Search is name-only with no filters",
+      "detail": "Reference: Google Drive offers chips for Type, People, Modified and Location, searches inside documents (OCR), and suggests recent searches. Dropbox has full-text search and filters. Today: Search is a substring match on the name across live items (DriveView.tsx:82). Proposal: Under the search pill, add filter chips for Type, Person (from uploadedBy) and Modified, plus recent searches. Add content search later on the server. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-drive-9",
+      "round": "Feature gaps",
+      "area": "drive",
+      "title": "No Activity/version history",
+      "detail": "Reference: Google Drive has an Activity tab and 'Manage versions'. Dropbox keeps version history and lets you restore. Today: Items carry only a modified date. There is no activity log or versions in DriveView.tsx and DrivePreview.tsx. Proposal: Add an Activity tab in Details (uploaded, renamed, moved, shared, by whom, with tappable avatars). Uploading a file with the same name creates a version that can be restored. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-drive-10",
+      "round": "Feature gaps",
+      "area": "drive",
+      "title": "Comments on files missing",
+      "detail": "Reference: Google Drive lets people comment on any previewed file and @mention them, and the mention notifies them. Today: There are no comments in DrivePreview.tsx. The only related link is 'Open related email' (DrivePreview.tsx:68). Proposal: Add a comment drawer in the preview that reuses Chat's composer and @mentions, and posts notifications to Home. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-drive-11",
+      "round": "Feature gaps",
+      "area": "drive",
+      "title": "Drag-and-drop move between folders and upload progress",
+      "detail": "Reference: On desktop you drag files onto folders or breadcrumbs to move them, and an upload tray shows progress with cancel and retry. Folder upload is supported. Today: Drop works only for uploading into the pane (DriveView.tsx:294-305). Moving needs the Move sheet, and there is no visible progress tray or folder upload. Proposal: Make folder tiles and breadcrumbs drop targets for moving. Add a bottom-corner upload tray with per-file progress, and accept dropped folders. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-drive-12",
+      "round": "Feature gaps",
+      "area": "drive",
+      "title": "Offline / Available offline on phones",
+      "detail": "Reference: Google Drive has 'Make available offline' and Dropbox has 'Make available offline' plus offline folders. Today: There is no offline option in the phone sheet (DriveView.tsx:226-242). Proposal: Add 'Available offline' to the phone action sheet and cache the file with the service worker. Show a small badge on the row. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-drive-13",
+      "round": "Feature gaps",
+      "area": "drive",
+      "title": "Scan document only takes a raw photo",
+      "detail": "Reference: Google Drive Scan and the Dropbox doc scanner detect edges, crop, enhance and combine several pages into one PDF. Today: 'Take a photo' at DriveView.tsx:69 uploads the raw camera image. Proposal: Change it to 'Scan': capture, then auto-crop, add more pages and save as a PDF, with Save as the one primary action. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-drive-14",
+      "round": "Feature gaps",
+      "area": "drive",
+      "title": "Suggested/Quick access and pinned folders",
+      "detail": "Reference: The Google Drive home shows Suggested files and folders. Dropbox has Starred at the top of Home. Today: Recent is just the last 30 files by date (DriveView.tsx:86-87), and there is no suggested strip. Proposal: At the top of My Drive, add a horizontal strip of suggested and recent files, with starred folders pinned, so the most likely file is one tap away. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-drive-15",
+      "round": "Feature gaps",
+      "area": "drive",
+      "title": "Make a copy / duplicate and keyboard shortcuts",
+      "detail": "Reference: Both apps offer 'Make a copy'. Google Drive desktop supports shortcuts: Delete, F2 to rename, Shift+Z, '/' to search and arrow keys. Today: Menus have no copy action (DriveView.tsx:174-182). Only the preview handles arrow keys and Esc (DrivePreview.tsx:~30-36). Proposal: Add 'Make a copy' to the menus. On desktop, add F2, Delete, '/', Enter and arrow-key navigation over the grid. (effort small)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "FG-drive-16",
+      "round": "Feature gaps",
+      "area": "drive",
+      "title": "Shared section is phone-only and lacks a 'shared by' grouping",
+      "detail": "Reference: Google Drive's 'Shared with me' (desktop and phone) groups items by person and lets you filter by sharer. Today: 'shared' is marked phone-only at DriveSidebar.tsx:14, so desktop users can't reach it. Proposal: Show Shared on desktop too, group it by person (tapping the avatar opens the profile card) and add a 'Shared by' filter. (effort small)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "FG-drive-17",
+      "round": "Feature gaps",
+      "area": "drive",
+      "title": "Restore from trash location feedback and an undo toast",
+      "detail": "Reference: Moving a file to the trash shows an 'Undo' snackbar right away, and restoring it shows where it went. Today: onTrash is called directly (DriveView.tsx:142, DrivePreview.tsx:85) with no undo found in these files. Proposal: After Trash, Move or Rename, show a toast with Undo. After a restore, the toast offers 'Show in folder'. (effort small)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "FG-meet-1",
+      "round": "Feature gaps",
+      "area": "meet",
+      "title": "Tapping a person does nothing: no profile card",
+      "detail": "Reference: Google Meet, Otter and Read AI: tap a participant or speaker name to open a card with photo, title, email, local time, and Message/Email/Call buttons. Otter also shows 'meetings with this person'. Today: People chips are plain spans with no onClick (src/components/MeetApp.tsx:715-718). Transcript speaker names are bold text inside a row button that seeks the audio (MeetApp.tsx:875-877), so tapping a name jumps playback. Proposal: Make the person chip and speaker name open a shared PersonCard: a bottom sheet on phones, a popover on desktop. It shows avatar, name, role/title, email, local time and a 'Meetings together' count. The one primary button is Message (opens Chat DM), with Email in the overflow. Outsiders get 'Add to contacts / file under project'. Tapping the row text still seeks. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-meet-2",
+      "round": "Feature gaps",
+      "area": "meet",
+      "title": "No per-speaker talk-time / speaker filter",
+      "detail": "Reference: Read AI and Otter show talk-time % per speaker and let you filter the transcript to one speaker. Today: Only a count of speakers is shown (MeetApp.tsx:711-712). The transcript renders every line with no filter (MeetApp.tsx:874). Proposal: Under the People list, show a bar per speaker with their talk-time %. Tapping a speaker filters the transcript to that person's lines. On phones, put this in the PersonCard ('Spoke 34%, show their lines'). (effort small)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-meet-3",
+      "round": "Feature gaps",
+      "area": "meet",
+      "title": "Can't rename or fix speaker labels",
+      "detail": "Reference: Otter: tap a speaker label, then 'Rename / tag speaker', with 'apply to all lines'. Read AI does the same. Today: Speaker labels are fixed (MeetApp.tsx:877). Unknown speakers show as 'Unknown' with no way to fix them. Proposal: Long-press (or right-click) a speaker name, choose 'Who is this?', and pick from workspace users or type a name. The change applies to all of that speaker's lines and re-links tasks. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-meet-4",
+      "round": "Feature gaps",
+      "area": "meet",
+      "title": "No search within one transcript",
+      "detail": "Reference: Otter and Read AI have a search box inside the transcript that highlights matches and jumps between them. Today: Search exists only on the meetings list (MeetApp.tsx:374, MeetPhone.tsx:213). It finds the meeting but doesn't highlight or jump to the line. Proposal: Add a find field in the Transcript tab header with match count and next/previous arrows. When you open a meeting from list search, carry the query along so the first match is highlighted and the audio seeks to it. (effort small)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-meet-5",
+      "round": "Feature gaps",
+      "area": "meet",
+      "title": "Action items not linked to the moment they were said",
+      "detail": "Reference: Read AI and Otter link each action item and key point to its timestamp. Tapping one plays that clip. Today: Topics have timestamps (MeetApp.tsx:802). Tasks and key points have none, so the Tasks tab only lists items (MeetApp.tsx:823-850). Proposal: Store an `at` time for tasks, decisions and key points when the notes are generated. Show a small timestamp chip on each one that seeks the player. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-meet-6",
+      "round": "Feature gaps",
+      "area": "meet",
+      "title": "No live view, captions or 'catch me up' while the meeting runs",
+      "detail": "Reference: Otter Live Notes and Read AI let you follow the transcript live on a phone, and give a 'catch me up' summary if you join late. Today: While live, the Summary tab only says notes come after the meeting (MeetApp.tsx:811). The live transcript auto-scrolls but has no summary. Proposal: When status is recording, open on a Live tab that shows the rolling transcript plus a single 'Catch me up' button that summarizes the last N minutes. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-meet-7",
+      "round": "Feature gaps",
+      "area": "meet",
+      "title": "No highlights/bookmarks or clip sharing",
+      "detail": "Reference: Otter: highlight a passage, comment on it, and share a clip. Read AI: share the clip of a key moment. Today: Transcript lines can only seek (MeetApp.tsx:875). Share covers the whole meeting only (MeetApp.tsx:490). Proposal: Long-press a line and choose Highlight, Comment or 'Share this moment' (a link with ?t=). Show highlights as markers on the progress bar (MeetApp.tsx:664). (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-meet-8",
+      "round": "Feature gaps",
+      "area": "meet",
+      "title": "No comments or @mentions on notes",
+      "detail": "Reference: Otter and Read AI support comments on transcript lines and @mentions that notify teammates. Today: Meetings have no comment model. The only places to act are tasks and Ask AI (MeetApp.tsx:733). Proposal: Add comments to a line or summary section. An @mention sends a Chat notification that deep-links to the timestamp. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-meet-9",
+      "round": "Feature gaps",
+      "area": "meet",
+      "title": "No recap email or post to Chat after the meeting",
+      "detail": "Reference: Read AI and Otter email a recap to attendees automatically, or post it to Slack, when the meeting ends. Today: Recap is copy-to-clipboard (MeetApp.tsx:464) or a read-only share link (MeetApp.tsx:490). Proposal: When a meeting ends, show one primary button, 'Send recap'. It opens a prefilled Mail draft or Chat post to the attendees, with a setting to do it automatically. (effort small)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-meet-10",
+      "round": "Feature gaps",
+      "area": "meet",
+      "title": "No playback speed or skip controls",
+      "detail": "Reference: Otter and Read AI offer 1x/1.5x/2x speed, 15-second skip, and skipping silence. Today: The player has only play/pause and click-to-seek (MeetApp.tsx:661-664). Proposal: Add a speed toggle and ±15s buttons beside Play. On phones, make the scrub bar bigger and draggable for touch. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-meet-11",
+      "round": "Feature gaps",
+      "area": "meet",
+      "title": "No pre-meeting brief",
+      "detail": "Reference: Read AI's prep notes and Google Meet's calendar card show the agenda, last meeting's open tasks and attendees before you join. Today: An upcoming row opens a sheet with join toggles and 'open event' (MeetPhone.tsx:146-171). It doesn't include past context. Proposal: In that sheet, show open tasks and open questions from the last meeting with the same people or project. The primary button is Join. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-meet-12",
+      "round": "Feature gaps",
+      "area": "meet",
+      "title": "Join link missing as the primary action on upcoming meetings",
+      "detail": "Reference: Google Meet on phone: the upcoming card has a big Join button. Today: The upcoming sheet's main action is the notetaker override plus 'open event' (MeetPhone.tsx:159-171). Proposal: When the event has a meeting link (meetingLinkOf), make Join the primary button. Move the notetaker toggle to a secondary row. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-meet-13",
+      "round": "Feature gaps",
+      "area": "meet",
+      "title": "Attendees list ignores who actually spoke",
+      "detail": "Reference: Google Meet attendance reports and Read AI's participant list show who joined, for how long, and who didn't show. Today: The list falls back to either invitees or speakers, not both (MeetApp.tsx:621, 715). Proposal: Merge the two lists and mark each person: attended/spoke, invited but absent, or not invited. Each person is tappable to open the PersonCard. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-meet-14",
+      "round": "Feature gaps",
+      "area": "meet",
+      "title": "Desktop meeting header has too many equal buttons",
+      "detail": "Reference: Google Meet and Otter use one clear primary action, with the rest in a menu. Today: The desktop header shows Stop, Regenerate, Share, Delete and More side by side (MeetApp.tsx:538-556). Proposal: Make Share primary (or Stop while live) and move Regenerate and Delete into the ⋮ menu, as the phone layout already does (MeetApp.tsx:490-493). (effort small)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "FG-vault-1",
+      "round": "Feature gaps",
+      "area": "vault",
+      "title": "Tap a person in 'Who sees it' / Activity to see who they are",
+      "detail": "Reference: 1Password shows each person with an avatar in 'Shared with'; tapping opens their profile (name, email, role, vaults) with actions. Bitwarden's member rows open member details. Today: Who sees it is a single summary string from accessLabel (VaultApp.tsx:850), and tapping it opens the editor rather than a list of people. Activity lines are plain sentences (VaultApp.tsx:49-64, 623) with no tappable names. Proposal: Turn 'Who sees it' into an avatar stack. Tapping it opens a sheet listing each person and team, and tapping a person opens the shared profile card (name, title, email, local time) with Message as the primary action. Names in Activity lines open the same card. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-vault-2",
+      "round": "Feature gaps",
+      "area": "vault",
+      "title": "Only one item type: logins",
+      "detail": "Reference: Both apps have item types for Login, Secure Note, Card, Identity, SSH key, API credential, Wi-Fi, Bank account and Document. Today: VaultItem has only title, url, username, password, totp and notes (VaultApp.tsx:28-38). The editor is 'New login' only (VaultApp.tsx:1045). Proposal: Make '+' open a type picker (Login, Secure note, API key, Card, Wi-Fi), each with its own fields. Agencies mostly need API keys and secure notes. (effort large)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-vault-3",
+      "round": "Feature gaps",
+      "area": "vault",
+      "title": "No browser autofill or save prompt",
+      "detail": "Reference: Both apps fill credentials through a browser extension and the OS autofill on iOS and Android, and offer to save a new login after sign-up. Today: Every use is copy and paste: copyPassword and copyUsername (VaultApp.tsx:269-330), with the clipboard cleared after 30 seconds (VaultApp.tsx:72). Proposal: In the short term, add an 'Open and copy' action that copies the password and opens the site in one tap. Longer term, build an extension or PWA credential provider. (effort large)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-vault-4",
+      "round": "Feature gaps",
+      "area": "vault",
+      "title": "Password generator has no options",
+      "detail": "Reference: Both generators offer a length slider, character-set toggles, memorable passphrases and a PIN mode, plus a standalone generator tab and generator history. Today: strongPassword() always makes 20 characters from a fixed set (VaultApp.tsx:876-881). The only control is a 'Generate' button (VaultApp.tsx:993). Proposal: Turn Generate into a sheet with a length slider, a Words/Characters toggle and a symbols switch, with 'Use password' as its one primary button. It remembers the last settings. (effort small)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-vault-5",
+      "round": "Feature gaps",
+      "area": "vault",
+      "title": "No password health or Watchtower",
+      "detail": "Reference: 1Password Watchtower and Bitwarden Vault Health flag weak, reused and breached (HIBP) passwords, missing 2FA and unsecured http sites. Today: Nothing scores passwords. The sidebar has only filters and an info note (VaultApp.tsx:82-110). Proposal: Add a 'Needs attention' filter with a count badge, computed on the client after unlock: weak, reused, sites that support 2FA but have none, and HIBP k-anonymity breach checks. Each row's primary action is 'Change password'. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-vault-6",
+      "round": "Feature gaps",
+      "area": "vault",
+      "title": "No favorites and no 'suggested for this site'",
+      "detail": "Reference: Both apps have Favorites at the top of the list, and they suggest logins that match the current site or app. Today: The list is flat with search and client filters only (VaultApp.tsx:87-105, 340-345). Proposal: Add a star in the detail view and a Favorites section pinned above the list on phones. Sort the rest by most recently used. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-vault-7",
+      "round": "Feature gaps",
+      "area": "vault",
+      "title": "No password history",
+      "detail": "Reference: Both apps keep earlier passwords for each item ('Password history' in Bitwarden, 'Previous passwords' in 1Password) so you can recover after a bad change. Today: Saving overwrites the encrypted password (VaultApp.tsx:946-960). Activity logs the action but not the old value. Proposal: Keep the last 5 encrypted passwords in a 'Previous passwords' row in the detail view, where each one can be revealed and copied. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-vault-8",
+      "round": "Feature gaps",
+      "area": "vault",
+      "title": "No custom fields or multiple URLs",
+      "detail": "Reference: Both apps let you add custom text, hidden and URL fields, several websites per login and match rules. Today: There is a single url and a single username field (VaultApp.tsx:31). Extras end up in notes, which are logged and hidden (VaultApp.tsx:610). Proposal: Add an 'Add field' row at the bottom of the editor (Text / Hidden / URL). Show custom fields as copy rows in the detail view. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-vault-9",
+      "round": "Feature gaps",
+      "area": "vault",
+      "title": "No biometric or PIN quick unlock",
+      "detail": "Reference: 1Password and Bitwarden unlock with Face ID, Touch ID or Windows Hello, or a PIN, after the master password has been entered once. Today: The gate always asks for the full passphrase (VaultApp.tsx:1091-1152). It auto-locks after 15 minutes (VaultApp.tsx:173) and again on every app restart. Proposal: After the first unlock, offer 'Unlock with Face ID / Windows Hello' using WebAuthn PRF to wrap the key. Keep the passphrase as a fallback. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-vault-10",
+      "round": "Feature gaps",
+      "area": "vault",
+      "title": "Auto-lock timeout is fixed",
+      "detail": "Reference: Both apps let you choose the lock timeout (immediately, 1 minute, 15 minutes, 1 hour, on restart, never) and whether to lock on sleep. Today: The timeout is hard-coded to 15 minutes (VaultApp.tsx:173). Proposal: Add a Vault section in Settings with a timeout picker and a 'Lock when the device sleeps' switch. (effort small)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "FG-vault-11",
+      "round": "Feature gaps",
+      "area": "vault",
+      "title": "Clipboard clear is fixed and unreliable",
+      "detail": "Reference: In Bitwarden, the clear-clipboard time is configurable. 1Password clears even when the app loses focus and marks copies as sensitive so they don't sync to clipboard history. Today: The clipboard clears after a fixed 30 seconds, only if the tab still has focus (VaultApp.tsx:71-75). Username copy is not tracked the same way (VaultApp.tsx:319). Proposal: Make the clear time configurable. Show a countdown in the toast with a 'Clear now' action. (effort small)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "FG-vault-12",
+      "round": "Feature gaps",
+      "area": "vault",
+      "title": "No import from other managers",
+      "detail": "Reference: Both apps import CSV and JSON from Chrome, LastPass, 1Password and Bitwarden, among others. Today: Logins can only be added one at a time through the editor (VaultApp.tsx:436, 883). Proposal: Add 'Import' to the empty state and overflow menu: pick a file, preview the rows, assign a client and access, then a single 'Import N logins' button. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-vault-13",
+      "round": "Feature gaps",
+      "area": "vault",
+      "title": "No export or backup",
+      "detail": "Reference: Both apps export to encrypted JSON or CSV. 1Password also has an Emergency Kit. Today: There is no export, and a lost passphrase cannot be recovered (VaultApp.tsx:1088-1089, 1126). Proposal: Add 'Export my logins' (an encrypted file) and a printable Recovery Kit right after the passphrase is set. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-vault-14",
+      "round": "Feature gaps",
+      "area": "vault",
+      "title": "Desktop detail is a menu, not a pane",
+      "detail": "Reference: 1Password and Bitwarden desktop use a list on the left and the full item in the right pane, with an inline TOTP countdown ring. Today: On desktop, a row opens a dropdown menu (VaultApp.tsx:503-560) and reading notes uses a modal (VaultApp.tsx:603). The full detail view exists only on phones (VaultApp.tsx:744). Proposal: Reuse the phone detail view as the right pane on desktop, with Copy password as its primary action and a countdown ring on the 2FA code. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-vault-15",
+      "round": "Feature gaps",
+      "area": "vault",
+      "title": "No one-off secure share link",
+      "detail": "Reference: Bitwarden Send and 1Password 'Share item' create an expiring link for someone outside the team, for example a client. Today: Sharing is only through workspace access lists (VaultApp.tsx:1010-1030) and re-sharing (VaultApp.tsx:231-255). Proposal: Add a 'Share link' action in the detail view: choose an expiry (1 hour, 1 day, 7 days) and whether it can be viewed only once, then copy the link. The key goes in the URL fragment. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-people-1",
+      "round": "Feature gaps",
+      "area": "people",
+      "title": "Tapping an avatar or name opens a profile card",
+      "detail": "Reference: Slack: tap an avatar or name in any message to open a profile sheet (phone) or popover (desktop) with photo, name, title, status, local time, email, and Message / Huddle buttons. Google and Microsoft 365 hover cards work the same way. Today: The Avatar is a plain span with aria-hidden and no click handler (src/components/Avatar.tsx:13-19). In chat it sits inside the message row, whose onClick opens the thread (src/components/chat/Message.tsx:240,249), so tapping a face jumps into the thread. Proposal: Add one shared PersonCard: a bottom sheet on phones and an anchored popover on desktop. Make Avatar and the sender name in chat, mail, tasks, activity, calendar guests and teams tappable, and call stopPropagation so the thread doesn't open. Show photo, name, title, status and local time. The primary action is Message, with Email and Call as secondary actions. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-people-2",
+      "round": "Feature gaps",
+      "area": "people",
+      "title": "Tapping an @mention opens that person",
+      "detail": "Reference: In Slack, Teams and Google Chat, tapping an @name opens the same profile card. Today: Mentions render as an inert <b className=\"mention\"> (src/components/chat/Message.tsx:43). Proposal: Make mentions buttons that open PersonCard. (effort small)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-people-3",
+      "round": "Feature gaps",
+      "area": "people",
+      "title": "Local time uses the person's own time zone",
+      "detail": "Reference: Slack shows each person's local time, for example \"4:12 PM local time (3 hrs ahead)\". Teams and Outlook show the same. Today: The DM profile shows 'Local time', but it's calculated from the company time zone (src/components/chat/Details.tsx:293). User has no timeZone field (src/types.ts:530-543). Proposal: Add User.timeZone, filled in automatically from the browser. Show their time and how far ahead or behind you they are on PersonCard, and warn before messaging outside their working hours. (effort small)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-people-4",
+      "round": "Feature gaps",
+      "area": "people",
+      "title": "Profiles carry more than name, title and email",
+      "detail": "Reference: Slack profiles have custom fields: phone, pronouns, department, location, manager. Microsoft cards add an org chart and contact details. Today: User only stores name, email, title, color and photo (src/types.ts:530-536). The profile editor is in ClientApp (src/components/ClientApp.tsx:1422). Proposal: Add optional fields: phone, pronouns, location, department and manager (reportsTo). Show only the ones that are filled in, and let people edit them in Your profile. (effort medium)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-people-5",
+      "round": "Feature gaps",
+      "area": "people",
+      "title": "Message from any profile",
+      "detail": "Reference: Every Slack, Teams and Google card has Message as its primary button, which opens or creates the DM. Today: Team member actions offer only Email, Make lead and Remove (src/components/teams/TeamsApp.tsx:316-321). There is no way to open a chat DM from there. Proposal: Make Message the primary action on PersonCard and the team member sheet. It opens the existing DM or creates one. (effort small)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "FG-people-6",
+      "round": "Feature gaps",
+      "area": "people",
+      "title": "Call / huddle from a profile",
+      "detail": "Reference: Slack cards have Huddle, Teams cards have Call / Video, and Google cards have a Meet button. Today: Huddle and Meet exist (src/components/Huddle.tsx, src/components/MeetApp.tsx) but can't be reached from a person. Proposal: Add Call as a secondary action that starts a 1:1 huddle. On phones, if a phone number is set, also offer a tel: link. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-people-7",
+      "round": "Feature gaps",
+      "area": "people",
+      "title": "Presence and status on every avatar",
+      "detail": "Reference: Slack and Teams show a green, away or busy dot and the status emoji wherever an avatar appears. Today: The status shows only in the DM About pane (src/components/chat/Details.tsx:289). Avatar has no presence badge (src/components/Avatar.tsx:13). Proposal: Add an optional presence dot to Avatar, fed by presence.ts, for sizes 32 and up. Show the status emoji and text plus 'until 5 PM' on PersonCard. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-people-8",
+      "round": "Feature gaps",
+      "area": "people",
+      "title": "\"View profile\" goes to a real profile",
+      "detail": "Reference: Slack's View full profile opens a dedicated profile page. Today: The DM start's 'View profile' button only opens the details menu pane (src/components/chat/Conversation.tsx:575-580). Proposal: Point it, and Details, at the shared full profile: PersonCard expanded to full screen on phones. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-people-9",
+      "round": "Feature gaps",
+      "area": "people",
+      "title": "One person page that links their work across apps",
+      "detail": "Reference: Microsoft profile cards list recent files, shared emails and meetings with you. Google contact cards show recent interactions. Today: Details computes a last-mail date only for client contacts (src/components/chat/Details.tsx:270-276). There's no per-person view across tasks, files and events. Proposal: Add tabs or sections to the full profile: Shared tasks, Upcoming meetings together, Recent files, Recent mail. Each is a short list with 'See all'. (effort medium)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-people-10",
+      "round": "Feature gaps",
+      "area": "people",
+      "title": "Mail sender avatar opens the contact",
+      "detail": "Reference: In Gmail and Outlook, hovering or tapping the sender shows a contact card with Add to contacts, Email, Chat and Schedule. Today: MessageList renders the sender Avatar without an action (src/components/MessageList.tsx:635,713), and the Contacts editor is separate (src/components/mail/Contacts.tsx:317,443). Proposal: Make the sender name and avatar in Reader open PersonCard. For an external person, it shows the contact or offers Add to contacts as the primary action. (effort small)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "FG-people-11",
+      "round": "Feature gaps",
+      "area": "people",
+      "title": "Stacked avatars open a people list",
+      "detail": "Reference: In Slack, tapping the reply avatars or reaction faces shows who it was. In Google Docs, tapping stacked avatars lists the people. Today: Thread reply avatars and poll voter avatars are decorative (src/components/chat/Message.tsx:318,372). Proposal: Tapping a stack opens a small sheet listing those people. Each row opens PersonCard. (effort small)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "FG-people-12",
+      "round": "Feature gaps",
+      "area": "people",
+      "title": "Search people directly",
+      "detail": "Reference: Slack has a People directory and lets you search people in the quick switcher, with results opening the profile. Today: The Teams directory search lists members, but tapping a row opens an action menu instead of a profile (src/components/teams/TeamsApp.tsx:305,341). Proposal: Show people in global search or the quick switcher. Selecting one opens PersonCard, and the team row tap opens the same card with team actions below. (effort medium)",
       "priority": "medium",
       "status": "todo"
     }

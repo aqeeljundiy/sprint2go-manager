@@ -72,6 +72,9 @@ const id: Record<string, string> = {
   Europe: 'Eropa',
   Indian: 'Samudra Hindia',
   Pacific: 'Pasifik',
+  'Copy {email}': 'Salin {email}',
+  'Local time': 'Waktu setempat',
+  'View tasks': 'Lihat tugas',
 };
 
 export default id;

@@ -1,4 +1,5 @@
 import { TabBar } from './ui/TabBar';
+import { PersonName } from './ui/PersonCard';
 import { ProjectBadge } from './ProjectBadge';
 import { MEETING_LANGUAGES, languageLabel, languagesLabel } from '../data/languages';
 import { t, tn, tx, mark } from '../i18n';
@@ -712,11 +713,14 @@ function MeetingPage(p: MeetProps & { m: Meeting }) {
               <dd>{speakers.length}</dd>
               <dt>{tx('meet', 'People')}</dt>
               <dd className="chips">
-                {(m.attendees.length ? m.attendees : speakers).map((a) => (
-                  <span key={a} className="m-person">
-                    {a}
-                  </span>
-                ))}
+                {(m.attendees.length ? m.attendees : speakers).map((a) => {
+                  const u = p.users.find((x) => x.name === a) ?? p.users.find((x) => x.name.split(' ')[0] === a.split(' ')[0]);
+                  return (
+                    <span key={a} className="m-person">
+                      {u ? <PersonName who={u.id}>{a}</PersonName> : a}
+                    </span>
+                  );
+                })}
               </dd>
               {client && (
                 <>

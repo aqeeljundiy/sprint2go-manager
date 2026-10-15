@@ -425,6 +425,7 @@ const id: Record<string, string> = {
   "{n} emails archived": "{n} email diarsipkan",
   "{n} emails marked read": "{n} email ditandai sudah dibaca",
   "Archived": "Diarsipkan",
+  'Profile of {name}': 'Profil {name}',
 };
 
 export default id;

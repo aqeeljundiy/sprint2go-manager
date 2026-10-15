@@ -570,7 +570,7 @@ export function ChatView(p: ViewProps) {
       {top.length === 0 &&
         (channel.kind === 'dm' && other ? (
           <div className="chat-start-dm">
-            <Avatar person={other} size={56} />
+            <Avatar person={other} size={56} card />
             <strong>{other.name}</strong>
             {other.title && <span className="csd-title">{other.title}</span>}
             <p className="chat-start">{t('This is the start of your conversation with {name}.', { name: other.name })}</p>
@@ -870,7 +870,7 @@ export function ChatView(p: ViewProps) {
           <button type="button" className="chan-title-btn" onClick={() => !guest && setDetails('menu')} aria-label={guest ? title : t('{name}: details', { name: title })} disabled={!!guest}>
             {other ? (
               <span className="dm-av">
-                <Avatar person={other} size={28} />
+                <Avatar person={other} size={28} card />
                 <i className={`presence ${p.presence(other.id)}`} />
               </span>
             ) : group ? (
@@ -917,7 +917,7 @@ export function ChatView(p: ViewProps) {
         {details && !guest && (
           <PushScreen title={t('Details')} backLabel={title.length > 14 ? t('Back') : title} onBack={() => setDetails(null)} className="chat-details">
             <div className="cd-hero">
-              {other && <Avatar person={other} size={64} />}
+              {other && <Avatar person={other} size={64} card />}
               {group && <GroupAvatar c={channel} users={users} me={me} size={56} />}
               <strong>{other ? other.name : group ? t('Group message') : title}</strong>
               {group && <span className="cd-topic">{groupNames}</span>}
@@ -1089,7 +1089,7 @@ export function ChatView(p: ViewProps) {
           )}
           {other && (
             <span className="dm-av">
-              <Avatar person={other} size={28} />
+              <Avatar person={other} size={28} card />
               <i className={`presence ${p.presence(other.id)}`} />
             </span>
           )}

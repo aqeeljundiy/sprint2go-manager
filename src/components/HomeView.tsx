@@ -465,7 +465,7 @@ export function HomeView(p: Props) {
           <div className="load-grid">
             {d.people.map(({ u, open, late, week }) => (
               <div key={u.id} className="load">
-                <Avatar person={u} size={26} />
+                <Avatar person={u} size={26} card={u.id} />
                 <span className="load-text">
                   <strong>{u.id === p.me.id ? t('You') : u.name.split(' ')[0]}</strong>
                   {bar(open, max, late > 0)}
@@ -545,7 +545,7 @@ export function HomeView(p: Props) {
                   <button className="brief-row" onClick={() => p.onOpenTask(b.id)}>
                     <span className="br-title">{b.title}</span>
                     <span className="br-meta">
-                      {owner && <Avatar person={owner} size={18} />}
+                      {owner && <Avatar person={owner} size={18} card={owner.id} />}
                       {bar(done, subs.length || 1)}
                       {done}/{subs.length}
                     </span>
@@ -597,7 +597,7 @@ export function HomeView(p: Props) {
               return (
                 <li key={th.id}>
                   <button className="home-mail" onClick={() => p.onOpenThread(th.id)}>
-                    <Avatar person={last.from} size={26} />
+                    <Avatar person={last.from} size={26} card />
                     <span>
                       <strong>{last.from.name}</strong>
                       <small>{th.subject}</small>
@@ -710,7 +710,7 @@ export function HomeView(p: Props) {
               const who = p.users.find((u) => u.id === (tk.doneBy ?? tk.userId));
               return (
                 <li key={tk.id} className="win">
-                  {who && <Avatar person={who} size={22} />}
+                  {who && <Avatar person={who} size={22} card={who.id} />}
                   <button className="ht-title" onClick={() => p.onOpenTask(tk.id)}>
                     {tk.title}
                     <small className="ht-brief">

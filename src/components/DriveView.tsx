@@ -9,6 +9,7 @@ import { usePersisted } from '../settings';
 import { DRIVE_SECTIONS } from './DriveSidebar';
 import { FileIcon } from './FileIcon';
 import { EmptyState } from './ui/EmptyState';
+import { PersonName } from './ui/PersonCard';
 import { useCreateAction } from '../mobile/chrome';
 import { ActionSheet, useActionMenu, type SheetAction } from './ui/ActionSheet';
 import { PushScreen } from './ui/PushScreen';
@@ -821,7 +822,7 @@ function DetailsScreen({ item, items, who, from, onBack }: { item: DriveItem; it
           {item.kind !== 'folder' && <GRow label={t('Size')} value={fmtSize(item.size)} />}
           <GRow label={t('Location')} value={item.id.startsWith('att:') ? t('From email') : [t('My Drive'), ...where].join(' / ')} />
           <GRow label={t('Modified')} value={fmtDay(item.modified)} />
-          {who && <GRow label={t('Uploaded by')} value={who} />}
+          {who && <GRow label={t('Uploaded by')} value={item.uploadedBy ? <PersonName who={item.uploadedBy}>{who}</PersonName> : who} />}
           {from && <GRow label={t('Saved from an email by')} value={from} />}
           {item.starred && <GRow label={t('Starred')} value={t('Yes')} />}
         </Group>
