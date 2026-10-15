@@ -587,10 +587,10 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
-    gap: 4px;
+    justify-content: center;
+    gap: 2px;
     min-width: 0;
-    padding-top: 4px;
+    padding: 0;
     color: var(--text-3);
     transition: color 0.2s;
   }
@@ -598,13 +598,12 @@
     color: var(--accent-text);
   }
   .tabbar-tabs button.on .tab-label {
-    color: var(--text);
-    font-weight: 600;
+    color: var(--accent-text);
   }
   /* The pill slides between tabs: one per bar, a fifth of the width each, 56 x 30 behind the icon. */
   .tabbar-ink {
     position: absolute;
-    top: 5px;
+    top: calc((var(--tabbar-h) - 32px - 2px - 14px) / 2);
     left: 0;
     width: calc(100% / var(--tabs, 5));
     height: 32px;
@@ -622,7 +621,7 @@
   .tabbar-ink i {
     width: 56px;
     height: 32px;
-    border-radius: var(--r-card);
+    border-radius: 999px;
     background: var(--accent-soft);
   }
   .tab-icon {
