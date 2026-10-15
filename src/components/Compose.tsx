@@ -3,7 +3,7 @@ import { Bell, ChevronUp, Clock, Sparkles, Eye, EyeOff, FileText, HardDrive, Max
 import { ActionSheet } from './ui/ActionSheet';
 import type { Person } from '../types';
 import { usePersisted } from '../settings';
-import { RecipientInput } from './RecipientInput';
+import { RecipientInput, type Field } from './RecipientInput';
 import { RichEditor, type RichEditorHandle } from './RichEditor';
 import { AIWriter } from './AIWriter';
 import { hasOwnText, htmlToText, textToHtml } from '../sanitize';
@@ -109,6 +109,14 @@ export function Compose({ contacts, signature: baseSignature, signatureFor, work
   const [cc, setCc] = useState<Person[]>(initial?.cc ?? []);
   const [bcc, setBcc] = useState<Person[]>(initial?.bcc ?? []);
   const [showCc, setShowCc] = useState(!!initial?.cc.length || !!initial?.bcc?.length);
+  /** A chip moved between To, Cc and Bcc (its menu): out of every field, into the one picked. */
+  const movePerson = (p: Person, dest: Field) => {
+    const out = (list: Person[]) => list.filter((x) => x.email !== p.email);
+    setTo((l) => (dest === 'to' ? [...out(l), p] : out(l)));
+    setCc((l) => (dest === 'cc' ? [...out(l), p] : out(l)));
+    setBcc((l) => (dest === 'bcc' ? [...out(l), p] : out(l)));
+    if (dest !== 'to') setShowCc(true);
+  };
   const [subject, setSubject] = useState(initial?.subject ?? '');
   const [body, setBody] = useState(initial ? { html: initial.html, text: initial.text } : { html: signature ? `<p><br></p>${signature}` : '', text: '' });
   const df = useDraftFiles(initial?.files ?? [], body.html.length);
@@ -331,6 +339,8 @@ export function Compose({ contacts, signature: baseSignature, signatureFor, work
             contacts={contacts}
             autoFocus={!to.length}
             onChange={setTo}
+            field="to"
+            onMove={movePerson}
             trailing={
               !showCc &&
               (phone ? (
@@ -346,8 +356,8 @@ export function Compose({ contacts, signature: baseSignature, signatureFor, work
           />
           {showCc && (
             <div className="cc-rows">
-              <RecipientInput label="Cc" value={cc} contacts={contacts} onChange={setCc} />
-              <RecipientInput label="Bcc" value={bcc} contacts={contacts} onChange={setBcc} />
+              <RecipientInput label="Cc" value={cc} contacts={contacts} onChange={setCc} field="cc" onMove={movePerson} />
+              <RecipientInput label="Bcc" value={bcc} contacts={contacts} onChange={setBcc} field="bcc" onMove={movePerson} />
             </div>
           )}
           {showReplyTo && <RecipientInput label={t('Reply to')} value={extras.replyTo ?? []} contacts={contacts} autoFocus={!extras.replyTo?.length} onChange={(v) => setX({ replyTo: v })} />}

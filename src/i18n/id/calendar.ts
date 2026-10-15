@@ -465,6 +465,14 @@ const id: Record<string, string> = {
   "Nothing planned this month": "Tidak ada rencana bulan ini",
   "Send notetaker now": "Kirim notulis sekarang",
   "{day}. Open the day": "{day}. Buka harinya",
+  "(No title)": "(Tanpa judul)",
+  "Message guests": "Kirim pesan ke tamu",
+  "New call link": "Link panggilan baru",
+  "No events match “{q}”": "Tidak ada acara yang cocok dengan “{q}”",
+  "No one else is on this event yet": "Belum ada orang lain di acara ini",
+  "Search by title, guest or place": "Cari menurut judul, tamu, atau tempat",
+  "Search events (/)": "Cari acara (/)",
+  "Search events": "Cari acara",
 };
 
 export default id;

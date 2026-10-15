@@ -850,3 +850,53 @@
     animation: none;
   }
 }
+
+/* The menu at the caret: "@" for people and notes, "/" for blocks (InlineMenu.tsx). Grows from the caret. */
+.note-inline {
+  position: fixed;
+  z-index: var(--z-pop);
+  max-height: min(320px, 45vh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-tile, 10px);
+  box-shadow: var(--shadow-lg);
+  transform-origin: top left;
+  animation: niIn var(--dur-in, 240ms) var(--ease-out-motion) backwards;
+}
+.note-inline.leaving {
+  pointer-events: none;
+  animation: niOut 140ms var(--ease-in-motion) forwards;
+}
+.note-inline .as-item {
+  min-height: var(--tap, 44px);
+}
+.note-inline .as-item.on {
+  background: var(--hover);
+}
+.note-inline .ni-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  color: var(--text-2);
+}
+.note-inline .sheet-empty {
+  margin: 0;
+  padding: 12px;
+  font-size: var(--fs-secondary);
+  color: var(--text-3);
+}
+@keyframes niIn {
+  from { opacity: 0; transform: scale(0.96) translateY(-4px); }
+}
+@keyframes niOut {
+  to { opacity: 0; transform: scale(0.96) translateY(-4px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .note-inline, .note-inline.leaving { animation-name: fadeIn; }
+  .note-inline.leaving { animation: none; opacity: 0; }
+}

@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { AlertTriangle, AtSign, Bell, Check, CheckCheck, CircleCheck, Clock, FileText, Headphones, Inbox, ListChecks, Mail, MessageCircle, Play, Repeat, Sunrise, Users, Video, type LucideIcon } from 'lucide-react';
 import { SwipeRow, type SwipeAction } from '../ui/SwipeRow';
 import { useLeaving, SmoothHeight } from '../ui/Smooth';
@@ -352,11 +352,13 @@ export function TodayBlock({
                   </span>
                   <small className="htd-ev-sub">{[`${fmtTime(e.start)}-${fmtTime(e.end)}`, e.location].filter(Boolean).join(' · ')}</small>
                 </button>
-                {link && (
+                {link && (Date.now() >= new Date(e.start).getTime() - 10 * 60_000 ? (
+                  <JoinSoon e={e} />
+                ) : (
                   <a className="ghost-btn sm" href={link.url} target="_blank" rel="noopener noreferrer">
                     {t('Join')}
                   </a>
-                )}
+                ))}
               </div>
             );
           })}
@@ -394,5 +396,26 @@ export function TodayBlock({
         </div>
       )}
     </section>
+  );
+}
+
+/** A meeting with a link that starts within 10 minutes (or is on now): Join, with a countdown. Nothing otherwise. */
+export function JoinSoon({ e }: { e: CalEvent }) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 30_000);
+    return () => clearInterval(id);
+  }, []);
+  const link = meetingLinkOf(e);
+  const start = new Date(e.start).getTime();
+  if (!link || e.allDay || now < start - 10 * 60_000 || now > new Date(e.end).getTime()) return null;
+  const mins = Math.ceil((start - now) / 60_000);
+  return (
+    <span className="join-soon">
+      <span className="join-soon-chip">{mins > 0 ? t('in {n} min', { n: mins }) : t('On now')}</span>
+      <a className="primary-btn sm" href={link.url} target="_blank" rel="noopener noreferrer">
+        <Video size={14} /> {t('Join')}
+      </a>
+    </span>
   );
 }

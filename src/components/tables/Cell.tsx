@@ -10,6 +10,8 @@ import { uploadFile } from '../../sync';
 import { session } from '../../store';
 import { t } from '../../i18n';
 import { fmtDay, fmtNumber } from '../../i18n/format';
+import { AttachmentViewer, type ViewItem } from '../mail/AttachmentViewer';
+import { fmtSize } from '../../data/drive';
 
 export interface CellCtx {
   users: User[];
@@ -135,21 +137,8 @@ export function CellView({ f, v, ctx, wrap }: { f: TableField; v: CellValue | un
         </span>
       );
     }
-    case 'files': {
-      const files = v as FileRef[];
-      return (
-        <span className="tb-files">
-          {files.slice(0, 4).map((x, i) =>
-            x.type.startsWith('image/') ? <img key={i} src={x.url} alt={x.name} title={x.name} /> : (
-              <span key={i} className="tb-file-chip" title={x.name}>
-                <FileText size={12} /> {x.name}
-              </span>
-            ),
-          )}
-          {files.length > 4 && <span className="muted small">+{files.length - 4}</span>}
-        </span>
-      );
-    }
+    case 'files':
+      return <FilesCell files={v as FileRef[]} />;
     case 'rating':
       return <Stars n={Number(v)} max={f.max ?? 5} />;
     case 'creator': {
@@ -172,6 +161,52 @@ export function CellView({ f, v, ctx, wrap }: { f: TableField; v: CellValue | un
     default:
       return <span className={wrap ? 'tb-text wrap' : 'tb-text'}>{String(v)}</span>;
   }
+}
+
+/** A cell's files: tap one to see it full size (swipe or arrow keys to the others, Download in the viewer). */
+function FilesCell({ files }: { files: FileRef[] }) {
+  const [open, setOpen] = useState<number | null>(null);
+  const items: ViewItem[] = files.map((x, i) => ({ key: `${i}:${x.url}`, att: { name: x.name, size: fmtSize(x.size), url: x.url, type: x.type } }));
+  const show = (i: number) => (e: React.SyntheticEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setOpen(i);
+  };
+  const stop = (e: React.SyntheticEvent) => e.stopPropagation();
+  return (
+    <span className="tb-files">
+      {files.slice(0, 4).map((x, i) => (
+        <span
+          key={i}
+          role="button"
+          tabIndex={0}
+          className={x.type.startsWith('image/') ? 'tb-file-open' : 'tb-file-chip tb-file-open'}
+          title={x.name}
+          aria-label={t('Open {name}', { name: x.name })}
+          onMouseDown={stop}
+          onPointerDown={stop}
+          onClick={show(i)}
+          onKeyDown={(e) => e.key === 'Enter' && show(i)(e)}
+        >
+          {x.type.startsWith('image/') ? <img src={x.url} alt={x.name} /> : (
+            <>
+              <FileText size={12} /> {x.name}
+            </>
+          )}
+        </span>
+      ))}
+      {files.length > 4 && (
+        <span role="button" tabIndex={0} className="muted small tb-file-open" onMouseDown={stop} onPointerDown={stop} onClick={show(4)}>
+          +{files.length - 4}
+        </span>
+      )}
+      {open !== null && (
+        <span onClick={stop} onMouseDown={stop} onPointerDown={stop} onKeyDown={stop}>
+          <AttachmentViewer items={items} index={open} onIndex={setOpen} onClose={() => setOpen(null)} />
+        </span>
+      )}
+    </span>
+  );
 }
 
 /** Stars, read only. */

@@ -157,3 +157,98 @@ export const onVaultLockChange = (f: () => void) => {
   lockListeners.add(f);
   return () => void lockListeners.delete(f);
 };
+
+/* ---------- quick unlock: Face ID, fingerprint or Windows Hello (WebAuthn PRF) ---------- */
+
+/**
+ * After the passphrase has opened the Vault once, the private key can also be locked with a secret that only this
+ * device's authenticator can give back (the WebAuthn PRF extension). The wrapped copy stays in this browser; the
+ * passphrase keeps working everywhere. Nothing about it reaches the server.
+ */
+interface QuickRecord {
+  credId: string;
+  salt: string; // the PRF input
+  iv: string;
+  wrapped: string;
+  pubX?: string; // which key pair it belongs to (a new passphrase setup makes new keys)
+}
+const quickKey = (userId: string) => `vault-quick:${userId}`;
+const readQuick = (userId: string): QuickRecord | null => {
+  try {
+    const raw = localStorage.getItem(quickKey(userId));
+    return raw ? (JSON.parse(raw) as QuickRecord) : null;
+  } catch {
+    return null;
+  }
+};
+/** Whether this device has a fingerprint, face or PIN authenticator that WebAuthn can use. */
+export async function quickUnlockAvailable() {
+  try {
+    const P = (window as any).PublicKeyCredential;
+    return !!P && (await P.isUserVerifyingPlatformAuthenticatorAvailable());
+  } catch {
+    return false;
+  }
+}
+/** Whether quick unlock is set up on this device for this person's current keys. */
+export const quickUnlockOn = (userId: string, record?: VaultKeyRecord) => {
+  const q = readQuick(userId);
+  return !!q && (!record || !q.pubX || q.pubX === record.pub.x);
+};
+export const quickUnlockOff = (userId: string) => {
+  try {
+    localStorage.removeItem(quickKey(userId));
+  } catch {
+    /* nothing kept */
+  }
+};
+async function prfKey(prf: ArrayBuffer) {
+  const hk = await crypto.subtle.importKey('raw', prf, 'HKDF', false, ['deriveKey']);
+  return crypto.subtle.deriveKey({ name: 'HKDF', hash: 'SHA-256', salt: new Uint8Array(0), info: te.encode('sprint2go-vault-quick') }, hk, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+}
+async function prfOf(credId: Uint8Array, salt: Uint8Array): Promise<ArrayBuffer> {
+  const got = (await navigator.credentials.get({
+    publicKey: {
+      challenge: rnd(32) as BufferSource,
+      allowCredentials: [{ type: 'public-key', id: credId as BufferSource }],
+      userVerification: 'required',
+      extensions: { prf: { eval: { first: salt as BufferSource } } } as AuthenticationExtensionsClientInputs,
+    },
+  })) as PublicKeyCredential | null;
+  const first = (got?.getClientExtensionResults() as any)?.prf?.results?.first as ArrayBuffer | undefined;
+  if (!first) throw new Error(t('This device can’t unlock the Vault this way. Use your passphrase.'));
+  return first;
+}
+/** Sets up quick unlock for the open key: asks the device to make a passkey, then locks a copy of the key with it. */
+export async function enableQuickUnlock(userId: string, name: string, priv: CryptoKey, record?: VaultKeyRecord) {
+  const cred = (await navigator.credentials.create({
+    publicKey: {
+      challenge: rnd(32) as BufferSource,
+      rp: { name: 'Vault' },
+      user: { id: te.encode(userId.slice(0, 64)) as BufferSource, name: name || userId, displayName: name || userId },
+      pubKeyCredParams: [
+        { type: 'public-key', alg: -7 },
+        { type: 'public-key', alg: -257 },
+      ],
+      authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'discouraged' },
+      extensions: { prf: {} } as AuthenticationExtensionsClientInputs,
+    },
+  })) as PublicKeyCredential | null;
+  if (!cred) throw new Error(t('Quick unlock wasn’t turned on.'));
+  if ((cred.getClientExtensionResults() as any)?.prf?.enabled === false) throw new Error(t('This device can’t unlock the Vault this way. Use your passphrase.'));
+  const credId = new Uint8Array(cred.rawId);
+  const salt = rnd(32);
+  const k = await prfKey(await prfOf(credId, salt));
+  const iv = rnd(12);
+  const wrapped = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv as BufferSource }, k, te.encode(JSON.stringify(await crypto.subtle.exportKey('jwk', priv))));
+  const q: QuickRecord = { credId: b64(credId), salt: b64(salt), iv: b64(iv), wrapped: b64(wrapped), pubX: record?.pub.x };
+  localStorage.setItem(quickKey(userId), JSON.stringify(q));
+}
+/** Opens the key with the device's authenticator; throws when it's cancelled or fails. */
+export async function quickUnlock(userId: string): Promise<CryptoKey> {
+  const q = readQuick(userId);
+  if (!q) throw new Error(t('Quick unlock isn’t set up on this device.'));
+  const k = await prfKey(await prfOf(unb64(q.credId), unb64(q.salt)));
+  const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(q.iv) as BufferSource }, k, unb64(q.wrapped) as BufferSource);
+  return crypto.subtle.importKey('jwk', JSON.parse(td.decode(plain)), ECDH, true, ['deriveKey', 'deriveBits']);
+}

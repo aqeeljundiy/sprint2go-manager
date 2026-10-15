@@ -85,6 +85,7 @@ const id: Record<string, string> = {
   '{n} tasks leave the team and keep their {projects}.': '{n} tugas keluar dari tim dan tetap di {projects} masing-masing.',
   'The team has no tasks, so no work is lost.': 'Tim ini tidak punya tugas, jadi tidak ada pekerjaan yang hilang.',
   'Open {team}': 'Buka {team}',
+  'Open the {team} chat': 'Buka obrolan {team}',
 };
 
 export default id;

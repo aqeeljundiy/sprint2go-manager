@@ -9,6 +9,8 @@ import { localDay, relative } from '../utils';
 import { Avatar } from './Avatar';
 import { Select } from './ui/Select';
 import { DatePicker } from './ui/DatePicker';
+import { DueTime } from './tasks/DueTime';
+import { MentionText, useMentions } from './tasks/Mentions';
 import { holidayOn } from '../holidayDays';
 import { SOURCE, doers, dueLabel, historyText, isBrief, peopleOptions, statusOf, teamOptions } from './TasksView';
 import { kindOf, stageBadge, stageIdFor, stageName, stageOf, stagesForTask, toneOf } from '../stages';
@@ -68,6 +70,8 @@ export function TaskDrawer(p: Props) {
   // A brief's comments take files too (a task's are in TaskDetail).
   const att = useCommentFiles(task.workspaceId ?? '');
   const canSend = (!!comment.trim() || att.files.length > 0) && !att.busy;
+  const commentRef = useRef<HTMLTextAreaElement>(null);
+  const mention = useMentions({ text: comment, setText: setComment, users: p.users, me: p.me, inputRef: commentRef });
   const send = () => {
     if (!canSend) return;
     p.onComment(task.id, comment.trim(), toClient, att.files.length ? att.files : undefined);
@@ -176,7 +180,8 @@ export function TaskDrawer(p: Props) {
             </dd>
             <dt>{t('Due')}</dt>
             <dd>
-              <DatePicker value={task.due ?? ''} onChange={(v) => p.onPatch(task.id, { due: v || undefined })} label={t('Due date')} placeholder={t('No date')} />
+              <DatePicker value={task.due ?? ''} onChange={(v) => p.onPatch(task.id, { due: v || undefined, ...(v ? {} : { dueTime: undefined }) })} label={t('Due date')} placeholder={t('No date')} />
+              <DueTime task={task} onPatch={p.onPatch} />
               {task.due && !task.done && dueLabel(task.due).cls && <span className={`due ${dueLabel(task.due).cls}`}>{dueLabel(task.due).text}</span>}
               {task.due && !task.done && dueLabel(task.due).cls !== 'overdue' && holidayOn(task.due) && <span className="hol-hint">{t('{holiday} is a public holiday', { holiday: holidayOn(task.due) ?? '' })}</span>}
             </dd>
@@ -350,7 +355,7 @@ export function TaskDrawer(p: Props) {
               const name = fromClient ? (p.clientNames?.[h.by.toLowerCase()] ?? h.by) : who ? (who.id === p.me ? t('You') : who.name.split(' ')[0]) : (h.byName ?? t('Someone'));
               return (
                 <li key={h.id} className={`h-${h.kind} ${fromClient ? 'h-client' : ''}`}>
-                  {who ? <Avatar person={who} size={22} /> : fromClient ? <span className="avatar-empty sm client">{name.charAt(0)}</span> : h.byName ? <Avatar person={{ name: h.byName, email: h.byName }} size={22} /> : <span className="avatar-empty sm">?</span>}
+                  {who ? <Avatar person={who} size={22} card={who.id} /> : fromClient ? <span className="avatar-empty sm client">{name.charAt(0)}</span> : h.byName ? <Avatar person={{ name: h.byName, email: h.byName }} size={22} /> : <span className="avatar-empty sm">?</span>}
                   <span className="h-body">
                     {h.kind === 'comment' ? (
                       <>
@@ -359,7 +364,7 @@ export function TaskDrawer(p: Props) {
                           {fromClient && <em className="h-tag client">{term.One}</em>}
                           {!fromClient && h.toClient && <em className="h-tag">{t('To {who}', { who: term.who })}</em>}
                         </b>
-                        {h.text && <span className="h-comment">{h.text}</span>}
+                        {h.text && <span className="h-comment"><MentionText text={h.text} users={p.users} /></span>}
                         <FileCards files={h.files} />
                       </>
                     ) : (
@@ -535,7 +540,8 @@ export function TaskDrawer(p: Props) {
           {historyBlock}
           <div className={`comment-box ${toClient ? 'to-client' : ''}`} {...dropFiles(att)}>
             <WaitingFiles state={att} />
-            <textarea rows={2} value={comment} onChange={(e) => setComment(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), send())} placeholder={toClient ? t('Reply to the {who}… they will see this', { who: term.who }) : t('Internal comment… @mention someone')} />
+            {mention.list}
+            <textarea ref={commentRef} rows={2} value={comment} {...mention.field} onKeyDown={(e) => !mention.onKey(e) && e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), send())} placeholder={toClient ? t('Reply to the {who}… they will see this', { who: term.who }) : t('Internal comment… @mention someone')} />
             <div className="cb-foot">
               {clientCanSee && (
                 <label className="cb-toggle">

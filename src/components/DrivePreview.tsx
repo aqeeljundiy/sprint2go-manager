@@ -136,6 +136,13 @@ export function DrivePreview({ item, list, onNav, onClose, onStar, onTrash, onOp
       <div className={`lb-stage ${dir}`} key={item.id} ref={stage}>
         {item.kind === 'video' && (isBlob || item.url) ? (
           <video src={isBlob ? item.thumb : item.url} controls autoPlay onClick={(e) => e.stopPropagation()} />
+        ) : item.kind === 'pdf' && item.url ? (
+          // PDFs open in the browser's own viewer: pages, zoom and search, nothing to install.
+          <div className="lb-pdf" onClick={(e) => e.stopPropagation()}>
+            <iframe src={item.url} title={item.name} />
+          </div>
+        ) : item.url && textKind(item.name) ? (
+          <TextView url={item.url} name={item.name} />
         ) : item.thumb ? (
           <div className="lb-media" onClick={(e) => e.stopPropagation()}>
             <img src={item.thumb} alt={item.name} />
@@ -174,6 +181,48 @@ export function DrivePreview({ item, list, onNav, onClose, onStar, onTrash, onOp
         <div className="lb-count">
           {idx + 1} / {list.length}
         </div>
+      )}
+    </div>
+  );
+}
+
+const TEXT_TYPES = /\.(txt|md|markdown|csv|tsv|json|log|xml|ya?ml|ini|env|toml|html?|css|scss|js|jsx|mjs|ts|tsx|py|rb|go|rs|java|kt|swift|c|h|cpp|cs|php|sh|sql)$/i;
+/** Plain text and code read as text in the viewer. */
+const textKind = (name: string) => TEXT_TYPES.test(name);
+/** Big files stop here: the rest is one Download away. */
+const TEXT_MAX = 200_000;
+
+/** Text and code, shown as they are, with line numbers off and wrapping on; a short note while it loads. */
+function TextView({ url, name }: { url: string; name: string }) {
+  const [text, setText] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
+  useEffect(() => {
+    let live = true;
+    setText(null);
+    setFailed(false);
+    fetch(url)
+      .then((r) => (r.ok ? r.text() : Promise.reject(new Error(String(r.status)))))
+      .then((x) => live && setText(x))
+      .catch(() => live && setFailed(true));
+    return () => {
+      live = false;
+    };
+  }, [url]);
+  return (
+    <div className="lb-text" onClick={(e) => e.stopPropagation()}>
+      {failed ? (
+        <div className="lb-doc">
+          <FileIcon kind="other" size={40} />
+          <strong>{name}</strong>
+          <small>{t('This file could not be read. Download it to open it.')}</small>
+          <a className="primary-btn lb-action" href={url} download={name} rel="noreferrer">
+            <Download size={16} /> {t('Download')}
+          </a>
+        </div>
+      ) : (
+        <pre className={text === null ? 'loading' : ''}>
+          {text === null ? t('Loading…') : text.length > TEXT_MAX ? `${text.slice(0, TEXT_MAX)}\n\n${t('The rest is in the download.')}` : text}
+        </pre>
       )}
     </div>
   );

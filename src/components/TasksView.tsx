@@ -1,11 +1,12 @@
 import { TabBar } from './ui/TabBar';
 import { ProjectPeople } from './ProjectPeople';
+import { ProjectActivity, ProjectStatus } from './ProjectPulse';
 import { ProjectBadge, ProjectPhotoButton } from './ProjectBadge';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { TabPane } from './ui/Smooth';
 import { PROJECT_TYPES, term } from '../terms';
-import { Archive, RotateCcw, Inbox, X, Brain, CheckCircle2, Clock, Columns3, Eye, EyeOff, FileText, Hash, LayoutGrid, LayoutTemplate, Mail, Menu, MessagesSquare, Plus, Sparkles, Users, Video, type LucideIcon, FolderInput, ChevronRight, MessageCircle, CalendarCheck2, CalendarRange, ListTodo, Send, Layers, SlidersHorizontal, Settings2, BarChart3, LayoutDashboard, NotebookPen, KeyRound, AtSign, MoreHorizontal } from 'lucide-react';
+import { Search, Archive, RotateCcw, Inbox, X, Brain, CheckCircle2, Clock, Columns3, Eye, EyeOff, FileText, Hash, LayoutGrid, LayoutTemplate, Mail, Menu, MessagesSquare, Plus, Sparkles, Users, Video, type LucideIcon, FolderInput, ChevronRight, MessageCircle, CalendarCheck2, CalendarRange, ListTodo, Send, Layers, SlidersHorizontal, Settings2, BarChart3, LayoutDashboard, NotebookPen, KeyRound, AtSign, MoreHorizontal } from 'lucide-react';
 import type { Channel, ChatMessage, Client, DriveItem, Meeting, TaskStatus, Team, Thread, Todo, User, ClientPerson, Workspace, Note, DataTable, TableRow } from '../types';
 import { kindOf, stageOf, stagesFor, stagesForScope, toneOf } from '../stages';
 import { OwnStages } from './admin/TaskStages';
@@ -31,6 +32,7 @@ import { useActionMenu, type SheetAction } from './ui/ActionSheet';
 import type { TopSettingsRow } from './MobileTop';
 import { TaskViews, type SavedTaskView, type PhoneBar } from './tasks/TaskViews';
 import { TasksBrowse, type BrowseGroup } from './tasks/TasksBrowse';
+import { TaskSearchField, TaskSearchResults, TaskSearchSheet, useTaskSearchKey } from './tasks/TaskSearch';
 import { QuickAdd } from './tasks/QuickAdd';
 import type { NewTask, TaskOps } from './tasks/taskOps';
 import { saveDisplay } from './tasks/display';
@@ -653,6 +655,9 @@ export function TasksView(p: Props) {
   useCreateAction(app, partCreate);
   const [domainOpen, setDomainOpen] = useState(false);
   const [domainDraft, setDomainDraft] = useState('');
+  // Search: a field on Browse (phones), '/' or the search button (computers).
+  const [browseQ, setBrowseQ] = useState('');
+  const taskSearch = useTaskSearchKey(!phone && app === 'tasks');
 
   /* ---------- Phones: the top bar (Todoist: "‹ Tasks", the view's name, one "…"; a project's people and layout) ---------- */
   const proj = client ?? project;
@@ -694,7 +699,7 @@ export function TasksView(p: Props) {
   if (showBrowse)
     return (
       <>
-        <TasksBrowse groups={browseGroups.filter((g) => g.id !== 'mine')} />
+        <TasksBrowse groups={browseGroups.filter((g) => g.id !== 'mine')} hideGroups={!!browseQ.trim()} top={<><TaskSearchField value={browseQ} onChange={setBrowseQ} />{browseQ.trim() && <TaskSearchResults ops={ops} query={browseQ} />}</>} />
         {browseAdd && <QuickAdd ops={ops} defaults={{}} mode="sheet" where={t('My tasks')} inputRef={browseField} onClose={() => setBrowseAdd(false)} />}
       </>
     );
@@ -810,6 +815,12 @@ export function TasksView(p: Props) {
         {client && <ProjectPeople client={client} users={p.users} me={p.me} canEdit={projectManage} canInvite={projectManage || !!p.canInviteGuests} onPatch={(x) => p.onPatchClient(client.id, x)} onGuests={() => setClientTab('portal')} />}
         {/* The task list's own actions (layout, Display, New task) sit here, on the title's row (TaskViews). */}
         <span className="tq-head-slot" id="tq-head-slot" />
+        {app === 'tasks' && (
+          <button type="button" className="icon-btn hide-phone tsr-open" onClick={() => taskSearch.setOpen(true)} aria-label={t('Search tasks')} title={t('Search tasks') + ' (/)'}>
+            <Search size={16} />
+          </button>
+        )}
+        {taskSearch.open && <TaskSearchSheet ops={ops} onClose={() => taskSearch.setOpen(false)} />}
         {(client || project) && !(client && projectManage && client.status !== 'ended') && (
           <button className="ghost-btn sm tpl-btn" onClick={p.onTemplate} title={t('Start from a template')}>
             <LayoutTemplate size={14} /> <span>{t('Template')}</span>
@@ -937,6 +948,7 @@ export function TasksView(p: Props) {
         <TabPane key={clientTab}>
         {client && clientTab === 'overview' && (
           <div className="hub-overview">
+            <ProjectStatus client={client} users={p.users} me={p.me} canPost={client.status !== 'ended'} onPost={(u) => p.onPatchClient(client.id, { updates: [...(client.updates ?? []), u].slice(-20) })} />
             {(() => {
               // What needs doing for this client, not how much there is.
               const today = localDay();
@@ -1075,6 +1087,7 @@ export function TasksView(p: Props) {
                 </ul>
               </div>
             </div>
+            <ProjectActivity client={client} tasks={p.tasks} notes={p.notes} meetings={clientMeetings} messages={clientMsgs} users={p.users} me={p.me} onOpenTask={p.onOpenTask} onOpenNote={p.onOpenNote} onOpenMeeting={p.onOpenMeeting} onOpenChat={clientChannel ? () => p.onOpenChannel(clientChannel.id) : undefined} />
           </div>
         )}
 

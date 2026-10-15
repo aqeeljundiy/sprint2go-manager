@@ -121,6 +121,23 @@ const id: Record<string, string> = {
   'in {place}': 'di {place}',
   '{n} item will be deleted forever.': '{n} item akan dihapus permanen.',
   '{n} items will be deleted forever.': '{n} item akan dihapus permanen.',
+  // Several at once, the Details panel on computers, and text and PDFs in the viewer
+  Select: 'Pilih',
+  Selection: 'Pilihan',
+  'Clear selection': 'Batalkan pilihan',
+  '{n} selected': '{n} dipilih',
+  'Tap files to select': 'Ketuk file untuk memilih',
+  'Stars removed': 'Bintang dihapus',
+  '{n} item moved to trash': '{n} item dipindahkan ke sampah',
+  '{n} items moved to trash': '{n} item dipindahkan ke sampah',
+  'Select {name}': 'Pilih {name}',
+  'Pick a file': 'Pilih file',
+  'Select a file to see who added it, when and where it lives.': 'Pilih file untuk melihat siapa yang menambahkannya, kapan, dan di mana letaknya.',
+  'Close details': 'Tutup detail',
+  'Move {n} item': 'Pindahkan {n} item',
+  'Move {n} items': 'Pindahkan {n} item',
+  'This file could not be read. Download it to open it.': 'File ini tidak bisa dibaca. Unduh untuk membukanya.',
+  'The rest is in the download.': 'Sisanya ada di unduhan.',
 };
 
 export default id;

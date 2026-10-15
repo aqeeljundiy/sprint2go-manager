@@ -1,6 +1,6 @@
 import { cloneElement, isValidElement, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactElement, type ReactNode } from 'react';
 import { flushSync } from 'react-dom';
-import { CalendarDays, CalendarPlus, CalendarX, Check, ChevronDown, ChevronLeft, ChevronRight, CircleCheck, Copy, CopyPlus, Link2, Mail, Pencil, Plus, SkipForward, Trash2, Video, X } from 'lucide-react';
+import { CalendarDays, CalendarPlus, CalendarX, Check, ChevronDown, ChevronLeft, ChevronRight, CircleCheck, Copy, CopyPlus, Link2, Mail, MessageCircle, Pencil, Plus, Search, SkipForward, Trash2, Video, X } from 'lucide-react';
 import type { CalEvent, CalendarDef, Person, RsvpStatus, User, Workspace } from '../types';
 import { addDays, eventsOn, monthGrid, sameDay, startOfDay } from '../calendarUtils';
 import { expandEvents, findEvent, type Scope } from '../repeat';
@@ -19,6 +19,7 @@ import { Sheet } from './ui/Sheet';
 import { type CalView, eventLink, gridDays, isPending, shownView, stepOf, viewLabel, WEEK_MIN } from './calendar/calTools';
 import { EventCard, type CardKit } from './calendar/EventCard';
 import { EventDetail, type GuestAnswer } from './calendar/EventDetail';
+import { EventSearch } from './calendar/EventSearch';
 import { MonthDrop } from './calendar/MonthDrop';
 import { MonthView } from './calendar/MonthView';
 import { QuickCreate } from './calendar/QuickCreate';
@@ -50,6 +51,8 @@ interface Props {
   onDelete: (id: string, at?: ScopeAt) => void;
   onDuplicate: (id: string) => void;
   onOpenThread: (threadId: string) => void;
+  /** Message everyone on an event (a Mail draft to the guests, the title as subject). */
+  onMessageGuests?: (e: CalEvent) => void;
   /** Move or resize an event (drag it, or drag its bottom edge). One date of a repeating event comes with which dates. */
   onMove?: (id: string, start: Date, end: Date, scope?: Scope) => void;
   /** A task dropped on the calendar: block time for it. */
@@ -233,6 +236,7 @@ export function CalendarView(props: Props) {
         w: () => props.onView('week'),
         m: () => props.onView('month'),
         c: () => create(nextSlot(cursor)),
+        '/': () => setSearching(true),
         Escape: () => (drop ? setDrop(false) : props.onSelect(null)),
       };
       if (map[e.key]) {
@@ -293,6 +297,7 @@ export function CalendarView(props: Props) {
             ...(movable(e) ? [{ label: t('Move to tomorrow'), icon: SkipForward, run: () => void moveTo(e.id, addDays(new Date(e.start), 1), addDays(new Date(e.end), 1), menuAt) }] : []),
           ]
         : []),
+      ...(e.guests?.length && props.onMessageGuests ? [{ label: t('Message guests'), icon: MessageCircle, group: 'copy', run: () => props.onMessageGuests!(e) }] : []),
       { label: link ? t('Copy call link') : t('Copy link'), icon: link ? Copy : Link2, group: 'copy', run: () => void copy(link ? link.url : eventLink(e.id), link ? t('Call link copied') : t('Link copied')) },
       ...(editable(e) ? [{ label: t('Delete'), icon: Trash2, danger: true, group: 'end', run: () => props.onDelete(e.id, menuAt) }] : []),
     ];
@@ -314,6 +319,7 @@ export function CalendarView(props: Props) {
             ...(movable(e) ? [{ label: t('Move to tomorrow'), icon: SkipForward, run: () => void moveTo(e.id, addDays(new Date(e.start), 1), addDays(new Date(e.end), 1)) }] : []),
           ]
         : []),
+      ...(e.guests?.length && props.onMessageGuests ? [{ label: t('Message guests'), icon: MessageCircle, group: 'copy', run: () => props.onMessageGuests!(e) }] : []),
       { label: t('Copy link'), icon: Link2, group: 'copy', run: () => void copy(eventLink(e.id), t('Link copied')) },
       ...(link ? [{ label: t('Copy call link'), icon: Copy, group: 'copy', run: () => void copy(link.url, t('Call link copied')) }] : []),
       ...(editable(e) ? [{ label: t('Delete'), icon: Trash2, danger: true, group: 'end', run: () => props.onDelete(e.id) }] : []),
@@ -336,6 +342,15 @@ export function CalendarView(props: Props) {
     onTaskDone: props.onTaskDone,
     botWillJoin: props.botWillJoin,
   };
+
+  /* ---------- search across events (Google's search; "/" opens it) ---------- */
+  const [searching, setSearching] = useState(false);
+  const searchBtn = useRef<HTMLButtonElement>(null);
+  const searchButton = (
+    <button type="button" ref={searchBtn} className={phone ? 'icon-btn mt-cal-search' : 'icon-btn cal-search-btn'} onClick={() => setSearching(true)} aria-label={t('Search events')} title={phone ? undefined : t('Search events (/)')}>
+      <Search size={phone ? 22 : 18} />
+    </button>
+  );
 
   /* ---------- "+N" all-day events of one day ---------- */
   const [allDayOf, setAllDayOf] = useState<Date | null>(null);
@@ -371,6 +386,7 @@ export function CalendarView(props: Props) {
           }
           actions={
             <>
+              {searchButton}
               <button type="button" className="cal-today mt-cal-today" onClick={toToday} aria-label={t('Today, {date}', { date: fmtWeekdayLong(today) })}>
                 <span>{today.getDate()}</span>
               </button>
@@ -396,6 +412,7 @@ export function CalendarView(props: Props) {
                 <ChevronRight size={18} />
               </button>
             </div>
+            {searchButton}
             {/* Google's one view drop-down at every desktop width; D/W/M/A still switch from the keyboard. */}
             <Select<CalView> value={view} onChange={props.onView} options={views.map((v) => ({ value: v, label: viewLabel(v) }))} label={tx('cal', 'View')} className="cal-view-sel" width={180} />
             {/* "New event" is the sidebar's button (and C); not repeated here, one primary per screen. */}
@@ -479,6 +496,7 @@ export function CalendarView(props: Props) {
           answers={props.answersOf?.(selected)}
           inviteNote={props.inviteNote}
           more={detailMore(selected)}
+          onMessageGuests={props.onMessageGuests ? () => props.onMessageGuests!(selected) : undefined}
         />
       )}
 
@@ -502,6 +520,18 @@ export function CalendarView(props: Props) {
         />
       )}
 
+      <EventSearch
+        anchor={searchBtn}
+        open={searching}
+        onClose={() => setSearching(false)}
+        events={events}
+        color={(e) => color(e.calendarId)}
+        onPick={(e) => {
+          setSearching(false);
+          props.onCursor(new Date(e.start));
+          select(e.id);
+        }}
+      />
       <ActionSheet open={!!menu} onClose={() => setMenu(null)} title={menu?.e.title} actions={menu ? actionsFor(menu.e) : []} at={menu && !phone ? { x: menu.x, y: menu.y } : null} className="cal-menu-sheet" />
 
       {panel}

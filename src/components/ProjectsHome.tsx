@@ -1,7 +1,11 @@
 import { ProjectBadge } from './ProjectBadge';
 import { Sheet } from './ui/Sheet';
 import { IconTile } from './ui/IconTile';
-import { useState } from 'react';
+import { useRef, useState, type SyntheticEvent } from 'react';
+import { Popover } from './ui/Popover';
+import { Badge, PersonCell } from './ui/Person';
+import { HealthPill, latestUpdate, healthLabel, MyWork } from './ProjectPulse';
+import { usePersisted } from '../settings';
 import { Archive, ArrowRight, Check, ChevronRight, Menu, Pause, Play, Plus, Search } from 'lucide-react';
 import { projectTabIcon } from './ProjectPhone';
 import { useActionMenu } from './ui/ActionSheet';
@@ -24,9 +28,11 @@ import { fmtDay } from '../i18n/format';
  * The Projects app's home: every project, the ones that need something first. Each card says what's wrong (late,
  * nobody on it, waiting on a guest) or that it's on track, and opens the project's hub.
  */
-export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu, startAdding, onPast, onOpenPart, onPause, onEnd }: { startAdding?: boolean; projects: Client[]; tasks: Todo[]; users: User[]; onOpen: (id: string) => void; onCreate?: (name: string, type?: string, domain?: string) => void; onPast?: () => void; onMenu: () => void; onOpenPart?: (id: string, part: 'tasks' | 'chat' | 'emails' | 'files') => void; onPause?: (id: string, paused: boolean) => void; onEnd?: (id: string) => void }) {
+export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu, startAdding, onPast, onOpenPart, onPause, onEnd, me, mineTab, onOpenTask, onToggleTask }: { me?: string; mineTab?: boolean; onOpenTask?: (id: string) => void; onToggleTask?: (id: string) => void; startAdding?: boolean; projects: Client[]; tasks: Todo[]; users: User[]; onOpen: (id: string) => void; onCreate?: (name: string, type?: string, domain?: string) => void; onPast?: () => void; onMenu: () => void; onOpenPart?: (id: string, part: 'tasks' | 'chat' | 'emails' | 'files') => void; onPause?: (id: string, paused: boolean) => void; onEnd?: (id: string) => void }) {
   const [adding, setAdding] = useState(!!startAdding);
   const phone = usePhone();
+  const [view] = usePersisted<'all' | 'work'>('s2g-proj-view', 'all'); // the sidebar's All projects / My work
+  const myWork = !!me && !!onOpenTask && !!onToggleTask && <MyWork phone={phone} tasks={tasks} projects={projects} me={me} onOpenTask={onOpenTask} onToggleTask={onToggleTask} />;
   const [find, setFind] = useState(''); // desktop: "Find a project"
   // Right-click a card (long-press on touch): the same things the project's own menu does, without opening it first.
   const [hit, setHit] = useState<Client | null>(null);
@@ -69,7 +75,7 @@ export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu,
       .sort()
       .pop();
     const next = open.filter((x) => x.due && x.due >= today).sort((a, b) => a.due!.localeCompare(b.due!))[0];
-    return { late, nobody, guest, open: open.length, last, next };
+    return { late, nobody, guest, open: open.length, last, next, health: latestUpdate(c)?.health };
   };
   // Name order, once, on every device: cards stay where you left them (Basecamp's way); late work shows on its badge.
   const rows = live.map((c) => ({ c, s: stats(c) })).sort((a, b) => a.c.name.localeCompare(b.c.name));
@@ -144,7 +150,7 @@ export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu,
   // Phones: the projects as rows (Todoist's Browse), by status, with what needs a look at the right.
   if (phone) {
     const hint = (s: ReturnType<typeof stats>) =>
-      s.late ? { hint: tn(s.late, '{n} late', '{n} late'), tone: 'danger' as const } : s.guest ? { hint: t('Waiting on {who}', { who: term.who }) } : s.nobody ? { hint: tn(s.nobody, '{n} not picked up', '{n} not picked up') } : {};
+      s.late ? { hint: tn(s.late, '{n} late', '{n} late'), tone: 'danger' as const } : s.health && s.health !== 'on' ? { hint: healthLabel(s.health), tone: s.health === 'off' ? ('danger' as const) : undefined } : s.guest ? { hint: t('Waiting on {who}', { who: term.who }) } : s.nobody ? { hint: tn(s.nobody, '{n} not picked up', '{n} not picked up') } : {};
     const row = ({ c, s }: (typeof rows)[number]) => ({
       id: c.id,
       label: c.name,
@@ -169,6 +175,7 @@ export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu,
         top={
           <>
             {newForm}
+            {mineTab && myWork}
             {rows.length === 0 && (
               <EmptyState
                 icon={<Plus size={20} />}
@@ -189,9 +196,9 @@ export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu,
           <Menu size={18} />
         </button>
         <div className="th-text">
-          <h1>{term.Many}</h1>
+          <h1>{view === 'work' && myWork ? t('My work') : term.Many}</h1>
         </div>
-        {rows.length > 0 && (
+        {rows.length > 0 && !(view === 'work' && myWork) && (
           <label className="search proj-search">
             <Search size={15} />
             <input value={find} onChange={(e) => setFind(e.target.value)} placeholder={t('Find a {project}', { project: term.one })} aria-label={t('Find a {project}', { project: term.one })} />
@@ -201,7 +208,9 @@ export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu,
       </header>
       <div className="tracking-scroll">
         {newForm}
-        {rows.length === 0 ? (
+        {view === 'work' && myWork ? (
+          myWork
+        ) : rows.length === 0 ? (
           <EmptyState
             icon={<Plus size={20} />}
             title={t('No {projects} yet', { projects: term.many })}
@@ -243,8 +252,9 @@ export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu,
                           {[c.type ? t(c.type) : null, c.status === 'lead' ? tx('status', 'Lead') : c.status === 'paused' ? t('Paused') : null].filter(Boolean).join(' · ') || ' '}
                         </small>
                       )}
+                      {s.health && <HealthPill health={s.health} />}
                     </span>
-                    {on('owner') && owner && <Avatar person={owner} size={24} />}
+                    {on('owner') && owner && <CardPeople project={c} owner={owner} users={users} me={me} />}
                   </span>
                   {on('people') && (c.members?.length ?? 0) > 0 && (
                     <span className="avatar-stack proj-card-people">
@@ -283,7 +293,7 @@ export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu,
             );
           })
         )}
-        {onPast && pastCount > 0 && !find.trim() && (
+        {view !== 'work' && onPast && pastCount > 0 && !find.trim() && (
           <button type="button" className="link-btn small proj-past-link" onClick={onPast}>
             <Archive size={14} /> {t('Past {projects}', { projects: term.many })} ({pastCount})
           </button>
@@ -292,5 +302,51 @@ export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu,
       </div>
       {cardMenu.menu}
     </section>
+  );
+}
+
+/**
+ * The people on a card: their own target (it doesn't open the project). Tapping shows who's on it (a popover, a sheet
+ * on phones); each face there opens their profile card.
+ */
+function CardPeople({ project, owner, users, me }: { project: Client; owner: User; users: User[]; me?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [open, setOpen] = useState(false);
+  const team = [owner, ...(project.members ?? []).map((m) => users.find((u) => u.id === m.userId))].filter((u, i, a): u is User => !!u && a.findIndex((x) => x?.id === u.id) === i);
+  const role = (id: string) => (id === project.ownerId ? t('Owner') : project.members?.find((m) => m.userId === id)?.role === 'lead' ? t('Lead') : t('Member'));
+  const stop = (e: SyntheticEvent) => e.stopPropagation();
+  return (
+    <>
+      <span
+        ref={ref}
+        role="button"
+        tabIndex={0}
+        className="avatar-stack proj-card-people"
+        aria-label={t('People on {name}', { name: project.name })}
+        title={t('People on {name}', { name: project.name })}
+        onPointerDown={stop}
+        onContextMenu={stop}
+        onClick={(e) => (e.stopPropagation(), e.preventDefault(), setOpen(true))}
+        onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.stopPropagation(), e.preventDefault(), setOpen(true))}
+      >
+        {team.slice(0, 3).map((u) => (
+          <Avatar key={u.id} person={u} size={24} />
+        ))}
+        {team.length > 3 && <span className="proj-card-more">+{team.length - 3}</span>}
+      </span>
+      {/* Clicks inside the popover (a portal) still bubble through React to the card: stop them here. */}
+      <span className="proj-card-pop" onClick={stop} onPointerDown={stop} onContextMenu={stop}>
+      <Popover anchor={ref} open={open} onClose={() => setOpen(false)} width={300} align="end" title={t('People on {name}', { name: project.name })}>
+        <div className="pp-list">
+          {team.map((u) => (
+            <div key={u.id} className="pp-row">
+              <PersonCell person={u} size={28} sub={null} card={u.id} badges={u.id === me && <Badge tone="accent">{t('You')}</Badge>} />
+              <span className="muted small">{role(u.id)}</span>
+            </div>
+          ))}
+        </div>
+      </Popover>
+      </span>
+    </>
   );
 }

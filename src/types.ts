@@ -536,6 +536,12 @@ export interface User {
   title: string;
   color: string;
   photo?: string; // profile photo, a small square JPEG data URL
+  timeZone?: string; // IANA name, filled in from their browser: their local time on the profile card
+  phone?: string; // optional profile details, shown on the card only when filled in
+  pronouns?: string;
+  location?: string;
+  department?: string;
+  reportsTo?: string; // a user id: their manager
   hiddenApps?: AppId[]; // apps this person hid from their own sidebar (the company still has them)
   nicknames?: string[]; // "Bim" for Owen; used by the brain dump
   clientOf?: { workspaceId: string; clientId: string }; // someone at a client: signs in to their portal only
@@ -560,6 +566,7 @@ export interface Todo {
   channelId?: string; // on this chat channel's to-do list
   saidAt?: number; // ms into the recording
   due?: string; // YYYY-MM-DD
+  dueTime?: string; // HH:MM, an optional time of day on the due date
   done: boolean;
   status?: TaskStatus; // board column; kept in step with `done`
   priority: 'high' | 'normal';
@@ -672,6 +679,16 @@ export interface Client {
   people?: ClientPerson[]; // the client's own people who can sign in to their portal
   access?: Partial<ClientAccess>; // this client's own settings (otherwise the company's)
   aiUsage?: { month: string; count: number }; // client questions to AI this month
+  updates?: ProjectUpdate[]; // status updates, newest last; the last one is its health (team only, never sent to guests)
+}
+
+/** A written status update on a project: how it's going and a short note (src/components/ProjectPulse.tsx). */
+export interface ProjectUpdate {
+  id: string;
+  health: 'on' | 'risk' | 'off'; // on track, at risk, off track
+  note: string;
+  by: string; // user id
+  at: string;
 }
 
 /** Someone at a client who can sign in to see what's shared with them. */
@@ -1260,7 +1277,9 @@ export interface TableRow {
   createdBy: string;
   createdAt: string;
   updatedAt: string;
-  comments?: { id: string; by: string; at: string; text: string }[];
+  comments?: { id: string; by: string; at: string; text: string; mentions?: string[] }[];
+  /** People who hear about new comments on this row (commenting follows it; the bell in the row toggles it). */
+  followers?: string[];
   extra?: Record<string, unknown>; // incoming data no field was mapped to (kept, never lost)
   runs?: { fieldId: string; at: string; by: string; ok: boolean; note: string; tr?: Msg }[]; // button presses on this row (note in English, tr for textOf)
   history?: { by: string; at: string; fieldId: string; from: CellValue; to: CellValue }[];

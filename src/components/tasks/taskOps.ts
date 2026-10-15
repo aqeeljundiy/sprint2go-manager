@@ -10,6 +10,7 @@ export interface NewTask {
   clientId?: string;
   teamId?: string;
   due?: string;
+  dueTime?: string; // HH:MM
   priority?: 'high' | 'normal';
   repeat?: Repeat;
   remindAt?: string;

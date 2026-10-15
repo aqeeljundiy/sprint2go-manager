@@ -2252,3 +2252,184 @@ a.cf-card:focus-visible {
     animation-duration: 2.4s;
   }
 }
+
+/* ---------- A due time on the row's chip, and "Add time" next to the date ---------- */
+.tm .tm-time {
+  font-variant-numeric: tabular-nums;
+}
+.due-time-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  font-size: 13px;
+}
+.due-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+}
+.due-time-x {
+  color: var(--text-3);
+  transition: color 0.15s, background 0.15s;
+}
+.due-time-x:hover {
+  color: var(--text);
+}
+
+/* ---------- Rows on a computer: the face opens the person's card, the chevron reassigns ---------- */
+.trow-pick {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.people-btn.chevron {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--text-3);
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+.people-btn.chevron:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+.people-btn.chevron.open .rot-chev {
+  transform: rotate(180deg);
+}
+
+/* ---------- @mentions in comments ---------- */
+.td-comment,
+.tdp-comment,
+.comment-box {
+  position: relative;
+}
+.mention-list {
+  position: absolute;
+  left: 12px;
+  bottom: calc(100% - 4px);
+  z-index: 3;
+  width: min(280px, calc(100% - 24px));
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: 0 8px 24px -8px rgb(0 0 0 / 0.25);
+}
+.mention-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mention-chip {
+  color: var(--accent-text);
+  font-weight: 600;
+}
+
+/* ---------- Search in Tasks: Browse on phones, "/" on a computer ---------- */
+.tsr-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  margin: 0 0 8px;
+}
+.tsr-field input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  outline: none;
+}
+.tsr-field input::-webkit-search-cancel-button {
+  display: none;
+}
+.tsr-results {
+  display: grid;
+  gap: 16px;
+  animation: fadeIn 0.18s ease-out backwards;
+}
+.tsr-head {
+  margin: 0 0 4px;
+  padding: 0 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-3);
+}
+.tsr-card {
+  display: grid;
+}
+.tsr-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.tsr-row:hover {
+  background: var(--hover);
+}
+.tsr-ic {
+  flex: none;
+  color: var(--text-3);
+}
+.tsr-row.done .tsr-ic {
+  color: var(--accent);
+}
+.tsr-row.done .tsr-title {
+  color: var(--text-3);
+}
+.tsr-text {
+  display: grid;
+  min-width: 0;
+}
+.tsr-title,
+.tsr-sub {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tsr-sub {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-3);
+}
+.tsr-sub > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tsr-proj {
+  flex: none;
+  font-weight: 600;
+}
+.tsr-hint {
+  margin: 8px 4px;
+  font-size: 13px;
+}
+.tsr-sheet .tsr-results {
+  padding-bottom: 8px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tsr-results {
+    animation: none;
+  }
+}

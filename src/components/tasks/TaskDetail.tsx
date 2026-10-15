@@ -6,6 +6,8 @@ import { useLeaving } from '../ui/Smooth';
 import { Avatar } from '../Avatar';
 import { Select, Dot } from '../ui/Select';
 import { DatePicker } from '../ui/DatePicker';
+import { DueTime } from './DueTime';
+import { MentionText, mentionedIn, useMentions } from './Mentions';
 import { PeoplePicker } from '../ui/PeoplePicker';
 import { useActionMenu } from '../ui/ActionSheet';
 import { ProjectPicker } from '../ProjectPicker';
@@ -169,7 +171,8 @@ export function TaskDetail({
       filled: !!task.due,
       row: (
         <span className={`td-due due-${tone ?? 'none'}`}>
-          <DatePicker value={task.due ?? ''} onChange={(v) => onPatch(task.id, { due: v || undefined })} label={t('Due date')} placeholder={t('No date')} className="sel-flat" />
+          <DatePicker value={task.due ?? ''} onChange={(v) => onPatch(task.id, { due: v || undefined, ...(v ? {} : { dueTime: undefined }) })} label={t('Due date')} placeholder={t('No date')} className="sel-flat" />
+          <DueTime task={task} onPatch={onPatch} />
           {task.due && !task.done && tone !== 'overdue' && holidayOn(task.due) && <small className="hol-hint">{t('{holiday} is a public holiday', { holiday: holidayOn(task.due) ?? '' })}</small>}
         </span>
       ),
@@ -290,10 +293,12 @@ export function TaskDetail({
   };
 
   // Who hears about a comment: everyone on the task but you.
-  const told = [...new Set([...doers, task.supervisorId, ...(task.followers ?? [])].filter((x): x is string => !!x && x !== me))].map((id) => users.find((u) => u.id === id)?.name.split(' ')[0]).filter(Boolean) as string[];
+  const told = [...new Set([...doers, task.supervisorId, ...(task.followers ?? []), ...mentionedIn(comment, users).map((u) => u.id)].filter((x): x is string => !!x && x !== me))].map((id) => users.find((u) => u.id === id)?.name.split(' ')[0]).filter(Boolean) as string[];
   const toldText = !told.length ? t('Nobody else is on this task yet') : told.length === 1 ? t('{name} will be notified', { name: told[0] }) : tn(told.length - 1, '{name} and {n} other will be notified', '{name} and {n} others will be notified', { name: told[0] });
   // Files going with the next comment: they upload as soon as they're picked; the comment waits for them.
   const att = useCommentFiles(wsId);
+  const commentRef = useRef<HTMLTextAreaElement>(null);
+  const mention = useMentions({ text: comment, setText: setComment, users, me, inputRef: commentRef });
   useEffect(() => att.clear(), [task.id]); // eslint-disable-line react-hooks/exhaustive-deps
   const canSend = (!!comment.trim() || att.files.length > 0) && !att.busy;
   const send = () => {
@@ -422,12 +427,14 @@ export function TaskDetail({
   const foot = (
     <div className={`td-comment${toClient ? ' to-client' : ''}`} {...dropFiles(att)}>
       <WaitingFiles state={att} />
+      {mention.list}
       <div className="td-c-row">
         <textarea
           rows={1}
+          ref={commentRef}
           value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing && (e.preventDefault(), send())}
+          {...mention.field}
+          onKeyDown={(e) => !mention.onKey(e) && e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing && (e.preventDefault(), send())}
           placeholder={toClient ? t('Reply to the {who}…', { who: term.who }) : t('Add a comment…')}
           aria-label={t('Comment')}
         />
@@ -554,10 +561,10 @@ export function TaskDetail({
         {!allActivity &&
           (lastComment ? (
             <div className="tdp-last">
-              {lastBy ? <Avatar person={lastBy} size={24} /> : <span className="avatar-empty sm">{lastComment.by.charAt(0).toUpperCase()}</span>}
+              {lastBy ? <Avatar person={lastBy} size={24} card={lastBy.id} /> : <span className="avatar-empty sm">{lastComment.by.charAt(0).toUpperCase()}</span>}
               <span className="tdp-last-text">
                 <b>{lastBy ? (lastBy.id === me ? t('You') : lastBy.name.split(' ')[0]) : (lastComment.byName ?? lastComment.by)}</b>
-                {lastComment.text && <span>{lastComment.text}</span>}
+                {lastComment.text && <span><MentionText text={lastComment.text} users={users} /></span>}
                 <FileCards files={lastComment.files} />
               </span>
             </div>
@@ -577,13 +584,15 @@ export function TaskDetail({
   const pFoot = (
     <div className={`tdp-comment${toClient ? ' to-client' : ''}`}>
       <WaitingFiles state={att} />
+      {mention.list}
       <div className="tdp-field">
         <AttachButton state={att} phone className="tdp-clip" />
         <textarea
           rows={1}
+          ref={commentRef}
           value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing && (e.preventDefault(), send())}
+          {...mention.field}
+          onKeyDown={(e) => !mention.onKey(e) && e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing && (e.preventDefault(), send())}
           placeholder={toClient ? t('Reply to the {who}…', { who: term.who }) : t('Comment')}
           aria-label={t('Comment')}
         />

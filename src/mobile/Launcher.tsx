@@ -1,8 +1,8 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { Bell, EyeOff, LayoutGrid, Plus, Search, Sparkles, type LucideIcon } from 'lucide-react';
-import type { Person, Workspace } from '../types';
+import type { CalEvent, Person, Workspace } from '../types';
 import type { Need } from '../needsYou';
-import { NeedsList, type NeedActions } from '../components/home/HomeParts';
+import { JoinSoon, NeedsList, type NeedActions } from '../components/home/HomeParts';
 import { Avatar } from '../components/Avatar';
 import { WorkspaceLogo } from '../components/WorkspaceLogo';
 import { ActionSheet, type SheetAction } from '../components/ui/ActionSheet';
@@ -66,7 +66,7 @@ export function Launcher(p: {
   firstName: string;
   needs: Need[];
   needActions: NeedActions;
-  next?: { title: string; start: string };
+  next?: { title: string; start: string } & Partial<CalEvent>; // a meeting with a link starting within 10 minutes gets Join
   recents: Recent[];
   apps: LauncherApp[];
   unreadNotices: number;
@@ -139,6 +139,7 @@ export function Launcher(p: {
           <p className="ln-date">{fmtWeekdayLong(new Date())}</p>
           <FitTitle full={greeting} short={greeting.split(',')[0]} />
           {lede && <p className="ln-lede">{lede}</p>}
+          {p.next?.id && p.next.end && <JoinSoon e={p.next as CalEvent} />}
         </div>
 
         {list.length > 0 && (

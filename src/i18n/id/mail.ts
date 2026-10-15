@@ -683,6 +683,11 @@ const id: Record<string, string> = {
   'Nothing archived': 'Tidak ada yang diarsipkan',
   'Archived email leaves your inbox and waits here.': 'Email yang diarsipkan keluar dari kotak masuk dan menunggu di sini.',
   // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
+  // Person card from mail: recipient chips and names (Oct 2026)
+  to: 'kepada',
+  'Edit address': 'Ubah alamat',
+  'Move to {field}': 'Pindahkan ke {field}',
+  'Options for {name}': 'Opsi untuk {name}',
 };
 
 export default id;

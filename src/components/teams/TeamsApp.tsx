@@ -1,7 +1,7 @@
 import { Sheet } from '../ui/Sheet';
 import { ConfirmSheet } from '../chat/Sheets';
 import { useMemo, useRef, useState } from 'react';
-import { ArrowLeft, Check, ChevronRight, Crown, LogOut, Mail, Menu, Plus, Search, Trash2, UserPlus, Users, X } from 'lucide-react';
+import { ArrowLeft, Check, ChevronRight, Crown, LogOut, Mail, Menu, MessageCircle, MoreHorizontal, Plus, Search, Trash2, UserPlus, Users, X } from 'lucide-react';
 import { useActionMenu } from '../ui/ActionSheet';
 import { usePhone } from '../../mobile/media';
 import type { Client, HomeTemplateId, Team, Todo, User } from '../../types';
@@ -10,6 +10,7 @@ import { kindOf, projectStages, stageBadge, stageOf, stagesFor } from '../../sta
 import { OwnStages, type Move } from '../admin/TaskStages';
 import { Avatar } from '../Avatar';
 import { Badge, PersonCell } from '../ui/Person';
+import { usePersonCard } from '../ui/PersonCard';
 import { EmptyState } from '../ui/EmptyState';
 import { HOME_TEMPLATES } from '../HomeView';
 import { PeoplePicker, PersonSelect } from '../ui/PeoplePicker';
@@ -47,6 +48,7 @@ export interface TeamActions {
   direct: (tm: Team) => boolean; // this person can join without asking (an open team, or they're an admin)
   leave: (tm: Team) => void;
   remove: (tm: Team) => void;
+  chat?: (tm: Team) => void; // opens the team's own Chat channel (made when it's missing)
 }
 
 /* ---------- the sidebar: your teams, then the rest ---------- */
@@ -317,9 +319,12 @@ function PersonRow({ u, teams, onOpen }: { u: User; teams: Team[]; onOpen: (id: 
       ),
     },
   );
+  const card = usePersonCard();
+  // Tap: their profile card (Message first). Long-press or right-click: Email and their teams.
+  const open = (el: HTMLElement, x: number, y: number) => (card ? card.open({ userId: u.id, email: u.email, name: u.name }, el) : menu.openAt(x, y));
   return (
     <>
-      <div className="tdir-row lp" role="button" tabIndex={0} {...menu.bind} onClick={(e) => menu.openAt(e.clientX, e.clientY)} onKeyDown={(e) => e.key === 'Enter' && menu.openAt(0, 0)}>
+      <div className="tdir-row lp" role="button" tabIndex={0} {...menu.bind} onClick={(e) => open(e.currentTarget, e.clientX, e.clientY)} onKeyDown={(e) => e.key === 'Enter' && open(e.currentTarget, 0, 0)}>
         <Avatar person={u} size={36} card={u.id} />
         <span className="tdir-text">
           <strong>{u.name}</strong>
@@ -357,9 +362,13 @@ function MemberRow({ u, tm, teams, me, manage, actions }: { u: User; tm: Team; t
       ),
     },
   );
+  const card = usePersonCard();
+  // Tap: their profile card, Message first. Make lead, Remove and Leave sit behind the "..." (and long-press).
+  const open = (el: HTMLElement, x: number, y: number) => (card ? card.open({ userId: u.id, email: u.email, name: u.name }, el) : menu.openAt(x, y));
+  const more = manage || u.id === me;
   return (
     <>
-      <div className="tdir-row tdir-member lp" role="button" tabIndex={0} {...menu.bind} onClick={(e) => menu.openAt(e.clientX, e.clientY)} onKeyDown={(e) => e.key === 'Enter' && menu.openAt(0, 0)}>
+      <div className="tdir-row tdir-member lp" role="button" tabIndex={0} {...menu.bind} onClick={(e) => open(e.currentTarget, e.clientX, e.clientY)} onKeyDown={(e) => e.key === 'Enter' && e.target === e.currentTarget && open(e.currentTarget, 0, 0)}>
         <Avatar person={u} size={36} card={u.id} />
         <span className="tdir-text">
           <strong>
@@ -369,6 +378,21 @@ function MemberRow({ u, tm, teams, me, manage, actions }: { u: User; tm: Team; t
           </strong>
           <small>{u.title || u.email}</small>
         </span>
+        {more && (
+          <button
+            type="button"
+            className="icon-btn tdir-more"
+            aria-label={t('More for {name}', { name: u.name })}
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              const b = e.currentTarget.getBoundingClientRect();
+              menu.openAt(b.right, b.bottom);
+            }}
+          >
+            <MoreHorizontal size={20} />
+          </button>
+        )}
       </div>
       {menu.menu}
     </>
@@ -434,7 +458,7 @@ export function TeamPage({
   return (
     <section className="tasks-pane view-enter team-page">
       {/* Phones: Join sits in the top bar (Slack's channel header), only while you are not in the team; no row of its own. */}
-      {subPhone && <TopBar app="teams" title={<h1 className="mt-title plain small">{tm.name}</h1>} actions={tm.members.includes(me) ? undefined : <JoinButton tm={tm} me={me} actions={actions} small />} />}
+      {subPhone && <TopBar app="teams" title={<h1 className="mt-title plain small">{tm.name}</h1>} actions={tm.members.includes(me) ? (actions.chat ? <button type="button" className="icon-btn" onClick={() => actions.chat!(tm)} aria-label={t('Open the {team} chat', { team: tm.name })}><MessageCircle size={20} /></button> : undefined) : <JoinButton tm={tm} me={me} actions={actions} small />} />}
       {!subPhone && (
       <header className="tracking-head tasks-head">
         <button className="icon-btn menu-btn" onClick={onBack} aria-label={t('All teams')}>
@@ -445,6 +469,11 @@ export function TeamPage({
           <h1>{tm.name}</h1>
           <p>{tm.about || (lead ? t('Led by {name}', { name: lead.name }) : t('No lead yet'))}</p>
         </div>
+        {actions.chat && tm.members.includes(me) && (
+          <button type="button" className="ghost-btn sm" onClick={() => actions.chat!(tm)} title={t('Open the {team} chat', { team: tm.name })}>
+            <MessageCircle size={14} /> {t('Chat')}
+          </button>
+        )}
         <JoinButton tm={tm} me={me} actions={actions} />
       </header>
       )}
@@ -470,6 +499,7 @@ export function TeamPage({
 
 function MembersTab({ tm, teams, users, me, manage, actions }: { tm: Team; teams: Team[]; users: User[]; me: string; manage: boolean; actions: TeamActions }) {
   const phone = usePhone();
+  const card = usePersonCard();
   const people = tm.members.map((id) => users.find((u) => u.id === id)).filter(Boolean) as User[];
   const requests = (tm.requests ?? []).map((r) => ({ r, u: users.find((u) => u.id === r.userId) })).filter((x) => x.u) as { r: { userId: string; at: string }; u: User }[];
   const approve = (id: string) => actions.patch(tm.id, { members: [...new Set([...tm.members, id])], requests: (tm.requests ?? []).filter((r) => r.userId !== id) });
@@ -502,7 +532,7 @@ function MembersTab({ tm, teams, users, me, manage, actions }: { tm: Team; teams
           if (phone) return <MemberRow key={u.id} u={u} tm={tm} teams={teams} me={me} manage={manage} actions={actions} />;
           const also = teams.filter((x) => x.id !== tm.id && x.members.includes(u.id));
           return (
-            <div key={u.id} className="team-row">
+            <div key={u.id} className="team-row team-row-open" onClick={(e) => !(e.target as HTMLElement).closest('button, a, [role="button"]') && card?.open({ userId: u.id, email: u.email, name: u.name }, e.currentTarget)}>
               <PersonCell
                 person={u}
                 card={u.id}

@@ -97,6 +97,7 @@ import { flashOption, settingsEntries } from './settingsIndex';
 import { HomeView } from './components/HomeView';
 import { TaskDrawer } from './components/TaskDrawer';
 import { TasksView, dueLabel, isBrief, type TaskScope } from './components/TasksView';
+import { mentionedIn } from './components/tasks/Mentions';
 import { TasksSidebar } from './components/TasksSidebar';
 import type { DumpResult } from './components/BrainDump';
 import { ChatSidebar, ChatView, NewMessageSheet, StatusPicker, statusText, fullLayout, sectionIdOf, sectionPeople, sectionTitle, type ChatPage, type GuestOption, type Presence, type Recipients, type SendPayload } from './components/ChatApp';
@@ -292,6 +293,14 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
     if (settings.name !== user.name || settings.title !== user.title || settings.avatarColor !== user.color)
       onUpdateUser({ name: settings.name, title: settings.title, color: settings.avatarColor });
   }, [settings.name, settings.title, settings.avatarColor]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Their time zone, from this browser: teammates see their local time on the profile card.
+  useEffect(() => {
+    let tz = '';
+    try {
+      tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    } catch {}
+    if (tz && tz !== user.timeZone) onUpdateUser({ timeZone: tz });
+  }, [user.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Workspaces: one per business, each with its own brand and accounts.
   // A user only sees workspaces they're a member of, and only mailboxes they've been given.
@@ -1884,6 +1893,14 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
       saveTeams(wsTeams.map((x) => (x.id === tm.id ? { ...x, members: x.members.filter((m) => m !== user.id), leadId: x.leadId === user.id ? undefined : x.leadId } : x)));
       showToast({ text: t('You left {team}', { team: tm.name }) });
     },
+    chat: (tm) => {
+      // The team's channel; teams made before channels came with them get one now.
+      const ch = channels.find((c) => c.workspaceId === ws.id && c.teamId === tm.id && !c.archived);
+      if (ch) return openChannel(ch.id);
+      const id = uid();
+      setChannels((cs) => [...cs, { id, workspaceId: ws.id, kind: 'channel', name: tm.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'), members: [...new Set([user.id, ...tm.members])], teamId: tm.id, topic: t('{team} team', { team: tm.name }), category: 'team', ownerId: user.id, createdAt: nowIso() }]);
+      openChannel(id);
+    },
     remove: (tm) => {
       saveTeams(wsTeams.filter((x) => x.id !== tm.id));
       setTeamId(null);
@@ -1973,6 +1990,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
       context?: string;
       userId: string;
       due?: string;
+      dueTime?: string; // HH:MM
       priority?: 'high' | 'normal';
       source: Todo['source'];
       threadId?: string;
@@ -1999,6 +2017,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
       context: t.context,
       userId: t.userId,
       due: t.due,
+      ...(t.dueTime ? { dueTime: t.dueTime } : {}),
       priority: t.priority ?? 'normal',
       done: false,
       // A stage it was given (Quick Add's /stage, a board column) when it's one of its own stages (its project's or team's, else the company's).
@@ -2179,7 +2198,9 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
   const commentTask = (id: string, text: string, toClient = false, files?: CommentFile[]) => {
     const t = todos.find((x) => x.id === id);
     if (!t) return;
-    setTodos((ts) => ts.map((x) => (x.id === id ? { ...x, history: [...(x.history ?? []), { id: uid(), at: nowIso(), by: user.id, kind: 'comment', text, ...(toClient ? { toClient: true } : {}), ...(files?.length ? { files } : {}) }] } : x)));
+    // People it @mentions follow the task from now on (they hear about what happens next).
+    const mentioned = mentionedIn(text, members).map((u) => u.id).filter((x) => x !== user.id && !doersOf(t).includes(x) && x !== t.supervisorId && !(t.followers ?? []).includes(x));
+    setTodos((ts) => ts.map((x) => (x.id === id ? { ...x, history: [...(x.history ?? []), { id: uid(), at: nowIso(), by: user.id, kind: 'comment', text, ...(toClient ? { toClient: true } : {}), ...(files?.length ? { files } : {}) }], ...(mentioned.length ? { followers: [...(x.followers ?? []), ...mentioned] } : {}) } : x)));
     // A comment that is only files: the notices name them.
     if (!text) text = (files ?? []).map((f) => f.name).join(', ');
     if (toClient) {
@@ -2337,6 +2358,17 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
     setChatPage(null);
     go('chat');
   };
+  // A #channel link in a message (chat/Message.tsx) opens that channel.
+  const openChannelRef = useRef(openChannel);
+  openChannelRef.current = openChannel;
+  useEffect(() => {
+    const on = (e: Event) => {
+      const id = (e as CustomEvent<{ id?: string }>).detail?.id;
+      if (id) openChannelRef.current(id);
+    };
+    window.addEventListener('s2g:open-channel', on);
+    return () => window.removeEventListener('s2g:open-channel', on);
+  }, []);
   const openMeeting = (id: string) => {
     setMeetPage({ kind: 'meeting', id });
     go('meet');
@@ -2383,6 +2415,13 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
     if (before && patch.members)
       for (const m of patch.members.filter((x) => x.userId !== user.id && !(before.members ?? []).some((y) => y.userId === x.userId)))
         notify(m.userId, 'task', m.role === 'lead' ? msg('{name} added you to {project} as lead', { name: user.name.split(' ')[0], project: before.name }) : msg('{name} added you to {project}', { name: user.name.split(' ')[0], project: before.name }), { app: 'projects', id: id });
+    // A status update: everyone on the project hears how it's going (ProjectPulse.tsx).
+    const posted = patch.updates?.at(-1);
+    if (before && posted && posted.id !== before.updates?.at(-1)?.id) {
+      for (const uid of new Set([before.ownerId, ...(before.members ?? []).map((m) => m.userId)]))
+        if (uid && uid !== user.id) notify(uid, 'task', (posted.health === 'on' ? msg('{name} posted an update on {project}: on track', { name: user.name.split(' ')[0], project: before.name }) : posted.health === 'risk' ? msg('{name} posted an update on {project}: at risk', { name: user.name.split(' ')[0], project: before.name }) : msg('{name} posted an update on {project}: off track', { name: user.name.split(' ')[0], project: before.name })), { app: 'projects', id });
+      showToast({ text: t('Update posted') });
+    }
   };
   /** With the local server: a link where a client person sets their password and signs in to their portal. */
   const makeClientInvite = (clientId: string) => async (p: { name: string; email: string }) => {
@@ -4695,6 +4734,16 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
               if (e) setCalCursor(new Date(e.start));
               setSelectedEventId(id);
             }}
+            onRecapEmail={
+              mailOut
+                ? (subject, body, to) => openCompose({ initial: { to, cc: [], subject, html: textToHtml(body) + settings.signature, text: body, files: [], track: settings.trackByDefault, trackOptions: DEFAULT_TRACK_OPTIONS, fromId: (sendable.find((a) => a.kind === 'personal') ?? sendable[0] ?? myAccounts[0])?.id ?? '' } })
+                : undefined
+            }
+            recapChannel={(m) => {
+              const ch = m.clientId ? channels.find((c) => c.workspaceId === ws.id && c.kind === 'channel' && c.clientId === m.clientId && !c.guests?.length && !c.archived) : undefined;
+              return ch ? { id: ch.id, name: ch.name } : undefined;
+            }}
+            onRecapPost={(channelId, text) => (postChat(channelId, text), showToast({ text: t('Recap posted'), action: { label: t('Open'), run: () => openChannel(channelId) } }))}
             {...extra}
           />
   );
@@ -4744,6 +4793,16 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
       onEmail={(to) => openCompose({ initial: { to: [to], cc: [], subject: '', html: settings.signature, text: '', files: [], track: settings.trackByDefault, trackOptions: DEFAULT_TRACK_OPTIONS, fromId: (sendable.find((a) => a.kind === 'personal') ?? sendable[0] ?? myAccounts[0])?.id ?? '' } })}
       onEmailsWith={(email) => (selectView({ kind: 'folder', id: 'inbox' }), setQuery(`from:${email} OR to:${email}`))}
       onTasks={(id) => openTasks({ kind: 'person', id })}
+      onCall={(other) => {
+        // A call from the card: our DM's huddle, as the phone button in Chat starts it.
+        const id = dmWith(other);
+        openChannel(id);
+        if (!server.on) return;
+        tried('voice');
+        if (huddleId && huddleId !== id) leaveHuddle();
+        setChannels((cs) => cs.map((c) => (c.id === id ? { ...c, huddle: { by: c.huddle?.by ?? user.id, at: c.huddle?.at ?? nowIso(), members: [...new Set([...(c.huddle?.members ?? []), user.id])] } } : c)));
+        setHuddleId(id);
+      }}
     >
     {inSandbox ? <DemoCompanyBar busy={demoBusy} onReset={() => setResettingDemo(true)} onHide={() => void hideDemo()} /> : topBar}
     <div className={`app mode-${mode} ${readerOpen ? 'reading' : ''} ${collapsed ? 'sb-collapsed' : ''} ${['home', 'settings'].includes(mode) ? 'no-sidebar' : ''} ${inSandbox || topBar ? 'with-demo-bar' : ''}`}>
@@ -4854,6 +4913,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
           />
           ) : appMode === 'projects' ? (
           <ProjectsSidebar
+            me={user.id}
             scope={projScope}
             tasks={wsTasks}
             clients={wsClientsAll}
@@ -4922,6 +4982,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
               setChatPage(null);
               setSidebarOpen(false);
             }}
+            onOpenMessage={(id, msg) => (setChatId(id), setChatPage(null), setSidebarOpen(false), setFocusMsg(msg))}
             onJoin={(id) => {
               setChannels((cs) => cs.map((c) => (c.id === id ? { ...c, members: [...c.members, user.id] } : c)));
               setChatId(id);
@@ -5054,6 +5115,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
               statuses={statuses}
               presence={presence}
               onOpen={setChatId}
+              onOpenMessage={(id, msg) => (setChatId(id), setChatPage(null), setFocusMsg(msg))}
               onJoin={(id) => {
                 setChannels((cs) => cs.map((c) => (c.id === id ? { ...c, members: [...c.members, user.id] } : c)));
                 setChatId(id);
@@ -5176,6 +5238,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
             }}
             onOpenTask={openTask}
             onOpenTeam={(id) => openTasks({ kind: 'team', id })}
+            onOpenPerson={(id) => openTasks({ kind: 'person', id })}
             onOpenBriefs={() => openTasks({ kind: 'briefs' })}
             onOpenGrid={() => openTasks({ kind: 'grid' })}
             threads={scoped}
@@ -5280,6 +5343,10 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
           <ProjectsHome
             key={projNew}
             startAdding={projNew > 0}
+            me={user.id}
+            mineTab={mobile && projMine}
+            onOpenTask={openTask}
+            onToggleTask={toggleTodo}
             projects={seesAllProjects && !(mobile && projMine) ? wsClientsAll : wsClientsAll.filter((c) => myClientIds.includes(c.id))}
             tasks={wsTasks}
             users={members}
@@ -5757,6 +5824,13 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
             onDelete={deleteEvent}
             onDuplicate={duplicateEvent}
             onOpenThread={openThread}
+            onMessageGuests={(e) => {
+              const mine = new Set([user.email, ...myAccounts.map((a) => a.email)].filter(Boolean).map((x) => x!.toLowerCase()));
+              const seen = new Set<string>();
+              const to = [...(e.organizer ? [e.organizer] : []), ...(e.guests ?? [])].filter((g) => g.email && !mine.has(g.email.toLowerCase()) && !seen.has(g.email.toLowerCase()) && !!seen.add(g.email.toLowerCase())).map((g) => ({ name: g.name, email: g.email }));
+              if (!to.length) return void showToast({ text: t('No one else is on this event yet') });
+              openCompose({ initial: { to, cc: [], subject: e.title, html: settings.signature, text: '', files: [], track: settings.trackByDefault, trackOptions: DEFAULT_TRACK_OPTIONS, fromId: (sendable.find((a) => a.kind === 'personal') ?? sendable[0] ?? myAccounts[0])?.id ?? '' } });
+            }}
             onRsvp={rsvpEvent}
             answersOf={answersOf}
             inviteNote={real ? undefined : t('Demo: invites aren’t emailed')}
@@ -5966,6 +6040,12 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
             onOpen={(item, list) => setPreview({ item, list })}
             onStar={(id) => patchDrive(id, { starred: !drive.find((i) => i.id === id)?.starred })}
             onTrash={trashDrive}
+            onBulk={(ids, patch, text) => {
+              // Several files at once, one Undo that puts each one back as it was.
+              const before = new Map(drive.filter((i) => ids.includes(i.id)).map((i) => [i.id, { trashed: i.trashed, starred: i.starred, parentId: i.parentId }]));
+              setDrive((d) => d.map((i) => (before.has(i.id) ? { ...i, ...patch } : i)));
+              showToast({ text, action: { label: t('Undo'), run: () => setDrive((d) => d.map((i) => (before.has(i.id) ? { ...i, ...before.get(i.id)! } : i))) } });
+            }}
             onRestore={(id) => patchDrive(id, { trashed: false })}
             onDeleteForever={deleteForever}
             onStartRename={setRenamingId}
@@ -6021,6 +6101,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
             users={allUsers}
             me={user.id}
             onPhoto={(photo) => onUpdateUser({ photo })}
+            onProfile={(patch) => onUpdateUser(patch)}
             onPreviewOnboarding={() => setPreviewOnboarding(true)}
             myApps={{ hidden: myHidden, asked: askedApps, onHidden: setMyHidden, onAsk: askForApp, onEdit: mobile ? () => setEditingApps(true) : undefined }}
             myRole={role}

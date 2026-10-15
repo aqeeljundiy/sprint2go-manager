@@ -98,7 +98,7 @@ const prio = (t: Todo) => (t.priority === 'high' ? 0 : 1);
 /** Smart: by day, high priority first within a day, then the oldest first. */
 export function sortTasks(tasks: Todo[], by: SortBy): Todo[] {
   const list = [...tasks];
-  const due = (t: Todo) => t.due ?? '9999';
+  const due = (t: Todo) => `${t.due ?? '9999'} ${t.dueTime ?? '99:99'}`; // timed tasks first on their day, in order
   switch (by) {
     case 'due':
       return list.sort((a, b) => due(a).localeCompare(due(b)) || a.createdAt.localeCompare(b.createdAt));

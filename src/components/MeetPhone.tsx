@@ -307,7 +307,7 @@ export function MeetHome(p: HomeProps) {
               const s = m.status ?? 'done';
               const row = (
                 <div className="mh-row" key={m.id}>
-                  <button type="button" className="mh-main" onClick={() => p.onPage({ kind: 'meeting', id: m.id })}>
+                  <button type="button" className="mh-main" onClick={() => p.onPage({ kind: 'meeting', id: m.id, ...(q.trim() ? { q: q.trim() } : {}) })}>
                     <CallMark kind={m.platform ?? 'meet'} />
                     <span className="mh-text">
                       <strong>{m.title}</strong>

@@ -3925,3 +3925,110 @@
   gap: 8px;
   padding: 4px;
 }
+/* A cell's files open full size in the viewer. */
+.tb-file-open {
+  display: inline-flex;
+  cursor: zoom-in;
+  border-radius: 5px;
+  transition: transform 150ms ease-out, opacity 150ms ease-out;
+}
+.tb-file-open:hover {
+  transform: scale(1.06);
+}
+.tb-file-open:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tb-file-open {
+    transition: none;
+  }
+}
+
+/* Row comments: follow, @mentions. */
+.tb-rd-sec-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.tb-follow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-3);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms ease-out, color 150ms ease-out;
+}
+.tb-follow:hover {
+  background: var(--hover);
+}
+.tb-follow.on {
+  color: var(--accent);
+}
+.tb-comment-new {
+  position: relative;
+}
+.tb-mention {
+  color: var(--accent);
+  font-weight: 600;
+}
+.tb-mention-pick {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% + 4px);
+  display: grid;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: var(--shadow-pop, 0 8px 24px rgb(0 0 0 / 0.16));
+  z-index: 5;
+  animation: tb-mention-in 180ms ease-out backwards;
+  transform-origin: bottom left;
+}
+.tb-mention-pick button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 150ms ease-out;
+}
+.tb-mention-pick button.on,
+.tb-mention-pick button:hover {
+  background: var(--hover);
+}
+@keyframes tb-mention-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
+}
+@media (pointer: coarse) {
+  .tb-follow,
+  .tb-mention-pick button {
+    min-height: var(--tap, 44px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tb-mention-pick {
+    animation: none;
+  }
+}

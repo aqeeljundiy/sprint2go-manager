@@ -43,7 +43,7 @@ import type { CalEvent, Message, Person, Thread, User, Client } from '../types';
 import { fmtTimeRange } from '../calendarUtils';
 import { fullDate, relative, snippet } from '../utils';
 import { Avatar } from './Avatar';
-import { PersonName } from './ui/PersonCard';
+import { PersonName, usePersonCard } from './ui/PersonCard';
 import { Wordmark } from './Logo';
 import { RichEditor } from './RichEditor';
 import { TrackingPanel } from './TrackingPanel';
@@ -76,7 +76,7 @@ import { OriginalSheet, downloadEml, printMail, translateText } from './mail/Mes
 import { ReplyHead } from './mail/ReplyHead';
 import { canReplyAll, replyPeople } from '../mailPeople';
 import type { ReplyOpts } from './mail/composeExtras';
-import { Code2, Languages, Printer } from 'lucide-react';
+import { Code2, Languages, Printer, Search as SearchIcon } from 'lucide-react';
 import { defaultSpell, type SpellLang } from './mail/composeExtras';
 import { suggestNext } from './mail/smartCompose';
 import { usePersisted } from '../settings';
@@ -175,6 +175,7 @@ export function Reader(props: Props) {
   const sigAddress = thread ? props.replyAddress?.(thread) : undefined;
   const signature = sigAddress && props.signatureFor ? props.signatureFor(sigAddress) : props.signature;
   const phone = usePhone();
+  const card = usePersonCard();
   const [translations, setTranslations] = useState<Map<string, Translation>>(new Map());
   const [original, setOriginal] = useState<string | null>(null); // the message whose source is open
   // The desktop reply box: its people and subject when changed (null: Gmail's), and which fields are open.
@@ -459,6 +460,7 @@ export function Reader(props: Props) {
     { label: t('Download message'), icon: Download, group: 'tools', disabled: confidentialIn(m), run: () => downloadEml(thread.id, m.id) },
     ...(m.html || m.body ? [{ label: translations.has(m.id) ? t('Show original language') : t('Translate'), icon: Languages, group: 'tools', disabled: confidentialIn(m), run: () => void translate(m) }] : []),
     { label: t('Mark unread from here'), icon: Mail, group: 'mark', run: () => props.onMarkUnread(thread.id) },
+    ...(card && !isMine(m.from.email) ? [{ label: t('Emails with {name}', { name: (m.from.name || m.from.email).split(' ')[0] }), icon: SearchIcon, group: 'mark', run: () => card.emailsWith(m.from.email) }] : []),
   ];
 
   /** Pictures pasted or dropped into a reply: uploaded, then shown where they were put (cid images when sent). */
@@ -565,13 +567,20 @@ export function Reader(props: Props) {
             </div>
             <div className="message-to">
               {open
-                ? [
-                    t('to {names}', { names: m.to.map((p) => (isMine(p.email) ? meOr(p.email) ?? t('me') : p.name || p.email)).join(', ') }),
-                    m.cc?.length ? t('Cc {names}', { names: m.cc.map((p) => (isMine(p.email) ? meOr(p.email) ?? t('me') : p.name || p.email)).join(', ') }) : '',
-                    m.bcc?.length ? t('Bcc {names}', { names: m.bcc.map((p) => p.name || p.email).join(', ') }) : '',
-                  ]
-                    .filter(Boolean)
-                    .join(' · ')
+                ? ([['to', m.to], ['cc', m.cc ?? []], ['bcc', m.bcc ?? []]] as const)
+                    .filter(([, ps]) => ps.length)
+                    .map(([kind, ps], k) => (
+                      <Fragment key={kind}>
+                        {k ? ' · ' : ''}
+                        {kind === 'to' ? t('to') : kind === 'cc' ? 'Cc' : 'Bcc'}{' '}
+                        {ps.map((p, i) => (
+                          <Fragment key={p.email + i}>
+                            {i ? ', ' : ''}
+                            {isMine(p.email) ? meOr(p.email) ?? t('me') : <PersonName who={p}>{p.name || p.email}</PersonName>}
+                          </Fragment>
+                        ))}
+                      </Fragment>
+                    ))
                 : m.confidential && !m.confidential.sender
                   ? t('Confidential email')
                   : snippet(m.body)}
@@ -970,7 +979,7 @@ export function Reader(props: Props) {
               <Avatar person={m.from} size={40} card />
             </button>
             <button type="button" className="gm-msg-name" onClick={() => toggle(m.id)} aria-expanded>
-              <strong>{who}</strong>
+              <strong>{isMine(m.from.email) ? who : <PersonName who={m.from}>{who}</PersonName>}</strong>
             </button>
             {/* The time sits on the "to me" line, so a long name keeps the whole first line. */}
             <button type="button" className="gm-msg-to" onClick={() => setDetails((d) => (d.has(m.id) ? new Set([...d].filter((x) => x !== m.id)) : new Set([...d, m.id])))} aria-expanded={showDetails}>

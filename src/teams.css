@@ -662,3 +662,15 @@ button.team-row:hover,
   flex: 1;
   min-width: 0;
 }
+
+/* A member row opens their profile card; the "..." holds Make lead, Remove and Leave. */
+.team-row-open {
+  cursor: pointer;
+}
+.tdir-more {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  margin-right: -10px;
+  color: var(--text-2);
+}

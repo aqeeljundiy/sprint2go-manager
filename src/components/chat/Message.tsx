@@ -7,7 +7,7 @@ import { companyOf } from '../../clientView';
 import { stageName, stageOf } from '../../stages';
 import { Avatar } from '../Avatar';
 import { Badge } from '../ui/Person';
-import { PersonName } from '../ui/PersonCard';
+import { PersonName, usePersonCard } from '../ui/PersonCard';
 import { useLongPress } from '../ui/useLongPress';
 import { shortTime, statusText, whenText, type SavedItem } from './chatPrefs';
 import { t, textOf, tn } from '../../i18n';
@@ -31,20 +31,42 @@ export function shortUrl(href: string) {
   }
 }
 
+type Refs = { me?: string; byFirst: Map<string, User>; byChan: Map<string, Channel>; chans: string };
+
 /** One line of a message: @mentions, links, `code`, *bold*, _italic_ and ~struck~ words. Never HTML. */
-function Inline({ text, names, short }: { text: string; names: string; short?: boolean }) {
-  const re = new RegExp(`(${names ? `@(?:${names})\\b|` : ''}https?://[^\\s<]+|\`[^\`\\n]+\`|\\*[^*\\s][^*\\n]*\\*|\\b_[^_\\n]+_\\b|~[^~\\s][^~\\n]*~)`, 'g');
+function Inline({ text, names, short, refs }: { text: string; names: string; short?: boolean; refs?: Refs }) {
+  const card = usePersonCard();
+  const re = new RegExp(`(${names ? `@(?:${names})\\b|` : ''}${refs?.chans ? `#(?:${refs.chans})\\b|` : ''}https?://[^\\s<]+|\`[^\`\\n]+\`|\\*[^*\\s][^*\\n]*\\*|\\b_[^_\\n]+_\\b|~[^~\\s][^~\\n]*~)`, 'g');
   return (
     <>
       {text.split(re).map((p, i) => {
         if (!p) return null;
         if (i % 2 === 0) return <Fragment key={i}>{p}</Fragment>;
-        if (p.startsWith('@'))
+        if (p.startsWith('@')) {
+          // A mention opens the person's card; mentions of me stand out.
+          const u = refs?.byFirst.get(p.slice(1).toLowerCase());
+          const mine = !!u && u.id === refs?.me;
+          if (!u || !card)
+            return (
+              <b key={i} className={`mention${mine ? ' is-me' : ''}`}>
+                {p}
+              </b>
+            );
           return (
-            <b key={i} className="mention">
+            <button key={i} type="button" className={`mention is-btn${mine ? ' is-me' : ''}`} aria-label={t('Profile of {name}', { name: u.name })} onPointerDown={(e) => e.stopPropagation()} onClick={(e) => (e.stopPropagation(), card.open(u, e.currentTarget))}>
               {p}
-            </b>
+            </button>
           );
+        }
+        if (p.startsWith('#') && refs) {
+          const c = refs.byChan.get(p.slice(1).toLowerCase());
+          if (c)
+            return (
+              <button key={i} type="button" className="mention is-btn is-chan" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => (e.stopPropagation(), window.dispatchEvent(new CustomEvent('s2g:open-channel', { detail: { id: c.id } })))}>
+                {p}
+              </button>
+            );
+        }
         if (/^https?:\/\//.test(p))
           return (
             <a key={i} href={p} target="_blank" rel="noreferrer" title={short ? p : undefined}>
@@ -61,8 +83,17 @@ function Inline({ text, names, short }: { text: string; names: string; short?: b
 }
 
 /** A message's words: lines starting with "> " are a quote, "- " a list; the rest as written. */
-export function Text({ text, users, short }: { text: string; users: User[]; short?: boolean }) {
+export function Text({ text, users, short, me, channels }: { text: string; users: User[]; short?: boolean; me?: string; channels?: Channel[] }) {
   const names = useMemo(() => users.map((u) => esc(u.name.split(' ')[0])).filter(Boolean).join('|'), [users]);
+  const refs = useMemo<Refs>(() => {
+    const rooms = (channels ?? []).filter((c) => c.kind !== 'dm' && c.name);
+    return {
+      me,
+      byFirst: new Map(users.map((u) => [u.name.split(' ')[0].toLowerCase(), u] as const)),
+      byChan: new Map(rooms.map((c) => [c.name.toLowerCase(), c] as const)),
+      chans: rooms.map((c) => esc(c.name)).sort((a, b) => b.length - a.length).join('|'),
+    };
+  }, [users, channels, me]);
   const lines = text.split('\n');
   const blocks: { kind: 'p' | 'quote' | 'list' | 'ol' | 'pre'; lines: string[] }[] = [];
   let fenced = false; // inside a ``` code block: lines as typed
@@ -90,7 +121,7 @@ export function Text({ text, users, short }: { text: string; users: User[]; shor
             {b.lines.map((l, j) => (
               <Fragment key={j}>
                 {j > 0 && <br />}
-                <Inline text={l} names={names} short={short} />
+                <Inline text={l} names={names} short={short} refs={refs} />
               </Fragment>
             ))}
           </blockquote>
@@ -102,7 +133,7 @@ export function Text({ text, users, short }: { text: string; users: User[]; shor
           <ol key={i} className="cm-list">
             {b.lines.map((l, j) => (
               <li key={j}>
-                <Inline text={l} names={names} short={short} />
+                <Inline text={l} names={names} short={short} refs={refs} />
               </li>
             ))}
           </ol>
@@ -110,14 +141,14 @@ export function Text({ text, users, short }: { text: string; users: User[]; shor
           <ul key={i} className="cm-list">
             {b.lines.map((l, j) => (
               <li key={j}>
-                <Inline text={l} names={names} short={short} />
+                <Inline text={l} names={names} short={short} refs={refs} />
               </li>
             ))}
           </ul>
         ) : (
           <Fragment key={i}>
             {i > 0 && blocks[i - 1].kind === 'p' && '\n'}
-            <Inline text={b.lines[0]} names={names} short={short} />
+            <Inline text={b.lines[0]} names={names} short={short} refs={refs} />
           </Fragment>
         ),
       )}
@@ -148,6 +179,7 @@ export interface MsgCtx {
   me: string;
   users: User[];
   channel: Channel;
+  channels?: Channel[]; // for #channel links in messages
   client?: Client;
   tasks: Todo[];
   statuses: Record<string, Status>;
@@ -240,16 +272,11 @@ export function Msg({ m, grouped, inThread = false, ctx }: { m: ChatMessage; gro
   const pending = m.userId === ctx.me && ctx.unsent.ids.has(m.id);
   const client = ctx.client;
   const person = (id: string) => ctx.users.find((u) => u.id === id);
-  const canOpen = ctx.phone && !inThread && !ctx.guest;
   return (
     <div
       data-msg={m.id}
       className={`chat-msg ${grouped ? 'grouped' : ''} ${m.kind === 'kudos' ? 'kudos-msg' : ''}${saved ? ' is-saved' : ''}${pending ? ' is-pending' : ''}${ctx.phone ? ' lp' : ''}`}
       {...press}
-      onClick={(e) => {
-        if (!canOpen || (e.target as HTMLElement).closest('a, button, audio, video, input, textarea, .poll, .voice')) return;
-        ctx.onOpenThread(m.id);
-      }}
       onContextMenu={(e) => {
         press.onContextMenu(e);
         if (e.defaultPrevented || ctx.phone || (e.target as HTMLElement).closest('a')) return;
@@ -294,7 +321,7 @@ export function Msg({ m, grouped, inThread = false, ctx }: { m: ChatMessage; gro
             <span className="cm-fwd-head">
               <Forward size={12} aria-hidden /> {t('{who} in {where}', { who: m.forwarded.userId === ctx.me ? t('You') : t(m.forwarded.who), where: m.forwarded.where })}
             </span>
-            <Text text={m.forwarded.text} users={ctx.users} short={ctx.phone} />
+            <Text text={m.forwarded.text} users={ctx.users} short={ctx.phone} me={ctx.me} channels={ctx.channels} />
           </div>
         )}
         {m.kind === 'kudos' ? (
@@ -308,7 +335,7 @@ export function Msg({ m, grouped, inThread = false, ctx }: { m: ChatMessage; gro
         ) : (
           m.text && (
             <div className="cm-text">
-              <Text text={msgText(m)} users={ctx.users} short={ctx.phone} />
+              <Text text={msgText(m)} users={ctx.users} short={ctx.phone} me={ctx.me} channels={ctx.channels} />
               {m.edited && <span className="cm-edited"> {t('(edited)')}</span>}
             </div>
           )

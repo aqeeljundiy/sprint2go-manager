@@ -7046,34 +7046,34 @@
       "title": "Tapping a person's avatar opens a profile card",
       "detail": "Reference: Slack, Teams, Google: tapping an avatar opens a profile card with name, title, team, email, local time, status, and Message, Call and Schedule buttons. Today: Avatars on Home are just pictures inside row buttons. In the Waiting card, the avatar sits inside the button that opens the thread (src/components/HomeView.tsx:599-600). Workload avatars do nothing (HomeView.tsx:468), and brief and task owner avatars do nothing either (HomeView.tsx:548, 713). Proposal: Add a shared PersonCard: a popover on desktop and a bottom sheet on phones. It shows the avatar, name, title, team, email, local time and status, with Message as the one main button and Call or Email as smaller icons. Every Avatar becomes its own button that stops the click from reaching the row, so tapping the face opens the profile and tapping the text still opens the item. (effort medium)",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-home-2",
       "round": "Feature gaps",
       "area": "home",
       "title": "Workload rows lead nowhere",
-      "detail": "Reference: Asana and Monday workload views: clicking a person opens a filtered list of their tasks. Today: Workload rows are plain divs with no click handler (HomeView.tsx:467). Proposal: Make each row a button that opens Tasks filtered to that person, with the late tasks shown first. A long press, or the avatar, opens the PersonCard. (effort small)",
+      "detail": "Reference: Asana and Monday workload views: clicking a person opens a filtered list of their tasks. Today: Workload rows are plain divs with no click handler (HomeView.tsx:467). Proposal: Make each row a button that opens Tasks filtered to that person, with the late tasks shown first. A long press, or the avatar, opens the PersonCard. (effort small) | Built: Each Workload row is now a button (.load-go, at least 44px tall, hover background). It opens Tasks filtered to that person through the existing openTasks({kind:'person'}) scope. The avatar still opens the PersonCard. Changes: new onOpenPerson prop in src/components/HomeView.tsx, wired in src/App.tsx (one added line), CSS in src/home.css, Indonesian string 'Open tasks of {name}' in src/i18n/id/home",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-home-3",
       "round": "Feature gaps",
       "area": "home",
       "title": "No reply or archive straight from Home",
-      "detail": "Reference: Gmail and Outlook widgets and Slack Activity let you swipe to archive or mark done, and give you a quick-reply box. Today: Waiting rows can only open the thread (HomeView.tsx:599). Notices can only open (HomeView.tsx:622). Proposal: Phones: swipe left to mark read or done, swipe right to snooze. Desktop: a hover action. Keep opening the item as the one main tap. (effort medium)",
+      "detail": "Reference: Gmail and Outlook widgets and Slack Activity let you swipe to archive or mark done, and give you a quick-reply box. Today: Waiting rows can only open the thread (HomeView.tsx:599). Notices can only open (HomeView.tsx:622). Proposal: Phones: swipe left to mark read or done, swipe right to snooze. Desktop: a hover action. Keep opening the item as the one main tap. (effort medium) | Built: In the For you card on desktop, each notice row has a CheckCheck 'Mark as seen' icon button that appears on hover or keyboard focus and calls onReadNotices. The same row is wrapped in SwipeRow with a 'Seen' end swipe for touch. Opening the item stays the row's main tap. The phone Needs you list already had swipe actions (Done/Approve, Tomorrow, Seen) through NeedsList.",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-home-4",
       "round": "Feature gaps",
       "area": "home",
       "title": "No Join button on meetings starting soon",
-      "detail": "Reference: Google Calendar, Outlook and the Microsoft 365 home show a Join button on a meeting about 5 minutes before it starts. Today: Home events open the calendar entry (HomeView.tsx:577). The MeetingStrip handles bot and notetaker actions (HomeView.tsx:1008), not a one-tap join. Proposal: When a meeting is within 10 minutes, its row's main action becomes Join, with a countdown chip, on both Home and the phone Launcher. (effort small)",
+      "detail": "Reference: Google Calendar, Outlook and the Microsoft 365 home show a Join button on a meeting about 5 minutes before it starts. Today: Home events open the calendar entry (HomeView.tsx:577). The MeetingStrip handles bot and notetaker actions (HomeView.tsx:1008), not a one-tap join. Proposal: When a meeting is within 10 minutes, its row's main action becomes Join, with a countdown chip, on both Home and the phone Launcher. (effort small) | Built: New JoinSoon component in src/components/home/HomeParts.tsx. For a meeting with a link, from 10 minutes before the start until the end, it shows a countdown chip ('in N min', or 'On now' once started) and a primary Join button. It refreshes every 30 seconds and animates in, with a reduced-motion fallback. It is used in three places: the phone Launcher under the greeting (src/mobile/Launcher.tsx; t",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-home-5",
@@ -7134,27 +7134,27 @@
       "round": "Feature gaps",
       "area": "mail",
       "title": "Tapping a sender's avatar or name opens their contact card, not a fold",
-      "detail": "Reference: Gmail on phone: tapping the sender's photo in an open email opens a contact card with name, email, phone, company, title, and Email, Chat, Meet, Schedule, Add to contacts. On desktop, hovering the name shows the same card. Superhuman keeps a right-hand sidebar with the sender's role, company, LinkedIn/X, recent threads and local time. Today: The avatar and the name both just fold the message. On desktop, src/components/Reader.tsx:557-558 puts the Avatar inside the message-head button, which calls toggle(m.id). On phones, Reader.tsx:968-970 gives the avatar a 'Fold this message' button, and :971-973 does the same for the name. No person card or hover card component exists anywhere in src (searched for HoverCard, PersonCard and ProfileCard: nothing found). Proposal: Build one shared PersonCard: a bottom sheet on phones and a popover on desktop (hover after 400ms or click). It shows the avatar, name, title and company (from the workspace directory or Contacts.tsx data), email, phone, local time, and presence for teammates. The primary button is 'Email'. Secondary buttons: Chat (teammates), Call/Meet, 'Emails with {name}', 'Add to contacts' or 'Edit', and Block. Open it from the reader avatar and name, recipient names in the 'to' details, compose recipient chips, Contacts rows and Chat. Folding stays on the rest of the message header. (effort medium)",
+      "detail": "Reference: Gmail on phone: tapping the sender's photo in an open email opens a contact card with name, email, phone, company, title, and Email, Chat, Meet, Schedule, Add to contacts. On desktop, hovering the name shows the same card. Superhuman keeps a right-hand sidebar with the sender's role, company, LinkedIn/X, recent threads and local time. Today: The avatar and the name both just fold the message. On desktop, src/components/Reader.tsx:557-558 puts the Avatar inside the message-head button, which calls toggle(m.id). On phones, Reader.tsx:968-970 gives the avatar a 'Fold this message' button, and :971-973 does the same for the name. No person card or hover card component exists anywhere in src (searched for HoverCard, PersonCard and ProfileCard: nothing found). Proposal: Build one shared PersonCard: a bottom sheet on phones and a popover on desktop (hover after 400ms or click). It shows the avatar, name, title and company (from the workspace directory or Contacts.tsx data), email, phone, local time, and presence for teammates. The primary button is 'Email'. Secondary buttons: Chat (teammates), Call/Meet, 'Emails with {name}', 'Add to contacts' or 'Edit', and Block. Open it from the reader avatar and name, recipient names in the 'to' details, compose recipient chips, Contacts rows and Chat. Folding stays on the rest of the message header. (effort medium) | Built: On phones, tapping the sender's name in an open email now opens their person card, the same way the avatar already did. The rest of the header still folds the message. To make the name tappable, the name link sits above the line's fold hit area and has its own 44px reach (CSS rule appended to mailExtras.css). File: src/components/Reader.tsx (gm-msg-name).",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-mail-2",
       "round": "Feature gaps",
       "area": "mail",
       "title": "Recipient names and compose chips do nothing when tapped",
-      "detail": "Reference: Gmail: in an open email, tapping a recipient in the 'to me' details opens their card. In compose, tapping a chip lets you edit the address or open the contact card, and you can drag a chip between To, Cc and Bcc. Superhuman: Cmd+Shift+B moves the selected recipients to Bcc ('Instant Intro'). Today: src/components/RecipientInput.tsx:53-58 renders each chip as a plain span. The only button on it is the X that removes the recipient, so you can't fix a typo or move the person to Cc or Bcc. The 'to' line in the reader is joined text (Reader.tsx:566-572) with no tappable names. Proposal: Make each chip a button that opens a small menu: the PersonCard, Edit address, Move to Cc, Move to Bcc, Remove. Double-tap edits the address in place. On desktop, allow dragging a chip between fields. In the reader's expanded details, render each recipient as a tappable name that opens the PersonCard. (effort small)",
+      "detail": "Reference: Gmail: in an open email, tapping a recipient in the 'to me' details opens their card. In compose, tapping a chip lets you edit the address or open the contact card, and you can drag a chip between To, Cc and Bcc. Superhuman: Cmd+Shift+B moves the selected recipients to Bcc ('Instant Intro'). Today: src/components/RecipientInput.tsx:53-58 renders each chip as a plain span. The only button on it is the X that removes the recipient, so you can't fix a typo or move the person to Cc or Bcc. The 'to' line in the reader is joined text (Reader.tsx:566-572) with no tappable names. Proposal: Make each chip a button that opens a small menu: the PersonCard, Edit address, Move to Cc, Move to Bcc, Remove. Double-tap edits the address in place. On desktop, allow dragging a chip between fields. In the reader's expanded details, render each recipient as a tappable name that opens the PersonCard. (effort small) | Built: In compose, each recipient chip's face is now a button. It opens a menu with Profile (the PersonCard), Edit address (puts the address back in the field as text; double-click does the same), Move to To/Cc/Bcc (Compose opens the Cc/Bcc rows when needed) and Remove. Quick reply and reply-head chips get Profile, Edit and Remove. In the desktop reader, the expanded to/Cc/Bcc line now shows each person ",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-mail-3",
       "round": "Feature gaps",
       "area": "mail",
       "title": "No one-tap 'all emails with this person'",
-      "detail": "Reference: Gmail's contact card has 'View recent emails' (from:/to: search). Superhuman's sidebar lists recent threads with the sender, and clicking one opens it. Today: The search screen exists (src/components/mail/MailSearch.tsx), but the reader has no path from a person to their history. The message ⋮ menu (Reader.tsx:450-494) offers reply, forward, translate, print, original and block, but no 'Emails from {name}'. Proposal: Add 'Emails with {name}' to the PersonCard and the message ⋮ menu. It runs MailSearch with a from:x OR to:x chip. On desktop, the card also previews the last 3 threads. (effort small)",
+      "detail": "Reference: Gmail's contact card has 'View recent emails' (from:/to: search). Superhuman's sidebar lists recent threads with the sender, and clicking one opens it. Today: The search screen exists (src/components/mail/MailSearch.tsx), but the reader has no path from a person to their history. The message ⋮ menu (Reader.tsx:450-494) offers reply, forward, translate, print, original and block, but no 'Emails from {name}'. Proposal: Add 'Emails with {name}' to the PersonCard and the message ⋮ menu. It runs MailSearch with a from:x OR to:x chip. On desktop, the card also previews the last 3 threads. (effort small) | Built: Added 'Emails with {name}' to the message menu (desktop and phone). It uses a new emailsWith() on the shared PersonCard context, which runs the existing from:x OR to:x mail search. It was already on the card. Files: src/components/ui/PersonCard.tsx (additive Api.emailsWith), src/components/Reader.tsx.",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-mail-4",
@@ -7197,9 +7197,9 @@
       "round": "Feature gaps",
       "area": "mail",
       "title": "No quick 'Message on Chat' or 'Call' from an email",
-      "detail": "Reference: Gmail's contact card has Chat and Meet buttons. Slack and Teams profile cards have Message and Call. This is the user's exact complaint. Today: Mail, Chat and Meet are separate apps. Reader.tsx has no route from a sender to a Chat DM or a Meet call. Proposal: In the PersonCard, show Chat (opens or creates the DM in the Chat app) and Meet (starts a call) for any workspace member. For external people, show 'Schedule a meeting'. (effort small)",
+      "detail": "Reference: Gmail's contact card has Chat and Meet buttons. Slack and Teams profile cards have Message and Call. This is the user's exact complaint. Today: Mail, Chat and Meet are separate apps. Reader.tsx has no route from a sender to a Chat DM or a Meet call. Proposal: In the PersonCard, show Chat (opens or creates the DM in the Chat app) and Meet (starts a call) for any workspace member. For external people, show 'Schedule a meeting'. (effort small) | Built: The PersonCard now has a Call (video) button for workspace teammates. It opens or creates the DM in Chat and starts its huddle, using the same logic as Chat's huddle button. This came from a new optional onCall prop wired in App.tsx. Message (Chat DM) was already there. Files: src/components/ui/PersonCard.tsx, src/App.tsx, src/i18n/id/ui.ts.",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-mail-9",
@@ -7226,25 +7226,25 @@
       "title": "Tapping an avatar or name opens a profile card",
       "detail": "Reference: Slack: tap an avatar or display name and a profile sheet opens (phone) or a popover (desktop), with photo, title, pronouns, local time, status, email, and Message / Huddle buttons. Discord does the same with its user popout. Today: The avatar in Message.tsx:249 is a plain <Avatar> with no handler, so the tap falls through to the whole-row onClick at Message.tsx:238-240, which calls ctx.onOpenThread(m.id) on phone. The only way to see a profile is the DM 'View profile' button (Conversation.tsx:578) or Details > Profile (Conversation.tsx:862), and both exist only inside a DM. Proposal: Make the avatar and the name in .cm-head (Message.tsx:257) buttons that open a ProfileCard: a bottom sheet on phone, an anchored popover on desktop. Reuse the Details 'about' pane, which already formats timeZone. Show name, title, status, local time, email (tap to copy) and team. Message is the one primary button; Huddle and 'View full profile' go underneath. Stop propagation so a tap on the avatar never opens the thread. (effort small)",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-chat-2",
       "round": "Feature gaps",
       "area": "chat",
       "title": "@mentions are inert bold text",
-      "detail": "Reference: Slack and Discord: an @mention is a tappable chip that opens the same profile card. #channel mentions open the channel. Today: Message.tsx:43 renders a mention as <b className=\"mention\">, so it does nothing when tapped, and on phone the tap opens the thread. Proposal: Render mentions as buttons that open the ProfileCard from gap 1, and render #channel references as links that open the channel. Highlight mentions of me in a different colour. (effort small)",
+      "detail": "Reference: Slack and Discord: an @mention is a tappable chip that opens the same profile card. #channel mentions open the channel. Today: Message.tsx:43 renders a mention as <b className=\"mention\">, so it does nothing when tapped, and on phone the tap opens the thread. Proposal: Render mentions as buttons that open the ProfileCard from gap 1, and render #channel references as links that open the channel. Highlight mentions of me in a different colour. (effort small) | Built: @mentions in messages are now buttons that open the shared PersonCard (Popover on desktop, Sheet on phone), with mentions of me in amber and others in the accent colour. #channel references become chips that open the channel through a new 's2g:open-channel' window event, which App.tsx listens for. Changes are in src/components/chat/Message.tsx (Inline/Text get refs, MsgCtx.channels), src/component",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-chat-3",
       "round": "Feature gaps",
       "area": "chat",
       "title": "Tapping a message on phone opens its thread",
-      "detail": "Reference: Slack mobile: a tap does nothing (or selects text) and a long-press opens the action sheet. You reply in a thread through the 'N replies' link or the action sheet. Discord: a tap does nothing and a swipe left replies. Today: Message.tsx:232-240 sets canOpen = ctx.phone and calls onOpenThread on any tap outside a button. This is the 'it jumps to the thread' complaint: reading or scrolling triggers navigation. Proposal: Remove the tap-to-thread behaviour. Keep long-press for the action sheet (actionsFor, Conversation.tsx:484) and the existing thread-link (Message.tsx:369). Optionally add swipe-to-reply. (effort small)",
+      "detail": "Reference: Slack mobile: a tap does nothing (or selects text) and a long-press opens the action sheet. You reply in a thread through the 'N replies' link or the action sheet. Discord: a tap does nothing and a swipe left replies. Today: Message.tsx:232-240 sets canOpen = ctx.phone and calls onOpenThread on any tap outside a button. This is the 'it jumps to the thread' complaint: reading or scrolling triggers navigation. Proposal: Remove the tap-to-thread behaviour. Keep long-press for the action sheet (actionsFor, Conversation.tsx:484) and the existing thread-link (Message.tsx:369). Optionally add swipe-to-reply. (effort small) | Built: Removed the phone tap-to-thread handler (canOpen/onClick) on .chat-msg in src/components/chat/Message.tsx. Long-press action sheet and the 'N replies' link stay.",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-chat-4",
@@ -7287,9 +7287,9 @@
       "round": "Feature gaps",
       "area": "chat",
       "title": "No workspace-wide message search",
-      "detail": "Reference: Slack: one search box covering all messages, files and people, with from:, in: and date filters and recent searches. Discord has the same filters per server. Today: Search lives only inside one conversation (Details 'search', Conversation.tsx:938 and :1021). The sidebar has no search across all chats. Proposal: Add a search entry at the top of the chat sidebar that searches every channel and DM, with filter chips (From, In, Has file, Date). Results jump to the message with jumpTo. (effort medium)",
+      "detail": "Reference: Slack: one search box covering all messages, files and people, with from:, in: and date filters and recent searches. Discord has the same filters per server. Today: Search lives only inside one conversation (Details 'search', Conversation.tsx:938 and :1021). The sidebar has no search across all chats. Proposal: Add a search entry at the top of the chat sidebar that searches every channel and DM, with filter chips (From, In, Has file, Date). Results jump to the message with jumpTo. (effort medium) | Built: Search across the whole workspace in the new src/components/chat/Search.tsx (ChatSearch). It is a Popover on desktop and a Sheet on phone. It searches every channel and DM the user can read (channels they belong to plus public channels; scheduled messages that aren't sent yet are left out), with Sender, In, Has file and Date filter chips, highlighted hits and per-user recent searches. A result ope",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-chat-9",
@@ -7341,27 +7341,27 @@
       "round": "Feature gaps",
       "area": "tasks",
       "title": "Tapping a person opens nothing about them",
-      "detail": "Reference: Asana: tap any avatar (assignee, commenter, follower) for a profile card with name, title, team, email, local time, and Message or 'View tasks'. Todoist shows the collaborator with their email. Today: Avatars are decoration or pickers. Phone row avatar src/components/tasks/TaskRow.tsx:158-160 sits inside the row, so a tap opens the task. Desktop avatar is a PeoplePicker (TaskRow.tsx:165), so a click reassigns. Comment avatars in TaskDrawer.tsx:353 and TaskDetail.tsx:557 do nothing. Proposal: Add one shared PersonCard (a sheet on phones, a popover on desktop) that opens from every avatar in Tasks: name, title, team, local time, and how many open or late tasks they have. One primary button, Message (opens a DM in Chat), with Email, Call and 'See their tasks' (goes to scope people:id) as secondary rows. On desktop rows, put the reassign picker behind a small chevron so a click on the avatar itself opens the card. (effort medium)",
+      "detail": "Reference: Asana: tap any avatar (assignee, commenter, follower) for a profile card with name, title, team, email, local time, and Message or 'View tasks'. Todoist shows the collaborator with their email. Today: Avatars are decoration or pickers. Phone row avatar src/components/tasks/TaskRow.tsx:158-160 sits inside the row, so a tap opens the task. Desktop avatar is a PeoplePicker (TaskRow.tsx:165), so a click reassigns. Comment avatars in TaskDrawer.tsx:353 and TaskDetail.tsx:557 do nothing. Proposal: Add one shared PersonCard (a sheet on phones, a popover on desktop) that opens from every avatar in Tasks: name, title, team, local time, and how many open or late tasks they have. One primary button, Message (opens a DM in Chat), with Email, Call and 'See their tasks' (goes to scope people:id) as secondary rows. On desktop rows, put the reassign picker behind a small chevron so a click on the avatar itself opens the card. (effort medium) | Built: On desktop task rows, clicking the assignee's face now opens the shared PersonCard. Reassigning moved to a small chevron, added as a new optional chevron prop on PeoplePicker. Comment avatars in the TaskDrawer history and the TaskDetail last-comment line also open the card (card prop). The phone row Doer already opened the card.",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-tasks-2",
       "round": "Feature gaps",
       "area": "tasks",
       "title": "No @mentions in task comments",
-      "detail": "Reference: Asana and Todoist: typing @ in a comment opens a people picker. The person mentioned gets notified and the name becomes a link to their profile. Today: Comment boxes are plain textareas (TaskDrawer.tsx:538, TaskDetail.tsx:588). Only doers, the supervisor and followers hear about a comment (TaskDetail.tsx:293). There is no way to pull someone else in. Proposal: Reuse QuickAdd's + or @ suggestion list (QuickAdd.tsx:101-104) in the comment field. A mention adds that person as a follower, notifies them, and shows as a chip that opens the PersonCard. The 'who will hear' line under the box should list them. (effort medium)",
+      "detail": "Reference: Asana and Todoist: typing @ in a comment opens a people picker. The person mentioned gets notified and the name becomes a link to their profile. Today: Comment boxes are plain textareas (TaskDrawer.tsx:538, TaskDetail.tsx:588). Only doers, the supervisor and followers hear about a comment (TaskDetail.tsx:293). There is no way to pull someone else in. Proposal: Reuse QuickAdd's + or @ suggestion list (QuickAdd.tsx:101-104) in the comment field. A mention adds that person as a follower, notifies them, and shows as a chip that opens the PersonCard. The 'who will hear' line under the box should list them. (effort medium) | Built: Typing @ in a comment box opens a teammate list in src/components/tasks/Mentions.tsx (useMentions, which reuses the qa-sug list look). Arrow keys, Enter or Tab, or a tap inserts @Name. This works in the TaskDetail desktop and phone composers and in the TaskDrawer brief composer. In shown comments, each @Name is a PersonName chip that opens the card. The 'who will hear' line now includes people men",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-tasks-3",
       "round": "Feature gaps",
       "area": "tasks",
       "title": "Due dates have no time of day",
-      "detail": "Reference: Todoist: 'tomorrow 3pm' sets a due time, and Today sorts by it. Asana: due time, plus start dates and date ranges. Today: Todo.due is only YYYY-MM-DD (types.ts, Todo.due). QuickAdd reads a time (parsed.time, QuickAdd.tsx:275) but only puts it into the label or the reminder. Today cannot show what is due at 2pm. Proposal: Add an optional dueTime. Show it on the row's due chip and sort Today by time. The date picker gets a 'Add time' row. On phones, Today lists timed tasks first, in order. (effort medium)",
+      "detail": "Reference: Todoist: 'tomorrow 3pm' sets a due time, and Today sorts by it. Asana: due time, plus start dates and date ranges. Today: Todo.due is only YYYY-MM-DD (types.ts, Todo.due). QuickAdd reads a time (parsed.time, QuickAdd.tsx:275) but only puts it into the label or the reminder. Today cannot show what is due at 2pm. Proposal: Add an optional dueTime. Show it on the row's due chip and sort Today by time. The date picker gets a 'Add time' row. On phones, Today lists timed tasks first, in order. (effort medium) | Built: Tasks have a new optional field, Todo.dueTime (HH:MM). Quick Add saves the parsed time ('tomorrow 3pm') as dueTime, via NewTask and createTask. The row's due chip shows the time, also under Today and Tomorrow headings. sortTasks orders by date and then time, so timed tasks come first and in order, including on Today. The due row in TaskDetail (phone and desktop) and in TaskDrawer has 'Add time', t",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-tasks-4",
@@ -7377,9 +7377,9 @@
       "round": "Feature gaps",
       "area": "tasks",
       "title": "No search inside Tasks",
-      "detail": "Reference: Todoist: search on phone and Cmd+K on desktop find tasks, comments and projects. Asana has a search bar with saved advanced searches. Today: The task list is rendered with search={false} (TaskViews.tsx:421). Browse (TasksView.tsx:315-380) has no search field. Finding an old task means scrolling through views. Proposal: Add a search field at the top of Browse on phones and a '/' shortcut on desktop. It matches titles, notes, checklist items and comments, done tasks included, grouped as Open and Done. (effort small)",
+      "detail": "Reference: Todoist: search on phone and Cmd+K on desktop find tasks, comments and projects. Asana has a search bar with saved advanced searches. Today: The task list is rendered with search={false} (TaskViews.tsx:421). Browse (TasksView.tsx:315-380) has no search field. Finding an old task means scrolling through views. Proposal: Add a search field at the top of Browse on phones and a '/' shortcut on desktop. It matches titles, notes, checklist items and comments, done tasks included, grouped as Open and Done. (effort small) | Built: Added search in src/components/tasks/TaskSearch.tsx. It matches titles, notes, checklist items and comments with every word typed, includes done tasks, and groups results as Open and Done. On phones it is a search pill at the top of Browse that replaces the cards while you type. On desktop, '/' or a new search button in the Tasks header opens it in a Sheet. Tapping a result opens the task. Copy is",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-tasks-6",
@@ -7467,45 +7467,45 @@
       "round": "Feature gaps",
       "area": "projects",
       "title": "Tapping a person opens nothing useful",
-      "detail": "Reference: Basecamp: tap any avatar to open a profile card with name, title, company, email, local time, and links to their activity and assignments. Monday: hovering or tapping an avatar shows a mini card with title, email, phone, local time and a Message button. Today: src/components/ProjectPeople.tsx:63-66 shows each member as a static PersonCell row (name only, sub={null}). The card avatars at ProjectsHome.tsx:236-242 sit inside the card's button, so tapping them just opens the project. Proposal: Use one shared PersonCard: a bottom sheet on phones and a popover on desktop. It shows the avatar, name, title, role on this project, email, phone, local time and their open tasks here. Message is the primary action; Call and Email are secondary. Make every Avatar in Projects open it, and stop the tap from bubbling up to the card. (effort medium)",
+      "detail": "Reference: Basecamp: tap any avatar to open a profile card with name, title, company, email, local time, and links to their activity and assignments. Monday: hovering or tapping an avatar shows a mini card with title, email, phone, local time and a Message button. Today: src/components/ProjectPeople.tsx:63-66 shows each member as a static PersonCell row (name only, sub={null}). The card avatars at ProjectsHome.tsx:236-242 sit inside the card's button, so tapping them just opens the project. Proposal: Use one shared PersonCard: a bottom sheet on phones and a popover on desktop. It shows the avatar, name, title, role on this project, email, phone, local time and their open tasks here. Message is the primary action; Call and Email are secondary. Make every Avatar in Projects open it, and stop the tap from bubbling up to the card. (effort medium) | Built: Every person in Projects now opens the shared PersonCard. In ProjectPeople.tsx, the rows for the owner, members and guests pass `card`. The people popover on each project card (ProjectsHome CardPeople) does the same. The card is a popover on desktop and a sheet on phones, with Message as the primary action and Email/Call/Tasks beside it. Taps stop propagating, so tapping a person no longer opens t",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-projects-2",
       "round": "Feature gaps",
       "area": "projects",
       "title": "No project activity feed",
-      "detail": "Reference: Basecamp's Activity screen and per-project timeline list everything that happened today (tasks done, comments, files added). Monday has an Activity Log on each board. Today: The tab list at src/components/ProjectPhone.tsx:38-53 has Overview, Tasks, Workload, Chat, Mail, Meetings, Files, Notes, Tables, Logins and Guests, but no Activity tab. Proposal: Add an 'Activity' section to Overview: a list grouped by day, where each row names a person and what they did, and tapping a row opens that item. Add a filter for 'just me'. (effort medium)",
+      "detail": "Reference: Basecamp's Activity screen and per-project timeline list everything that happened today (tasks done, comments, files added). Monday has an Activity Log on each board. Today: The tab list at src/components/ProjectPhone.tsx:38-53 has Overview, Tasks, Workload, Chat, Mail, Meetings, Files, Notes, Tables, Logins and Guests, but no Activity tab. Proposal: Add an 'Activity' section to Overview: a list grouped by day, where each row names a person and what they did, and tapping a row opens that item. Add a filter for 'just me'. (effort medium) | Built: Added an Activity card to the project Overview (ProjectActivity in src/components/ProjectPulse.tsx). It lists events grouped by day: task created, moved, reviewed, commented, assigned and completed, plus notes, meetings, chat posts and status updates. Each row has an avatar that opens the PersonCard. Tapping a row opens the task, note, meeting or chat. An Everyone / Just me segmented filter and Sh",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-projects-3",
       "round": "Feature gaps",
       "area": "projects",
       "title": "No 'My work' across projects",
-      "detail": "Reference: Monday's My Work and Basecamp's My Assignments and Hey! menu collect everything assigned to you and coming due across all projects. Today: ProjectsSidebar.tsx:28-115 lists projects and late counts only. Nothing shows my items across projects. Proposal: Add a 'Mine' scope to the Projects sidebar and phone home: my due items grouped by Today, This week and Later, each with a one-tap complete. (effort medium)",
+      "detail": "Reference: Monday's My Work and Basecamp's My Assignments and Hey! menu collect everything assigned to you and coming due across all projects. Today: ProjectsSidebar.tsx:28-115 lists projects and late counts only. Nothing shows my items across projects. Proposal: Add a 'Mine' scope to the Projects sidebar and phone home: my due items grouped by Today, This week and Later, each with a one-tap complete. (effort medium) | Built: Added My work (MyWork in ProjectPulse.tsx). It shows tasks assigned to me across live projects, grouped into Today (including late), This week and Later. Each row shows a project dot and the due date, has a 44px one-tap complete (toggleTodo), and folds away with useLeaving. On desktop it is a 'My work' item in ProjectsSidebar with a late count, saved as the s2g-proj-view pref. On phones it sits at",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-projects-4",
       "round": "Feature gaps",
       "area": "projects",
       "title": "Card avatars and the people stack are tap traps",
-      "detail": "Reference: In Monday, the people column is its own target: tapping it opens assignment or the person, not the item. Today: ProjectsHome.tsx:225 makes the whole card one button, so the owner and people avatars at lines 236-242 cannot be tapped on their own. Proposal: Make the avatar stack its own target that opens the People popover (desktop) or sheet (phone), with each person opening the PersonCard. (effort small)",
+      "detail": "Reference: In Monday, the people column is its own target: tapping it opens assignment or the person, not the item. Today: ProjectsHome.tsx:225 makes the whole card one button, so the owner and people avatars at lines 236-242 cannot be tapped on their own. Proposal: Make the avatar stack its own target that opens the People popover (desktop) or sheet (phone), with each person opening the PersonCard. (effort small) | Built: The avatar stack on each project card is now its own target (CardPeople in ProjectsHome.tsx). It shows the owner and members, up to 3 plus +N. Tapping it opens a 'People on X' Popover (a sheet on phones) with the role of each person; each face opens the PersonCard. Portal clicks are stopped so they don't reach the card button.",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-projects-5",
       "round": "Feature gaps",
       "area": "projects",
       "title": "No status updates or project health",
-      "detail": "Reference: Monday has status updates and a project-health column, and Basecamp has a pinned project message. Stakeholders see 'On track / At risk' without digging. Today: The only states are active, lead, paused and ended (ProjectsHome.tsx:128-131). There is no health indicator or written update. Proposal: Add 'Post update' to Overview: pick a health colour, write a short note, and notify the team. Show the latest health on the card. (effort small)",
+      "detail": "Reference: Monday has status updates and a project-health column, and Basecamp has a pinned project message. Stakeholders see 'On track / At risk' without digging. Today: The only states are active, lead, paused and ended (ProjectsHome.tsx:128-131). There is no health indicator or written update. Proposal: Add 'Post update' to Overview: pick a health colour, write a short note, and notify the team. Show the latest health on the card. (effort small) | Built: Added status updates and health. New type Client.updates / ProjectUpdate {health on|risk|off, note, by, at} in types.ts. The Overview has a Status card with the latest update and a Post update Sheet (health chips, a note, and a primary Post). patchClient in App.tsx notifies the owner and members and shows a toast. The project card shows a HealthPill, and phone rows show an At risk / Off track hint",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-projects-6",
@@ -7548,18 +7548,18 @@
       "round": "Feature gaps",
       "area": "teams",
       "title": "Tapping a person opens their team, not their profile",
-      "detail": "Reference: Slack: tapping any avatar or name opens a full profile (photo, title, pronouns, local time, status, email, phone, Message / Huddle / Call). Teams mobile: the profile card has Chat, Call, Email, org position. Today: People directory row jumps to the person's first team: src/components/teams/TeamsApp.tsx:293 (onClick={() => onOpen(theirs[0].id)}). People with no team are not tappable at all. Proposal: Add one shared PersonProfile sheet (a bottom sheet on phones, a popover on computers) showing avatar, name, title, email, teams, local time, and open/late task counts. The primary action is Message, which opens a Chat DM; Email and Call sit in a secondary row. Open it from every avatar and name in the app. (effort medium)",
+      "detail": "Reference: Slack: tapping any avatar or name opens a full profile (photo, title, pronouns, local time, status, email, phone, Message / Huddle / Call). Teams mobile: the profile card has Chat, Call, Email, org position. Today: People directory row jumps to the person's first team: src/components/teams/TeamsApp.tsx:293 (onClick={() => onOpen(theirs[0].id)}). People with no team are not tappable at all. Proposal: Add one shared PersonProfile sheet (a bottom sheet on phones, a popover on computers) showing avatar, name, title, email, teams, local time, and open/late task counts. The primary action is Message, which opens a Chat DM; Email and Call sit in a secondary row. Open it from every avatar and name in the app. (effort medium) | Built: People directory row tap now opens the shared PersonCard (Message first, Email/Call/tasks secondary) instead of jumping to their first team; long-press keeps the Email/Open-team menu. Works for people with no team too. src/components/teams/TeamsApp.tsx PersonRow",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-teams-2",
       "round": "Feature gaps",
       "area": "teams",
       "title": "Member row opens an action menu, not a real profile",
-      "detail": "Reference: Slack and Teams open a profile first. Admin actions such as remove or make owner are tucked away in an overflow menu. Today: MemberRow tap opens the action menu with a small header (name, title, email) and only Email, Make lead and Remove: TeamsApp.tsx:313-338. Proposal: Tapping a member opens the PersonProfile sheet, with Message as the primary action. Make lead and Remove move into the sheet's '...' overflow, and only managers see them. (effort small)",
+      "detail": "Reference: Slack and Teams open a profile first. Admin actions such as remove or make owner are tucked away in an overflow menu. Today: MemberRow tap opens the action menu with a small header (name, title, email) and only Email, Make lead and Remove: TeamsApp.tsx:313-338. Proposal: Tapping a member opens the PersonProfile sheet, with Message as the primary action. Make lead and Remove move into the sheet's '...' overflow, and only managers see them. (effort small) | Built: Phone MemberRow tap opens the PersonCard sheet; Make lead / Remove / Leave moved into a 44px '...' overflow (only shown to managers or yourself), long-press still opens it",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-teams-3",
@@ -7568,16 +7568,16 @@
       "title": "No 'Message' or DM action anywhere in Teams",
       "detail": "Reference: Slack: Message is the first button on a profile. MS Teams: a chat icon on every person card. Today: The member menu only offers mailto: TeamsApp.tsx:315. There is no link into the Chat app. Proposal: Add a Message action that opens or creates a Chat DM with that person (and a 'Message team' action that opens the team's channel). Use it as the profile's primary button. (effort small)",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-teams-4",
       "round": "Feature gaps",
       "area": "teams",
       "title": "Desktop member list rows are dead text",
-      "detail": "Reference: Slack desktop: clicking a name in the member list opens a profile popover. Linear: clicking a member shows their profile and issues. Today: Desktop PersonCell rows in the members tab have no click handler: TeamsApp.tsx:482-492. Proposal: Make the PersonCell clickable, opening the PersonProfile popover anchored to the row. The Make lead and remove buttons move into its overflow menu. (effort small)",
+      "detail": "Reference: Slack desktop: clicking a name in the member list opens a profile popover. Linear: clicking a member shows their profile and issues. Today: Desktop PersonCell rows in the members tab have no click handler: TeamsApp.tsx:482-492. Proposal: Make the PersonCell clickable, opening the PersonProfile popover anchored to the row. The Make lead and remove buttons move into its overflow menu. (effort small) | Built: Desktop member rows (.team-row-open) are clickable and open the PersonCard popover anchored to the row; inline buttons excluded",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-teams-5",
@@ -7595,7 +7595,7 @@
       "title": "No presence, status or local time",
       "detail": "Reference: Slack: green or away dot, custom status emoji and text, 'Away until', local time on the profile. MS Teams: Available, Busy, In a meeting, Out of office. Today: Avatar shows no presence. User rows show only title or email: TeamsApp.tsx:294-297, 339-346. Proposal: Add a presence dot on Avatar (derived from Calendar busy time and Meet). Let people set a status message and 'out until' date in Settings. Show local time and status on the profile. (effort medium)",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-teams-7",
@@ -7611,9 +7611,9 @@
       "round": "Feature gaps",
       "area": "teams",
       "title": "No team channel or conversation",
-      "detail": "Reference: Slack user groups link to default channels. MS Teams: every team has channels as its core surface. Today: Team tabs are only People, Tasks, Who's busy and Settings: TeamsApp.tsx:405-411. Proposal: Auto-create a Chat channel per team. Put a 'Chat' button in the team header that opens it, and add new members to it automatically. (effort medium)",
+      "detail": "Reference: Slack user groups link to default channels. MS Teams: every team has channels as its core surface. Today: Team tabs are only People, Tasks, Who's busy and Settings: TeamsApp.tsx:405-411. Proposal: Auto-create a Chat channel per team. Put a 'Chat' button in the team header that opens it, and add new members to it automatically. (effort medium) | Built: Team header gets a Chat button (desktop ghost button, phone top-bar icon) for members; new TeamActions.chat in App.tsx opens the team's channel (auto-created per team already, members synced) and creates one for older teams lacking it",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-teams-9",
@@ -7656,18 +7656,18 @@
       "round": "Feature gaps",
       "area": "tables",
       "title": "Tapping a person in a cell does nothing useful",
-      "detail": "Reference: Notion and Airtable open a hover or popover card for a Person/Collaborator value with avatar, name and email. Slack-style cards also show title, local time and Message/Call buttons. Today: src/components/tables/Cell.tsx:85-93 (person) and :153-160 (creator) render only an Avatar and name in a plain span. There is no click handler, so a click falls through to the cell or opens the row. Proposal: Make the person chip a button that opens a shared ProfileCard: a popover on desktop, a bottom sheet on phones. It shows name, role, email and local time, with one main button, Message (opens Chat DM), plus Email and Call. Reuse the same card for comment avatars and Created by. (effort small)",
+      "detail": "Reference: Notion and Airtable open a hover or popover card for a Person/Collaborator value with avatar, name and email. Slack-style cards also show title, local time and Message/Call buttons. Today: src/components/tables/Cell.tsx:85-93 (person) and :153-160 (creator) render only an Avatar and name in a plain span. There is no click handler, so a click falls through to the cell or opens the row. Proposal: Make the person chip a button that opens a shared ProfileCard: a popover on desktop, a bottom sheet on phones. It shows name, role, email and local time, with one main button, Message (opens Chat DM), plus Email and Call. Reuse the same card for comment avatars and Created by. (effort small) | Built: The person and Created by cells already open the shared PersonCard. I added card={u.id} to the comment author avatars in RecordDrawer so those open the card too.",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-tables-2",
       "round": "Feature gaps",
       "area": "tables",
       "title": "No @mentions or notifications in row comments",
-      "detail": "Reference: In Airtable and Notion, typing @ in a record comment picks a teammate. That person gets notified with a link back to the record. You can also follow a record. Today: src/components/tables/RecordDrawer.tsx:197-235 has a plain input that posts text. There is no @ picker, no notification and no follow. Comment author avatars (line 207) can't be clicked either. Proposal: Add an @ picker to the comment box using PeoplePicker. On send, notify the mentioned people in Home with a deep link to the row. Commenting auto-follows the row. A bell toggle in the drawer header lets you follow or unfollow. (effort medium)",
+      "detail": "Reference: In Airtable and Notion, typing @ in a record comment picks a teammate. That person gets notified with a link back to the record. You can also follow a record. Today: src/components/tables/RecordDrawer.tsx:197-235 has a plain input that posts text. There is no @ picker, no notification and no follow. Comment author avatars (line 207) can't be clicked either. Proposal: Add an @ picker to the comment box using PeoplePicker. On send, notify the mentioned people in Home with a deep link to the row. Commenting auto-follows the row. A bell toggle in the drawer header lets you follow or unfollow. (effort medium) | Built: Row comments now have an @mention picker. It filters teammates, works with arrow keys, Tab and Enter, and highlights each @Name in the posted comment. Mentions are saved on the comment. Posting a comment makes you follow the row automatically, and a Follow/Following bell toggle sits in the Comments header. Server (server/tables.ts afterRowWrite): when a new comment arrives, the mentioned people an",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-tables-3",
@@ -7692,9 +7692,9 @@
       "round": "Feature gaps",
       "area": "tables",
       "title": "Photos and files in cells can't be opened full size",
-      "detail": "Reference: In Airtable, tapping an attachment opens a full-screen previewer you can swipe through, with download. Notion opens images in a lightbox. Today: src/components/tables/Cell.tsx:138-151 shows up to 4 thumbnails and +N. There is no viewer, so a tap opens the row or editor. Proposal: Tapping a thumbnail opens a full-screen viewer. Swipe between files on phones and use arrow keys on desktop. Download is the main action, Share the second. PDFs open in the browser viewer. (effort small)",
+      "detail": "Reference: In Airtable, tapping an attachment opens a full-screen previewer you can swipe through, with download. Notion opens images in a lightbox. Today: src/components/tables/Cell.tsx:138-151 shows up to 4 thumbnails and +N. There is no viewer, so a tap opens the row or editor. Proposal: Tapping a thumbnail opens a full-screen viewer. Swipe between files on phones and use arrow keys on desktop. Download is the main action, Share the second. PDFs open in the browser viewer. (effort small) | Built: Tapping a file thumbnail or chip in a cell (or +N) now opens the shared full-screen AttachmentViewer from mail. You can swipe or use the arrow keys to move between files, PDFs and Office files preview, and Download is available. Clicks are stopped from opening the row or the cell editor. Hover, focus and reduced-motion styles are added in src/tables.css. File: src/components/tables/Cell.tsx (Files",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-tables-6",
@@ -7782,18 +7782,18 @@
       "round": "Feature gaps",
       "area": "calendar",
       "title": "Tapping a guest does nothing: no person card",
-      "detail": "Reference: Google Calendar: tap a guest to get a hover/sheet card with name, email, Email and Chat buttons, and their calendar. Notion Calendar shows the person card with local time and quick 'Schedule with'. Today: Guests render as plain rows with no handler: desktop src/components/calendar/EventDetail.tsx:216-224 (div.ev-guest), phone EventDetail.tsx:481-500 (div.dr-guest). Proposal: Make each guest row a button that opens the shared person sheet (same one Chat/Teams should use): avatar, name, title, email, local time. One primary action 'Message', secondary Email / Call / 'Find a time'. Bottom sheet on phones, popover on desktop. (effort medium)",
+      "detail": "Reference: Google Calendar: tap a guest to get a hover/sheet card with name, email, Email and Chat buttons, and their calendar. Notion Calendar shows the person card with local time and quick 'Schedule with'. Today: Guests render as plain rows with no handler: desktop src/components/calendar/EventDetail.tsx:216-224 (div.ev-guest), phone EventDetail.tsx:481-500 (div.dr-guest). Proposal: Make each guest row a button that opens the shared person sheet (same one Chat/Teams should use): avatar, name, title, email, local time. One primary action 'Message', secondary Email / Call / 'Find a time'. Bottom sheet on phones, popover on desktop. (effort medium) | Built: Guest names in the event detail (desktop .ev-guest and phone .dr-guest) are now PersonName links, so both the avatar and the name open the shared PersonCard (sheet on phones, popover on desktop). That card already has Message, Email, local time and the rest. Edited src/components/calendar/EventDetail.tsx.",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-calendar-2",
       "round": "Feature gaps",
       "area": "calendar",
       "title": "No search across events",
-      "detail": "Reference: Google Calendar has a search icon in the top bar (phone and desktop) finding events by title, guest, place, past and future. Notion Calendar has Cmd+K. Today: The Calendar top bar is mounted with search={false}, src/components/CalendarView.tsx:357; there is no event search anywhere in the calendar folder. Proposal: Turn on the top bar search: results as a schedule-style list grouped by date. Tapping one jumps the cursor to that day and opens the event. On desktop, '/' focuses it. (effort medium)",
+      "detail": "Reference: Google Calendar has a search icon in the top bar (phone and desktop) finding events by title, guest, place, past and future. Notion Calendar has Cmd+K. Today: The Calendar top bar is mounted with search={false}, src/components/CalendarView.tsx:357; there is no event search anywhere in the calendar folder. Proposal: Turn on the top bar search: results as a schedule-style list grouped by date. Tapping one jumps the cursor to that day and opens the event. On desktop, '/' focuses it. (effort medium) | Built: Event search. New src/components/calendar/EventSearch.tsx uses Popover, which becomes a bottom sheet on phones. It searches title, place, notes, organiser and guest names or emails, a year back and a year ahead with repeating events expanded. Upcoming events come first, then past ones newest first, grouped by day. Tapping a result moves to that day and opens the event. The search button sits in th",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-calendar-3",
@@ -7809,9 +7809,9 @@
       "round": "Feature gaps",
       "area": "calendar",
       "title": "No 'Message guests' / 'Email guests' from an event",
-      "detail": "Reference: Google Calendar event detail has 'Email guests' (and Chat guests in Workspace). Today: The event overflow menu (CalendarView.tsx:276-312) has Open invite, Edit, Duplicate, Move to tomorrow, Copy link, Delete; the only mail link is 'Open related email' to an existing thread (EventDetail.tsx:272-273). Proposal: Add 'Message guests' to the More menu and next to the guests count: opens a Chat group or a Mail draft with all guests in To and the event title as subject. (effort small)",
+      "detail": "Reference: Google Calendar event detail has 'Email guests' (and Chat guests in Workspace). Today: The event overflow menu (CalendarView.tsx:276-312) has Open invite, Edit, Duplicate, Move to tomorrow, Copy link, Delete; the only mail link is 'Open related email' to an existing thread (EventDetail.tsx:272-273). Proposal: Add 'Message guests' to the More menu and next to the guests count: opens a Chat group or a Mail draft with all guests in To and the event title as subject. (effort small) | Built: 'Message guests' appears in the right-click menu and in the event's More menu, as a button next to the guest count on desktop, and as a row under the guests on phones. It opens a Mail draft to the organiser and guests (leaving out me and my own mailboxes), with the event title as the subject. If nobody else is on the event, a toast says so. Added the new onMessageGuests prop to CalendarView and Ev",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-calendar-5",
@@ -7872,9 +7872,9 @@
       "round": "Feature gaps",
       "area": "calendar",
       "title": "Video call must be pasted; no one-tap Meet link",
-      "detail": "Reference: Google adds a Meet link with one tap 'Add Google Meet video conferencing'; Notion adds Zoom/Meet automatically. Today: The video field is a text input 'Paste a Meet, Zoom or Teams link', EventForm.tsx:280 and 550. Proposal: Primary chip 'Add sprint2go Meet call' that generates a Meet room link; keep paste as secondary. (effort small)",
+      "detail": "Reference: Google adds a Meet link with one tap 'Add Google Meet video conferencing'; Notion adds Zoom/Meet automatically. Today: The video field is a text input 'Paste a Meet, Zoom or Teams link', EventForm.tsx:280 and 550. Proposal: Primary chip 'Add sprint2go Meet call' that generates a Meet room link; keep paste as secondary. (effort small) | Built: A 'New call link' button sits next to the video call field in the desktop editor and the phone full editor. One tap fills in a new Jitsi Meet room link (meet.jit.si/sprint2go-xxxx-xxxx-xxxx: free, no account needed, and meetingLinkOf already recognises it for Join). Pasting a link still works. The helper is newCallLink() in calTools.ts.",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-calendar-12",
@@ -7892,25 +7892,25 @@
       "title": "Tapping an @person mention launches a mail client instead of opening their profile",
       "detail": "Reference: Notion: hovering or tapping an @person mention shows a card with avatar, name, email and role. Slack and Teams open a profile sheet with title, local time, Message and Call. Today: MentionPanel onPick inserts a plain mailto link (src/components/notes/NoteEditor.tsx:362). NoteText's click handler only intercepts /notes/ links and task pills (NoteText.tsx:409-416), so tapping @Ana opens the device's mail app or does nothing. The sanitizer keeps only href/style/class/data-task (noteHtml.ts:13), so no user id is stored. Proposal: Store mentions as <a class=\"note-person\" data-user=\"id\">. A tap opens the shared person sheet used across the app: avatar, title, team, local time and email. Message is the primary button, Call and Email are secondary. On desktop the same card shows on hover or click. (effort small)",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-notes-2",
       "round": "Feature gaps",
       "area": "notes",
       "title": "No slash (/) command menu",
-      "detail": "Reference: In Notion, typing / opens a filterable menu of blocks (heading, to-do, table, callout, toggle, page, mention, date). In Apple Notes the Aa and checklist buttons sit above the keyboard. Today: Markdown shortcuts work at the start of a line (NoteText.tsx:352-376). Blocks are inserted from the toolbar or the Format sheet (NoteSheets.tsx:58-150). Typing / does nothing. Proposal: Typing / at the start of a line or after a space opens a small inline list with the same actions as FormatPanel plus Task, Mention, Date and Divider. It filters as you type and Enter inserts. On a phone it sits above the keyboard. (effort medium)",
+      "detail": "Reference: In Notion, typing / opens a filterable menu of blocks (heading, to-do, table, callout, toggle, page, mention, date). In Apple Notes the Aa and checklist buttons sit above the keyboard. Today: Markdown shortcuts work at the start of a line (NoteText.tsx:352-376). Blocks are inserted from the toolbar or the Format sheet (NoteSheets.tsx:58-150). Typing / does nothing. Proposal: Typing / at the start of a line or after a space opens a small inline list with the same actions as FormatPanel plus Task, Mention, Date and Divider. It filters as you type and Enter inserts. On a phone it sits above the keyboard. (effort medium) | Built: Slash menu: typing / at the start of a line or after a space opens a list at the caret (new src/components/notes/InlineMenu.tsx, wired in src/components/notes/NoteEditor.tsx). It has Title, Heading, Subheading, Body, Checklist, Bulleted and Numbered list, Quote, Callout, Code block, Inline code, Divider, Make a task, Mention and Today's date. It filters as you type. Arrow keys move, Enter or Tab i",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-notes-3",
       "round": "Feature gaps",
       "area": "notes",
       "title": "Typing @ does not trigger mentions inline",
-      "detail": "Reference: In Notion, Slack and Apple Notes (shared notes), typing @ opens an inline people picker right at the caret. Today: Mentions open only from the toolbar's @ button, which brings up a full tall sheet (NoteBar.tsx:54, NoteSheets.tsx:184-215). Proposal: Typing @ opens a compact popover at the caret listing people first, then notes, filtered by the characters typed. Keep the sheet as a fallback for the toolbar button. (effort medium)",
+      "detail": "Reference: In Notion, Slack and Apple Notes (shared notes), typing @ opens an inline people picker right at the caret. Today: Mentions open only from the toolbar's @ button, which brings up a full tall sheet (NoteBar.tsx:54, NoteSheets.tsx:184-215). Proposal: Typing @ opens a compact popover at the caret listing people first, then notes, filtered by the characters typed. Keep the sheet as a fallback for the toolbar button. (effort medium) | Built: Typing @ opens the same compact menu at the caret. It lists people first (avatar and title), then notes, filtered by what is typed. Picking a person inserts the same @mention link as before, so the shared PersonCard still opens on tap and team notes still notify via onMention. Picking a note inserts a note link. The toolbar's @ sheet stays as the fallback.",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-notes-4",
@@ -8027,7 +8027,7 @@
       "title": "Tapping the uploader/owner name or avatar opens nothing",
       "detail": "Reference: Google Drive: owner avatar in Details/Activity opens a people card (name, email, Message/Email/Meet). Dropbox: member avatar shows name, email and actions. Today: Uploader is only text in the meta line ('{name} uploaded') built at src/components/DriveView.tsx:215-219; there is no profile card, and nothing on that line can be tapped. Proposal: Make the uploader name a tap target that opens the shared person card from Chat/Teams as a bottom sheet on phones and a popover on desktop. It shows name, title, email and local time, with Message as the primary action and Call as the secondary. (effort small)",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-drive-2",
@@ -8043,9 +8043,9 @@
       "round": "Feature gaps",
       "area": "drive",
       "title": "Details/info pane missing on desktop",
-      "detail": "Reference: Google Drive desktop: an 'i' toggles a right-side panel with Details and Activity (who, when, size, location, access). Dropbox has a similar side panel. Today: Details exists only in the phone sheet (DriveView.tsx:241). The desktop menu at DriveView.tsx:166-182 has no Details entry. Proposal: On desktop, add Details to the right-click and '...' menus, and an 'i' toggle in the toolbar that opens a side panel reusing the phone details content. (effort small)",
+      "detail": "Reference: Google Drive desktop: an 'i' toggles a right-side panel with Details and Activity (who, when, size, location, access). Dropbox has a similar side panel. Today: Details exists only in the phone sheet (DriveView.tsx:241). The desktop menu at DriveView.tsx:166-182 has no Details entry. Proposal: On desktop, add Details to the right-click and '...' menus, and an 'i' toggle in the toolbar that opens a side panel reusing the phone details content. (effort small) | Built: Desktop Details side panel: an 'i' toggle in the Drive toolbar (remembered per browser as pm-drive-info) slides a 320px panel out from the right. It reuses DetailsBody, and the uploader shown there opens the shared PersonCard through PersonName. The panel shows whatever Details was chosen for, otherwise the one picked file, otherwise the folder you are in, otherwise an empty state. The right-click",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-drive-4",
@@ -8054,25 +8054,25 @@
       "title": "No sorting on desktop",
       "detail": "Reference: Both apps let you sort by Name, Last modified and Size from the column headers or a sort menu, with folders kept first. Today: Sort (name/modified/size) exists only in the phone layout (DriveView.tsx:~492-500, 604). Desktop always sorts by name, or by date in fixed sections (DriveView.tsx:82-97). Proposal: Make the desktop list-view column headers clickable for sorting, add the same sort menu in grid view, and reuse the sorter(). (effort small)",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-drive-5",
       "round": "Feature gaps",
       "area": "drive",
       "title": "No multi-select / bulk actions",
-      "detail": "Reference: Long-press on phone, or Ctrl/Shift-click and checkboxes on desktop, then a bulk bar with Share, Download (as zip), Move, Star and Trash. Today: Every action works on one item at a time. Row actions are per item (DriveView.tsx:124-145), and Trash has no 'Empty trash'. Proposal: Long-press on phones enters selection mode, and checkboxes plus Shift and Ctrl work on desktop. A contextual top bar offers Move, Download, Trash and Star. Add an 'Empty trash' action in Trash. (effort medium)",
+      "detail": "Reference: Long-press on phone, or Ctrl/Shift-click and checkboxes on desktop, then a bulk bar with Share, Download (as zip), Move, Star and Trash. Today: Every action works on one item at a time. Row actions are per item (DriveView.tsx:124-145), and Trash has no 'Empty trash'. Proposal: Long-press on phones enters selection mode, and checkboxes plus Shift and Ctrl work on desktop. A contextual top bar offers Move, Download, Trash and Star. Add an 'Empty trash' action in Trash. (effort medium) | Built: Multi-select and bulk actions. Desktop: Ctrl/Cmd-click adds or removes an item, Shift-click selects a range, and a round check appears on hover; picked cards get a highlighted fill. Phones and desktop: 'Select' in the item menu turns on selection mode, then taps toggle items. A bar folds open with Clear, a count, Star/Unstar, Move to folder (MoveSheet now takes a list), Download for each file and ",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-drive-6",
       "round": "Feature gaps",
       "area": "drive",
       "title": "Document preview is a placeholder",
-      "detail": "Reference: Both apps render PDFs, Office files, text and code inline, with page scroll and search. Today: DrivePreview.tsx:108-112 shows 'Previews for documents arrive with the real file server.' Proposal: Render PDFs with pdf.js and text or code with a viewer. Show Office files through a converted PDF. Download stays the one primary action. (effort medium)",
+      "detail": "Reference: Both apps render PDFs, Office files, text and code inline, with page scroll and search. Today: DrivePreview.tsx:108-112 shows 'Previews for documents arrive with the real file server.' Proposal: Render PDFs with pdf.js and text or code with a viewer. Show Office files through a converted PDF. Download stays the one primary action. (effort medium) | Built: Document preview: PDFs open in the browser's own viewer inside the lightbox (pages, zoom, search). Text and code files (txt, md, csv, json, js, ts, py, sql and others) are fetched and shown in a wrapped monospace view, cut at 200 KB with a note, with a fallback state that keeps Download. Download stays the primary action for every other file type. File: src/components/DrivePreview.tsx (+ CSS in sr",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-drive-7",
@@ -8178,45 +8178,45 @@
       "round": "Feature gaps",
       "area": "meet",
       "title": "Tapping a person does nothing: no profile card",
-      "detail": "Reference: Google Meet, Otter and Read AI: tap a participant or speaker name to open a card with photo, title, email, local time, and Message/Email/Call buttons. Otter also shows 'meetings with this person'. Today: People chips are plain spans with no onClick (src/components/MeetApp.tsx:715-718). Transcript speaker names are bold text inside a row button that seeks the audio (MeetApp.tsx:875-877), so tapping a name jumps playback. Proposal: Make the person chip and speaker name open a shared PersonCard: a bottom sheet on phones, a popover on desktop. It shows avatar, name, role/title, email, local time and a 'Meetings together' count. The one primary button is Message (opens Chat DM), with Email in the overflow. Outsiders get 'Add to contacts / file under project'. Tapping the row text still seeks. (effort medium)",
+      "detail": "Reference: Google Meet, Otter and Read AI: tap a participant or speaker name to open a card with photo, title, email, local time, and Message/Email/Call buttons. Otter also shows 'meetings with this person'. Today: People chips are plain spans with no onClick (src/components/MeetApp.tsx:715-718). Transcript speaker names are bold text inside a row button that seeks the audio (MeetApp.tsx:875-877), so tapping a name jumps playback. Proposal: Make the person chip and speaker name open a shared PersonCard: a bottom sheet on phones, a popover on desktop. It shows avatar, name, role/title, email, local time and a 'Meetings together' count. The one primary button is Message (opens Chat DM), with Email in the overflow. Outsiders get 'Add to contacts / file under project'. Tapping the row text still seeks. (effort medium) | Built: Speaker names in the transcript and outsider People chips can now be tapped. A teammate's name opens the shared PersonCard (bottom sheet on phones, popover on desktop, with Message, Email and Tasks). An outsider opens a speaker menu. Tapping the rest of the row still seeks the audio. The 'Meetings together' count was not added, because the shared PersonCard has no slot for it.",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-meet-2",
       "round": "Feature gaps",
       "area": "meet",
       "title": "No per-speaker talk-time / speaker filter",
-      "detail": "Reference: Read AI and Otter show talk-time % per speaker and let you filter the transcript to one speaker. Today: Only a count of speakers is shown (MeetApp.tsx:711-712). The transcript renders every line with no filter (MeetApp.tsx:874). Proposal: Under the People list, show a bar per speaker with their talk-time %. Tapping a speaker filters the transcript to that person's lines. On phones, put this in the PersonCard ('Spoke 34%, show their lines'). (effort small)",
+      "detail": "Reference: Read AI and Otter show talk-time % per speaker and let you filter the transcript to one speaker. Today: Only a count of speakers is shown (MeetApp.tsx:711-712). The transcript renders every line with no filter (MeetApp.tsx:874). Proposal: Under the People list, show a bar per speaker with their talk-time %. Tapping a speaker filters the transcript to that person's lines. On phones, put this in the PersonCard ('Spoke 34%, show their lines'). (effort small) | Built: The Transcript tab shows a talk-time bar per speaker, estimated from each line's length and capped by the next line's start time. Tapping a bar filters the transcript to that speaker and shows an 'Only X's lines / Show everyone' row. The speaker menu also has 'Show only their lines (Spoke N%)'.",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-meet-3",
       "round": "Feature gaps",
       "area": "meet",
       "title": "Can't rename or fix speaker labels",
-      "detail": "Reference: Otter: tap a speaker label, then 'Rename / tag speaker', with 'apply to all lines'. Read AI does the same. Today: Speaker labels are fixed (MeetApp.tsx:877). Unknown speakers show as 'Unknown' with no way to fix them. Proposal: Long-press (or right-click) a speaker name, choose 'Who is this?', and pick from workspace users or type a name. The change applies to all of that speaker's lines and re-links tasks. (effort medium)",
+      "detail": "Reference: Otter: tap a speaker label, then 'Rename / tag speaker', with 'apply to all lines'. Read AI does the same. Today: Speaker labels are fixed (MeetApp.tsx:877). Unknown speakers show as 'Unknown' with no way to fix them. Proposal: Long-press (or right-click) a speaker name, choose 'Who is this?', and pick from workspace users or type a name. The change applies to all of that speaker's lines and re-links tasks. (effort medium) | Built: Long-press or right-click a speaker name (or tap an outsider) and choose 'Who is this?'. A Sheet lets you pick a workspace user or type a name. The new name goes on every transcript line, on matching action-item owners and on attendees, and unassigned tasks that speaker promised are linked to the picked user. A toast offers Undo. This only works on meetings that are not live, because the server ke",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-meet-4",
       "round": "Feature gaps",
       "area": "meet",
       "title": "No search within one transcript",
-      "detail": "Reference: Otter and Read AI have a search box inside the transcript that highlights matches and jumps between them. Today: Search exists only on the meetings list (MeetApp.tsx:374, MeetPhone.tsx:213). It finds the meeting but doesn't highlight or jump to the line. Proposal: Add a find field in the Transcript tab header with match count and next/previous arrows. When you open a meeting from list search, carry the query along so the first match is highlighted and the audio seeks to it. (effort small)",
+      "detail": "Reference: Otter and Read AI have a search box inside the transcript that highlights matches and jumps between them. Today: Search exists only on the meetings list (MeetApp.tsx:374, MeetPhone.tsx:213). It finds the meeting but doesn't highlight or jump to the line. Proposal: Add a find field in the Transcript tab header with match count and next/previous arrows. When you open a meeting from list search, carry the query along so the first match is highlighted and the audio seeks to it. (effort small) | Built: Find-in-transcript bar with an 'n of total' count, previous/next buttons (Enter and Shift+Enter), clear, and highlighted matches. The current match is outlined, scrolled into view, and the playhead is moved there without playing. A search from the desktop meeting list or the phone Meet home is passed along (MeetPage meeting gets an optional q), so the meeting opens on the Transcript tab with the f",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-meet-5",
       "round": "Feature gaps",
       "area": "meet",
       "title": "Action items not linked to the moment they were said",
-      "detail": "Reference: Read AI and Otter link each action item and key point to its timestamp. Tapping one plays that clip. Today: Topics have timestamps (MeetApp.tsx:802). Tasks and key points have none, so the Tasks tab only lists items (MeetApp.tsx:823-850). Proposal: Store an `at` time for tasks, decisions and key points when the notes are generated. Show a small timestamp chip on each one that seeks the player. (effort medium)",
+      "detail": "Reference: Read AI and Otter link each action item and key point to its timestamp. Tapping one plays that clip. Today: Topics have timestamps (MeetApp.tsx:802). Tasks and key points have none, so the Tasks tab only lists items (MeetApp.tsx:823-850). Proposal: Store an `at` time for tasks, decisions and key points when the notes are generated. Show a small timestamp chip on each one that seeks the player. (effort medium) | Built: Key points, decisions and open questions get a timestamp chip, found by matching their words to transcript lines. Tapping the chip plays from that moment, or for notes-only meetings jumps to the transcript line. Tasks already had saidAt jump chips. This works on existing meetings without any AI or server change.",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-meet-6",
@@ -8250,9 +8250,9 @@
       "round": "Feature gaps",
       "area": "meet",
       "title": "No recap email or post to Chat after the meeting",
-      "detail": "Reference: Read AI and Otter email a recap to attendees automatically, or post it to Slack, when the meeting ends. Today: Recap is copy-to-clipboard (MeetApp.tsx:464) or a read-only share link (MeetApp.tsx:490). Proposal: When a meeting ends, show one primary button, 'Send recap'. It opens a prefilled Mail draft or Chat post to the attendees, with a setting to do it automatically. (effort small)",
+      "detail": "Reference: Read AI and Otter email a recap to attendees automatically, or post it to Slack, when the meeting ends. Today: Recap is copy-to-clipboard (MeetApp.tsx:464) or a read-only share link (MeetApp.tsx:490). Proposal: When a meeting ends, show one primary button, 'Send recap'. It opens a prefilled Mail draft or Chat post to the attendees, with a setting to do it automatically. (effort small) | Built: A 'Send recap' primary button appears on finished meetings that have notes (header on desktop, full-width under the facts on phones). It opens a Sheet with the recap as editable text: summary, decisions, action items with owners and due dates, open questions. From there you can either email the attendees (opens a prefilled Mail compose to the teammate attendees through App's openCompose) or post i",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-meet-10",
@@ -8304,9 +8304,9 @@
       "round": "Feature gaps",
       "area": "vault",
       "title": "Tap a person in 'Who sees it' / Activity to see who they are",
-      "detail": "Reference: 1Password shows each person with an avatar in 'Shared with'; tapping opens their profile (name, email, role, vaults) with actions. Bitwarden's member rows open member details. Today: Who sees it is a single summary string from accessLabel (VaultApp.tsx:850), and tapping it opens the editor rather than a list of people. Activity lines are plain sentences (VaultApp.tsx:49-64, 623) with no tappable names. Proposal: Turn 'Who sees it' into an avatar stack. Tapping it opens a sheet listing each person and team, and tapping a person opens the shared profile card (name, title, email, local time) with Message as the primary action. Names in Activity lines open the same card. (effort medium)",
+      "detail": "Reference: 1Password shows each person with an avatar in 'Shared with'; tapping opens their profile (name, email, role, vaults) with actions. Bitwarden's member rows open member details. Today: Who sees it is a single summary string from accessLabel (VaultApp.tsx:850), and tapping it opens the editor rather than a list of people. Activity lines are plain sentences (VaultApp.tsx:49-64, 623) with no tappable names. Proposal: Turn 'Who sees it' into an avatar stack. Tapping it opens a sheet listing each person and team, and tapping a person opens the shared profile card (name, title, email, local time) with Message as the primary action. Names in Activity lines open the same card. (effort medium) | Built: 'Who sees it' is now a stack of avatars (up to 3 plus +N) on desktop rows and in the phone login screen. Tapping it opens a Popover (a sheet on phones) that lists the teams and every person with access. Tapping a person closes it and opens the shared PersonCard, with Message as its primary action. 'Change who sees it' appears for anyone who can edit. Names in Activity (phone screen and desktop mod",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-vault-2",
@@ -8331,18 +8331,18 @@
       "round": "Feature gaps",
       "area": "vault",
       "title": "Password generator has no options",
-      "detail": "Reference: Both generators offer a length slider, character-set toggles, memorable passphrases and a PIN mode, plus a standalone generator tab and generator history. Today: strongPassword() always makes 20 characters from a fixed set (VaultApp.tsx:876-881). The only control is a 'Generate' button (VaultApp.tsx:993). Proposal: Turn Generate into a sheet with a length slider, a Words/Characters toggle and a symbols switch, with 'Use password' as its one primary button. It remembers the last settings. (effort small)",
+      "detail": "Reference: Both generators offer a length slider, character-set toggles, memorable passphrases and a PIN mode, plus a standalone generator tab and generator history. Today: strongPassword() always makes 20 characters from a fixed set (VaultApp.tsx:876-881). The only control is a 'Generate' button (VaultApp.tsx:993). Proposal: Turn Generate into a sheet with a length slider, a Words/Characters toggle and a symbols switch, with 'Use password' as its one primary button. It remembers the last settings. (effort small) | Built: The generator now has a Characters/Words segmented control. Words makes memorable passphrases of 3 to 8 words, with one capital, an optional number, and dashes or spaces. It also has a length slider, Numbers and Symbols/Dashes switches, and a 'Make another' button. The last settings are remembered in localStorage ('vault-gen'). It still opens as the existing inline fold in the editor, not a separa",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-vault-5",
       "round": "Feature gaps",
       "area": "vault",
       "title": "No password health or Watchtower",
-      "detail": "Reference: 1Password Watchtower and Bitwarden Vault Health flag weak, reused and breached (HIBP) passwords, missing 2FA and unsecured http sites. Today: Nothing scores passwords. The sidebar has only filters and an info note (VaultApp.tsx:82-110). Proposal: Add a 'Needs attention' filter with a count badge, computed on the client after unlock: weak, reused, sites that support 2FA but have none, and HIBP k-anonymity breach checks. Each row's primary action is 'Change password'. (effort medium)",
+      "detail": "Reference: 1Password Watchtower and Bitwarden Vault Health flag weak, reused and breached (HIBP) passwords, missing 2FA and unsecured http sites. Today: Nothing scores passwords. The sidebar has only filters and an info note (VaultApp.tsx:82-110). Proposal: Add a 'Needs attention' filter with a count badge, computed on the client after unlock: weak, reused, sites that support 2FA but have none, and HIBP k-anonymity breach checks. Each row's primary action is 'Change password'. (effort medium) | Built: There is a new 'Needs attention' filter in the sidebar and in the phone title menu. Its count badge appears after a check. The check runs on the client after unlock, on end-to-end encrypted logins, and flags weak passwords, reused passwords, HIBP breaches (k-anonymity range API, padded; only a 5-character hash prefix leaves the browser), known 2FA-capable sites without a 2FA key, and http:// sites",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-vault-6",
@@ -8376,9 +8376,9 @@
       "round": "Feature gaps",
       "area": "vault",
       "title": "No biometric or PIN quick unlock",
-      "detail": "Reference: 1Password and Bitwarden unlock with Face ID, Touch ID or Windows Hello, or a PIN, after the master password has been entered once. Today: The gate always asks for the full passphrase (VaultApp.tsx:1091-1152). It auto-locks after 15 minutes (VaultApp.tsx:173) and again on every app restart. Proposal: After the first unlock, offer 'Unlock with Face ID / Windows Hello' using WebAuthn PRF to wrap the key. Keep the passphrase as a fallback. (effort medium)",
+      "detail": "Reference: 1Password and Bitwarden unlock with Face ID, Touch ID or Windows Hello, or a PIN, after the master password has been entered once. Today: The gate always asks for the full passphrase (VaultApp.tsx:1091-1152). It auto-locks after 15 minutes (VaultApp.tsx:173) and again on every app restart. Proposal: After the first unlock, offer 'Unlock with Face ID / Windows Hello' using WebAuthn PRF to wrap the key. Keep the passphrase as a fallback. (effort medium) | Built: Quick unlock with Face ID, fingerprint or Windows Hello uses WebAuthn PRF (src/vaultCrypto.ts: enableQuickUnlock, quickUnlock, quickUnlockOn, quickUnlockOff, quickUnlockAvailable). The private key is wrapped with an HKDF/AES-GCM key derived from the platform passkey's PRF output and stored only in this browser. It is tied to the current key pair. After the passphrase unlocks the Vault, a dismissib",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-vault-10",
@@ -8403,9 +8403,9 @@
       "round": "Feature gaps",
       "area": "vault",
       "title": "No import from other managers",
-      "detail": "Reference: Both apps import CSV and JSON from Chrome, LastPass, 1Password and Bitwarden, among others. Today: Logins can only be added one at a time through the editor (VaultApp.tsx:436, 883). Proposal: Add 'Import' to the empty state and overflow menu: pick a file, preview the rows, assign a client and access, then a single 'Import N logins' button. (effort medium)",
+      "detail": "Reference: Both apps import CSV and JSON from Chrome, LastPass, 1Password and Bitwarden, among others. Today: Logins can only be added one at a time through the editor (VaultApp.tsx:436, 883). Proposal: Add 'Import' to the empty state and overflow menu: pick a file, preview the rows, assign a client and access, then a single 'Import N logins' button. (effort medium) | Built: Import is available from the desktop header button, the empty states (phone and desktop) and an 'Import logins' row at the end of the phone list. You pick a CSV or JSON file: Chrome, Edge, Safari, Firefox, LastPass, 1Password and Bitwarden CSVs plus Bitwarden JSON are parsed by header names, including quoted commas and line breaks. Then you preview the rows with checkboxes, assign a project, and c",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-vault-13",
@@ -8441,7 +8441,7 @@
       "title": "Tapping an avatar or name opens a profile card",
       "detail": "Reference: Slack: tap an avatar or name in any message to open a profile sheet (phone) or popover (desktop) with photo, name, title, status, local time, email, and Message / Huddle buttons. Google and Microsoft 365 hover cards work the same way. Today: The Avatar is a plain span with aria-hidden and no click handler (src/components/Avatar.tsx:13-19). In chat it sits inside the message row, whose onClick opens the thread (src/components/chat/Message.tsx:240,249), so tapping a face jumps into the thread. Proposal: Add one shared PersonCard: a bottom sheet on phones and an anchored popover on desktop. Make Avatar and the sender name in chat, mail, tasks, activity, calendar guests and teams tappable, and call stopPropagation so the thread doesn't open. Show photo, name, title, status and local time. The primary action is Message, with Email and Call as secondary actions. (effort medium)",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-people-2",
@@ -8450,25 +8450,25 @@
       "title": "Tapping an @mention opens that person",
       "detail": "Reference: In Slack, Teams and Google Chat, tapping an @name opens the same profile card. Today: Mentions render as an inert <b className=\"mention\"> (src/components/chat/Message.tsx:43). Proposal: Make mentions buttons that open PersonCard. (effort small)",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-people-3",
       "round": "Feature gaps",
       "area": "people",
       "title": "Local time uses the person's own time zone",
-      "detail": "Reference: Slack shows each person's local time, for example \"4:12 PM local time (3 hrs ahead)\". Teams and Outlook show the same. Today: The DM profile shows 'Local time', but it's calculated from the company time zone (src/components/chat/Details.tsx:293). User has no timeZone field (src/types.ts:530-543). Proposal: Add User.timeZone, filled in automatically from the browser. Show their time and how far ahead or behind you they are on PersonCard, and warn before messaging outside their working hours. (effort small)",
+      "detail": "Reference: Slack shows each person's local time, for example \"4:12 PM local time (3 hrs ahead)\". Teams and Outlook show the same. Today: The DM profile shows 'Local time', but it's calculated from the company time zone (src/components/chat/Details.tsx:293). User has no timeZone field (src/types.ts:530-543). Proposal: Add User.timeZone, filled in automatically from the browser. Show their time and how far ahead or behind you they are on PersonCard, and warn before messaging outside their working hours. (effort small) | Built: Added User.timeZone (src/types.ts). App.tsx now fills it in from the browser once per user, and the server's ownProfile accepts it after validating the IANA name (server/index.ts profileExtras). PersonCard shows their local time with the gap to yours, for example '5.46 (11 hrs behind)', and a soft note when it's outside 8:00 to 19:00 for them: 'It's {time} for {name}. They may reply later.' The DM",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-people-4",
       "round": "Feature gaps",
       "area": "people",
       "title": "Profiles carry more than name, title and email",
-      "detail": "Reference: Slack profiles have custom fields: phone, pronouns, department, location, manager. Microsoft cards add an org chart and contact details. Today: User only stores name, email, title, color and photo (src/types.ts:530-536). The profile editor is in ClientApp (src/components/ClientApp.tsx:1422). Proposal: Add optional fields: phone, pronouns, location, department and manager (reportsTo). Show only the ones that are filled in, and let people edit them in Your profile. (effort medium)",
+      "detail": "Reference: Slack profiles have custom fields: phone, pronouns, department, location, manager. Microsoft cards add an org chart and contact details. Today: User only stores name, email, title, color and photo (src/types.ts:530-536). The profile editor is in ClientApp (src/components/ClientApp.tsx:1422). Proposal: Add optional fields: phone, pronouns, location, department and manager (reportsTo). Show only the ones that are filled in, and let people edit them in Your profile. (effort medium) | Built: Added optional User fields phone, pronouns, location, department and reportsTo (types and the server's profileExtras whitelist, which keeps a field when it isn't sent, so it stays backward compatible). Editing lives in the new src/components/ProfileDetails.tsx. On desktop these are plain fields that save when you leave them, plus a PersonSelect for 'Reports to'. On phones they are an 'About you' g",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-people-5",
@@ -8477,7 +8477,7 @@
       "title": "Message from any profile",
       "detail": "Reference: Every Slack, Teams and Google card has Message as its primary button, which opens or creates the DM. Today: Team member actions offer only Email, Make lead and Remove (src/components/teams/TeamsApp.tsx:316-321). There is no way to open a chat DM from there. Proposal: Make Message the primary action on PersonCard and the team member sheet. It opens the existing DM or creates one. (effort small)",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "FG-people-6",

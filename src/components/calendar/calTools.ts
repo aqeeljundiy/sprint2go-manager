@@ -150,3 +150,11 @@ export function placeOf(e: Pick<CalEvent, 'location' | 'meetUrl'>, linkUrl?: str
 
 /** Join shows on an event with a call link from 10 minutes before it starts until it ends. */
 export const joinable = (e: CalEvent, now = Date.now()) => new Date(e.start).getTime() - now <= 10 * 60_000 && new Date(e.end).getTime() > now;
+
+/** A fresh video call room (Jitsi Meet: free, no account, anyone with the link joins), for "New call link". */
+export function newCallLink() {
+  const abc = 'abcdefghijkmnopqrstuvwxyz23456789';
+  const bytes = crypto.getRandomValues(new Uint8Array(12));
+  const code = Array.from(bytes, (b) => abc[b % abc.length]).join('');
+  return `https://meet.jit.si/sprint2go-${code.slice(0, 4)}-${code.slice(4, 8)}-${code.slice(8)}`;
+}

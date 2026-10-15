@@ -27,13 +27,14 @@ export interface BrowseGroup {
  * top bar, or Tasks in the bar tapped again. Grouped cards: Today, Upcoming, My tasks; the team's queues and
  * reviews; the projects; saved views; then this app's settings. The Projects app's list on a phone is the same page.
  */
-export function TasksBrowse({ groups, top }: { groups: BrowseGroup[]; top?: ReactNode }) {
+export function TasksBrowse({ groups, top, hideGroups }: { groups: BrowseGroup[]; top?: ReactNode; hideGroups?: boolean /* a search is showing its results instead */ }) {
   // The title is the top bar's (24/700); no large title row.
   return (
     <section className="tasks-pane tasks-browse view-enter">
       <div className="tracking-scroll tbr-scroll">
         {top}
-        {groups
+        {!hideGroups &&
+          groups
           .filter((g) => g.rows.length || g.add)
           .map((g) => (
             <section key={g.id} className="tbr-group" aria-label={g.title}>

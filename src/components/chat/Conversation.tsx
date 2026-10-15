@@ -511,6 +511,7 @@ export function ChatView(p: ViewProps) {
     me,
     users,
     channel,
+    channels: p.channels,
     client,
     tasks: p.tasks,
     statuses: p.statuses,

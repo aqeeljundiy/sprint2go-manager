@@ -1063,6 +1063,12 @@ const id: Record<string, string> = {
   "Deleted the rule “{name}”": "Aturan “{name}” dihapus",
   "Rename table": "Ganti nama tabel",
   "View settings": "Pengaturan tampilan",
+  'Follow': 'Ikuti',
+  'Following': 'Diikuti',
+  'You hear about new comments. Tap to stop.': 'Anda diberi tahu soal komentar baru. Ketuk untuk berhenti.',
+  'Hear about new comments on this row': 'Dapat kabar soal komentar baru di baris ini',
+  'Write a comment, @ to mention': 'Tulis komentar, @ untuk menyebut',
+  'Mention someone': 'Sebut seseorang',
 };
 
 export default id;

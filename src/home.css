@@ -450,3 +450,68 @@
   align-self: flex-end;
   margin: 0 0 6px;
 }
+
+/* Workload: a person's row opens their tasks; the face opens their card. */
+.load-go {
+  text-align: left;
+  border-radius: 8px;
+  min-height: var(--tap, 44px);
+  transition: background-color 180ms ease-out;
+}
+.load:has(.load-go:hover) {
+  background: var(--hover);
+}
+.load {
+  transition: background-color 180ms ease-out;
+}
+
+/* Today and For you cards: a quick action at the row's end. */
+.home-event-row,
+.home-notice-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.home-event-row > .home-event,
+.home-notice-row > .home-notice {
+  flex: 1;
+  min-width: 0;
+}
+.join-soon {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  animation: join-soon-in 220ms ease-out backwards;
+}
+.join-soon-chip {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.join-soon .primary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+@keyframes join-soon-in {
+  from { opacity: 0; transform: translateX(6px); }
+}
+.home-notice-seen {
+  flex: none;
+  opacity: 0;
+  transition: opacity 180ms ease-out, background-color 180ms ease-out;
+}
+.home-notice-row:hover .home-notice-seen,
+.home-notice-seen:focus-visible {
+  opacity: 1;
+}
+@media (hover: none) {
+  .home-notice-seen { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .join-soon { animation: none; }
+  .load, .load-go, .home-notice-seen { transition: none; }
+}

@@ -56,6 +56,7 @@ import { Avatar } from './Avatar';
 import { SettingsSearch } from './SettingsSearch';
 import { registerSettings } from '../settingsIndex';
 import { ChoiceRow, Group, GRow } from './ui/Grouped';
+import { ProfileDetailsFields, ProfileDetailsPhone, type ProfilePatch } from './ProfileDetails';
 import { AccountPhone, DeleteAccountPhone, DeleteFacts, deleteTyped, MailPhone, MailboxesPhone, MembersPhone, PasswordPhone, WorkspacePhone } from './SettingsPhone';
 import { SignaturesDesktop, WritingDesktop } from './mail/MailWriting';
 import { fmtSize } from '../data/drive';
@@ -140,6 +141,7 @@ interface Props {
   users: User[];
   me: string; // current user id
   onPhoto?: (photo: string | undefined) => void;
+  onProfile?: (patch: ProfilePatch) => void; // pronouns, phone, department, location, manager
   onPreviewOnboarding?: () => void;
   myApps?: { hidden: AppId[]; asked: AppId[]; onHidden: (l: AppId[]) => void; onAsk: (id: AppId) => void; onEdit?: () => void }; // onEdit: phones, Edit apps (the launcher's order)
   myRole: Role;
@@ -257,7 +259,7 @@ function SectionScreen({ phone, open, title, onBack, children }: { phone: boolea
   ) : null;
 }
 
-export function SettingsPage({ email, settings: s, update, section, onSection, usage, onMenu, workspace: ws, onWorkspace, onHolidays, holidayCal, onAddAccount, onRemoveAccount, mailExtras, users, me, onPhoto, onPreviewOnboarding, myApps, myRole, onInvite, onRole, onRemoveMember, onAccess, blocked, onUnblock, admin, demo, embedded, mailTeams, accountState }: Props & { embedded?: boolean }) {
+export function SettingsPage({ email, settings: s, update, section, onSection, usage, onMenu, workspace: ws, onWorkspace, onHolidays, holidayCal, onAddAccount, onRemoveAccount, mailExtras, users, me, onPhoto, onProfile, onPreviewOnboarding, myApps, myRole, onInvite, onRole, onRemoveMember, onAccess, blocked, onUnblock, admin, demo, embedded, mailTeams, accountState }: Props & { embedded?: boolean }) {
   // Phones: the list of sections, and the one open over it (Settings opened for one section starts on it).
   const onPhone = usePhone();
   const phone = onPhone && !embedded;
@@ -613,6 +615,7 @@ export function SettingsPage({ email, settings: s, update, section, onSection, u
                     onPhoto={onPhoto}
                     security={
                       <>
+                        {onProfile && <ProfileDetailsPhone me={users.find((u) => u.id === me)} people={users} onSave={onProfile} />}
                         <Group title={t('Security')}>
                           <PasswordPhone
                             on={server.on}
@@ -662,6 +665,7 @@ export function SettingsPage({ email, settings: s, update, section, onSection, u
                 <label>{t('Title')}</label>
                 <input value={s.title} onChange={(e) => update({ title: e.target.value })} />
               </div>
+              {onProfile && <ProfileDetailsFields me={users.find((u) => u.id === me)} people={users} onSave={onProfile} />}
               <div className="field">
                 <label>{t('Email address')}</label>
                 <input value={email} readOnly />

@@ -200,6 +200,11 @@ const id: Record<string, string> = {
   "Send a copy": "Kirim salinan",
   "Note copied as text": "Catatan disalin sebagai teks",
   "Couldn’t copy the note here.": "Catatan tidak bisa disalin di sini.",
+  // The menu at the caret (notes/InlineMenu.tsx): "@" for people and notes, "/" for blocks.
+  'Insert a block': 'Sisipkan blok',
+  'Nothing matches “{query}”': 'Tidak ada yang cocok dengan “{query}”',
+  'From this line': 'Dari baris ini',
+  'Today’s date': 'Tanggal hari ini',
 };
 
 export default id;

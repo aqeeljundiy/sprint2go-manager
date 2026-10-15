@@ -1,6 +1,6 @@
 import { ProjectBadge } from './ProjectBadge';
 import { term } from '../terms';
-import { Archive, LayoutGrid, Plus } from 'lucide-react';
+import { Archive, LayoutGrid, ListTodo, Plus } from 'lucide-react';
 import type { Client, Todo } from '../types';
 import { isBrief, type TaskScope } from './TasksView';
 import { localDay } from '../utils';
@@ -15,6 +15,7 @@ interface Props {
   isAdmin: boolean;
   myClientIds: string[];
   onScope: (s: TaskScope) => void;
+  me?: string; // My work counts what's late for this person
   onNew?: () => void; // opens the one New project form over the grid; missing: this person can't start projects
 }
 
@@ -22,7 +23,8 @@ interface Props {
  * The Projects app's sidebar: every project (filter by type), past ones, and a new one in two taps.
  * A project's page is the hub for everything about it (tasks, chat, mail, meetings, files, notes, logins, guests).
  */
-export function ProjectsSidebar({ scope, tasks, clients: allClients, isAdmin, myClientIds, onScope, onNew }: Props) {
+export function ProjectsSidebar({ scope, tasks, clients: allClients, isAdmin, myClientIds, onScope, onNew, me }: Props) {
+  const [view, setView] = usePersisted<'all' | 'work'>('s2g-proj-view', 'all');
   const mineOrAll = isAdmin ? allClients : allClients.filter((c) => myClientIds.includes(c.id));
   const [typeFilter, setTypeFilter] = usePersisted<string>('s2g-project-type', '');
   const types = [...new Set(mineOrAll.filter((c) => c.status !== 'ended' && c.type).map((c) => c.type!))];
@@ -30,6 +32,8 @@ export function ProjectsSidebar({ scope, tasks, clients: allClients, isAdmin, my
   const past = mineOrAll.filter((c) => c.status === 'ended');
   const open = tasks.filter((x) => !x.done && !isBrief(x));
   const today = localDay();
+  const live = new Set(allClients.filter((c) => c.status !== 'ended').map((c) => c.id));
+  const myLate = me ? open.filter((x) => !!x.clientId && live.has(x.clientId) && !!x.due && x.due < today && (x.userId === me || x.assignees?.includes(me))).length : 0;
   const is = (s: TaskScope) => s.kind === scope.kind && (!('id' in s) || ('id' in scope && scope.id === s.id));
 
   return (
@@ -41,9 +45,15 @@ export function ProjectsSidebar({ scope, tasks, clients: allClients, isAdmin, my
         </button>
       )}
       <nav className="nav">
-        <button className={`nav-item ${scope.kind === 'projects' ? 'active' : ''}`} onClick={() => onScope({ kind: 'projects' })} title={t('All {projects}', { projects: term.many })}>
+        <button className={`nav-item ${scope.kind === 'projects' && view !== 'work' ? 'active' : ''}`} onClick={() => (setView('all'), onScope({ kind: 'projects' }))} title={t('All {projects}', { projects: term.many })}>
           <LayoutGrid size={17} />
           <span className="sb-label">{t('All {projects}', { projects: term.many })}</span>
+        </button>
+        {/* Everything assigned to me and coming due, across projects (ProjectPulse's MyWork). */}
+        <button className={`nav-item ${scope.kind === 'projects' && view === 'work' ? 'active' : ''}`} onClick={() => (setView('work'), onScope({ kind: 'projects' }))} title={t('My work')}>
+          <ListTodo size={17} />
+          <span className="sb-label">{t('My work')}</span>
+          {myLate ? <span className="count warn-count" title={tn(myLate, '{n} late', '{n} late')}>{myLate}</span> : null}
         </button>
       </nav>
       <div className="nav-heading sb-label">{term.Many}</div>

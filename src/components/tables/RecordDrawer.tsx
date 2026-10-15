@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { ChevronDown, ChevronRight, ChevronUp, CopyPlus, GripVertical, LayoutTemplate, Link2, Maximize2, Minimize2, MoreHorizontal, Plus, Send, Trash2, X } from 'lucide-react';
+import { Bell, BellRing, ChevronDown, ChevronRight, ChevronUp, CopyPlus, GripVertical, LayoutTemplate, Link2, Maximize2, Minimize2, MoreHorizontal, Plus, Send, Trash2, X } from 'lucide-react';
 import type { CellValue, Channel, DataTable, TableField, TablePage, TableRow, User } from '../../types';
 import { FieldMenu } from './FieldMenu';
 import { Avatar } from '../Avatar';
@@ -122,7 +122,9 @@ export interface RecordProps {
   phone?: boolean; // a page of its own (pushed over the table), with editors in sheets
   nav?: RowNav;
   onCell: (fieldId: string, v: CellValue) => void;
-  onComment: (text: string) => void;
+  onComment: (text: string, mentions?: string[]) => void;
+  /** Follows or stops following the row's comments. */
+  onFollow?: () => void;
   onDelete: () => void;
   onDuplicate: () => void;
   onCopyLink?: () => void;
@@ -194,21 +196,50 @@ function useRowKeys(nav: RowNav | undefined, onClose?: () => void) {
   }, []);
 }
 
-function Comments({ row, ctx, me, onComment }: { row: TableRow; ctx: CellCtx; me: string; onComment: (tb: string) => void }) {
+/** The words of a comment, with each @Name of a mentioned person picked out. */
+function CommentText({ text, people }: { text: string; people: User[] }) {
+  const names = people.map((u) => '@' + u.name).sort((x, y) => y.length - x.length);
+  if (!names.length) return <p>{text}</p>;
+  const re = new RegExp('(' + names.map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')', 'g');
+  return <p>{text.split(re).map((part, i) => (names.includes(part) ? <span key={i} className="tb-mention">{part}</span> : part))}</p>;
+}
+
+function Comments({ row, ctx, me, onComment, onFollow }: { row: TableRow; ctx: CellCtx; me: string; onComment: (text: string, mentions?: string[]) => void; onFollow?: () => void }) {
   const [comment, setComment] = useState('');
+  const [picked, setPicked] = useState<string[]>([]);
+  const [hi, setHi] = useState(0);
+  const input = useRef<HTMLInputElement>(null);
   const userOf = (id: string): User | undefined => ctx.users.find((u) => u.id === id);
+  const following = (row.followers ?? []).includes(me);
+  // "@jo" at the end of what's typed: teammates whose name starts with it.
+  const q = /(^|\s)@([^@\s]*)$/.exec(comment)?.[2];
+  const matches = q === undefined ? [] : ctx.users.filter((u) => u.id !== me && u.name.toLowerCase().split(' ').some((w) => w.startsWith(q.toLowerCase()))).slice(0, 5);
+  const pick = (u: User) => {
+    setComment((c) => c.replace(/@([^@\s]*)$/, '@' + u.name + ' '));
+    setPicked((ps) => (ps.includes(u.id) ? ps : [...ps, u.id]));
+    setHi(0);
+    input.current?.focus();
+  };
   return (
     <div className="tb-rd-sec">
-      <h4>{t('Comments')}</h4>
+      <div className="tb-rd-sec-head">
+        <h4>{t('Comments')}</h4>
+        {onFollow && (
+          <button type="button" className={following ? 'tb-follow on' : 'tb-follow'} aria-pressed={following} onClick={onFollow} title={following ? t('You hear about new comments. Tap to stop.') : t('Hear about new comments on this row')}>
+            {following ? <BellRing size={15} /> : <Bell size={15} />}
+            <span>{following ? t('Following') : t('Follow')}</span>
+          </button>
+        )}
+      </div>
       {!row.comments?.length && <p className="tb-rd-empty">{t('No comments yet')}</p>}
       {(row.comments ?? []).map((c) => {
         const u = userOf(c.by);
         return (
           <div key={c.id} className="tb-comment">
-            {u && <Avatar person={u} size={24} />}
+            {u && <Avatar person={u} size={24} card={u.id} />}
             <div>
               <strong>{u?.name.split(' ')[0] ?? t('Someone')}</strong> <small className="muted">{relative(c.at)}</small>
-              <p>{c.text}</p>
+              <CommentText text={c.text} people={(c.mentions ?? []).map(userOf).filter((x): x is User => !!x)} />
             </div>
           </div>
         );
@@ -217,16 +248,43 @@ function Comments({ row, ctx, me, onComment }: { row: TableRow; ctx: CellCtx; me
         className="tb-comment-new"
         onSubmit={(e) => {
           e.preventDefault();
-          if (!comment.trim()) return;
-          onComment(comment.trim());
+          if (matches.length) return pick(matches[hi] ?? matches[0]);
+          const text = comment.trim();
+          if (!text) return;
+          const mentions = picked.filter((id) => { const u = userOf(id); return !!u && text.includes('@' + u.name); });
+          onComment(text, mentions.length ? mentions : undefined);
           setComment('');
+          setPicked([]);
         }}
       >
         {userOf(me) && <Avatar person={userOf(me)!} size={24} />}
-        <input value={comment} onChange={(e) => setComment(e.target.value)} placeholder={t('Write a comment')} aria-label={t('Write a comment')} enterKeyHint="send" />
+        <input
+          ref={input}
+          value={comment}
+          onChange={(e) => (setComment(e.target.value), setHi(0))}
+          onKeyDown={(e) => {
+            if (!matches.length) return;
+            if (e.key === 'ArrowDown') (e.preventDefault(), setHi((h) => (h + 1) % matches.length));
+            else if (e.key === 'ArrowUp') (e.preventDefault(), setHi((h) => (h - 1 + matches.length) % matches.length));
+            else if (e.key === 'Tab') (e.preventDefault(), pick(matches[hi] ?? matches[0]));
+          }}
+          placeholder={t('Write a comment, @ to mention')}
+          aria-label={t('Write a comment')}
+          enterKeyHint="send"
+        />
         <button type="submit" className="icon-btn sm" disabled={!comment.trim()} aria-label={t('Send comment')}>
           <Send size={15} />
         </button>
+        {matches.length > 0 && (
+          <div className="tb-mention-pick" role="listbox" aria-label={t('Mention someone')}>
+            {matches.map((u, i) => (
+              <button key={u.id} type="button" role="option" aria-selected={i === hi} className={i === hi ? 'on' : ''} onMouseDown={(e) => e.preventDefault()} onClick={() => pick(u)}>
+                <Avatar person={u} size={24} />
+                <span>{u.name}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </form>
     </div>
   );
@@ -327,7 +385,7 @@ function Meta({ row, ctx }: { row: TableRow; ctx: CellCtx }) {
 
 /* ---------- desktop: the side panel (or a page) ---------- */
 
-function RecordPanel({ table, row, ctx, me, onCell, onComment, onDelete, onDuplicate, onCopyLink, onClose, onOpenRow, readOnly, guest, full, onToggleFull, edit, onPage, onLayout, onNewField, nav }: RecordProps) {
+function RecordPanel({ table, row, ctx, me, onCell, onComment, onFollow, onDelete, onDuplicate, onCopyLink, onClose, onOpenRow, readOnly, guest, full, onToggleFull, edit, onPage, onLayout, onNewField, nav }: RecordProps) {
   useOnePanel(onClose);
   useFocusedScreen();
   useRowKeys(nav, onClose);
@@ -483,7 +541,7 @@ function RecordPanel({ table, row, ctx, me, onCell, onComment, onDelete, onDupli
             </div>
           )}
           <Extras row={row} linkedFrom={linkedFromOf(table, row, ctx)} onOpenRow={onOpenRow} />
-          {!guest && <Comments row={row} ctx={ctx} me={me} onComment={onComment} />}
+          {!guest && <Comments row={row} ctx={ctx} me={me} onComment={onComment} onFollow={onFollow} />}
           <History table={table} row={row} ctx={ctx} />
         </div>
       </aside>
@@ -537,7 +595,7 @@ function PhoneField({ f, table, row, ctx, readOnly, onEdit, onCell }: { f: Table
  * A row on a phone: its own page (Notion's). The name, then every field as a label-and-value row (the pinned ones
  * first), empty ones folded away, tabs when it's long, and the row's main button pinned at the bottom.
  */
-function RecordPage({ table, row, ctx, me, onCell, onComment, onDelete, onDuplicate, onCopyLink, onClose, onOpenRow, readOnly, guest, nav }: RecordProps) {
+function RecordPage({ table, row, ctx, me, onCell, onComment, onFollow, onDelete, onDuplicate, onCopyLink, onClose, onOpenRow, readOnly, guest, nav }: RecordProps) {
   const { pinned, main: mainField, body, sections, folded } = layoutOf(table, row, ctx, true, true);
   const [showFolded, setShowFolded] = useState(false);
   const [editing, setEditing] = useState<string | null>(null);
@@ -597,7 +655,7 @@ function RecordPage({ table, row, ctx, me, onCell, onComment, onDelete, onDuplic
   );
   const activityPane = (
     <>
-      {!guest && <Comments row={row} ctx={ctx} me={me} onComment={onComment} />}
+      {!guest && <Comments row={row} ctx={ctx} me={me} onComment={onComment} onFollow={onFollow} />}
       <History table={table} row={row} ctx={ctx} />
     </>
   );

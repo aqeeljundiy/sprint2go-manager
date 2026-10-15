@@ -75,6 +75,15 @@ const id: Record<string, string> = {
   'Copy {email}': 'Salin {email}',
   'Local time': 'Waktu setempat',
   'View tasks': 'Lihat tugas',
+  'Start a call': 'Mulai panggilan',
+  // Profile card: details and their local time
+  'Department': 'Departemen',
+  'It’s {time} for {name}. They may reply later.': 'Di tempat {name} sekarang pukul {time}. Mungkin balasannya nanti.',
+  'Pronouns': 'Kata ganti',
+  'Reports to': 'Atasan',
+  '{n} hrs ahead': '{n} jam lebih cepat',
+  '{n} hrs behind': '{n} jam lebih lambat',
+  '{time} ({diff})': '{time} ({diff})',
 };
 
 export default id;

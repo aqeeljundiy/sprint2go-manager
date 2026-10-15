@@ -457,3 +457,43 @@ iframe.print-frame {
     padding-right: 0;
   }
 }
+
+/* A recipient chip's face (avatar and name): a button that opens its menu, sized like the chip, not like the X. */
+.recip-chip button.recip-face {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: auto;
+  height: auto;
+  padding: 0 2px 0 0;
+  border-radius: 20px;
+  color: inherit;
+  font: inherit;
+  transition: background-color 0.18s var(--ease), color 0.18s var(--ease);
+}
+.recip-chip button.recip-face:hover,
+.recip-chip button.recip-face[aria-expanded='true'] {
+  background: none;
+  color: var(--accent);
+}
+.recip-chip button.recip-face::after {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .recip-chip button.recip-face {
+    transition: none;
+  }
+}
+
+/* Phones: the sender's name opens their card, above the line's fold hit area (round 4's ::after), with its own 44px reach. */
+@media (max-width: 767px) {
+  .gm-msg-name .person-link {
+    position: relative;
+    z-index: 1;
+  }
+  .gm-msg-name .person-link::after {
+    content: '';
+    position: absolute;
+    inset: -12px -4px -2px;
+  }
+}

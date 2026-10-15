@@ -46,7 +46,7 @@ export function ProjectPeople({ client, users, me, canEdit, canInvite = canEdit,
           <span className="pp-head">{t('Team')}</span>
           {owner && (
             <div className="pp-row">
-              <PersonCell person={owner} size={28} sub={null} badges={owner.id === me && <Badge tone="accent">{t('You')}</Badge>} />
+              <PersonCell person={owner} size={28} sub={null} card={owner.id} badges={owner.id === me && <Badge tone="accent">{t('You')}</Badge>} />
               <span className="muted small">{t('Owner')}</span>
             </div>
           )}
@@ -57,7 +57,7 @@ export function ProjectPeople({ client, users, me, canEdit, canInvite = canEdit,
               if (!u) return null;
               return (
                 <div key={m.userId} className="pp-row">
-                  <PersonCell person={u} size={28} sub={null} badges={u.id === me && <Badge tone="accent">{t('You')}</Badge>} />
+                  <PersonCell person={u} size={28} sub={null} card={u.id} badges={u.id === me && <Badge tone="accent">{t('You')}</Badge>} />
                   {canEdit ? (
                     <>
                       <Select<'lead' | 'member'>
@@ -95,7 +95,7 @@ export function ProjectPeople({ client, users, me, canEdit, canInvite = canEdit,
           {guests.length ? (
             guests.map((g) => (
               <div key={g.email} className="pp-row">
-                <PersonCell person={{ name: g.name, email: g.email, color: client.color }} size={28} sub={g.company ?? null} />
+                <PersonCell person={{ name: g.name, email: g.email, color: client.color }} size={28} sub={g.company ?? null} card />
                 <span className="muted small">{g.status === 'invited' ? t('Invited') : g.role === 'approver' ? t('Approver') : g.role === 'viewer' ? t('Viewer') : t('Collaborator')}</span>
               </div>
             ))

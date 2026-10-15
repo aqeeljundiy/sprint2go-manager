@@ -3,7 +3,7 @@ import { CalendarDays, Check, CheckCircle2, Inbox, MessageSquare, MoreHorizontal
 import { SwipeRow, type SwipeAction } from '../ui/SwipeRow';
 import { useActionMenu, type SheetAction } from '../ui/ActionSheet';
 import { PeoplePicker } from '../ui/PeoplePicker';
-import { dateTone, dueText } from '../../taskDates';
+import { dateTone, dueText, hhmmText } from '../../taskDates';
 import { firstOf, stageBadge, stageOf, stagesForTask, toneOf } from '../../stages';
 import { holidayOn } from '../../holidayDays';
 import { relative } from '../../utils';
@@ -101,11 +101,12 @@ export function TaskRow({
                 <Inbox size={12} /> {t('Request')}
               </span>
             )}
-            {look.show('due') && task.due && !task.done && (look.dueWords !== false || task.repeat) && (
+            {look.show('due') && task.due && !task.done && (look.dueWords !== false || task.repeat || task.dueTime) && (
               <span className={`tm due-${tone}`}>
                 {task.repeat && <RepeatIcon size={12} className="tm-rep" aria-label={t('Repeats')} />}
                 {look.dueWords !== false && <CalendarDays size={12} className="tm-cal" aria-hidden="true" />}
                 {look.dueWords !== false && dueText(task.due, ops.today)}
+                {task.dueTime && <span className="tm-time">{hhmmText(task.dueTime)}</span>}
               </span>
             )}
             {look.show('due') && !task.due && task.repeat && !task.done && (
@@ -162,7 +163,8 @@ export function TaskRow({
         )}
         {look.show('assignee') && (
           <span className="trow-pick hide-phone">
-            <PeoplePicker compact value={doersOf(task)} users={ops.users} me={ops.me} label={tx('field', 'Doing it')} onChange={(ids) => ops.patch(task.id, { assignees: ids, userId: ids[0] ?? '' })} />
+            {doersOf(task).length > 0 && <Doer task={task} ops={ops} size={24} />}
+            <PeoplePicker compact chevron={doersOf(task).length > 0} value={doersOf(task)} users={ops.users} me={ops.me} label={tx('field', 'Doing it')} onChange={(ids) => ops.patch(task.id, { assignees: ids, userId: ids[0] ?? '' })} />
           </span>
         )}
         <button type="button" ref={dots} className="icon-btn sm trow-more hide-phone" aria-label={t('More for “{title}”', { title: task.title })} onClick={(e) => (e.stopPropagation(), m.openFrom(dots))}>

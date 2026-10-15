@@ -468,7 +468,7 @@ function clientLens(me: Person) {
         return { id: d.id, name: access.teamNames === 'first' ? String(d.name ?? '').split(' ')[0] : d.name, color: d.color, title: d.title, photo: d.photo, email: '' };
       case 'clients':
         // A project's own task stages: ids and kinds only, like the company's.
-        return d.id === clientId ? { ...d, taskStages: Array.isArray(d.taskStages) ? d.taskStages.map((x: any) => ({ id: x.id, kind: x.kind })) : undefined } : null;
+        return d.id === clientId ? { ...d, updates: undefined, taskStages: Array.isArray(d.taskStages) ? d.taskStages.map((x: any) => ({ id: x.id, kind: x.kind })) : undefined } : null;
       case 'teams':
         return d.workspaceId === workspaceId ? { id: d.id, workspaceId: d.workspaceId, name: d.name, color: d.color, leadId: d.leadId, members: d.members, taskStages: Array.isArray(d.taskStages) ? d.taskStages.map((x: any) => ({ id: x.id, kind: x.kind })) : undefined } : null;
       case 'channels':
@@ -1369,6 +1369,16 @@ function applySync(me: string, incoming: any, from: { conn?: string; operator?: 
     if (coll === 'statuses') return d.id === me;
     return !!see(coll, d);
   };
+  // Optional profile details (phone, pronouns, place, department, manager, time zone): short strings, kept when not sent.
+  const profileExtras = (d: db.Doc, before: db.Doc) => {
+    const out: Record<string, unknown> = {};
+    for (const k of ['timeZone', 'phone', 'pronouns', 'location', 'department', 'reportsTo']) {
+      if (!(k in d)) continue;
+      const v = typeof d[k] === 'string' ? (d[k] as string).trim().slice(0, k === 'reportsTo' ? 64 : 80) : '';
+      out[k] = k === 'timeZone' && v && !/^[A-Za-z_]+(\/[A-Za-z0-9_+-]+)*$/.test(v) ? before[k] : v || undefined;
+    }
+    return out;
+  };
   // Your own profile: name, title, colour and photo (a small image), whoever you are. Nothing else on it.
   const ownProfile = (d: db.Doc) => {
     if (coll !== 'users' || d.id !== me) return null;
@@ -1379,7 +1389,7 @@ function applySync(me: string, incoming: any, from: { conn?: string; operator?: 
     // The vault key pair: a public key anyone may read, and the private key locked by the passphrase (only its owner can open it).
     const dk = d.vaultKey as any;
     const vk = dk && typeof dk === 'object' && typeof dk.wrapped === 'string' && typeof dk.salt === 'string' && typeof dk.iv === 'string' && dk.pub && typeof dk.pub === 'object' ? { pub: dk.pub, wrapped: String(dk.wrapped).slice(0, 4000), salt: String(dk.salt).slice(0, 64), iv: String(dk.iv).slice(0, 64) } : before.vaultKey;
-    return { ...before, name: String(d.name ?? before.name).slice(0, 80) || before.name, title: String(d.title ?? '').slice(0, 80), color: typeof d.color === 'string' ? d.color.slice(0, 20) : before.color, photo, hiddenApps, vaultKey: vk };
+    return { ...before, name: String(d.name ?? before.name).slice(0, 80) || before.name, title: String(d.title ?? '').slice(0, 80), color: typeof d.color === 'string' ? d.color.slice(0, 20) : before.color, photo, hiddenApps, vaultKey: vk, ...profileExtras(d, before) };
   };
   // Your own settings and status, whoever you are (someone with only a demo company has no company to write into).
   const ownRecord = (d: db.Doc) => (coll === 'prefs' || coll === 'statuses') && d.id === me;
@@ -3471,6 +3481,21 @@ const handle = async (req: IncomingMessage, res: ServerResponse) => {
       // Nothing new is saved in a paused or suspended company; reading what's there still works.
       const vaultRo = (wsId: string) => billing.readOnlyWords(db.getDoc('workspaces', wsId) as any);
       const m = p.match(/^\/api\/vault\/([\w-]+)(?:\/(reveal|code|log))?$/);
+      // Password health ("Needs attention"): the end-to-end encrypted passwords this person holds the key to, in one
+      // go, to be scored in their browser. Unreadable here; each one read is logged on its login like a copy.
+      if (p === '/api/vault/health' && req.method === 'POST') {
+        if (!memberOf(me).some((w) => w.id === wsId)) return json(res, 403, {});
+        if (session?.operator) return json(res, 403, { error: mark('Passwords and codes stay with them: you’re signed in as them.') });
+        const secrets: Record<string, string> = {};
+        for (const it of db.vaultList(wsId).filter(canSee)) {
+          if (!it.meta.keys?.[me]) continue;
+          const v = db.vaultSecret(it.id, 'password');
+          if (!v || !v.startsWith('enc:')) continue;
+          secrets[it.id] = v;
+          db.vaultLog(it.id, me, 'checked the password health');
+        }
+        return json(res, 200, { secrets });
+      }
       if (p === '/api/vault' && req.method === 'GET') {
         if (!memberOf(me).some((w) => w.id === wsId)) return json(res, 403, {});
         return json(res, 200, { items: db.vaultList(wsId).filter(canSee).map((it) => ({ ...it, canEdit: canEdit(it) })) });

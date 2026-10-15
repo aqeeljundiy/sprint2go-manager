@@ -222,6 +222,9 @@ const id: Record<string, string> = {
   "Tall": "Tinggi",
   "Width": "Lebar",
   "{n} of 12 columns": "{n} dari 12 kolom",
+  "Mark as seen": "Tandai sudah dilihat",
+  "On now": "Sedang berlangsung",
+  "Open tasks of {name}": "Buka tugas {name}",
 };
 
 export default id;

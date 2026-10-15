@@ -504,6 +504,8 @@ const id: Record<string, string> = {
   "{code} is your code to add this backup sign-in email.": "{code} adalah kode Anda untuk menambahkan email masuk cadangan ini.",
   // Settings, Domains (src/components/admin/Domains.tsx) and picking a domain for new addresses
   "That isn’t one of your domains.": "Itu bukan salah satu domain Anda.",
+  'You were mentioned on {row} in {table}: {text}': 'Anda disebut di {row} pada {table}: {text}',
+  'New comment on {row} in {table}: {text}': 'Komentar baru di {row} pada {table}: {text}',
 };
 
 export default id;

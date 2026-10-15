@@ -334,7 +334,11 @@ export function TableScreen(p: ScreenProps) {
     p.setRows((rs) => rs.map((r) => (ids.includes(r.id) ? withValue(r, fieldId, v) : r)));
     p.toast({ text: tn(ids.length, '{field} changed on {n} row', '{field} changed on {n} rows', { field }), action: { label: t('Undo'), run: undoLast } });
   };
-  const comment = (id: string, text: string) => p.setRows((rs) => rs.map((r) => (r.id === id ? { ...r, comments: [...(r.comments ?? []), { id: uid(), by: p.me, at: now(), text }] } : r)));
+  // Commenting follows the row, so you hear about replies.
+  const comment = (id: string, text: string, mentions?: string[]) =>
+    p.setRows((rs) => rs.map((r) => (r.id === id ? { ...r, followers: (r.followers ?? []).includes(p.me) ? r.followers : [...(r.followers ?? []), p.me], comments: [...(r.comments ?? []), { id: uid(), by: p.me, at: now(), text, ...(mentions ? { mentions } : {}) }] } : r)));
+  const follow = (id: string) =>
+    p.setRows((rs) => rs.map((r) => (r.id !== id ? r : { ...r, followers: (r.followers ?? []).includes(p.me) ? (r.followers ?? []).filter((x) => x !== p.me) : [...(r.followers ?? []), p.me] })));
   const moveRow = (id: string, targetId: string, after: boolean, grp?: { fieldId: string; value: CellValue }) => {
     remember(t('move row'));
     const order = orderNear(targetId, after);
@@ -1184,7 +1188,8 @@ export function TableScreen(p: ScreenProps) {
           full={full}
           onToggleFull={() => setFull((x) => !x)}
           onCell={(fieldId, v) => setCell(openRow.id, fieldId, v)}
-          onComment={(text) => comment(openRow.id, text)}
+          onComment={(text, mentions) => comment(openRow.id, text, mentions)}
+          onFollow={() => follow(openRow.id)}
           onDelete={() => deleteRows([openRow.id])}
           onDuplicate={() => {
             const id = duplicate(openRow.id);

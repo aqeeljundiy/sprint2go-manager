@@ -2,7 +2,7 @@ import { useMemo, useRef, useState, type ReactNode } from 'react';
 import { flushSync } from 'react-dom';
 import { SmoothHeight, TabPane } from './ui/Smooth';
 import { term } from '../terms';
-import { FolderPlus, ChevronUp, Handshake, ChevronDown, ChevronRight, Check, LayoutList, Pencil, Compass, Hash, Lock, MoreHorizontal, Plus, Settings, Star, Trash2, Users, X, Headphones, BellOff, Bell, Link2, LogOut, MailOpen, CheckCheck, Inbox, MessagesSquare, SendHorizontal, Bookmark, ArrowLeft, ArrowRight, EyeOff, GripVertical, Smile, LayoutGrid, PenLine, MessageCircle, Folder, Briefcase, PartyPopper, ListFilter, Clock } from 'lucide-react';
+import { FolderPlus, ChevronUp, Handshake, ChevronDown, ChevronRight, Check, LayoutList, Pencil, Compass, Hash, Lock, MoreHorizontal, Plus, Settings, Star, Trash2, Users, X, Headphones, BellOff, Bell, Link2, LogOut, MailOpen, CheckCheck, Inbox, MessagesSquare, SendHorizontal, Bookmark, ArrowLeft, ArrowRight, EyeOff, GripVertical, Smile, LayoutGrid, PenLine, MessageCircle, Folder, Briefcase, PartyPopper, ListFilter, Clock, Search } from 'lucide-react';
 import type { Channel, ChannelCategory, ChatLayout, ChatMessage, ChatSection, ChatView as ChatViewDef, Notice, Status, Team, User } from '../types';
 import { usePersisted } from '../settings';
 import { Avatar } from './Avatar';
@@ -26,6 +26,7 @@ import { toast } from '../toast';
 import { dmOther, followedThreads, isMutedValue, readFallback, shortTime, STATUS_PRESETS, statusText, TILE_NAMES, useChatState, whenText, type ChatState, type TileId } from './chat/chatPrefs';
 export { statusText };
 import { preview } from './chat/Message';
+import { ChatSearch } from './chat/Search';
 import { ConfirmSheet, chanName } from './chat/Sheets';
 import { GroupAvatar } from './chat/GroupAvatar';
 import { isGroupDm, GROUP_MAX } from '../chatFollow';
@@ -104,6 +105,8 @@ interface SidebarProps {
   page?: ChatPage | null; // the page open in the main area (wider screens)
   onPage: (p: ChatPage) => void;
   onOpen: (id: string) => void;
+  /** Open a conversation at one message (search results). */
+  onOpenMessage?: (id: string, msgId: string) => void;
   onJoin: (id: string) => void;
   onLeave: (id: string) => void;
   onNewChannel?: () => void; // missing: only admins start channels in this company
@@ -171,6 +174,8 @@ export function ChatSidebar(p: SidebarProps) {
   const [huddlePick, setHuddlePick] = useState(false);
   const [hiddenBanners, setHiddenBanners] = useState<string[]>([]);
   const switchRow = useRef<HTMLDivElement>(null);
+  const [searching, setSearching] = useState(false);
+  const searchAnchor = useRef<HTMLButtonElement>(null);
 
   const mine = p.channels.filter((c) => c.members.includes(p.me) && !c.archived);
   const joinable = p.channels.filter((c) => c.kind === 'channel' && !c.private && !c.archived && !c.members.includes(p.me));
@@ -404,6 +409,12 @@ export function ChatSidebar(p: SidebarProps) {
       {part === 'activity' ? <CheckCheck size={20} /> : <ListFilter size={20} />}
     </button>
   );
+  // Search every conversation: an icon in the phone's top bar, a row at the top of the sidebar on computers.
+  const searchBtn = p.onOpenMessage ? (
+    <button ref={phone ? searchAnchor : undefined} type="button" className="icon-btn chat-search-btn" onClick={() => setSearching(true)} aria-label={t('Search messages')} title={t('Search messages')}>
+      <Search size={20} />
+    </button>
+  ) : null;
   const dmsShown = [...dms].filter((c) => (dmFilter === 'unread' ? info[c.id]?.unread : dmFilter === 'guests' ? !!c.guests?.length : true)).sort((a, b) => recency(b).localeCompare(recency(a)));
   const banner = phone ? live.find((c) => !c.huddle!.members.includes(p.me) && !hiddenBanners.includes(c.id + c.huddle!.at)) : undefined;
   const menuChannel = p.channels.find((c) => c.id === rowMenu?.id);
@@ -420,6 +431,12 @@ export function ChatSidebar(p: SidebarProps) {
     <>
       {!phone && (
         <>
+          {p.onOpenMessage && (
+            <button ref={searchAnchor} type="button" className="chat-search-row" onClick={() => setSearching(true)}>
+              <Search size={15} aria-hidden />
+              <span className="sb-label">{t('Search messages')}</span>
+            </button>
+          )}
           <button ref={statusBtn} className="status-btn" onClick={() => setStatusOpen(true)}>
             <span className="st-emoji big">{myStatus?.emoji ?? '🙂'}</span>
             <span className="sb-label">{myStatus ? statusText(myStatus) : t('Set a status')}</span>
@@ -468,7 +485,7 @@ export function ChatSidebar(p: SidebarProps) {
         </>
       )}
 
-      {phone && inBar && <TopBar app="chat" actions={part === 'home' || part === 'you' ? undefined : filterBtn} />}
+      {phone && inBar && <TopBar app="chat" search={!searchBtn} actions={part === 'you' ? undefined : part === 'home' ? searchBtn : <>{searchBtn}{filterBtn}</>} />}
       {phone && !inBar && (
         <div className="chat-switch-row" ref={switchRow}>
           <div className="segmented chat-switch" role="tablist" aria-label={t('Chat')}>
@@ -493,6 +510,7 @@ export function ChatSidebar(p: SidebarProps) {
               </button>
             ))}
           </div>
+          {searchBtn}
           {part !== 'home' && filterBtn}
         </div>
       )}
@@ -824,6 +842,7 @@ export function ChatSidebar(p: SidebarProps) {
           />
         </Layer>
       )}
+      {p.onOpenMessage && <ChatSearch anchor={searchAnchor} open={searching} onClose={() => setSearching(false)} channels={p.channels} messages={p.messages} users={p.users} me={p.me} workspaceId={p.workspaceId} onOpen={p.onOpenMessage} />}
       {newMsg && (phone ? <NewMessageScreen users={p.users} me={p.me} channels={rooms} guests={p.dmGuests} presence={p.presence} onPick={p.onNewMessage} onPickChannel={p.onOpen} onNewChannel={p.onNewChannel} onClose={() => setNewMsg(false)} /> : <NewMessageSheet users={p.users} me={p.me} guests={p.dmGuests} onPick={p.onNewMessage} onNewChannel={p.onNewChannel} onClose={() => setNewMsg(false)} />)}
       {huddlePick && p.onHuddle && (
         <NewMessageScreen

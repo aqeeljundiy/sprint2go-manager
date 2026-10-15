@@ -1,0 +1,257 @@
+/* Meet: talk time, find in transcript, speaker labels, moments on key points, Send recap. Owned by Meet. */
+
+/* Talk time: one row per speaker, tap to read only their lines. */
+.m-talk {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+  margin-bottom: 8px;
+}
+.m-talk-row {
+  display: grid;
+  grid-template-columns: minmax(80px, 160px) 1fr 44px;
+  align-items: center;
+  gap: 12px;
+  min-height: 36px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  text-align: left;
+  font-size: 13px;
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+.m-talk-row:hover {
+  background: var(--surface-2);
+}
+.m-talk-row.on {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.m-talk-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+.m-talk-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.m-talk-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transition: width 0.25s ease-out;
+}
+.m-talk-pct {
+  text-align: right;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Find in transcript */
+.m-find {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 4px;
+  padding: 0 4px 0 12px;
+  margin-bottom: 4px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--text-3);
+}
+.m-find input {
+  flex: 1;
+  min-width: 0;
+  width: 0;
+  height: 36px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+}
+.m-find-n {
+  flex: none;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.m-find .icon-btn:disabled {
+  opacity: 0.35;
+}
+.m-only {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 8px;
+  font-size: 13px;
+  color: var(--text-2);
+  animation: m-x-in 0.2s ease-out backwards;
+}
+.m-tl-list {
+  display: contents;
+}
+.tl mark {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  color: inherit;
+  border-radius: 3px;
+}
+.tl.hit {
+  background: var(--accent-soft);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+.tl {
+  transition: background-color 0.18s ease, box-shadow 0.18s ease;
+}
+.tl .tl-who {
+  cursor: pointer;
+  border-radius: 4px;
+}
+.tl .tl-who:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* A key point's moment: a small chip that plays from there. */
+.m-at {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  vertical-align: 1px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.m-at:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* Who is this? */
+.m-who-list {
+  display: grid;
+  max-height: 320px;
+  overflow: auto;
+  margin: 0 -8px 12px;
+}
+.m-who-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  text-align: left;
+  transition: background-color 0.15s ease;
+}
+.m-who-row:hover,
+.m-who-row.on {
+  background: var(--accent-soft);
+}
+.m-who-row small {
+  color: var(--text-3);
+  margin-left: auto;
+}
+.m-who-type {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 16px;
+}
+
+/* Send recap */
+.m-recap-to {
+  font-size: 13px;
+  color: var(--text-2);
+  margin: 0 0 8px;
+}
+.m-recap-text {
+  width: 100%;
+  min-height: 220px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  resize: vertical;
+}
+.m-recap-foot {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+.m-recap-btn {
+  width: 100%;
+  justify-content: center;
+  min-height: var(--tap);
+  margin: 8px 0 16px;
+}
+
+@keyframes m-x-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@media (max-width: 767px) {
+  .m-talk-row {
+    min-height: var(--tap);
+    font-size: 15px;
+  }
+  .m-find input {
+    height: var(--tap);
+    font-size: 16px;
+  }
+  .m-find .icon-btn {
+    width: var(--tap);
+    height: var(--tap);
+  }
+  .m-at {
+    min-height: 28px;
+    padding: 2px 10px;
+  }
+  .m-recap-foot {
+    flex-direction: column-reverse;
+    width: 100%;
+  }
+  .m-recap-foot > * {
+    width: 100%;
+    min-height: var(--tap);
+    justify-content: center;
+  }
+  .m-recap-text {
+    font-size: 16px;
+    min-height: 45vh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m-only {
+    animation: none;
+  }
+  .m-talk-bar > span,
+  .tl,
+  .m-at,
+  .m-talk-row {
+    transition: none;
+  }
+}

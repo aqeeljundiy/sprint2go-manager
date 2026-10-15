@@ -1,0 +1,211 @@
+/* A project's pulse: health, status updates, activity, My work (ProjectPulse.tsx). Tokens only. */
+
+.health-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+.health-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+}
+.h-on { color: var(--ok); }
+.h-risk { color: var(--warn); }
+.h-off { color: var(--danger); }
+
+.pulse-last { display: grid; gap: 6px; }
+.pulse-note { margin: 0; white-space: pre-wrap; }
+.pulse-by { margin: 0; }
+
+.pulse-health { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.pulse-pick {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.18s var(--ease, ease), border-color 0.18s var(--ease, ease), color 0.18s var(--ease, ease);
+}
+.pulse-pick:not(.on) { color: var(--text-2); }
+.pulse-pick:not(.on) .health-dot { opacity: 0.55; }
+.pulse-pick.h-on.on { border-color: var(--ok); background: var(--ok-soft); }
+.pulse-pick.h-risk.on { border-color: var(--warn); background: var(--warn-soft); }
+.pulse-pick.h-off.on { border-color: var(--danger); background: var(--danger-soft); }
+.pulse-text {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 96px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-control, 10px);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 16px;
+  resize: vertical;
+}
+.pulse-text:focus { outline: none; border-color: var(--accent); }
+
+/* Activity */
+.activity-card h3 { flex-wrap: wrap; }
+.pa-seg { margin-left: auto; font-weight: 400; }
+.pa-day + .pa-day { margin-top: 8px; }
+.pa-day-h {
+  margin: 4px 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-3);
+}
+.pa-list { list-style: none; margin: 0; padding: 0; }
+.pa-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  animation: paIn 0.22s var(--ease-out-motion, ease-out) backwards;
+}
+.pa-face { flex: none; padding-top: 6px; width: 24px; }
+.pa-face-none { display: block; width: 24px; height: 24px; border-radius: 50%; background: var(--hover); }
+.pa-main {
+  flex: 1;
+  min-width: 0;
+  min-height: 36px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s var(--ease, ease);
+}
+.pa-main:hover:not(:disabled) { background: var(--hover); }
+.pa-main:disabled { cursor: default; opacity: 1; }
+.pa-text { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.pa-what { color: var(--text-2); }
+.pa-main time { flex: none; color: var(--text-3); font-size: 12px; }
+.pa-more { margin-top: 8px; }
+@keyframes paIn {
+  from { opacity: 0; transform: translateY(4px); }
+}
+
+/* My work */
+.mywork { margin: 0 0 24px; }
+.mywork-h { margin: 0 0 8px; font-size: 15px; font-weight: 600; }
+.mywork-gh { margin: 12px 0 4px; font-size: 12px; font-weight: 600; color: var(--text-3); }
+.mywork-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card, 16px);
+  background: var(--surface);
+  overflow: hidden;
+}
+.mywork-row { display: flex; align-items: center; gap: 4px; padding-left: 8px; animation: paIn 0.22s var(--ease-out-motion, ease-out) backwards; }
+.mywork-row + .mywork-row .mywork-main { border-top: 1px solid var(--divider, var(--line)); }
+.mywork-check {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  color: transparent;
+}
+.mywork-check::before {
+  content: '';
+  grid-area: 1 / 1;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid var(--text-3);
+  transition: border-color 0.15s var(--ease, ease), background-color 0.15s var(--ease, ease);
+}
+.mywork-check svg { grid-area: 1 / 1; transition: color 0.15s var(--ease, ease); }
+.mywork-check:hover::before { border-color: var(--ok); background: var(--ok-soft); }
+.mywork-check:hover { color: var(--ok); }
+.mywork-main {
+  flex: 1;
+  min-width: 0;
+  min-height: 52px;
+  display: grid;
+  gap: 2px;
+  align-content: center;
+  padding: 8px 12px 8px 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.mywork-title { font-size: 15px; overflow-wrap: anywhere; }
+.mywork-sub { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--text-2); }
+.mywork-proj { display: inline-flex; align-items: center; gap: 6px; }
+.mywork-proj::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+.mywork-late { color: var(--danger); }
+
+/* The card's health, next to its type */
+.proj-card .health-pill { margin-top: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pa-row,
+  .mywork-row { animation: none; }
+  .pulse-pick,
+  .pa-main,
+  .mywork-check::before { transition: none; }
+}
+
+/* A card's people: their own target */
+.proj-card-pop { display: contents; }
+.proj-card .proj-card-people {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  margin: -6px -6px -6px 0;
+  padding: 6px;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: background-color 0.15s var(--ease, ease);
+}
+.proj-card .proj-card-people:hover,
+.proj-card .proj-card-people:focus-visible { background: var(--hover); }
+.proj-card-more { margin-left: 4px; font-size: 12px; color: var(--text-2); }
+.proj-card-people > .proj-card-more { margin-left: 4px; box-shadow: none; border-radius: 0; }
+/* Desktop: the page's own title already says My work. */
+.mywork:not(.is-phone) > .mywork-h { display: none; }
+.mywork.is-phone { margin: 8px var(--gutter, 16px) 24px; }
+/* Inside the cards: the same inset as the cards' headings (18px) */
+.pulse-card .pulse-last { padding: 4px 18px 16px; }
+.activity-card .pa-days { padding: 4px 10px 12px; }
+.activity-card .pa-day-h { padding: 0 8px; }
+.activity-card .pa-more { margin-left: 8px; }
+.pulse-form { padding: 4px 8px 0; }
+@media (max-width: 767px) {
+  .pulse-form { padding: 4px 12px 0; }
+  .pulse-card h3 .ghost-btn,
+  .pa-seg > button,
+  .pulse-pick { min-height: var(--tap, 44px); }
+  .pa-main { min-height: var(--tap, 44px); }
+}

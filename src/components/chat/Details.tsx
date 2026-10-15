@@ -291,7 +291,7 @@ export function ChannelAbout(p: {
               </span>
             )}
             <a href={`mailto:${other.email}`}>{other.email}</a>
-            <span className="muted small">{t('Local time {time}', { time: fmtDate(new Date(), { hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: companyTz({ timeZone: p.timeZone }), timeZoneName: 'short' }) })}</span>
+            <span className="muted small">{t('Local time {time}', { time: fmtDate(new Date(), { hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: other.timeZone || companyTz({ timeZone: p.timeZone }), timeZoneName: 'short' }) })}</span>
           </div>
         ) : (
           <dl className="fields about-fields">

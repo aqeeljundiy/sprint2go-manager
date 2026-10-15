@@ -331,6 +331,18 @@ export function afterRowWrite(env: Env, before: Map<string, TableRow | undefined
       if (typeof who === 'string' && who && who !== by && who !== (was?.values[f.id] ?? null))
         save(env, 'notices', [{ id: uid(), userId: who, workspaceId: t.workspaceId, kind: 'task', ...msg('{row} in {table} is yours ({field})', { row: rowName(t, r), table: t.name, field: f.name }), at: now(), read: false, link: { app: 'tables', id: t.id, msg: r.id } }]);
     }
+    // New comments: the people @mentioned in them, then the row's followers, hear about it (never the writer).
+    const seen = new Set((was?.comments ?? []).map((c) => c.id));
+    for (const c of (r.comments ?? []).filter((x) => was && !seen.has(x.id))) {
+      const told = new Set<string>([c.by]);
+      const tell = (userId: string, words: ReturnType<typeof msg>) => {
+        if (told.has(userId)) return;
+        told.add(userId);
+        save(env, 'notices', [{ id: uid(), userId, workspaceId: t.workspaceId, kind: 'mention', ...words, at: now(), read: false, link: { app: 'tables', id: t.id, msg: r.id } }]);
+      };
+      for (const m of c.mentions ?? []) if (c.text.includes('@')) tell(m, msg('You were mentioned on {row} in {table}: {text}', { row: rowName(t, r), table: t.name, text: c.text.slice(0, 120) }));
+      for (const fo of r.followers ?? []) tell(fo, msg('New comment on {row} in {table}: {text}', { row: rowName(t, r), table: t.name, text: c.text.slice(0, 120) }));
+    }
     const rules = (t.rules ?? []).filter((x) => x.enabled && x.actions.length && x.on !== 'schedule');
     if (!rules.length) continue;
     for (const rule of rules) {

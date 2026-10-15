@@ -16,6 +16,7 @@ export function PeoplePicker({
   compact,
   emptyText = t('Nobody yet'),
   max = 4,
+  chevron,
 }: {
   value: string[];
   users: User[];
@@ -25,6 +26,7 @@ export function PeoplePicker({
   compact?: boolean; // just the avatars, for task rows
   emptyText?: string;
   max?: number; // avatars shown before "+N"
+  chevron?: boolean; // just a small chevron (task rows on a computer: the face itself opens the person's card)
 }) {
   const btn = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
@@ -36,7 +38,7 @@ export function PeoplePicker({
       <button
         ref={btn}
         type="button"
-        className={`people-btn ${compact ? 'compact' : 'sel'} ${open ? 'open' : ''}`}
+        className={`people-btn ${chevron ? 'chevron' : compact ? 'compact' : 'sel'} ${open ? 'open' : ''}`}
         onClick={(e) => {
           e.stopPropagation();
           setOpen((o) => !o);
@@ -44,7 +46,9 @@ export function PeoplePicker({
         aria-label={label}
         title={chosen.length ? chosen.map((u) => u.name).join(', ') : label}
       >
-        {chosen.length ? (
+        {chevron ? (
+          <ChevronDown size={14} className="rot-chev" aria-hidden="true" />
+        ) : chosen.length ? (
           <span className="av-stack">
             {chosen.slice(0, max).map((u) => (
               <Avatar key={u.id} person={u} size={compact ? 24 : 22} />

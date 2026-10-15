@@ -1,9 +1,10 @@
 import { useRef, useState, type ReactNode } from 'react';
-import { AlarmClock, Bell, Check, CircleHelp, Clock, Copy, EllipsisVertical, Globe, Lock, Mail, MapPin, Mic, Pencil, Repeat, Send, StickyNote, TextAlignStart, Trash2, Users, Video, X } from 'lucide-react';
+import { AlarmClock, Bell, Check, CircleHelp, Clock, Copy, EllipsisVertical, Globe, Lock, Mail, MapPin, MessageCircle, Mic, Pencil, Repeat, Send, StickyNote, TextAlignStart, Trash2, Users, Video, X } from 'lucide-react';
 import type { CalEvent, CalendarDef, GuestAnswer, RsvpStatus } from '../../types';
 import { MEETING_NAME, meetingLinkOf, notetakerJoins } from '../../meetingLinks';
 import { Avatar } from '../Avatar';
 import { Badge, type BadgeTone } from '../ui/Person';
+import { PersonName } from '../ui/PersonCard';
 import { Sheet } from '../ui/Sheet';
 import { ActionSheet, type SheetAction } from '../ui/ActionSheet';
 import { toast } from '../../toast';
@@ -43,6 +44,8 @@ export interface DetailProps {
   inviteNote?: string;
   /** Phones: the ⋮ menu (Duplicate, Move to tomorrow, Copy link, Delete), the one home for them. */
   more?: SheetAction[];
+  /** Message everyone on it (a Mail draft to the guests). */
+  onMessageGuests?: () => void;
 }
 
 const ANSWER: Record<GuestAnswer, { label: string; tone: BadgeTone }> = {
@@ -209,13 +212,20 @@ function DetailBody(p: DetailProps) {
         <div className="ev-row top">
           <Users size={16} />
           <div className="ev-guests">
-            <span>{tn(guests.length + 1, '{n} person', '{n} people')}</span>
+            <div className="ev-guests-head">
+              <span>{tn(guests.length + 1, '{n} person', '{n} people')}</span>
+              {p.onMessageGuests && (
+                <button type="button" className="ghost-btn sm" onClick={p.onMessageGuests}>
+                  <MessageCircle size={15} /> {t('Message guests')}
+                </button>
+              )}
+            </div>
             {guests.map((g) => {
               const a = p.answers?.[g.email.toLowerCase()];
               return (
                 <div key={g.email} className="ev-guest">
                   <Avatar person={g} size={24} card />
-                  <span className="ev-guest-name">{g.name}</span>
+                  <PersonName who={{ name: g.name, email: g.email }} className="ev-guest-name">{g.name}</PersonName>
                   {a && (
                     <Badge tone={ANSWER[a].tone} small>
                       {t(ANSWER[a].label)}
@@ -485,12 +495,17 @@ function PhoneDetail(p: DetailProps & { rsvp: ReactNode }) {
                       )}
                     </span>
                     <span className="dr-guest-text">
-                      <span>{g.name}</span>
+                      <PersonName who={{ name: g.name, email: g.email }}>{g.name}</PersonName>
                       {g.organiser && <small>{t('Organiser')}</small>}
                     </span>
                   </div>
                 );
               })}
+              {p.onMessageGuests && (
+                <DRow icon={<MessageCircle size={20} />} onClick={p.onMessageGuests}>
+                  <span>{t('Message guests')}</span>
+                </DRow>
+              )}
             </div>
           )}
 

@@ -2,7 +2,7 @@ import { ProjectBadge } from './ProjectBadge';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { SmoothHeight } from './ui/Smooth';
 import { term } from '../terms';
-import { AlertTriangle, ArrowDown, ArrowRight, ArrowUp, CalendarDays, Check, ChevronRight, FileText, FlaskConical, GripVertical, Hash, Inbox, LayoutGrid, ListChecks, Menu, Mic, PartyPopper, Plus, Settings2, Sparkles, Users, Video, X, Search, Megaphone } from 'lucide-react';
+import { AlertTriangle, CheckCheck, ArrowDown, ArrowRight, ArrowUp, CalendarDays, Check, ChevronRight, FileText, FlaskConical, GripVertical, Hash, Inbox, LayoutGrid, ListChecks, Menu, Mic, PartyPopper, Plus, Settings2, Sparkles, Users, Video, X, Search, Megaphone } from 'lucide-react';
 import type { CalEvent, Client, HomeTemplateId, Meeting, Notice, Team, Thread, Todo, User } from '../types';
 import { fmtDay, fmtTime, fmtWeekday, fmtWeekdayLong } from '../i18n/format';
 import { mark, t, textOf, tn, tx } from '../i18n';
@@ -22,7 +22,8 @@ import { TopBar } from '../mobile/TopBar';
 import { usePhone } from '../mobile/media';
 import { needsYou, updatesOf } from '../needsYou';
 import { addDays } from '../taskDates';
-import { LiveCalls, MeetingStrip, NeedsList, TodayBlock, Updates } from './home/HomeParts';
+import { JoinSoon, LiveCalls, MeetingStrip, NeedsList, TodayBlock, Updates } from './home/HomeParts';
+import { SwipeRow } from './ui/SwipeRow';
 
 type CardId =
   | 'briefing'
@@ -150,6 +151,8 @@ interface Props {
   onSearch: () => void;
   onOpenTask: (id: string) => void;
   onOpenTasks: () => void;
+  /** Workload: one person's open tasks (late first). */
+  onOpenPerson?: (userId: string) => void;
   onOpenTeam: (id: string) => void;
   onOpenBriefs: () => void;
   onOpenGrid: () => void;
@@ -469,11 +472,22 @@ export function HomeView(p: Props) {
             {d.people.map(({ u, open, late, week }) => (
               <div key={u.id} className="load">
                 <Avatar person={u} size={26} card={u.id} />
-                <span className="load-text">
-                  <strong>{u.id === p.me.id ? t('You') : u.name.split(' ')[0]}</strong>
-                  {bar(open, max, late > 0)}
-                  <small>{late ? t('{open} open · {week} this week · {late} late', { open, week, late }) : t('{open} open · {week} this week', { open, week })}</small>
-                </span>
+                {(() => {
+                  const inner = (
+                    <>
+                      <strong>{u.id === p.me.id ? t('You') : u.name.split(' ')[0]}</strong>
+                      {bar(open, max, late > 0)}
+                      <small>{late ? t('{open} open · {week} this week · {late} late', { open, week, late }) : t('{open} open · {week} this week', { open, week })}</small>
+                    </>
+                  );
+                  return p.onOpenPerson ? (
+                    <button type="button" className="load-text load-go" onClick={() => p.onOpenPerson!(u.id)} aria-label={t('Open tasks of {name}', { name: u.name })}>
+                      {inner}
+                    </button>
+                  ) : (
+                    <span className="load-text">{inner}</span>
+                  );
+                })()}
               </div>
             ))}
           </div>
@@ -578,10 +592,13 @@ export function HomeView(p: Props) {
           <ul className="home-list">
             {d.todayEvents.map((e) => (
               <li key={e.id}>
-                <button className="home-event" onClick={() => p.onOpenCalendar(e.id)}>
-                  <time>{fmtTime(e.start)}</time>
-                  <span>{e.title}</span>
-                </button>
+                <div className="home-event-row">
+                  <button className="home-event" onClick={() => p.onOpenCalendar(e.id)}>
+                    <time>{fmtTime(e.start)}</time>
+                    <span>{e.title}</span>
+                  </button>
+                  <JoinSoon e={e} />
+                </div>
               </li>
             ))}
           </ul>
@@ -623,10 +640,17 @@ export function HomeView(p: Props) {
           <ul className="home-list">
             {fresh.map((n) => (
               <li key={n.id}>
-                <button className="home-notice" onClick={() => p.onNotice(n)}>
-                  <span>{textOf(n)}</span>
-                  <time>{relative(n.at)}</time>
-                </button>
+                <SwipeRow className="home-notice-swipe" end={[{ id: 'seen', label: t('Seen'), icon: CheckCheck, tone: 'neutral', removes: true, done: t('Marked as seen'), run: () => p.onReadNotices([n.id]) }]}>
+                  <div className="home-notice-row">
+                    <button className="home-notice" onClick={() => p.onNotice(n)}>
+                      <span>{textOf(n)}</span>
+                      <time>{relative(n.at)}</time>
+                    </button>
+                    <button type="button" className="icon-btn sm home-notice-seen" onClick={() => p.onReadNotices([n.id])} title={t('Mark as seen')} aria-label={t('Mark as seen')}>
+                      <CheckCheck size={15} />
+                    </button>
+                  </div>
+                </SwipeRow>
               </li>
             ))}
           </ul>

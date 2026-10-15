@@ -138,7 +138,7 @@ export function QuickAdd({ ops, defaults, mode, onClose, where, inputRef }: { op
   const submit = () => {
     const title = parsed.title.trim();
     if (!title) return;
-    const input: NewTask = { title, userId: assignees[0] ?? '', assignees, clientId, teamId: defaults.teamId, due: due ?? (repeat ? ops.today : undefined), priority, repeat, remindAt, status, ...(todo && notes.trim() ? { notes: notes.trim() } : {}) };
+    const input: NewTask = { title, userId: assignees[0] ?? '', assignees, clientId, teamId: defaults.teamId, due: due ?? (repeat ? ops.today : undefined), ...(due && !has('due') && parsed.time ? { dueTime: parsed.time } : {}), priority, repeat, remindAt, status, ...(todo && notes.trim() ? { notes: notes.trim() } : {}) };
     const id = ops.add(input);
     const who = assignees.filter((x) => x !== ops.me).map((x) => ops.users.find((u) => u.id === x)?.name.split(' ')[0]).filter(Boolean);
     const c = ops.clients.find((x) => x.id === clientId);

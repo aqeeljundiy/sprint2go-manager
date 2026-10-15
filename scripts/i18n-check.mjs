@@ -41,7 +41,7 @@ const AREAS = [
   ['meet', /^src\/components\/(MeetApp|MeetPhone)\.tsx$|^src\/(meetingLinks)\.ts$|^src\/data\/languages\.ts$/],
   ['drive', /^src\/components\/(DriveView|DriveSidebar|DrivePreview|BigFileDialog|FileIcon)\.tsx$|^src\/data\/drive\.ts$/],
   ['tasks', /^src\/components\/(TasksView|TaskDrawer|TasksSidebar|BrainDump|TemplateDialog)\.tsx$|^src\/components\/tasks\/|^src\/(quickAdd|taskDates|stages)\.ts$|^src\/data\/templates\.ts$/],
-  ['projects', /^src\/components\/(ProjectsHome|ProjectsSidebar|ProjectPhone|ProjectPeople|ProjectPicker|ProjectBadge|PastClients|EndClientDialog|Quotes)\.tsx$/],
+  ['projects', /^src\/components\/(ProjectsHome|ProjectsSidebar|ProjectPhone|ProjectPeople|ProjectPulse|ProjectPicker|ProjectBadge|PastClients|EndClientDialog|Quotes)\.tsx$/],
   ['teams', /^src\/components\/teams\//],
   ['tables', /^src\/components\/tables\/|^src\/data\/tables\.ts$/],
   ['vault', /^src\/components\/VaultApp\.tsx$|^src\/vaultCrypto\.ts$/],

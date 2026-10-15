@@ -1,9 +1,9 @@
 import { ProjectBadge } from './ProjectBadge';
-import { Fragment, useEffect, useReducer, useRef, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useReducer, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { ProjectPicker } from './ProjectPicker';
 import { SmoothHeight } from './ui/Smooth';
 import { term, brand as product } from '../terms';
-import { ChevronDown, Copy, Eye, EyeOff, Globe, History, NotebookText, KeyRound, Lock, MoreHorizontal, Pencil, Plus, RefreshCw, Search, ShieldCheck, Trash2, Users, X } from 'lucide-react';
+import { ChevronDown, Copy, Eye, EyeOff, Fingerprint, Globe, History, NotebookText, KeyRound, Lock, MoreHorizontal, Pencil, Plus, RefreshCw, Search, ShieldAlert, ShieldCheck, Trash2, Upload, Users, X } from 'lucide-react';
 import type { Client, Team, User } from '../types';
 import { t, tn } from '../i18n';
 import { tj } from '../i18n/tj';
@@ -12,6 +12,11 @@ import { server } from '../sync';
 import { isSandboxId } from '../sandbox';
 import { Popover } from './ui/Popover';
 import { PeoplePicker } from './ui/PeoplePicker';
+import { enableQuickUnlock, quickUnlock, quickUnlockAvailable, quickUnlockOff, quickUnlockOn } from '../vaultCrypto';
+import { Avatar } from './Avatar';
+import { PersonName, usePersonCard } from './ui/PersonCard';
+import { TabPane } from './ui/Smooth';
+import './vault.css';
 import { decryptSecret, encryptSecret, isEncrypted, makeVaultKeys, newItemKeys, rewrapVaultKey, setVaultUnlocked, vaultAnyUnlocked, onVaultLockChange, totp as totpCode, unlockVaultKey, unwrapWith, vaultUnlocked, wrapFor, type VaultKeyRecord, type WrappedKey } from '../vaultCrypto';
 import { EmptyState } from './ui/EmptyState';
 import { PushScreen } from './ui/PushScreen';
@@ -59,6 +64,8 @@ function logLine(who: ReactNode, what: string): ReactNode {
       return tj('{who} added it', { who });
     case 'changed it':
       return tj('{who} changed it', { who });
+    case 'checked the password health':
+      return tj('{who} checked its password health', { who });
   }
   const shared = /^re-shared with (\d+) people$/.exec(what);
   if (shared) return tj('{who} re-shared it with {people}', { who, people: tn(Number(shared[1]), '{n} person', '{n} people') });
@@ -81,6 +88,7 @@ export function VaultSidebar({ items, clients, filter, onFilter, onNew, workspac
   const [, redraw] = useReducer((n: number) => n + 1, 0);
   useEffect(() => onVaultLockChange(redraw), []);
   const locked = !vaultAnyUnlocked();
+  const h = useHealth();
   return (
     <>
       <button className="compose-btn" onClick={onNew} disabled={!server.on || isSandboxId(workspaceId) || locked} title={locked ? t('Unlock the Vault first.') : t('Add a login')}>
@@ -96,6 +104,13 @@ export function VaultSidebar({ items, clients, filter, onFilter, onNew, workspac
           <Lock size={16} />
           <span className="sb-label">{t('Company logins')}</span>
         </button>
+        {!locked && (
+          <button className={`nav-item ${filter === 'attention' ? 'active' : ''}`} onClick={() => onFilter('attention')}>
+            <ShieldAlert size={16} />
+            <span className="sb-label">{t('Needs attention')}</span>
+            {h.checked && h.issues.size > 0 && <span className="count warn-count">{h.issues.size}</span>}
+          </button>
+        )}
       </nav>
       {withItems.length > 0 && (
         <>
@@ -159,6 +174,19 @@ export function VaultView({
   const [reading, setReading] = useState<{ title: string; value: string } | null>(null);
   const [log, setLog] = useState<{ item: VaultItem; rows: { userId: string; what: string; at: string }[] } | null>(null);
   const anchor = useRef<HTMLElement | null>(null);
+  const accessAnchor = useRef<HTMLElement | null>(null);
+  const [accessOf, setAccessOf] = useState<string | null>(null);
+  const [importing, setImporting] = useState(false);
+  const h = useHealth();
+  const checkHealth = () => {
+    const k = vaultUnlocked(me);
+    if (k) runHealth(workspaceId, items, me, k).catch((e) => toast((e as Error).message));
+  };
+  // "Needs attention" checks on its own the first time it's opened (that's what opening it asks for).
+  const open_ = !!vaultUnlocked(me);
+  useEffect(() => {
+    if (filter === 'attention' && open_ && server.on && !h.checked && !h.running) checkHealth();
+  }, [filter, open_]); // eslint-disable-line react-hooks/exhaustive-deps
   // The 2FA code counts down and refreshes itself while it's shown.
   useEffect(() => {
     if (!code) return;
@@ -200,6 +228,7 @@ export function VaultView({
         options: [
           { value: '', label: t('All logins'), icon: <KeyRound size={15} /> },
           { value: 'company', label: t('Company logins'), icon: <Lock size={15} /> },
+          { value: 'attention', label: t('Needs attention'), icon: <ShieldAlert size={15} /> },
           ...projectsWith.map((c) => ({ value: c.id, label: c.name, group: term.Many, icon: <Dot color={c.color} /> })),
         ],
         onChange: (v) => onFilter(v),
@@ -261,7 +290,8 @@ export function VaultView({
   };
   if (!priv) return <VaultGate record={vaultKey} me={me} onUnlocked={(k, record) => (setVaultUnlocked(me, k), record && onVaultKey(record), setTick((n) => n + 1), reload())} />;
 
-  const shown = items.filter((i) => (filter === '' ? true : filter === 'company' ? !i.meta.clientId : i.meta.clientId === filter));
+  const shown = items.filter((i) => (filter === '' || filter === 'attention' ? true : filter === 'company' ? !i.meta.clientId : i.meta.clientId === filter));
+  const attention = filter === 'attention';
   /** A secret of an end-to-end login, decrypted here; a server-locked (older) one comes back as is. */
   const secretOf = async (it: VaultItem, field: 'password' | 'totp' | 'notes') => {
     const { value } = await api<{ value: string }>(`/api/vault/${it.id}/reveal`, { method: 'POST', body: JSON.stringify({ field }) });
@@ -328,7 +358,33 @@ export function VaultView({
       toast((e as Error).message);
     }
   };
-  const ops: VaultOps = { copyPassword, copyUsername, copyCode, showCode: (id) => void showCode(id), secretOf, askDelete, openLog, edit: (it) => setEditing(it), accessLabel, who, toast };
+  const faces = (it: VaultItem) => peopleWithAccess(it, users, teams);
+  const openAccess = (it: VaultItem, el: HTMLElement | null) => ((accessAnchor.current = el), setAccessOf(it.id));
+  const ops: VaultOps = { copyPassword, copyUsername, copyCode, showCode: (id) => void showCode(id), secretOf, askDelete, openLog, edit: (it) => setEditing(it), accessLabel, who, toast, faces, openAccess };
+  const logName = (id: string) => {
+    const u = users.find((x) => x.id === id);
+    if (id === me || !u) return id === me ? t('You') : who(id);
+    return <PersonName who={{ userId: u.id, email: u.email, name: u.name }}>{who(id)}</PersonName>;
+  };
+  const accessItem = items.find((i) => i.id === accessOf) ?? null;
+  const accessPop = (
+    <AccessPeople it={accessItem} users={users} teams={teams} me={me} anchor={accessAnchor} open={!!accessOf} onClose={() => setAccessOf(null)} onEdit={accessItem?.canEdit ? () => setEditing(accessItem) : undefined} />
+  );
+  const importer = importing && (
+    <VaultImport
+      adminIds={adminIds}
+      workspaceId={workspaceId}
+      clients={clients}
+      users={users}
+      me={me}
+      defaultClient={filter && filter !== 'company' && filter !== 'attention' ? filter : undefined}
+      onDone={(n) => (setImporting(false), reload(), toast(tn(n, '{n} login imported', '{n} logins imported')))}
+      onClose={() => setImporting(false)}
+    />
+  );
+  const offer = <QuickUnlockOffer me={me} name={users.find((u) => u.id === me)?.name ?? ''} priv={priv} record={vaultKey} toast={toast} />;
+  const healthList = <VaultHealthList items={items} run={checkHealth} onChange={(it) => setEditing(it)} phone={phone} />;
+  const savedEdit = () => (editing && editing !== 'new' && healthFixed(editing.id), setEditing(null), reload(), toast(t('Login saved')));
 
   const confirmSheet = confirmDel && (
           <Sheet title={t('Delete “{title}”?', { title: confirmDel.meta.title })} onClose={() => setConfirmDel(null)} className="vp-confirm">
@@ -353,6 +409,8 @@ export function VaultView({
     return (
       <section className="tasks-pane view-enter vault-phone">
         <div className="vp-scroll">
+          {offer}
+          {attention ? healthList : <>
           {shown.length > 0 && (
             <label className="vp-search">
               <Search size={17} />
@@ -369,16 +427,24 @@ export function VaultView({
               icon={<KeyRound size={22} />}
               title={t('No logins yet')}
               text={usable ? t('Add a client login. Paste its 2FA setup key and the team gets the codes here.') : t('Logins can be added once the server is on and you are in your real company.')}
-              action={usable ? <button type="button" className="primary-btn" onClick={() => setEditing('new')}><Plus size={16} /> {t('Add a login')}</button> : undefined}
+              action={usable ? <><button type="button" className="primary-btn" onClick={() => setEditing('new')}><Plus size={16} /> {t('Add a login')}</button><button type="button" className="ghost-btn" onClick={() => setImporting(true)}><Upload size={16} /> {t('Import logins')}</button></> : undefined}
             />
           ) : (
             <VaultPhoneList items={list} clients={clients} me={me} ops={ops} onOpen={setOpenId} />
           )}
           {shown.length > 0 && list.length === 0 && <p className="vp-none">{t('No logins with “{query}”.', { query: q.trim() })}</p>}
+          {shown.length > 0 && usable && (
+            <Group>
+              <GRow icon={Upload} plainIcon label={t('Import logins')} onClick={() => setImporting(true)} />
+            </Group>
+          )}
           {shown.length > 0 && <p className="vp-foot">{t('End-to-end encrypted. Copying a password is logged.')}</p>}
+          </>}
         </div>
         {open && <VaultItemScreen it={open} clients={clients} me={me} ops={ops} code={code?.id === open.id ? code : null} onBack={() => setOpenId(null)} />}
         {confirmSheet}
+        {accessPop}
+        {importer}
         {log && (
           <PushScreen title={t('Activity')} backLabel={log.item.meta.title} onBack={() => setLog(null)} className="g-page">
             <div className="vp-detail">
@@ -387,7 +453,7 @@ export function VaultView({
               ) : (
                 <Group>
                   {log.rows.map((r, i) => (
-                    <GRow key={i} label={logLine(r.userId === me ? t('You') : who(r.userId), r.what)} value={fmtAgo(r.at)} />
+                    <GRow key={i} label={logLine(logName(r.userId), r.what)} value={fmtAgo(r.at)} />
                   ))}
                 </Group>
               )}
@@ -406,7 +472,7 @@ export function VaultView({
             teams={teams}
             me={me}
             isAdmin={isAdmin}
-            onSaved={() => (setEditing(null), reload(), toast(t('Login saved')))}
+            onSaved={savedEdit}
             onClose={() => setEditing(null)}
           />
         )}
@@ -418,7 +484,7 @@ export function VaultView({
     <section className="tasks-pane view-enter">
       <header className="tracking-head tasks-head">
         <div className="th-text">
-          <h1>{filter === '' ? t('All logins') : filter === 'company' ? t('Company logins') : (clients.find((c) => c.id === filter)?.name ?? t('Logins'))}</h1>
+          <h1>{filter === '' ? t('All logins') : attention ? t('Needs attention') : filter === 'company' ? t('Company logins') : (clients.find((c) => c.id === filter)?.name ?? t('Logins'))}</h1>
         </div>
         {priv && items.some((it) => it.meta.keys?.[me]) && (
           <button className="ghost-btn sm" title={t('Give everyone who may open a login the key to it (after they set up their Vault, or lost their passphrase)')} onClick={() => void reshareAll()}>
@@ -431,6 +497,9 @@ export function VaultView({
             <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('Search logins')} aria-label={t('Search logins')} />
           </label>
         )}
+        <button className="ghost-btn sm" onClick={() => setImporting(true)} title={t('Import logins from another password manager')}>
+          <Upload size={14} /> {t('Import')}
+        </button>
         {priv && (
           <button className="ghost-btn sm" onClick={lock} title={t('Lock the Vault: your passphrase is needed to open it again')}>
             <Lock size={14} /> {t('Lock')}
@@ -441,14 +510,21 @@ export function VaultView({
         </button>
       </header>
       <div className="tracking-scroll">
-        {shown.length === 0 && (
+        {offer}
+        {attention && healthList}
+        {!attention && shown.length === 0 && (
           <EmptyState
             icon={<KeyRound size={22} />}
             title={t('No logins here yet')}
             text={t('Add the client logins your team shares (Meta, Shopify, Google Ads). Paste the 2FA setup key and everyone with access gets the codes here, without anyone’s phone.')}
+            action={
+              <button type="button" className="ghost-btn" onClick={() => setImporting(true)}>
+                <Upload size={16} /> {t('Import logins')}
+              </button>
+            }
           />
         )}
-        <div className="todo-group">
+        {!attention && <div className="todo-group">
           {/* The same search as on phones (1Password and Bitwarden open on search). */}
           {shown.filter((it) => !q.trim() || `${it.meta.title} ${it.meta.username ?? ''} ${it.meta.url ?? ''}`.toLowerCase().includes(q.trim().toLowerCase())).map((it) => {
             const c = clients.find((x) => x.id === it.meta.clientId);
@@ -465,9 +541,9 @@ export function VaultView({
                         {c.name}
                       </span>
                     )}
-                    <span className="src">
-                      <Users size={11} /> {accessLabel(it)}
-                    </span>
+                    <button type="button" className="src vault-access" onClick={(e) => openAccess(it, e.currentTarget)} title={t('Who sees it')}>
+                      <AccessFaces people={faces(it)} /> {accessLabel(it)}
+                    </button>
                     {/* Password managers don't show crypto per item; only an older login that still needs re-saving says so. */}
                     {!it.meta.keys && (
                       <span className="src vault-e2e" title={t('Locked by the server. Edit and save to move it to end-to-end')}>
@@ -513,7 +589,7 @@ export function VaultView({
               </div>
             );
           })}
-        </div>
+        </div>}
       </div>
 
       <Popover anchor={anchor} open={!!current} onClose={() => setMenu(null)} width={230} title={current?.meta.title ?? ''}>
@@ -585,7 +661,7 @@ export function VaultView({
           teams={teams}
           me={me}
           isAdmin={isAdmin}
-          onSaved={() => (setEditing(null), reload(), toast(t('Login saved')))}
+          onSaved={savedEdit}
           onClose={() => setEditing(null)}
         />
       )}
@@ -626,7 +702,7 @@ export function VaultView({
               <ul className="home-list">
                 {log.rows.map((r, i) => (
                   <li key={i} className="vault-log-row">
-                    <span>{logLine(<b>{r.userId === me ? t('You') : who(r.userId)}</b>, r.what)}</span>
+                    <span>{logLine(<b>{logName(r.userId)}</b>, r.what)}</span>
                     <time dateTime={r.at} title={fmtDateTime(r.at)}>
                       {fmtAgo(r.at)}
                     </time>
@@ -639,6 +715,8 @@ export function VaultView({
         </div>
       )}
       {confirmSheet}
+      {accessPop}
+      {importer}
     </section>
   );
 }
@@ -656,6 +734,8 @@ interface VaultOps {
   accessLabel: (it: VaultItem) => string;
   who: (id: string) => string;
   toast: (t: string) => void;
+  faces: (it: VaultItem) => User[];
+  openAccess: (it: VaultItem, el: HTMLElement | null) => void;
 }
 
 /** The letter tile in a colour of its own, the same for a login every time (Apple's site icons stand in here). */
@@ -700,7 +780,7 @@ function rowActions(it: VaultItem, ops: VaultOps, onOpen?: () => void): SheetAct
     ...(it.hasPassword ? [{ label: t('Copy password'), icon: KeyRound, run: () => void ops.copyPassword(it) }] : []),
     ...(it.hasTotp ? [{ label: t('Copy 2FA code'), icon: ShieldCheck, run: () => void ops.copyCode(it) }] : []),
     ...(it.meta.url ? [{ label: t('Open {site}', { site: host(it.meta.url) }), icon: Globe, group: 'more', run: () => void window.open(it.meta.url, '_blank', 'noreferrer') }] : []),
-    ...(onOpen ? [{ label: t('Who sees it'), icon: Users, hint: ops.accessLabel(it), group: 'more', run: onOpen }] : []),
+    ...(onOpen ? [{ label: t('Who sees it'), icon: Users, hint: ops.accessLabel(it), group: 'more', run: () => ops.openAccess(it, document.activeElement as HTMLElement | null) }] : []),
     ...(it.canEdit ? [{ label: t('Delete'), icon: Trash2, danger: true, group: 'end', run: () => ops.askDelete(it) }] : []),
   ];
 }
@@ -861,7 +941,7 @@ function VaultItemScreen({ it, clients, me, ops, code, onBack }: { it: VaultItem
           </Group>
         )}
         <Group footer={it.hasNotes && notes != null ? t('Reading notes is logged, like copying a password.') : undefined}>
-          <GRow icon={Users} plainIcon label={t('Who sees it')} value={ops.accessLabel(it)} onClick={it.canEdit ? () => ops.edit(it) : undefined} />
+          <GRow icon={Users} plainIcon label={t('Who sees it')} sub={ops.accessLabel(it)} value={<AccessFaces people={ops.faces(it)} />} onClick={() => ops.openAccess(it, document.activeElement as HTMLElement | null)} />
           {it.canEdit && <GRow icon={History} plainIcon label={t('Activity')} onClick={() => void ops.openLog(it)} />}
         </Group>
         {it.canEdit && (
@@ -892,6 +972,46 @@ const strongPassword = (length = 20, symbols = true, digits = true) => {
   const a = new Uint32Array(length);
   crypto.getRandomValues(a);
   return [...a].map((n) => chars[n % chars.length]).join('');
+};
+
+/** The generator's settings, remembered in this browser. */
+interface GenOpts {
+  mode: 'chars' | 'words';
+  length: number; // characters, or words
+  symbols: boolean; // words: joined with dashes instead of spaces
+  digits: boolean;
+}
+const loadGen = (): GenOpts => {
+  try {
+    const o = JSON.parse(localStorage.getItem('vault-gen') ?? 'null');
+    if (o && (o.mode === 'chars' || o.mode === 'words') && Number.isFinite(o.length)) return { mode: o.mode, length: o.length, symbols: !!o.symbols, digits: !!o.digits };
+  } catch {
+    /* the defaults */
+  }
+  return { mode: 'chars', length: 20, symbols: true, digits: true };
+};
+const saveGen = (o: GenOpts) => {
+  try {
+    localStorage.setItem('vault-gen', JSON.stringify(o));
+  } catch {
+    /* not remembered */
+  }
+};
+/** Short words that are easy to type. Four of them are about 32 bits, plus the capital and the number. */
+const WORDS =
+  'acid acorn actor adapt agent alarm album alert alien alley amber angle ankle apple april apron arena armor arrow atlas attic audio autumn award bacon badge bagel baker bamboo banjo barn basil beach beard bench berry bison blade blank bloom board bonus boost brave bread brick bride brush bucket buddy cabin cable cactus camel candy canoe canvas cargo carpet cedar chalk charm cherry chess chief cider cinema civic clay cliff clock cloud clover coast cobra cocoa comet coral cotton couch crane crisp crown cubic curry daisy dance delta denim diary dingo disco dolphin donut dragon dream drift drum eagle earth easel echo elbow elder ember empty energy equal fable falcon fancy feast fern ferry fiber field flame flute focus forest fossil frost fruit galaxy garden gecko ginger glass globe glove goose grape gravy guitar habit hammer harbor hazel heart hello honey hotel humble igloo index island ivory jacket jelly jewel jungle kayak kettle kiwi koala label ladder lemon lilac lime linen lotus lunar magic mango maple marble meadow melon metal mint mocha moose motor music nectar noble north novel oasis ocean olive onion opera orbit otter paddle panda paper pearl pepper piano pilot pixel plum polar poppy pulse quartz quiet quill rabbit radar raven ribbon river robin rocket ruby saddle salad salmon sandal satin scout shadow shell silk sketch sofa solar spice spiral spoon spring squid stamp storm sugar summit sunny swan tango teapot tiger timber toast topaz tower trail tulip tunnel turtle velvet violin wagon walnut whale willow window winter wizard yacht yogurt zebra'.split(' ');
+const pick = (n: number) => {
+  const a = new Uint32Array(1);
+  crypto.getRandomValues(a);
+  return a[0] % n;
+};
+const makeSecret = (o: GenOpts) => {
+  if (o.mode === 'chars') return strongPassword(o.length, o.symbols, o.digits);
+  const words = Array.from({ length: o.length }, () => WORDS[pick(WORDS.length)]);
+  const cap = pick(words.length);
+  words[cap] = words[cap].replace(/^./, (c) => c.toUpperCase());
+  if (o.digits) words[pick(words.length)] += String(pick(10));
+  return words.join(o.symbols ? '-' : ' ');
 };
 
 function VaultEditor({
@@ -932,8 +1052,8 @@ function VaultEditor({
   const [userIds, setUserIds] = useState<string[]>(item?.meta.access.userIds ?? []);
   const [teamIds, setTeamIds] = useState<string[]>(item?.meta.access.teamIds ?? []);
   const [showPw, setShowPw] = useState(false);
-  const [gen, setGen] = useState<{ length: number; symbols: boolean; digits: boolean } | null>(null);
-  const makePw = (o: { length: number; symbols: boolean; digits: boolean }) => (setGen(o), setPassword(strongPassword(o.length, o.symbols, o.digits)), setShowPw(true));
+  const [gen, setGen] = useState<GenOpts | null>(null);
+  const makePw = (o: GenOpts) => (setGen(o), saveGen(o), setPassword(makeSecret(o)), setShowPw(true));
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [noKey, setNoKey] = useState<string[]>([]); // people who'd get access but haven't set up their Vault yet
@@ -1006,23 +1126,34 @@ function VaultEditor({
                 <button type="button" className="icon-btn sm" onClick={() => setShowPw((s) => !s)} title={showPw ? t('Hide') : t('Show')}>
                   <Eye size={14} />
                 </button>
-                <button type="button" className="ghost-btn sm vault-gen" onClick={() => makePw(gen ?? { length: 20, symbols: true, digits: true })}>
+                <button type="button" className="ghost-btn sm vault-gen" onClick={() => makePw(gen ?? loadGen())}>
                   {t('Generate')}
                 </button>
               </span>
               <div className={`fold${gen ? ' open' : ''}`} aria-hidden={!gen}>
                 <div className="fold-in">
                   <div className="vault-gen-opts">
+                    <div className="segmented vault-gen-mode" role="group" aria-label={t('Kind of password')}>
+                      <button type="button" className={gen?.mode !== 'words' ? 'on' : ''} onClick={() => gen && makePw({ ...gen, mode: 'chars', length: gen.mode === 'words' ? 20 : gen.length })} tabIndex={gen ? 0 : -1}>
+                        {t('Characters')}
+                      </button>
+                      <button type="button" className={gen?.mode === 'words' ? 'on' : ''} onClick={() => gen && makePw({ ...gen, mode: 'words', length: gen.mode === 'words' ? gen.length : 4 })} tabIndex={gen ? 0 : -1}>
+                        {t('Words')}
+                      </button>
+                    </div>
                     <label className="vault-gen-len">
-                      <span>{t('Length {n}', { n: gen?.length ?? 20 })}</span>
-                      <input type="range" min={8} max={40} value={gen?.length ?? 20} onChange={(e) => gen && makePw({ ...gen, length: Number(e.target.value) })} tabIndex={gen ? 0 : -1} />
+                      <span>{gen?.mode === 'words' ? tn(gen.length, '{n} word', '{n} words') : t('Length {n}', { n: gen?.length ?? 20 })}</span>
+                      <input type="range" min={gen?.mode === 'words' ? 3 : 8} max={gen?.mode === 'words' ? 8 : 40} value={gen?.length ?? 20} onChange={(e) => gen && makePw({ ...gen, length: Number(e.target.value) })} tabIndex={gen ? 0 : -1} />
                     </label>
                     <label className="vault-gen-check">
                       <input type="checkbox" checked={gen?.digits ?? true} onChange={(e) => gen && makePw({ ...gen, digits: e.target.checked })} tabIndex={gen ? 0 : -1} /> {t('Numbers')}
                     </label>
                     <label className="vault-gen-check">
-                      <input type="checkbox" checked={gen?.symbols ?? true} onChange={(e) => gen && makePw({ ...gen, symbols: e.target.checked })} tabIndex={gen ? 0 : -1} /> {t('Symbols')}
+                      <input type="checkbox" checked={gen?.symbols ?? true} onChange={(e) => gen && makePw({ ...gen, symbols: e.target.checked })} tabIndex={gen ? 0 : -1} /> {gen?.mode === 'words' ? t('Dashes') : t('Symbols')}
                     </label>
+                    <button type="button" className="icon-btn sm" onClick={() => gen && makePw(gen)} aria-label={t('Make another')} title={t('Make another')} tabIndex={gen ? 0 : -1}>
+                      <RefreshCw size={14} />
+                    </button>
                   </div>
                 </div>
               </div>
@@ -1129,6 +1260,17 @@ function VaultGate({ record, me, onUnlocked }: { record?: VaultKeyRecord; me: st
   const phone = usePhone();
   const [how, setHow] = useState(false);
   const [showPass, setShowPass] = useState(false);
+  const [quick, setQuick] = useState(() => !fresh && quickUnlockOn(me, record));
+  const tryQuick = async () => {
+    setBusy(true);
+    setError('');
+    try {
+      onUnlocked(await quickUnlock(me));
+    } catch (e) {
+      if ((e as Error).name !== 'NotAllowedError') setError(t('Quick unlock didn’t work. Use your passphrase.'));
+    }
+    setBusy(false);
+  };
   // A rough strength: length, plus a little for mixing kinds of characters. 0 to 4.
   const strength = !pass ? 0 : Math.min(4, Math.floor(pass.length / 6) + (/[^a-zA-Z]/.test(pass) && /[a-zA-Z]/.test(pass) ? 1 : 0));
   const go = async () => {
@@ -1174,6 +1316,16 @@ function VaultGate({ record, me, onUnlocked }: { record?: VaultKeyRecord; me: st
               </div>
             </>
           )}
+          {quick && (
+            <div className="vg-quick">
+              <button type="button" className="primary-btn" disabled={busy} onClick={() => void tryQuick()}>
+                <Fingerprint size={18} /> {phone ? t('Unlock with Face ID or fingerprint') : t('Unlock with Face ID, fingerprint or Windows Hello')}
+              </button>
+              <button type="button" className="link-btn small" onClick={() => (quickUnlockOff(me), setQuick(false))}>
+                {t('Turn off quick unlock on this device')}
+              </button>
+            </div>
+          )}
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -1193,10 +1345,11 @@ function VaultGate({ record, me, onUnlocked }: { record?: VaultKeyRecord; me: st
             )}
             {fresh && <input type={showPass ? 'text' : 'password'} value={again} onChange={(e) => setAgain(e.target.value)} placeholder={t('Confirm passphrase')} aria-label={t('Confirm passphrase')} autoComplete="new-password" />}
             {error && <p className="err small">{error}</p>}
-            <button className="primary-btn" disabled={busy || !pass}>
-              {busy ? t('Working…') : fresh ? t('Set and open') : t('Unlock')}
+            <button className={quick ? 'ghost-btn' : 'primary-btn'} disabled={busy || !pass}>
+              {busy && !quick ? t('Working…') : fresh ? t('Set and open') : t('Unlock')}
             </button>
           </form>
+
         </div>
       </div>
     </section>
@@ -1208,4 +1361,516 @@ export async function changeVaultPassphrase(me: string, record: VaultKeyRecord, 
   const priv = vaultUnlocked(me);
   if (!priv) throw new Error(t('Unlock the Vault first.'));
   return rewrapVaultKey(priv, record.pub, next);
+}
+
+/* ---------- who sees a login: faces, and the list behind them ---------- */
+
+/** Everyone who can open a login: the people and team members it's shared with, and whoever added it. */
+function peopleWithAccess(it: VaultItem, users: User[], teams: Team[]) {
+  const live = users.filter((u) => !u.deletedAt && !u.clientOf);
+  if (it.meta.access.everyone) return live;
+  const ids = new Set([it.createdBy, ...it.meta.access.userIds, ...it.meta.access.teamIds.flatMap((tid) => teams.find((x) => x.id === tid)?.members ?? [])]);
+  return live.filter((u) => ids.has(u.id));
+}
+
+/** Up to three faces and "+N": who sees a login, at a glance. */
+function AccessFaces({ people }: { people: User[] }) {
+  const shown = people.slice(0, 3);
+  return (
+    <span className="vault-faces" aria-hidden>
+      {shown.map((u) => (
+        <Avatar key={u.id} person={{ name: u.name, email: u.email, color: u.color, photo: u.photo }} size={24} />
+      ))}
+      {people.length > shown.length && <span className="vault-faces-more">+{people.length - shown.length}</span>}
+    </span>
+  );
+}
+
+/** The people and teams a login is shared with. Tapping a person opens their profile card. */
+function AccessPeople({ it, users, teams, me, anchor, open, onClose, onEdit }: { it: VaultItem | null; users: User[]; teams: Team[]; me: string; anchor: RefObject<HTMLElement | null>; open: boolean; onClose: () => void; onEdit?: () => void }) {
+  const card = usePersonCard();
+  const people = it ? peopleWithAccess(it, users, teams) : [];
+  const shareTeams = it && !it.meta.access.everyone ? teams.filter((x) => it.meta.access.teamIds.includes(x.id)) : [];
+  return (
+    <Popover anchor={anchor} open={open && !!it} onClose={onClose} width={300} title={t('Who sees it')}>
+      {it && (
+        <div className="vault-people">
+          <p className="vault-people-note">{it.meta.access.everyone ? t('Everyone in the company. Admins can always open it.') : t('These people, and admins, who can always open it.')}</p>
+          {shareTeams.map((x) => (
+            <div key={x.id} className="vault-people-row team">
+              <span className="team-square" style={{ background: x.color }} />
+              <span className="vault-people-text">
+                <span className="vault-people-name">{x.name}</span>
+                <span className="vault-people-sub">{tn(x.members.length, '{n} person', '{n} people')}</span>
+              </span>
+            </div>
+          ))}
+          {people.map((u) => (
+            <button
+              key={u.id}
+              type="button"
+              className="vault-people-row"
+              onClick={() => {
+                const at = anchor.current;
+                onClose();
+                card?.open({ userId: u.id, email: u.email, name: u.name }, at);
+              }}
+            >
+              <Avatar person={{ name: u.name, email: u.email, color: u.color, photo: u.photo }} size={32} />
+              <span className="vault-people-text">
+                <span className="vault-people-name">{u.id === me ? t('{name} (you)', { name: u.name }) : u.name}</span>
+                <span className="vault-people-sub">{u.id === it.createdBy ? t('Added it') : u.title || u.email}</span>
+              </span>
+            </button>
+          ))}
+          {onEdit && (
+            <button type="button" className="sel-opt vault-people-edit" onClick={() => (onClose(), onEdit())}>
+              <Pencil size={14} /> {t('Change who sees it')}
+            </button>
+          )}
+        </div>
+      )}
+    </Popover>
+  );
+}
+
+/* ---------- password health ---------- */
+
+type Issue = 'weak' | 'reused' | 'breached' | 'no2fa' | 'http';
+const ISSUE_LABEL: Record<Issue, () => string> = {
+  weak: () => t('Weak password'),
+  reused: () => t('Reused password'),
+  breached: () => t('Found in a data breach'),
+  no2fa: () => t('2FA available, not set up'),
+  http: () => t('Not a secure (https) site'),
+};
+/** The last check, kept in memory only while the Vault is open. */
+const health: { checked: boolean; running: boolean; issues: Map<string, Issue[]>; notChecked: number; breachUnknown: boolean } = { checked: false, running: false, issues: new Map(), notChecked: 0, breachUnknown: false };
+const healthListeners = new Set<() => void>();
+const healthChanged = () => healthListeners.forEach((f) => f());
+onVaultLockChange(() => {
+  if (vaultAnyUnlocked()) return;
+  Object.assign(health, { checked: false, running: false, issues: new Map(), notChecked: 0, breachUnknown: false });
+  healthChanged();
+});
+/** A login that was just changed drops off the list until the next check. */
+const healthFixed = (id: string) => {
+  if (health.issues.delete(id)) healthChanged();
+};
+function useHealth() {
+  const [, redraw] = useReducer((n: number) => n + 1, 0);
+  useEffect(() => {
+    healthListeners.add(redraw);
+    return () => void healthListeners.delete(redraw);
+  }, []);
+  return health;
+}
+/** Sites that offer two-step sign-in: a login there without a 2FA key is worth fixing. */
+const TWO_FA_SITES = ['facebook.com', 'instagram.com', 'google.com', 'shopify.com', 'myshopify.com', 'tiktok.com', 'linkedin.com', 'x.com', 'twitter.com', 'github.com', 'amazon.com', 'microsoft.com', 'live.com', 'apple.com', 'dropbox.com', 'slack.com', 'stripe.com', 'paypal.com', 'mailchimp.com', 'canva.com', 'wordpress.com', 'godaddy.com', 'cloudflare.com', 'namecheap.com', 'zoom.us', 'hubspot.com', 'pinterest.com', 'youtube.com', 'tokopedia.com', 'shopee.co.id', 'figma.com', 'notion.so', 'xero.com', 'klaviyo.com'];
+const COMMON = new Set(['password', 'password1', '123456', '12345678', '123456789', 'qwerty', 'abc123', 'letmein', 'welcome', 'admin', 'iloveyou', 'monkey', 'dragon', 'sunshine', 'football', 'passw0rd', 'qwerty123']);
+const isWeak = (pw: string) => {
+  const kinds = [/[a-z]/, /[A-Z]/, /\d/, /[^a-zA-Z\d]/].filter((r) => r.test(pw)).length;
+  return pw.length < 10 || (pw.length < 14 && kinds < 3) || COMMON.has(pw.toLowerCase()) || /^(.)\1+$/.test(pw);
+};
+/** Have I Been Pwned, by k-anonymity: only the first 5 characters of the SHA-1 leave the browser. */
+async function breached(pw: string): Promise<boolean> {
+  const hash = [...new Uint8Array(await crypto.subtle.digest('SHA-1', new TextEncoder().encode(pw)))].map((b) => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+  const r = await fetch(`https://api.pwnedpasswords.com/range/${hash.slice(0, 5)}`, { headers: { 'Add-Padding': 'true' } });
+  if (!r.ok) throw new Error('hibp');
+  const rest = hash.slice(5);
+  return (await r.text()).split('\n').some((line) => {
+    const [suffix, count] = line.trim().split(':');
+    return suffix === rest && Number(count) > 0;
+  });
+}
+/** Reads every password I hold the key to (the server logs it on each login), and scores them here. */
+async function runHealth(workspaceId: string, items: VaultItem[], me: string, priv: CryptoKey) {
+  if (health.running) return;
+  health.running = true;
+  healthChanged();
+  try {
+    const { secrets } = await api<{ secrets: Record<string, string> }>(`/api/vault/health?ws=${encodeURIComponent(workspaceId)}`, { method: 'POST', body: '{}' });
+    const plain = new Map<string, string>();
+    for (const it of items) {
+      const enc = secrets[it.id];
+      const w = it.meta.keys?.[me];
+      if (!enc || !w || !isEncrypted(enc)) continue;
+      try {
+        plain.set(it.id, await decryptSecret(await unwrapWith(priv, w), enc));
+      } catch {
+        /* a key that no longer opens: skipped */
+      }
+    }
+    const counts = new Map<string, number>();
+    plain.forEach((v) => counts.set(v, (counts.get(v) ?? 0) + 1));
+    const issues = new Map<string, Issue[]>();
+    let breachUnknown = false;
+    for (const it of items) {
+      const list: Issue[] = [];
+      const pw = plain.get(it.id);
+      if (pw) {
+        if (isWeak(pw)) list.push('weak');
+        if ((counts.get(pw) ?? 0) > 1) list.push('reused');
+        if (!breachUnknown) {
+          try {
+            if (await breached(pw)) list.push('breached');
+          } catch {
+            breachUnknown = true;
+          }
+        }
+      }
+      const site = host(it.meta.url).toLowerCase();
+      if (site && !it.hasTotp && TWO_FA_SITES.some((d) => site === d || site.endsWith('.' + d))) list.push('no2fa');
+      if (it.meta.url?.trim().toLowerCase().startsWith('http://')) list.push('http');
+      if (list.length) issues.set(it.id, list);
+    }
+    Object.assign(health, { checked: true, issues, notChecked: items.filter((it) => it.hasPassword && !plain.has(it.id)).length, breachUnknown });
+  } finally {
+    health.running = false;
+    healthChanged();
+  }
+}
+
+/** "Needs attention": each login with what's wrong, and Change password as the one thing to do. */
+function VaultHealthList({ items, run, onChange, phone }: { items: VaultItem[]; run: () => void; onChange: (it: VaultItem) => void; phone: boolean }) {
+  const h = useHealth();
+  const flagged = items.filter((it) => h.issues.has(it.id)).sort((a, b) => h.issues.get(b.id)!.length - h.issues.get(a.id)!.length || a.meta.title.localeCompare(b.meta.title));
+  const rows = useLeaving(flagged, (i) => i.id);
+  return (
+    <div className={`vault-health${phone ? ' phone' : ''}`}>
+      <div className="vault-health-head">
+        <ShieldAlert size={20} />
+        <span className="vault-health-text">
+          <b>{!h.checked ? (h.running ? t('Checking your passwords…') : t('Check your passwords')) : flagged.length ? tn(flagged.length, '{n} login needs attention', '{n} logins need attention') : t('All your logins look good')}</b>
+          <small>
+            {t('Weak, reused and breached passwords, and sites with 2FA you haven’t set up. Breach checks send only part of a hash, never the password.')}
+            {h.notChecked > 0 && ' ' + tn(h.notChecked, '{n} older login wasn’t checked: re-save it to encrypt it first.', '{n} older logins weren’t checked: re-save them to encrypt them first.')}
+            {h.breachUnknown && ' ' + t('The breach check couldn’t be reached this time.')}
+          </small>
+        </span>
+        <button type="button" className="ghost-btn sm" disabled={h.running} onClick={run}>
+          <RefreshCw size={14} className={h.running ? 'spin' : ''} /> {h.checked ? t('Check again') : t('Check')}
+        </button>
+      </div>
+      {rows.map(({ item: it, leaving }) => (
+        <div key={it.id} className={`vault-health-row${leaving ? ' leaving' : ''}`}>
+          <VaultTile title={it.meta.title} size={phone ? 40 : 32} />
+          <span className="vault-health-main">
+            <span className="vault-health-title">{it.meta.title}</span>
+            <span className="vault-health-issues">
+              {(h.issues.get(it.id) ?? []).map((x) => (
+                <span key={x} className={`vault-issue ${x}`}>
+                  {ISSUE_LABEL[x]()}
+                </span>
+              ))}
+            </span>
+          </span>
+          {it.canEdit && (
+            <button type="button" className="row-act primary" onClick={() => onChange(it)}>
+              {h.issues.get(it.id)?.some((x) => x === 'weak' || x === 'reused' || x === 'breached') ? t('Change password') : t('Fix it')}
+            </button>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ---------- quick unlock offer ---------- */
+
+/** After the passphrase: offer Face ID, fingerprint or Windows Hello for next time, once per device. */
+function QuickUnlockOffer({ me, name, priv, record, toast }: { me: string; name: string; priv: CryptoKey; record?: VaultKeyRecord; toast: (t: string) => void }) {
+  const [can, setCan] = useState(false);
+  const [gone, setGone] = useState(() => {
+    try {
+      return localStorage.getItem(`vault-quick-no:${me}`) === '1';
+    } catch {
+      return false;
+    }
+  });
+  const [busy, setBusy] = useState(false);
+  useEffect(() => void quickUnlockAvailable().then(setCan), []);
+  const show = can && !gone && !quickUnlockOn(me, record);
+  const dismiss = () => {
+    setGone(true);
+    try {
+      localStorage.setItem(`vault-quick-no:${me}`, '1');
+    } catch {
+      /* asked again next time */
+    }
+  };
+  return (
+    <div className={`fold${show ? ' open' : ''}`} aria-hidden={!show}>
+      <div className="fold-in">
+        <div className="vault-quick">
+          <Fingerprint size={20} />
+          <span className="vault-quick-text">
+            <b>{t('Unlock faster on this device')}</b>
+            <small>{t('Use Face ID, your fingerprint or Windows Hello instead of the passphrase. The passphrase still works.')}</small>
+          </span>
+          <button
+            type="button"
+            className="ghost-btn sm"
+            disabled={busy || !show}
+            onClick={async () => {
+              setBusy(true);
+              try {
+                await enableQuickUnlock(me, name, priv, record);
+                toast(t('Quick unlock is on for this device'));
+                setGone(true);
+              } catch (e) {
+                if ((e as Error).name !== 'NotAllowedError') toast((e as Error).message);
+              }
+              setBusy(false);
+            }}
+          >
+            {t('Turn on')}
+          </button>
+          <button type="button" className="icon-btn sm" onClick={dismiss} aria-label={t('Not now')} tabIndex={show ? 0 : -1}>
+            <X size={15} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- import from another password manager ---------- */
+
+interface ImportRow {
+  title: string;
+  url?: string;
+  username?: string;
+  password?: string;
+  totp?: string;
+  notes?: string;
+}
+/** A CSV file as rows of cells (quotes, commas and line breaks inside quotes). */
+function parseCsv(text: string): string[][] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let cell = '';
+  let quoted = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (quoted) {
+      if (c === '"' && text[i + 1] === '"') {
+        cell += '"';
+        i++;
+      } else if (c === '"') quoted = false;
+      else cell += c;
+    } else if (c === '"') quoted = true;
+    else if (c === ',') {
+      row.push(cell);
+      cell = '';
+    } else if (c === '\n' || c === '\r') {
+      if (c === '\r' && text[i + 1] === '\n') i++;
+      row.push(cell);
+      rows.push(row);
+      row = [];
+      cell = '';
+    } else cell += c;
+  }
+  if (cell || row.length) {
+    row.push(cell);
+    rows.push(row);
+  }
+  return rows.filter((r) => r.some((x) => x.trim()));
+}
+/** Chrome, Edge, Safari, Firefox, LastPass, Bitwarden and 1Password exports: CSV, or Bitwarden's JSON. */
+function parseImport(text: string): ImportRow[] {
+  const clean = text.replace(/^﻿/, '');
+  if (clean.trim().startsWith('{')) {
+    const d = JSON.parse(clean) as { items?: any[] };
+    return (d.items ?? [])
+      .filter((x) => x && x.login)
+      .map((x) => ({ title: String(x.name ?? ''), url: x.login.uris?.[0]?.uri, username: x.login.username ?? undefined, password: x.login.password ?? undefined, totp: x.login.totp ?? undefined, notes: x.notes ?? undefined }));
+  }
+  const [head, ...body] = parseCsv(clean);
+  if (!head) return [];
+  const cols = head.map((h) => h.trim().toLowerCase());
+  const col = (...names: string[]) => cols.findIndex((c) => names.includes(c));
+  const at = {
+    title: col('name', 'title', 'account', 'account name'),
+    url: col('url', 'login_uri', 'website', 'web site', 'uri', 'login url'),
+    username: col('username', 'login_username', 'login name', 'user', 'email', 'username/email'),
+    password: col('password', 'login_password'),
+    totp: col('totp', 'login_totp', 'otpauth', 'one-time password', 'otp'),
+    notes: col('notes', 'note', 'extra', 'comments'),
+  };
+  if (at.password < 0 && at.username < 0) throw new Error(t('That file has no username or password column. Export a CSV from your password manager and try again.'));
+  const get = (r: string[], i: number) => (i >= 0 ? r[i]?.trim() || undefined : undefined);
+  return body.map((r) => {
+    const url = get(r, at.url);
+    return { title: get(r, at.title) || host(url) || get(r, at.username) || t('Login'), url, username: get(r, at.username), password: (at.password >= 0 && r[at.password]) || undefined, totp: get(r, at.totp), notes: get(r, at.notes) };
+  });
+}
+
+/** Pick a file, check the rows, choose the project and who sees them, then one button imports them all. */
+function VaultImport({ adminIds, workspaceId, clients, users, me, defaultClient, onDone, onClose }: { adminIds: string[]; workspaceId: string; clients: Client[]; users: User[]; me: string; defaultClient?: string; onDone: (n: number) => void; onClose: () => void }) {
+  const [rows, setRows] = useState<ImportRow[] | null>(null);
+  const [skip, setSkip] = useState<Set<number>>(new Set());
+  const [clientId, setClientId] = useState(defaultClient ?? '');
+  const [everyone, setEveryone] = useState(false);
+  const [error, setError] = useState('');
+  const [done, setDone] = useState<number | null>(null);
+  const file = useRef<HTMLInputElement>(null);
+  const phone = usePhone();
+  const chosen = (rows ?? []).filter((_, i) => !skip.has(i));
+  const read = async (f: File | undefined) => {
+    if (!f) return;
+    setError('');
+    try {
+      if (f.size > 5_000_000) throw new Error(t('That file is too big to be a password export.'));
+      const parsed = parseImport(await f.text()).filter((r) => r.password || r.username);
+      if (!parsed.length) throw new Error(t('No logins found in that file.'));
+      setRows(parsed.slice(0, 1000));
+      setSkip(new Set());
+    } catch (e) {
+      setError(e instanceof SyntaxError ? t('That file couldn’t be read. Export a CSV from your password manager and try again.') : (e as Error).message);
+    }
+    if (file.current) file.current.value = '';
+  };
+  const go = async () => {
+    setError('');
+    setDone(0);
+    // The same keys as a login added by hand: me, admins, and everyone when it's for everyone.
+    const withKey = users.filter((u) => u.vaultKey && (u.id === me || adminIds.includes(u.id) || everyone));
+    let n = 0;
+    try {
+      for (const r of chosen) {
+        const made = await newItemKeys(withKey.map((u) => ({ id: u.id, pub: u.vaultKey!.pub })));
+        const enc = (v?: string) => (v ? encryptSecret(made.key, v) : Promise.resolve(undefined));
+        await api('/api/vault', {
+          method: 'POST',
+          body: JSON.stringify({
+            workspaceId,
+            meta: { title: r.title.slice(0, 120), url: r.url || undefined, username: r.username || undefined, clientId: clientId || undefined, access: { everyone, userIds: [], teamIds: [] }, keys: made.keys },
+            password: await enc(r.password),
+            totp: await enc(r.totp ? parseTotp(r.totp) : undefined),
+            notes: await enc(r.notes),
+          }),
+        });
+        setDone(++n);
+      }
+      onDone(n);
+    } catch (e) {
+      setError(n ? t('Imported {n}, then stopped: {why}', { n, why: (e as Error).message }) : (e as Error).message);
+      setDone(null);
+    }
+  };
+  const busy = done !== null;
+  const body = (
+    <TabPane key={rows ? 'preview' : 'pick'}>
+      {!rows ? (
+        <div className="vault-import-pick">
+          <Upload size={28} />
+          <p>{t('Export your logins as a CSV from Chrome, Edge, Safari, Firefox, LastPass, 1Password or Bitwarden (or Bitwarden’s JSON), then pick the file here.')}</p>
+          <p className="muted small">{t('The file is read on this device and each login is encrypted before it’s sent. Delete the export file afterwards.')}</p>
+          <input ref={file} type="file" accept=".csv,.json,text/csv,application/json" hidden onChange={(e) => void read(e.target.files?.[0])} />
+          <button type="button" className="primary-btn" onClick={() => file.current?.click()}>
+            <Upload size={16} /> {t('Choose a file')}
+          </button>
+        </div>
+      ) : (
+        <div className="vault-import-preview">
+          <div className="field vault-project">
+            <span>{term.One}</span>
+            <ProjectPicker value={clientId} onChange={setClientId} projects={clients} none={t('Company login (no {project})', { project: term.one })} />
+          </div>
+          <div className="field">
+            <span>{t('Who can use them')}</span>
+            <div className="segmented wide">
+              <button type="button" className={!everyone ? 'on' : ''} onClick={() => setEveryone(false)}>
+                {t('Only me and admins')}
+              </button>
+              <button type="button" className={everyone ? 'on' : ''} onClick={() => setEveryone(true)}>
+                {t('Everyone')}
+              </button>
+            </div>
+          </div>
+          <ul className="vault-import-list">
+            {rows.map((r, i) => (
+              <li key={i}>
+                <label className="vault-import-row">
+                  <input
+                    type="checkbox"
+                    checked={!skip.has(i)}
+                    onChange={() =>
+                      setSkip((s) => {
+                        const next = new Set(s);
+                        if (next.has(i)) next.delete(i);
+                        else next.add(i);
+                        return next;
+                      })
+                    }
+                  />
+                  <VaultTile title={r.title} size={32} />
+                  <span className="vault-import-text">
+                    <span className="vault-import-title">{r.title}</span>
+                    <span className="vault-import-sub">{[r.username, host(r.url)].filter(Boolean).join(' · ') || t('No username')}</span>
+                  </span>
+                  {r.totp && <ShieldCheck size={16} className="vault-import-mark" aria-label={t('Has a 2FA code')} />}
+                </label>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {error && <p className="err">{error}</p>}
+    </TabPane>
+  );
+  const label = busy ? t('Importing {done} of {total}…', { done: done ?? 0, total: chosen.length }) : tn(chosen.length, 'Import {n} login', 'Import {n} logins');
+  if (phone)
+    return (
+      <PushScreen
+        title={t('Import logins')}
+        backLabel={t('Cancel')}
+        onBack={() => !busy && onClose()}
+        className="g-page vault-edit"
+        actions={
+          rows ? (
+            <button type="button" className="vp-edit strong" disabled={!chosen.length || busy} onClick={() => void go()}>
+              {busy ? t('Importing…') : t('Import')}
+            </button>
+          ) : undefined
+        }
+      >
+        <div className="vault-body vp-form">
+          {body}
+          {rows && <p className="vp-foot">{label}</p>}
+        </div>
+      </PushScreen>
+    );
+  return (
+    <div className="modal-scrim" onMouseDown={() => !busy && onClose()}>
+      <div className="modal vault-modal" role="dialog" aria-label={t('Import logins')} onMouseDown={(e) => e.stopPropagation()} onKeyDown={(e) => e.key === 'Escape' && !busy && !document.querySelector('.pop') && onClose()}>
+        <header className="modal-head">
+          <span className="dump-title">
+            <Upload size={15} /> {t('Import logins')}
+          </span>
+          <button className="icon-btn sm" onClick={onClose} disabled={busy} aria-label={t('Close')}>
+            <X size={15} />
+          </button>
+        </header>
+        <div className="modal-body vault-body">
+          <SmoothHeight>{body}</SmoothHeight>
+        </div>
+        {rows && (
+          <footer className="modal-foot">
+            <button className="ghost-btn" disabled={busy} onClick={() => (setRows(null), setError(''))}>
+              {t('Another file')}
+            </button>
+            <span className="spacer" />
+            <button className="ghost-btn" disabled={busy} onClick={onClose}>
+              {t('Cancel')}
+            </button>
+            <button className="primary-btn" disabled={!chosen.length || busy} onClick={() => void go()}>
+              {label}
+            </button>
+          </footer>
+        )}
+      </div>
+    </div>
+  );
 }

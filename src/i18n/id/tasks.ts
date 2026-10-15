@@ -782,6 +782,13 @@ const id: Record<string, string> = {
   'All company tasks': 'Semua tugas perusahaan',
   'Every open task in the company': 'Semua tugas terbuka di perusahaan',
   'Late': 'Terlambat',
+  'Add time': 'Tambah jam',
+  'Due time': 'Jam tenggat',
+  'Remove time': 'Hapus jam',
+  'No tasks match': 'Tidak ada tugas yang cocok',
+  'Search tasks': 'Cari tugas',
+  'Titles, notes, checklists and comments, done tasks too.': 'Judul, catatan, daftar periksa, dan komentar, termasuk tugas yang selesai.',
+  'Try other words. Titles, notes, checklists and comments are searched.': 'Coba kata lain. Judul, catatan, daftar periksa, dan komentar ikut dicari.',
 };
 
 export default id;

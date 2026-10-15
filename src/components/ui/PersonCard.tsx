@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type KeyboardEvent, type MouseEvent, type ReactNode } from 'react';
-import { Check, Copy, ListTodo, Mail, MessageCircle, Phone, Search } from 'lucide-react';
+import { Check, Copy, ListTodo, Mail, MessageCircle, Phone, Search, Video } from 'lucide-react';
 import type { Status, Team, User } from '../../types';
 import { Avatar } from '../Avatar';
 import { Popover } from './Popover';
@@ -20,6 +20,10 @@ export interface CardPerson {
   phone?: string;
   company?: string;
   timeZone?: string; // an IANA name: shows their local time
+  pronouns?: string;
+  location?: string;
+  department?: string;
+  manager?: string; // their manager's name
   guest?: boolean; // someone at a client with portal access
   status?: Status;
   presence?: 'active' | 'away' | 'meeting';
@@ -29,6 +33,10 @@ type Who = string | { id?: string; userId?: string; name?: string; email?: strin
 
 interface Api {
   open: (who: Who, anchor: HTMLElement | null) => void;
+  /** Mail search for everything from or to this address (the card's 'Emails with'). */
+  emailsWith: (email: string) => void;
+  /** Opens (or starts) the direct message with a teammate. */
+  message?: (userId: string) => void;
 }
 
 const Ctx = createContext<Api | null>(null);
@@ -79,6 +87,7 @@ export function PersonCardProvider({
   onEmail,
   onEmailsWith,
   onTasks,
+  onCall,
 }: {
   children: ReactNode;
   me: string;
@@ -93,6 +102,7 @@ export function PersonCardProvider({
   onEmail: (p: { name: string; email: string }) => void;
   onEmailsWith: (email: string) => void;
   onTasks: (userId: string) => void;
+  onCall?: (userId: string) => void; // starts a call in our DM (teammates only)
 }) {
   const [who, setWho] = useState<CardPerson | null>(null);
   const anchor = useRef<HTMLElement | null>(null);
@@ -103,7 +113,13 @@ export function PersonCardProvider({
     const d = data.current;
     const key = typeof w === 'string' ? w : (w.userId ?? w.id ?? w.email ?? '');
     const email = (typeof w === 'string' ? w : (w.email ?? '')).toLowerCase();
-    const u = d.users.find((x) => x.id === key || (!!email && x.email.toLowerCase() === email));
+    const low = key.toLowerCase();
+    // An @mention gives just a name: a teammate's full or first name.
+    const byName = (x: User) => !x.deletedAt && !!low && !low.includes('@') && (x.name.toLowerCase() === low || x.name.split(' ')[0].toLowerCase() === low);
+    const u =
+      d.users.find((x) => x.id === key || (!!email && x.email.toLowerCase() === email)) ??
+      d.users.find((x) => d.memberIds.includes(x.id) && byName(x)) ??
+      d.users.find(byName);
     if (u && !u.deletedAt) {
       const st = d.statuses[u.id];
       return {
@@ -113,6 +129,12 @@ export function PersonCardProvider({
         title: u.title,
         color: u.color,
         photo: u.photo,
+        phone: u.phone,
+        timeZone: u.timeZone,
+        pronouns: u.pronouns,
+        location: u.location,
+        department: u.department,
+        manager: u.reportsTo ? d.users.find((x) => x.id === u.reportsTo && !x.deletedAt)?.name : undefined,
         teams: d.teams.filter((tm) => tm.members.includes(u.id) || tm.leadId === u.id).map((tm) => tm.name),
         status: st && (!st.until || st.until > new Date().toISOString()) ? st : undefined,
         presence: d.memberIds.includes(u.id) ? d.presence(u.id) : undefined,
@@ -125,6 +147,10 @@ export function PersonCardProvider({
     return { name, email: g?.email ?? c?.email ?? email, phone: g?.phone, company: g?.company, guest: !!g };
   }, []);
 
+  const onEmailsWithRef = useRef(onEmailsWith);
+  onEmailsWithRef.current = onEmailsWith;
+  const onMessageRef = useRef(onMessage);
+  onMessageRef.current = onMessage;
   const api = useMemo<Api>(
     () => ({
       open: (w, el) => {
@@ -134,6 +160,8 @@ export function PersonCardProvider({
         anchor.current = el;
         setWho((cur) => (cur && same && cur.email === p.email ? null : p));
       },
+      emailsWith: (email) => (setWho(null), onEmailsWithRef.current(email)),
+      message: (id) => (setWho(null), onMessageRef.current(id)),
     }),
     [resolve],
   );
@@ -153,6 +181,7 @@ export function PersonCardProvider({
             onEmail={run(() => onEmail({ name: who.name, email: who.email }))}
             onEmailsWith={run(() => onEmailsWith(who.email))}
             onTasks={who.userId ? run(() => onTasks(who.userId!)) : undefined}
+            onCall={who.userId && onCall ? run(() => onCall(who.userId!)) : undefined}
           />
         </CardShell>
       )}
@@ -184,6 +213,35 @@ function localTime(tz: string) {
   }
 }
 
+/** Minutes a zone is ahead of UTC right now. */
+function zoneOffset(tz: string, at = new Date()) {
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', { timeZone: tz, hourCycle: 'h23', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' }).formatToParts(at);
+    const n = (k: string) => Number(parts.find((x) => x.type === k)?.value ?? 0);
+    const wall = Date.UTC(n('year'), n('month') - 1, n('day'), n('hour') % 24, n('minute'));
+    return Math.round((wall - Math.floor(at.getTime() / 60000) * 60000) / 60000);
+  } catch {
+    return null;
+  }
+}
+
+/** "3 hrs ahead", "1.5 hrs behind", or '' when it's the same as yours. */
+function zoneDiff(tz: string) {
+  const theirs = zoneOffset(tz);
+  if (theirs == null) return '';
+  const diff = theirs + new Date().getTimezoneOffset(); // getTimezoneOffset is minus your own offset
+  if (Math.abs(diff) < 1) return '';
+  const hrs = Math.abs(diff) / 60;
+  const n = Number.isInteger(hrs) ? String(hrs) : hrs.toFixed(1);
+  return diff > 0 ? t('{n} hrs ahead', { n }) : t('{n} hrs behind', { n });
+}
+
+/** Their clock hour (0 to 23) right now, or null. */
+function localHour(tz: string) {
+  const off = zoneOffset(tz);
+  return off == null ? null : new Date(Date.now() + off * 60000).getUTCHours();
+}
+
 function CardBody({
   p,
   me,
@@ -191,6 +249,7 @@ function CardBody({
   onEmail,
   onEmailsWith,
   onTasks,
+  onCall,
 }: {
   p: CardPerson;
   me: string;
@@ -198,6 +257,7 @@ function CardBody({
   onEmail: () => void;
   onEmailsWith: () => void;
   onTasks?: () => void;
+  onCall?: () => void;
 }) {
   const [copied, setCopied] = useState(false);
   useEffect(() => {
@@ -211,6 +271,9 @@ function CardBody({
   const first = p.name.split(' ')[0] || p.name;
   const isMe = p.userId === me;
   const time = p.timeZone ? localTime(p.timeZone) : '';
+  const ahead = p.timeZone ? zoneDiff(p.timeZone) : '';
+  const hour = p.timeZone ? localHour(p.timeZone) : null;
+  const late = !isMe && hour != null && (hour < 8 || hour >= 19); // outside a usual working day where they are
   const presence = p.presence === 'meeting' ? t('In a meeting') : p.presence === 'away' ? t('Away') : p.presence === 'active' ? t('Active') : '';
 
   return (
@@ -262,13 +325,42 @@ function CardBody({
             <dd className="pcard-val">{p.teams.join(', ')}</dd>
           </div>
         )}
+        {p.pronouns && (
+          <div className="pcard-fact">
+            <dt>{t('Pronouns')}</dt>
+            <dd className="pcard-val">{p.pronouns}</dd>
+          </div>
+        )}
+        {p.department && (
+          <div className="pcard-fact">
+            <dt>{t('Department')}</dt>
+            <dd className="pcard-val">{p.department}</dd>
+          </div>
+        )}
+        {p.manager && (
+          <div className="pcard-fact">
+            <dt>{t('Reports to')}</dt>
+            <dd className="pcard-val">{p.manager}</dd>
+          </div>
+        )}
+        {p.location && (
+          <div className="pcard-fact">
+            <dt>{t('Location')}</dt>
+            <dd className="pcard-val">{p.location}</dd>
+          </div>
+        )}
         {time && (
           <div className="pcard-fact">
             <dt>{t('Local time')}</dt>
-            <dd className="pcard-val">{time}</dd>
+            <dd className="pcard-val">{ahead ? t('{time} ({diff})', { time, diff: ahead }) : time}</dd>
           </div>
         )}
       </dl>
+      {late && (
+        <p className="pcard-late" role="note">
+          {t('It’s {time} for {name}. They may reply later.', { time, name: first })}
+        </p>
+      )}
 
       <div className="pcard-actions">
         {!isMe &&
@@ -285,6 +377,11 @@ function CardBody({
           {onMessage && !isMe && (
             <button type="button" className="icon-btn" onClick={onEmail} aria-label={t('Email')} title={t('Email')}>
               <Mail size={20} />
+            </button>
+          )}
+          {onCall && !isMe && (
+            <button type="button" className="icon-btn" onClick={onCall} aria-label={t('Start a call')} title={t('Start a call')}>
+              <Video size={20} />
             </button>
           )}
           {p.phone && (

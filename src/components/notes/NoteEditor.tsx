@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
-import { ArrowDown, ArrowUp, Bold, Check, ChevronDown, Cloud, CloudOff, Copy, Eye, Highlighter, Italic, Link2, List, ListChecks, ListOrdered, ListTodo, MoreHorizontal, NotebookPen, Quote, Redo2, RotateCcw, SquareCheck, Strikethrough, Trash2, Type, Underline, Undo2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, AtSign, Bold, CalendarDays, Code, FileText, Heading1, Heading2, Heading3, Megaphone, Minus, Pilcrow, SquareCode, Check, ChevronDown, Cloud, CloudOff, Copy, Eye, Highlighter, Italic, Link2, List, ListChecks, ListOrdered, ListTodo, MoreHorizontal, NotebookPen, Quote, Redo2, RotateCcw, SquareCheck, Strikethrough, Trash2, Type, Underline, Undo2 } from 'lucide-react';
 import type { Note, Todo } from '../../types';
 import { relative } from '../../utils';
 import { toast } from '../../toast';
@@ -10,6 +10,9 @@ import { ActionSheet, useActionMenu, type SheetAction } from '../ui/ActionSheet'
 import { ProjectPicker } from '../ProjectPicker';
 import { term } from '../../terms';
 import { NoteBar } from './NoteBar';
+import { InlineMenu, type InlineItem } from './InlineMenu';
+import { Avatar } from '../Avatar';
+import { fmtDayLong } from '../../i18n/format';
 import { NoteText, type Caret, type NoteTextHandle } from './NoteText';
 import { FormatPanel, HIGHLIGHTS, LinkPanel, MentionPanel, PALETTE, whoSees } from './NoteSheets';
 import { htmlToText } from '../../sanitize';
@@ -396,6 +399,54 @@ function Open(p: NoteEditorProps & { note: Note }) {
           }}
         />
       )}
+      <InlineMenu
+        root={() => text.current?.root() ?? null}
+        active={canEdit && editing}
+        items={(kind, q) => {
+          const s = q.toLowerCase();
+          const has = (x: string) => !s || x.toLowerCase().includes(s);
+          if (kind === '@') {
+            const people: InlineItem[] = api.users
+              .filter((u) => u.id !== me && has(`${u.name} ${u.email} ${u.title ?? ''}`))
+              .slice(0, 6)
+              .map((u) => ({
+                key: `u${u.id}`,
+                group: t('People'),
+                label: u.name,
+                hint: u.title || undefined,
+                icon: <Avatar person={u} size={24} />,
+                run: () => {
+                  text.current?.link(`mailto:${u.email}`, `@${u.name.split(' ')[0]}`);
+                  if (note.visibility === 'team') p.onMention(u.id, note);
+                },
+              }));
+            const found: InlineItem[] = p.notes
+              .filter((n) => n.id !== note.id && !n.deletedAt && has(n.title || t('Untitled')))
+              .slice(0, 5)
+              .map((n) => ({ key: `n${n.id}`, group: t('Notes'), label: n.title || t('Untitled'), icon: <FileText size={18} />, run: () => text.current?.link(noteLink(n.id), n.title || t('Untitled')) }));
+            return [...people, ...found];
+          }
+          const today = fmtDayLong(new Date());
+          const blocks: InlineItem[] = [
+            { key: 'h1', label: tx('style', 'Title'), icon: <Heading1 size={18} />, run: () => fmt.block('H1') },
+            { key: 'h2', label: t('Heading'), icon: <Heading2 size={18} />, run: () => fmt.block('H2') },
+            { key: 'h3', label: t('Subheading'), icon: <Heading3 size={18} />, run: () => fmt.block('H3') },
+            { key: 'p', label: t('Body'), icon: <Pilcrow size={18} />, run: () => fmt.block('P') },
+            { key: 'check', label: t('Checklist'), icon: <ListChecks size={18} />, run: fmt.checklist },
+            { key: 'ul', label: t('Bulleted list'), icon: <List size={18} />, run: () => fmt.cmd('insertUnorderedList') },
+            { key: 'ol', label: t('Numbered list'), icon: <ListOrdered size={18} />, run: () => fmt.cmd('insertOrderedList') },
+            { key: 'quote', label: t('Quote'), icon: <Quote size={18} />, run: () => fmt.block('BLOCKQUOTE') },
+            { key: 'callout', label: t('Callout'), icon: <Megaphone size={18} />, run: fmt.callout },
+            { key: 'pre', label: t('Code block'), icon: <SquareCode size={18} />, run: () => fmt.block('PRE') },
+            { key: 'code', label: t('Inline code'), icon: <Code size={18} />, run: fmt.code },
+            { key: 'hr', label: t('Divider'), icon: <Minus size={18} />, run: () => fmt.cmd('insertHorizontalRule') },
+            { key: 'task', label: tx('mail', 'Make a task'), hint: t('From this line'), icon: <ListTodo size={18} />, run: () => makeTask() },
+            { key: 'mention', label: t('Mention'), hint: t('A person or a note'), icon: <AtSign size={18} />, run: () => openPanel('mention') },
+            { key: 'date', label: t('Today’s date'), hint: today, icon: <CalendarDays size={18} />, run: () => text.current?.insertHtml(`${today}&nbsp;`) },
+          ];
+          return blocks.filter((b) => has(b.label) || has(b.key));
+        }}
+      />
       {lineMenu && <ActionSheet open onClose={() => setLineMenu(null)} title={lineText(lineMenu.block).slice(0, 60) || t('This line')} actions={lineActions(lineMenu.block)} at={phone ? null : { x: lineMenu.x, y: lineMenu.y }} />}
       {hlSheet && (
         <ActionSheet

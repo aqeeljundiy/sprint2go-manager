@@ -404,3 +404,11 @@
     padding-bottom: max(16px, env(safe-area-inset-bottom));
   }
 }
+
+/* Launcher: Join on a meeting that starts within 10 minutes, under the greeting. */
+.ln-hello .join-soon {
+  margin-top: 8px;
+}
+.ln-hello .join-soon .primary-btn {
+  min-height: var(--tap);
+}

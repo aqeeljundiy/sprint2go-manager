@@ -5,7 +5,7 @@ import { deviceTz, isZone } from '../../jobTimes';
 import { addDays } from '../../calendarUtils';
 import { clockOf, dateFacts, repeatWords, ruleToSpec, specToRule } from '../../repeat';
 import { zoneOptions } from '../ui/zones';
-import { fromWall, wallIn } from './calTools';
+import { fromWall, newCallLink, wallIn } from './calTools';
 import { DatePicker, TimePicker } from '../ui/DatePicker';
 import { Select } from '../ui/Select';
 import { SmoothHeight } from '../ui/Smooth';
@@ -278,6 +278,11 @@ export function EventForm({
               <label className="ev-extra">
                 <Video size={16} />
                 <input autoFocus={opened.has('meet') && !draft.meetUrl} value={draft.meetUrl} onChange={(e) => set({ meetUrl: e.target.value })} placeholder={t('Paste a Meet, Zoom or Teams link')} inputMode="url" aria-label={t('Video call link')} />
+                {!draft.meetUrl.trim() && (
+                  <button type="button" className="ghost-btn outline sm ev-newcall" onClick={(e) => (e.preventDefault(), set({ meetUrl: newCallLink() }))}>
+                    {t('New call link')}
+                  </button>
+                )}
               </label>
             )}
             {!task && shows('location') && (
@@ -548,6 +553,11 @@ export function EventRows({
           <ERow icon={<Video size={20} />}>
             <span className="er-field">
               <input className="er-input" value={draft.meetUrl} onChange={(e) => set({ meetUrl: e.target.value })} placeholder={t('Add video call')} inputMode="url" aria-label={t('Video call link')} />
+              {!draft.meetUrl.trim() && (
+                <button type="button" className="ghost-btn outline sm er-newcall" onClick={() => set({ meetUrl: newCallLink() })}>
+                  {t('New call link')}
+                </button>
+              )}
               {draft.meetUrl && (
                 <button type="button" className="icon-btn er-clear" onClick={() => set({ meetUrl: '' })} aria-label={t('Remove the video call')}>
                   <X size={18} />

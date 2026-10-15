@@ -623,6 +623,11 @@
     line-height: 1.45;
     overflow: hidden;
   }
+  .er-newcall {
+    flex: none;
+    min-height: var(--tap);
+    white-space: nowrap;
+  }
   .er-clear {
     flex: none;
     width: var(--tap);

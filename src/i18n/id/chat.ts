@@ -837,6 +837,19 @@ const id: Record<string, string> = {
   'Off: channels you didn’t place are hidden in this view (you can still find them in Search)': 'Nonaktif: channel yang tidak Anda tempatkan disembunyikan di tampilan ini (tetap bisa dicari lewat Cari)',
   '{n}m': '{n} mnt',
   '{n}h': '{n} jam',
+  // Search across every channel and DM (chat/Search.tsx)
+  'Search all channels and DMs': 'Cari di semua channel dan DM',
+  'In': 'Di',
+  'Sender': 'Pengirim',
+  'Has file': 'Ada file',
+  'Type a word, or pick a filter, to search every channel and direct message you can read.': 'Ketik kata, atau pilih filter, untuk mencari di semua channel dan pesan langsung yang bisa Anda baca.',
+  '{n} message': '{n} pesan',
+  'No messages found': 'Tidak ada pesan yang cocok',
+  'Try other words or fewer filters.': 'Coba kata lain atau kurangi filter.',
+  'Anywhere': 'Di mana saja',
+  'Last 24 hours': '24 jam terakhir',
+  'From {name}': 'Dari {name}',
+  'In {name}': 'Di {name}',
 };
 
 export default id;

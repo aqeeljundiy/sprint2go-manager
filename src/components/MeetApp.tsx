@@ -1,5 +1,5 @@
 import { TabBar } from './ui/TabBar';
-import { PersonName } from './ui/PersonCard';
+import { PersonName, usePersonCard } from './ui/PersonCard';
 import { ProjectBadge } from './ProjectBadge';
 import { MEETING_LANGUAGES, languageLabel, languagesLabel } from '../data/languages';
 import { t, tn, tx, mark } from '../i18n';
@@ -45,6 +45,12 @@ import {
   ChevronRight,
   FolderInput,
   Settings,
+  Search,
+  ChevronUp,
+  ChevronDown,
+  Mail,
+  MessageSquare,
+  PenLine,
 } from 'lucide-react';
 import type { CalEvent, Client, Meeting, MeetingSettings, MeetingType, Role, Todo, User, Workspace } from '../types';
 import { relative, fullDate } from '../utils';
@@ -53,8 +59,9 @@ import { isMine } from '../identity';
 import { Avatar } from './Avatar';
 import { Select } from './ui/Select';
 import { Popover } from './ui/Popover';
+import './meetExtras.css';
 
-export type MeetPage = { kind: 'list' } | { kind: 'folders' } | { kind: 'unfiled' } | { kind: 'upcoming' } | { kind: 'tasks' } | { kind: 'folder'; clientId: string } | { kind: 'meeting'; id: string };
+export type MeetPage = { kind: 'list' } | { kind: 'folders' } | { kind: 'unfiled' } | { kind: 'upcoming' } | { kind: 'tasks' } | { kind: 'folder'; clientId: string } | { kind: 'meeting'; id: string; q?: string };
 
 /** A meeting's status. Show it with t(). */
 export const STATUS_LABEL: Record<NonNullable<Meeting['status']>, string> = {
@@ -204,6 +211,10 @@ export interface MeetProps {
   company?: Pick<Workspace, 'name' | 'logo' | 'color'>;
   appSettings?: { id: string; label: string; hint?: string; run: () => void }[];
   onOpenEvent?: (id: string) => void;
+  /** Send recap: a prefilled Mail draft to the attendees, and a post in the project's team channel. */
+  onRecapEmail?: (subject: string, body: string, to: { name: string; email: string }[]) => void;
+  recapChannel?: (m: Meeting) => { id: string; name: string } | undefined;
+  onRecapPost?: (channelId: string, text: string) => void;
 }
 
 export type { AskScope } from './Assistant';
@@ -387,12 +398,12 @@ function useFilter(list: Meeting[]) {
       <Select value={type} onChange={setType} label={t('Type')} options={[{ value: '', label: t('All types') }, ...Object.entries(TYPE_LABEL).map(([v, l]) => ({ value: v, label: l }))]} />
     </div>
   );
-  return { shown, bar, filtering: !!(q || type), clear: () => (setQ(''), setType('')) };
+  return { shown, bar, q: q.trim(), filtering: !!(q || type), clear: () => (setQ(''), setType('')) };
 }
 
 function MeetingList(p: MeetProps & { unfiled: boolean }) {
   const list = [...p.meetings].filter((m) => !p.unfiled || !m.clientId).sort((a, b) => b.at.localeCompare(a.at));
-  const { shown, bar, filtering } = useFilter(list);
+  const { shown, bar, filtering, q } = useFilter(list);
   return (
     <section className="meet-pane view-enter">
       {/* "Send notetaker" is the sidebar's button; not repeated here (one primary per screen). */}
@@ -400,7 +411,7 @@ function MeetingList(p: MeetProps & { unfiled: boolean }) {
       <div className="tracking-scroll">
         {!p.unfiled && !filtering && <NextCalls {...p} />}
         {bar(t('Search titles, notes and transcripts'))}
-        <MeetingRows list={shown} clients={p.clients} tasks={p.tasks} onOpen={(id) => p.onPage({ kind: 'meeting', id })} onFile={(id, cid) => p.onFolder(id, cid, false)} />
+        <MeetingRows list={shown} clients={p.clients} tasks={p.tasks} onOpen={(id) => p.onPage({ kind: 'meeting', id, ...(q ? { q } : {}) })} onFile={(id, cid) => p.onFolder(id, cid, false)} />
         {shown.length === 0 && <EmptyState compact text={filtering ? t('Nothing matches.') : t('No meetings here yet. Use “{send}”.', { send: t('Send notetaker') })} />}
       </div>
     </section>
@@ -443,7 +454,15 @@ function NextCalls(p: MeetProps) {
 
 function MeetingPage(p: MeetProps & { m: Meeting }) {
   const { m } = p;
-  const [tab, setTab] = useState<'summary' | 'tasks' | 'transcript' | 'log'>('summary');
+  // A search from the meetings list comes along: the transcript opens on its first match.
+  const carried = p.page.kind === 'meeting' && p.page.q ? p.page.q : '';
+  const carriedHit = !!carried && (m.transcript ?? []).some((l) => l.text.toLowerCase().includes(carried.toLowerCase()));
+  const [tab, setTab] = useState<'summary' | 'tasks' | 'transcript' | 'log'>(carriedHit ? 'transcript' : 'summary');
+  const [find, setFind] = useState(carriedHit ? carried : '');
+  const [hit, setHit] = useState(0);
+  const [only, setOnly] = useState<string | null>(null); // the transcript shows one speaker's lines
+  const [renaming, setRenaming] = useState<string | null>(null); // "Who is this?" for a speaker label
+  const [recapOpen, setRecapOpen] = useState(false);
   const [time, setTime] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [askRemember, setAskRemember] = useState<string | null>(null);
@@ -555,6 +574,178 @@ function MeetingPage(p: MeetProps & { m: Meeting }) {
     ],
     { title: m.title },
   );
+  /* ---- Talk time, the speaker filter, find in transcript, speaker labels, moments, recap ---- */
+  const lines = useMemo(() => m.transcript ?? [], [m.transcript]);
+  const userOf = (name: string) => (name ? (p.users.find((u) => u.name === name) ?? p.users.find((u) => u.name.split(' ')[0] === name.split(' ')[0])) : undefined);
+  // Each line lasts until the next one starts, but no longer than its words take to say (about 150 a minute), so
+  // a silence or a gap in the transcript doesn't count as talking.
+  const talk = useMemo(() => {
+    const per = new Map<string, number>();
+    lines.forEach((l, i) => {
+      const next = lines[i + 1]?.at;
+      const said = Math.max(2000, l.text.split(/\s+/).filter(Boolean).length * 400);
+      const ms = next !== undefined && next > l.at ? Math.min(next - l.at, said) : said;
+      per.set(l.speaker, (per.get(l.speaker) ?? 0) + ms);
+    });
+    const total = [...per.values()].reduce((a, b) => a + b, 0);
+    return [...per].map(([name, ms]) => ({ name, ms, pct: total ? Math.round((ms / total) * 100) : 0 })).sort((a, b) => b.ms - a.ms);
+  }, [lines]);
+  const shownLines = useMemo(() => lines.map((l, i) => ({ l, i })).filter(({ l }) => only === null || l.speaker === only), [lines, only]);
+  const needle = find.trim().toLowerCase();
+  const hits = useMemo(() => (needle ? shownLines.filter(({ l }) => l.text.toLowerCase().includes(needle)).map(({ i }) => i) : []), [shownLines, needle]);
+  const hitAt = hits.length ? hits[Math.min(hit, hits.length - 1)] : -1;
+  const trBox = useRef<HTMLDivElement>(null);
+  // Moves the playhead without playing, so finding a line doesn't start the sound.
+  const cue = (ms: number) => {
+    setTime(ms);
+    if (real && audio.current) audio.current.currentTime = ms / 1000;
+  };
+  useEffect(() => setHit(0), [needle, only]);
+  useEffect(() => {
+    if (hitAt < 0 || tab !== 'transcript') return;
+    cue(lines[hitAt].at);
+    trBox.current?.querySelector(`[data-line="${hitAt}"]`)?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hitAt, tab]);
+  const step = (d: 1 | -1) => hits.length && setHit((h) => (Math.min(h, hits.length - 1) + d + hits.length) % hits.length);
+  const marked = (text: string, on: boolean) => {
+    if (!needle || !on) return text;
+    const out: React.ReactNode[] = [];
+    let from = 0;
+    const low = text.toLowerCase();
+    for (let at = low.indexOf(needle); at >= 0; at = low.indexOf(needle, from)) {
+      out.push(text.slice(from, at), <mark key={at}>{text.slice(at, at + needle.length)}</mark>);
+      from = at + needle.length;
+    }
+    out.push(text.slice(from));
+    return out;
+  };
+
+  // When a key point or decision was said: the transcript line that shares the most words with it.
+  const momentOf = useMemo(() => {
+    const words = (s: string) => new Set(s.toLowerCase().match(/[\p{L}\p{N}]{4,}/gu) ?? []);
+    const lw = lines.map((l) => words(l.text));
+    const cache = new Map<string, number | undefined>();
+    return (text: string) => {
+      if (cache.has(text)) return cache.get(text);
+      const want = [...words(text)];
+      let best = -1;
+      let score = 0;
+      lw.forEach((w, i) => {
+        const n = want.filter((x) => w.has(x)).length;
+        if (n > score) (score = n), (best = i);
+      });
+      const at = best >= 0 && score >= Math.max(2, Math.ceil(want.length * 0.3)) ? lines[best].at : undefined;
+      cache.set(text, at);
+      return at;
+    };
+  }, [lines]);
+  const jump = (ms: number) => {
+    if (keep === 'notes' || !keep) {
+      const i = lines.findIndex((l) => l.at === ms);
+      setOnly(null);
+      setTab('transcript');
+      setTimeout(() => trBox.current?.querySelector(`[data-line="${i}"]`)?.scrollIntoView({ block: 'center', behavior: 'smooth' }), 260);
+      setTime(ms);
+    } else seek(ms);
+  };
+
+  // A speaker's name: tap opens their profile card (teammates), long-press or right-click opens what you can do.
+  const card = usePersonCard();
+  const [spk, setSpk] = useState('');
+  const spkEl = useRef<HTMLElement | null>(null);
+  const spkMenu = useActionMenu(
+    () => {
+      const u = userOf(spk);
+      const share = talk.find((x) => x.name === spk)?.pct ?? 0;
+      return [
+        ...(u && card ? [{ label: t('Profile'), icon: Users, run: () => card.open(u.id, spkEl.current) }] : []),
+        only === spk
+          ? { label: t('Show everyone'), icon: Users, run: () => setOnly(null) }
+          : { label: t('Show only their lines'), hint: t('Spoke {pct}%', { pct: share }), icon: Search, run: () => (setOnly(spk), setTab('transcript')) },
+        ...(!live ? [{ label: t('Who is this?'), hint: t('Rename on every line'), icon: PenLine, run: () => setRenaming(spk) }] : []),
+      ];
+    },
+    { title: spk || t('Unknown') },
+  );
+  const speakerProps = (name: string) => ({
+    role: 'button' as const,
+    tabIndex: 0,
+    'aria-label': t('{name}: profile and options', { name: name || t('Unknown') }),
+    onPointerDown: (e: React.PointerEvent<HTMLElement>) => {
+      e.stopPropagation();
+      setSpk(name);
+      spkEl.current = e.currentTarget;
+      spkMenu.bind.onPointerDown(e);
+    },
+    onPointerMove: spkMenu.bind.onPointerMove,
+    onPointerUp: spkMenu.bind.onPointerUp,
+    onPointerCancel: spkMenu.bind.onPointerCancel,
+    onClickCapture: spkMenu.bind.onClickCapture,
+    onContextMenu: (e: React.MouseEvent<HTMLElement>) => {
+      e.stopPropagation();
+      setSpk(name);
+      spkEl.current = e.currentTarget;
+      spkMenu.bind.onContextMenu(e);
+    },
+    onClick: (e: React.MouseEvent<HTMLElement>) => {
+      e.stopPropagation();
+      setSpk(name);
+      spkEl.current = e.currentTarget;
+      const u = userOf(name);
+      if (u && card) card.open(u.id, e.currentTarget);
+      else spkMenu.openAt(e.clientX, e.clientY);
+    },
+    onKeyDown: (e: React.KeyboardEvent<HTMLElement>) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      e.stopPropagation();
+      setSpk(name);
+      const r = e.currentTarget.getBoundingClientRect();
+      spkMenu.openAt(r.left, r.bottom);
+    },
+  });
+
+  // "Who is this?": one name on every line, the action items' owners, and unassigned tasks they promised.
+  const rename = (from: string, to: string, user?: User) => {
+    const name = to.trim();
+    if (!name || name === from) return setRenaming(null);
+    const before = { transcript: m.transcript, actions: m.actions, attendees: m.attendees };
+    const firstOf = (s: string) => s.split(' ')[0].toLowerCase();
+    const relink = mTasks.filter((tk) => !tk.userId && !!user && (actionOwner(tk) === from || (!!from && !!actionOwner(tk) && firstOf(actionOwner(tk)!) === firstOf(from))));
+    p.onPatch(m.id, {
+      transcript: lines.map((l) => (l.speaker === from ? { ...l, speaker: name } : l)),
+      actions: m.actions.map((a) => (a.owner === from || (!!from && !!a.owner && firstOf(a.owner) === firstOf(from)) ? { ...a, owner: name } : a)),
+      attendees: m.attendees.map((a) => (a === from ? name : a)),
+    });
+    relink.forEach((tk) => p.onPatchTask(tk.id, { userId: user!.id }));
+    if (only === from) setOnly(name);
+    setRenaming(null);
+    p.toast(t('{from} is now {to}', { from: from || t('Unknown'), to: name }), () => {
+      p.onPatch(m.id, before);
+      relink.forEach((tk) => p.onPatchTask(tk.id, { userId: '' }));
+    });
+  };
+
+  // The recap: what was decided and who does what, ready for Mail or the project's chat.
+  const recapText = () => {
+    const list = (h: string, xs?: string[]) => (xs?.length ? ['', t(h), ...xs.map((x) => `- ${x}`)] : []);
+    const taskLines = mTasks.length
+      ? mTasks.map((tk) => {
+          const who = nameFor(tk)?.name ?? actionOwner(tk);
+          return `- ${who ? `${tk.title} (${who})` : tk.title}${tk.due ? `, ${t('due {due}', { due: fmtDay(tk.due) })}` : ''}`;
+        })
+      : m.actions.map((a) => `- ${a.owner ? `${a.title} (${a.owner})` : a.title}`);
+    return [m.title, fullDate(m.at), '', m.summary, ...list(mark('Decisions'), m.decisions), ...(taskLines.length ? ['', t('Action items'), ...taskLines] : []), ...list(mark('Open questions'), m.openQuestions)].join('\n');
+  };
+  const recapTo = (m.attendees.length ? m.attendees : speakers)
+    .map((a) => userOf(a))
+    .filter((u): u is User => !!u && u.id !== p.me)
+    .filter((u, i, all) => all.findIndex((x) => x.id === u.id) === i)
+    .map((u) => ({ name: u.name, email: u.email }));
+  const recapChan = p.recapChannel?.(m);
+  const canRecap = status === 'done' && !!m.summary && (!!p.onRecapEmail || !!recapChan);
+
   // Phones: Google's details page: Back, then Share and ⋮ at the top right.
   const phoneBar = phone && (
     <TopBar
@@ -591,6 +782,11 @@ function MeetingPage(p: MeetProps & { m: Meeting }) {
           </button>
         )}
         {/* Regenerate and Delete live in ⋮, so the header stays one row on tablets. */}
+        {canRecap && !phone && (
+          <button className="primary-btn sm" onClick={() => setRecapOpen(true)}>
+            <Send size={13} /> {t('Send recap')}
+          </button>
+        )}
         <button className="ghost-btn sm" onClick={() => p.onShare(m.id)}>
           <Share2 size={13} /> {m.share ? t('Shared') : t('Share')}
         </button>
@@ -675,6 +871,11 @@ function MeetingPage(p: MeetProps & { m: Meeting }) {
               <ChevronRight size={20} className="m-fact-chev" aria-hidden="true" />
             </button>
           </div>
+        )}
+        {phone && canRecap && (
+          <button type="button" className="primary-btn m-recap-btn" onClick={() => setRecapOpen(true)}>
+            <Send size={16} /> {t('Send recap')}
+          </button>
         )}
 
         <div className="m-top">
@@ -774,7 +975,7 @@ function MeetingPage(p: MeetProps & { m: Meeting }) {
                   const u = p.users.find((x) => x.name === a) ?? p.users.find((x) => x.name.split(' ')[0] === a.split(' ')[0]);
                   return (
                     <span key={a} className="m-person">
-                      {u ? <PersonName who={u.id}>{a}</PersonName> : a}
+                      {u ? <PersonName who={u.id}>{a}</PersonName> : speakers.includes(a) ? <span className="person-link" {...speakerProps(a)}>{a}</span> : a}
                     </span>
                   );
                 })}
@@ -846,9 +1047,19 @@ function MeetingPage(p: MeetProps & { m: Meeting }) {
                   <h4>{t(h)}</h4>
                   {list?.length ? (
                     <ul>
-                      {list.map((x) => (
-                        <li key={x}>{x}</li>
-                      ))}
+                      {list.map((x) => {
+                        const at = momentOf(x);
+                        return (
+                          <li key={x}>
+                            {x}
+                            {at !== undefined && (
+                              <button type="button" className="m-at" onClick={() => jump(at)} title={t('Jump to when it was said')} aria-label={t('Jump to {time}', { time: mmss(at) })}>
+                                <Play size={12} /> {mmss(at)}
+                              </button>
+                            )}
+                          </li>
+                        );
+                      })}
                     </ul>
                   ) : (
                     <p className="muted small">{t('None')}</p>
@@ -949,15 +1160,59 @@ function MeetingPage(p: MeetProps & { m: Meeting }) {
                 />
               </div>
             )}
-            {(m.transcript ?? []).map((l, i) => (
-              <button key={i} className={`tl ${time >= l.at && time < (m.transcript![i + 1]?.at ?? Infinity) && playing ? 'now' : ''}`} onClick={() => seek(l.at)}>
+            {lines.length > 0 && (
+              <>
+                {/* Who talked how much; tap a speaker to read only their lines. */}
+                {talk.length > 1 && (
+                  <div className="m-talk" role="group" aria-label={t('Talk time')}>
+                    {talk.map((s) => (
+                      <button key={s.name} type="button" className={`m-talk-row${only === s.name ? ' on' : ''}`} aria-pressed={only === s.name} onClick={() => setOnly(only === s.name ? null : s.name)}>
+                        <span className="m-talk-name">{s.name || t('Unknown')}</span>
+                        <span className="m-talk-bar" aria-hidden="true">
+                          <span style={{ width: `${s.pct}%` }} />
+                        </span>
+                        <span className="m-talk-pct">{s.pct}%</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <div className="m-find">
+                  <Search size={16} aria-hidden="true" />
+                  <input value={find} onChange={(e) => setFind(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), step(e.shiftKey ? -1 : 1))} placeholder={t('Find in transcript')} aria-label={t('Find in transcript')} enterKeyHint="search" />
+                  {needle && <span className="m-find-n">{hits.length ? t('{n} of {total}', { n: Math.min(hit, hits.length - 1) + 1, total: hits.length }) : t('No matches')}</span>}
+                  <button type="button" className="icon-btn" disabled={!hits.length} onClick={() => step(-1)} aria-label={t('Previous match')}>
+                    <ChevronUp size={18} />
+                  </button>
+                  <button type="button" className="icon-btn" disabled={!hits.length} onClick={() => step(1)} aria-label={t('Next match')}>
+                    <ChevronDown size={18} />
+                  </button>
+                  {find && (
+                    <button type="button" className="icon-btn" onClick={() => setFind('')} aria-label={t('Clear')}>
+                      <X size={18} />
+                    </button>
+                  )}
+                </div>
+                {only !== null && (
+                  <div className="m-only">
+                    <span>{t('Only {name}’s lines', { name: only || t('Unknown') })}</span>
+                    <button type="button" className="link-btn" onClick={() => setOnly(null)}>
+                      {t('Show everyone')}
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+            <div ref={trBox} className="m-tl-list">
+            {shownLines.map(({ l, i }) => (
+              <button key={i} data-line={i} className={`tl ${time >= l.at && time < (lines[i + 1]?.at ?? Infinity) && playing ? 'now' : ''}${i === hitAt ? ' hit' : ''}`} onClick={() => seek(l.at)}>
                 {/* Phones: the speaker's face, name and time on one line, the words under the name. */}
-                {phone && <Avatar person={p.users.find((u) => u.name === l.speaker) ?? p.users.find((u) => !!l.speaker && u.name.split(' ')[0] === l.speaker.split(' ')[0]) ?? { name: l.speaker || t('Unknown'), email: '' }} size={32} />}
+                {phone && <Avatar person={userOf(l.speaker) ?? { name: l.speaker || t('Unknown'), email: '' }} size={32} />}
                 <time>{mmss(l.at)}</time>
-                <b>{l.speaker || t('Unknown')}</b>
-                <span>{l.text}</span>
+                <b className="tl-who" {...speakerProps(l.speaker)}>{l.speaker || t('Unknown')}</b>
+                <span>{marked(l.text, hits.includes(i))}</span>
               </button>
             ))}
+            </div>
             {!m.transcript?.length && <EmptyState compact text={live ? t('Waiting for people to talk.') : t('No transcript.')} />}
             <div ref={tEnd} />
           </div>
@@ -1010,6 +1265,19 @@ function MeetingPage(p: MeetProps & { m: Meeting }) {
         </div>
       </Popover>
       {ask && <ConfirmSheet title={ask.title} text={ask.text} yes={ask.yes} safe={ask.safe} onYes={ask.run} onClose={() => setAsk(null)} />}
+      {spkMenu.menu}
+      {renaming !== null && <WhoIsThis from={renaming} users={p.users} onPick={(name, u) => rename(renaming, name, u)} onClose={() => setRenaming(null)} />}
+      {recapOpen && (
+        <RecapSheet
+          title={t('Recap: {title}', { title: m.title })}
+          text={recapText()}
+          to={recapTo}
+          channel={recapChan}
+          onEmail={p.onRecapEmail ? (body) => (p.onRecapEmail!(t('Recap: {title}', { title: m.title }), body, recapTo), setRecapOpen(false)) : undefined}
+          onPost={recapChan && p.onRecapPost ? (body) => (p.onRecapPost!(recapChan.id, body), setRecapOpen(false)) : undefined}
+          onClose={() => setRecapOpen(false)}
+        />
+      )}
       {addOpen && (
         <Sheet
           title={t('New task')}
@@ -1025,6 +1293,66 @@ function MeetingPage(p: MeetProps & { m: Meeting }) {
         </Sheet>
       )}
     </section>
+  );
+}
+
+/** "Who is this?": pick a teammate or type a name; it applies to every line of that speaker. */
+function WhoIsThis({ from, users, onPick, onClose }: { from: string; users: User[]; onPick: (name: string, u?: User) => void; onClose: () => void }) {
+  const [typed, setTyped] = useState('');
+  const s = typed.trim().toLowerCase();
+  const list = users.filter((u) => !u.deletedAt && (!s || u.name.toLowerCase().includes(s) || u.email.toLowerCase().includes(s)));
+  return (
+    <Sheet
+      title={t('Who is {name}?', { name: from || t('Unknown') })}
+      onClose={onClose}
+      footer={
+        <button type="button" className="primary-btn" disabled={!typed.trim()} onClick={() => onPick(typed.trim())}>
+          {t('Use “{name}”', { name: typed.trim() || '…' })}
+        </button>
+      }
+    >
+      <p className="m-recap-to">{t('Changes the name on every line they said, and on their action items.')}</p>
+      <input className="m-who-type" value={typed} onChange={(e) => setTyped(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && typed.trim() && onPick(typed.trim())} placeholder={t('Search people or type a name')} aria-label={t('Name')} />
+      <div className="m-who-list">
+        {list.map((u) => (
+          <button key={u.id} type="button" className={`m-who-row${u.name === from ? ' on' : ''}`} onClick={() => onPick(u.name, u)}>
+            <Avatar person={u} size={32} />
+            <span>{u.name}</span>
+            <small>{u.title ?? u.email}</small>
+          </button>
+        ))}
+        {!list.length && <EmptyState compact text={t('No teammate by that name. Use the button to keep the name you typed.')} />}
+      </div>
+    </Sheet>
+  );
+}
+
+/** Send recap: the notes as an editable message, then Mail to the attendees or a post in the project's chat. */
+function RecapSheet({ title, text, to, channel, onEmail, onPost, onClose }: { title: string; text: string; to: { name: string; email: string }[]; channel?: { id: string; name: string }; onEmail?: (body: string) => void; onPost?: (body: string) => void; onClose: () => void }) {
+  const [body, setBody] = useState(text);
+  return (
+    <Sheet
+      title={title}
+      onClose={onClose}
+      size="tall"
+      footer={
+        <div className="m-recap-foot">
+          {onPost && channel && (
+            <button type="button" className={onEmail ? 'ghost-btn' : 'primary-btn'} disabled={!body.trim()} onClick={() => onPost(body)}>
+              <MessageSquare size={16} /> {t('Post in #{channel}', { channel: channel.name })}
+            </button>
+          )}
+          {onEmail && (
+            <button type="button" className="primary-btn" disabled={!body.trim()} onClick={() => onEmail(body)}>
+              <Mail size={16} /> {to.length ? t('Email attendees') : t('Write email')}
+            </button>
+          )}
+        </div>
+      }
+    >
+      <p className="m-recap-to">{to.length ? t('To {people}', { people: fmtList(to.map((x) => x.name)) }) : t('No attendee emails found. Add who it goes to in the draft.')}</p>
+      <textarea className="m-recap-text" value={body} onChange={(e) => setBody(e.target.value)} aria-label={t('Recap')} />
+    </Sheet>
   );
 }
 

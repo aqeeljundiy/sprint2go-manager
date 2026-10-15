@@ -194,3 +194,14 @@ a.pcard-val {
     transition: none;
   }
 }
+
+/* Outside their working day: a quiet heads-up before you message them. */
+.pcard-late {
+  margin: -8px 0 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--warn-soft, var(--hover));
+  color: var(--text-2);
+  font-size: 13px;
+  line-height: 1.4;
+}

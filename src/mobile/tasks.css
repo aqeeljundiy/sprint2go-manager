@@ -1957,3 +1957,38 @@
     min-height: var(--tap);
   }
 }
+
+/* Search on Browse: a pill under the top bar; results take the cards' place. */
+@media (max-width: 767px) {
+  .tasks-browse .tsr-field {
+    min-height: var(--tap);
+    margin: 8px 16px 0;
+  }
+  .tsr-field input {
+    font-size: 16px;
+  }
+  .tasks-browse .tsr-results {
+    margin: 16px 16px 0;
+  }
+  .tasks-browse .tsr-card {
+    overflow: hidden;
+    border-radius: var(--r-card);
+    background: var(--surface);
+  }
+  .tsr-row {
+    min-height: var(--row-1);
+    padding: 8px 16px;
+    border-radius: 0;
+    font-size: var(--fs-body);
+  }
+  .tsr-sheet .tsr-field {
+    margin: 0 0 8px;
+  }
+  .mention-list .qa-sug {
+    min-height: var(--tap);
+  }
+  .due-time-add,
+  .due-time-x {
+    min-height: var(--tap);
+  }
+}

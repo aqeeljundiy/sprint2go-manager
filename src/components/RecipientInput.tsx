@@ -1,6 +1,8 @@
 import { isPhone } from '../mobile/media';
-import { useMemo, useState } from 'react';
-import { X } from 'lucide-react';
+import { useMemo, useRef, useState } from 'react';
+import { ArrowRightLeft, Pencil, UserRound, X } from 'lucide-react';
+import { useActionMenu, type SheetAction } from './ui/ActionSheet';
+import { usePersonCard } from './ui/PersonCard';
 import type { Person } from '../types';
 import { Avatar } from './Avatar';
 import { t } from '../i18n';
@@ -14,9 +16,16 @@ interface Props {
   autoFocus?: boolean;
   onChange: (p: Person[]) => void;
   trailing?: React.ReactNode;
+  /** Which field this is, so a chip can offer to move to the others (Gmail: To, Cc and Bcc). */
+  field?: Field;
+  onMove?: (p: Person, to: Field) => void;
 }
 
-export function RecipientInput({ label, value, contacts, autoFocus, onChange, trailing }: Props) {
+export type Field = 'to' | 'cc' | 'bcc';
+const FIELD_NAME: Record<Field, () => string> = { to: () => t('To'), cc: () => 'Cc', bcc: () => 'Bcc' };
+
+export function RecipientInput({ label, value, contacts, autoFocus, onChange, trailing, field, onMove }: Props) {
+  const input = useRef<HTMLInputElement>(null);
   const [text, setText] = useState('');
   const [hi, setHi] = useState(0);
 
@@ -50,15 +59,22 @@ export function RecipientInput({ label, value, contacts, autoFocus, onChange, tr
       <span className="recip-label">{label}</span>
       <div className="recip-chips">
         {value.map((p) => (
-          <span key={p.email} className="recip-chip" title={p.email}>
-            <Avatar person={p} size={18} />
-            {p.name}
-            <button onClick={() => onChange(value.filter((v) => v.email !== p.email))} aria-label={t('Remove {name}', { name: p.name })}>
-              <X size={12} />
-            </button>
-          </span>
+          <Chip
+            key={p.email}
+            p={p}
+            field={field}
+            onMove={onMove}
+            onRemove={() => onChange(value.filter((v) => v.email !== p.email))}
+            onEdit={() => {
+              // Back into the field as text, to fix a typo (Gmail's double-click).
+              onChange(value.filter((v) => v.email !== p.email));
+              setText(p.email);
+              requestAnimationFrame(() => input.current?.focus());
+            }}
+          />
         ))}
         <input
+          ref={input}
           autoFocus={autoFocus}
           value={text}
           onChange={(e) => {
@@ -105,5 +121,32 @@ export function RecipientInput({ label, value, contacts, autoFocus, onChange, tr
         </div>
       )}
     </div>
+  );
+}
+
+/** One recipient: tap the face for its menu (profile, edit, move to Cc or Bcc, remove); the X removes. */
+function Chip({ p, field, onMove, onRemove, onEdit }: { p: Person; field?: Field; onMove?: (p: Person, to: Field) => void; onRemove: () => void; onEdit: () => void }) {
+  const face = useRef<HTMLButtonElement>(null);
+  const card = usePersonCard();
+  const menu = useActionMenu(
+    (): SheetAction[] => [
+      ...(card ? [{ label: t('Profile'), icon: UserRound, run: () => card.open(p, face.current) }] : []),
+      { label: t('Edit address'), icon: Pencil, run: onEdit },
+      ...(onMove && field ? (['to', 'cc', 'bcc'] as Field[]).filter((f) => f !== field).map((f) => ({ label: t('Move to {field}', { field: FIELD_NAME[f]() }), icon: ArrowRightLeft, group: 'move', run: () => onMove(p, f) })) : []),
+      { label: t('Remove'), icon: X, group: 'end', danger: true, run: onRemove },
+    ],
+    { title: p.name || p.email, menu: true },
+  );
+  return (
+    <span className="recip-chip" title={p.email}>
+      <button ref={face} type="button" className="recip-face" onClick={() => menu.openFrom(face)} onDoubleClick={onEdit} aria-haspopup="menu" aria-expanded={menu.open} aria-label={t('Options for {name}', { name: p.name || p.email })}>
+        <Avatar person={p} size={18} />
+        {p.name}
+      </button>
+      <button type="button" onClick={onRemove} aria-label={t('Remove {name}', { name: p.name })}>
+        <X size={12} />
+      </button>
+      {menu.menu}
+    </span>
   );
 }

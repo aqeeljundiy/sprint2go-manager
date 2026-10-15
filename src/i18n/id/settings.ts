@@ -604,6 +604,14 @@ const id: Record<string, string> = {
   'tasks, messages and files you made, kept by the company under a deleted account.': 'tugas, pesan, dan file yang Anda buat, disimpan perusahaan atas nama akun yang dihapus.',
   'version {v}': 'versi {v}',
   'Edit photo': 'Ubah foto',
+  // Your profile: optional details
+  'About you': 'Tentang Anda',
+  'No one': 'Tidak ada',
+  'Shown on your profile card when filled in.': 'Tampil di kartu profil Anda jika diisi.',
+  'e.g. +62 812 3456 7890': 'mis. +62 812 3456 7890',
+  'e.g. Design': 'mis. Desain',
+  'e.g. Jakarta': 'mis. Jakarta',
+  'e.g. she/her': 'mis. dia (perempuan)',
 };
 
 export default id;
