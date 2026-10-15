@@ -25,6 +25,9 @@ import { fmtDayLong, fmtMonth } from '../src/i18n/format.ts';
 import * as lang from './lang.ts';
 import { renderEmail, type Block } from './emailLayout.ts';
 
+/** Wrong operator 2FA codes per email, for the 15-minute lockout. */
+const opTries = new Map<string, number[]>();
+
 export interface AdminCtx {
   req: IncomingMessage;
   res: ServerResponse;
@@ -511,7 +514,12 @@ export async function handleAdmin(p: string, ctx: AdminCtx): Promise<boolean> {
   }
   if (sub === '2fa/verify' && POST) {
     const { code } = await body(req);
-    if (!platform.checkTotp(email, String(code ?? ''))) return (json(res, 400, { error: mark('That code isn’t right. Check the time on your phone and try the next one.') }), true);
+    // Five wrong codes and the console waits 15 minutes: a 6-digit code can't be guessed by trying them all.
+    const now = Date.now();
+    const tries = (opTries.get(email) ?? []).filter((at) => now - at < 15 * 60_000);
+    if (tries.length >= 5) return (json(res, 429, { error: mark('Too many wrong codes. Try again in 15 minutes.') }), true);
+    if (!platform.checkTotp(email, String(code ?? ''))) return (opTries.set(email, [...tries, now]), json(res, 400, { error: mark('That code isn’t right. Check the time on your phone and try the next one.') }), true);
+    opTries.delete(email);
     if (!op.totpOn) (platform.confirmTotp(email), log('team.2fa-on', email));
     platform.markSessionVerified(ctx.token);
     return (json(res, 200, { ok: true }), true);

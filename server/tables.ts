@@ -7,6 +7,8 @@ import type { CellValue, DataTable, TableAction, TableField, TableLogEntry, Tabl
 import { stageIdFor, stagesFrom } from '../src/stages.ts';
 import { companyTz } from '../src/jobTimes.ts';
 import { mark, msg, phrase, type Msg } from '../src/i18n/index.ts';
+import { lookup } from 'node:dns/promises';
+import { isPrivateAddress } from './safeFetch.ts';
 
 export interface Env {
   broadcast: (coll: string, upserts: db.Doc[], deletes: string[]) => void;
@@ -152,6 +154,15 @@ const dig = (obj: unknown, path: string) => path.split('.').reduce<unknown>((o, 
 /** Sends one webhook, retrying network errors and server errors (1s, 4s, 10s). Returns the reply. */
 export async function sendHook(t: DataTable, url: string, payload: unknown): Promise<{ ok: boolean; status: number; reply: unknown; note: string; tr?: Msg }> {
   if (!/^https?:\/\//.test(url)) return { ok: false, status: 0, reply: null, ...said(msg('The webhook address must start with https://')) };
+  // Never to this server's own network (Dokploy, the cloud's metadata address, other containers): the address is
+  // resolved first and refused when any of it is private. Redirects aren't followed, so they can't lead there either.
+  try {
+    const host = new URL(url).hostname.replace(/^\[|\]$/g, '');
+    const found = await lookup(host, { all: true });
+    if (!found.length || found.some((a) => isPrivateAddress(a.address))) return { ok: false, status: 0, reply: null, ...said(msg('Webhooks can only go to addresses on the public internet.')) };
+  } catch {
+    return { ok: false, status: 0, reply: null, ...said(msg('That webhook address can’t be found.')) };
+  }
   const body = JSON.stringify(payload);
   const sig = t.signingSecret ? createHmac('sha256', t.signingSecret).update(body).digest('hex') : '';
   const waits = [0, 1000, 4000, 10000];
@@ -159,7 +170,7 @@ export async function sendHook(t: DataTable, url: string, payload: unknown): Pro
   for (const w of waits) {
     if (w) await new Promise((r) => setTimeout(r, w));
     try {
-      const res = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json', 'user-agent': 'sprint2go-Webhooks', ...(sig ? { 'x-sprint2go-signature': `sha256=${sig}` } : {}) }, body, signal: AbortSignal.timeout(10_000) });
+      const res = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json', 'user-agent': 'sprint2go-Webhooks', ...(sig ? { 'x-sprint2go-signature': `sha256=${sig}` } : {}) }, body, signal: AbortSignal.timeout(10_000), redirect: 'manual' });
       const text = await res.text().catch(() => '');
       let reply: unknown = text;
       try {

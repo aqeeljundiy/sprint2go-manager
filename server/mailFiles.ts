@@ -581,7 +581,7 @@ export async function handlePublic(req: IncomingMessage, res: ServerResponse, ur
       codes.set(`${row.token}\n${email}`, { code, until: Date.now() + 15 * 60_000, tries: 0 });
       const mail = fileCodeMail(row.name, code, ws as any);
       const sent = await deps.sendCode(email, mail.subject, mail.text, mail.html).catch(() => false);
-      if (!sent) console.log(`[mail links] Code for ${email} to open ${row.name}: ${code}`);
+      if (!sent && process.env.NODE_ENV !== 'production') console.log(`[mail links] Code for ${email} to open ${row.name}: ${code}`);
     }
     return (linkPage(res, 200, row.name, `${head}<p>If ${escH(email)} is one of the addresses this file was sent to, a 6-digit code is on its way there. Enter it here.</p><form method="post" action="/f/${row.token}/open"><input type="hidden" name="email" value="${escH(email)}"><input name="code" inputmode="numeric" autocomplete="one-time-code" placeholder="6-digit code" required maxlength="6"><button type="submit">Open the file</button></form>`), true);
   }

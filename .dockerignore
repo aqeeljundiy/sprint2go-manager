@@ -5,3 +5,7 @@ desktop
 recorder/node_modules
 .git
 *.log
+# Never bake local secrets into the image (set them in Dokploy's Environment tab).
+.env
+.env.*
+!.env.example

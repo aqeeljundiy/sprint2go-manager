@@ -662,7 +662,14 @@ function tooMany(key: string, max: number, windowMs: number) {
   attempts.set(key, list);
   return list.length > max;
 }
-const ipOf = (req: IncomingMessage) => String(req.headers['x-forwarded-for'] ?? req.socket.remoteAddress ?? '').split(',')[0].trim();
+/**
+ * The client's address for rate limits. Behind the proxy (Traefik) the last X-Forwarded-For entry is the one the proxy
+ * added; anything before it was sent by the client and can be anything, so it never decides a limit.
+ */
+const ipOf = (req: IncomingMessage) => {
+  const fwd = String(req.headers['x-forwarded-for'] ?? '').split(',').map((s) => s.trim()).filter(Boolean);
+  return fwd.length ? fwd[fwd.length - 1] : String(req.socket.remoteAddress ?? '');
+};
 /** The largest single upload (S2G_MAX_UPLOAD_MB, 2 GB unless set); a company's storage left can lower it. */
 const MAX_UPLOAD = Math.max(1, Number(process.env.S2G_MAX_UPLOAD_MB) || 2048) * 1024 * 1024;
 const mb = (n: number) => (n >= 1024 ** 3 ? `${+(n / 1024 ** 3).toFixed(1)} GB` : `${Math.max(0, Math.round(n / 1024 ** 2))} MB`);
@@ -708,7 +715,8 @@ const newCode = () => String(randomInt(0, 1_000_000)).padStart(6, '0');
 async function sendCode(to: string, what: 'signup' | 'reset' | 'backup', code: string, l: lang.Lang) {
   const m = codeMail(what, code, l);
   const sent = await mailer.sendNote(to, m.subject, m.text, m.html).catch((e) => (console.error('[mail]', e instanceof Error ? e.message : e), false));
-  if (!sent) console.log(`Code for ${to} (${what === 'signup' ? 'finish signing up' : 'set a new password'}): ${code}`);
+  // Codes in the log only while developing: in production, anyone who can read the logs could use them.
+  if (!sent && process.env.NODE_ENV !== 'production') console.log(`Code for ${to} (${what === 'signup' ? 'finish signing up' : 'set a new password'}): ${code}`);
   return sent;
 }
 
@@ -1233,14 +1241,19 @@ function serveStatic(req: IncomingMessage, res: ServerResponse, site = false) {
   }
   if (path === '/brand-icon' && branded) {
     const icon: string | undefined = branded.whiteLabel.logo ?? branded.logo;
-    const m = icon?.match(/^data:(image\/[\w+.-]+);base64,(.+)$/);
+    // Raster only: an SVG logo served at our address could carry script.
+    const m = icon?.match(/^data:(image\/(?:png|jpe?g|gif|webp));base64,(.+)$/);
     if (m) return (res.setHeader('content-type', m[1]), res.end(Buffer.from(m[2], 'base64')));
   }
   // The front door: people who aren't signed in see the landing page; /welcome always shows it.
   // At a company's own address there's no landing page: its clients go straight to the branded sign-in.
   const signedIn = !!db.sessionUser(cookie(req, 's2g'));
   // Our own work board (public/backlog): for people signed in, never at a company's address.
-  if ((path === '/backlog' || path === '/backlog/') && signedIn && !branded && !site) file = join(DIST, 'backlog', 'index.html');
+  // Every /backlog path (the page and its data.json): signed-in people only, never at a company's own address.
+  if (path === '/backlog' || path.startsWith('/backlog/')) {
+    if (!signedIn || branded || site) return (res.writeHead(404), res.end());
+    if (path === '/backlog' || path === '/backlog/') file = join(DIST, 'backlog', 'index.html');
+  }
   // With a separate marketing site, the app's own address opens on sign-in, not the landing page.
   if (((path === '/' && (site || (!SITE_HOST && !signedIn))) || path === '/welcome') && !branded) {
     file = join(DIST, 'landing.html');
@@ -1755,7 +1768,8 @@ connector.init({
 
 /* ---------- routes ---------- */
 
-createServer(async (req, res) => {
+// One request that throws (a malformed address, a bug) answers 400 or 500; it never takes the server, mail included, down.
+const handle = async (req: IncomingMessage, res: ServerResponse) => {
   lang.answering(req, res); // errors go back in the language the asker's screen speaks
   const url = new URL(req.url ?? '/', 'http://localhost');
   const p = url.pathname;
@@ -1923,7 +1937,8 @@ createServer(async (req, res) => {
     // Forgot the password: a code by email, then a new password. Every session of that account ends.
     if (p === '/api/reset' && req.method === 'POST') {
       const mail = String((await body(req)).email ?? '').trim().toLowerCase();
-      if (tooMany(`reset:${ipOf(req)}`, 10, 60 * 60_000)) return json(res, 429, { error: mark('Too many attempts. Try again later.') });
+      // Per address too: no one fills someone's inbox with reset codes from many places.
+      if (tooMany(`reset:${ipOf(req)}`, 10, 60 * 60_000) || (mail && tooMany(`reset-to:${mail}`, 5, 60 * 60_000))) return json(res, 429, { error: mark('Too many attempts. Try again later.') });
       const login = mail && db.findLogin(mail);
       // The answer is the same whether the email is known or not.
       if (login) {
@@ -3634,6 +3649,13 @@ createServer(async (req, res) => {
     // Never leak keys or raw upstream errors.
     json(res, status, { error: err instanceof AIError ? err.message : status === 503 ? 'AI is busy, try again shortly.' : 'Something went wrong.' });
   }
+};
+createServer((req, res) => {
+  handle(req, res).catch((e) => {
+    console.error('[http]', req.method, (req.url ?? '').slice(0, 200), e instanceof Error ? e.message : e);
+    if (!res.headersSent) res.writeHead(e instanceof URIError ? 400 : 500, { 'content-type': 'text/plain' });
+    res.end();
+  });
 }).listen(PORT, HOST, () => {
   const mailPath = mailer.systemMailPath();
   console.log(`sprint2go on http://localhost:${PORT}${mailPath === 'ses' ? ' (email through Amazon SES)' : mailPath === 'own' ? ` (email from ${mailer.NOREPLY} through our mail server)` : ' (no email: codes go to this log)'}`);
