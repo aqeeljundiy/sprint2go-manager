@@ -120,7 +120,7 @@
     position: absolute;
     top: 0;
     left: 68px;
-    right: 0;
+    right: 16px;
     height: 1px;
     background: var(--line);
   }
@@ -273,10 +273,10 @@
     padding-top: 4px;
   }
   /* Drawer: 44px+ rows, the active pill inside the gutter. */
-  .sidebar:has(.storage-row) .nav-item {
+  .sidebar:has(.d-new-nav) .nav-item {
     min-height: var(--row-1);
   }
-  .sidebar:has(.storage-row) .nav {
+  .sidebar:has(.d-new-nav) .nav {
     padding-right: 8px;
   }
   /* Preview: 44px buttons, 12px captions, the card on the 16px gutter. */
@@ -285,8 +285,8 @@
     height: var(--tap);
   }
   .lb-doc {
-    margin-left: 8px;
-    margin-right: 8px;
+    margin-left: 16px;
+    margin-right: 16px;
   }
   .lb-doc > strong,
   .lb-doc > span:not(.ficon) {
@@ -447,3 +447,76 @@
 }
 .drive-pane .d-tr:focus-within:has(.rename-input),
 .drive-pane .file-card:focus-within:has(.rename-input) { box-shadow: inset 0 0 0 2px var(--accent); }
+
+/* Drive round 4. */
+/* Touch tablets have no hover: the star and trash buttons stay in view (P110). */
+@media (min-width: 768px) and (hover: none) {
+  .drive-pane .d-actions { opacity: 1; transform: none; }
+  .drive-pane .folder-card .d-actions { transform: translateY(-50%); }
+}
+.d-danger:hover { color: var(--danger); }
+/* Sortable list header (P115). */
+.d-sort-h {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  justify-self: start;
+  min-height: 24px;
+  padding: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: var(--text-3);
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.d-sort-h:hover,
+.d-sort-h.on { color: var(--text); }
+.d-sort-btn { display: inline-flex; align-items: center; gap: 4px; }
+/* Search results get a Location column (P124). */
+.d-table.d-search .d-tr { grid-template-columns: minmax(0, 1fr) minmax(0, 180px) 140px 90px 80px; }
+.d-loc { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.d-trash-note { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.d-empty-trash { flex: none; color: var(--danger); font-weight: 600; }
+.d-show-more { display: flex; margin: 16px auto 0; }
+.d-confirm { display: grid; gap: 16px; padding: 0 16px 16px; }
+.d-confirm p { margin: 0; color: var(--text-2); }
+.d-confirm-actions { display: flex; justify-content: flex-end; gap: 8px; }
+/* The viewer: the next file slides in from its side (P120). */
+.lb-stage.from-right { animation: lbFromRight 0.2s var(--ease-out-motion) backwards; }
+.lb-stage.from-left { animation: lbFromLeft 0.2s var(--ease-out-motion) backwards; }
+.lb-stage { transition: transform 0.2s var(--ease); }
+@keyframes lbFromRight { from { opacity: 0; transform: translateX(24px); } }
+@keyframes lbFromLeft { from { opacity: 0; transform: translateX(-24px); } }
+.lightbox { transition: background-color 0.2s; }
+@media (prefers-reduced-motion: reduce) {
+  .lb-stage,
+  .lb-stage.from-left,
+  .lb-stage.from-right { animation: none; transition: none; }
+}
+@media (max-width: 767px) {
+  .d-new-nav { display: none; } /* "+" makes folders on phones (MA6-8) */
+  .dp-sort-btn:disabled,
+  .dp-layout:disabled { opacity: 0.4; }
+  .dp-empty-trash { margin: 0 -8px 0 0; color: var(--danger); font-weight: 600; }
+  .dp-tile .fc-text { width: 100%; }
+  .dp-tile-text { display: grid; gap: 2px; min-width: 0; }
+  .dp-tile .d-name .dp-star { display: inline; margin-right: 4px; vertical-align: -1px; }
+  .dp-tile-date { font: var(--t-secondary); color: var(--text-3); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .dp-show-more { display: block; width: calc(100% - 32px); min-height: var(--tap); margin: 8px 16px 0; border-radius: var(--r-pill); background: var(--surface-2); font: var(--t-segment); color: var(--text); transition: background 0.15s; }
+  .dp-show-more:active { background: var(--hover); }
+  .d-confirm-actions > * { flex: 1; justify-content: center; min-height: var(--tap); }
+}
+/* Details on computers, in a centred sheet (P116). */
+.d-details { display: grid; gap: 16px; padding: 0 0 8px; }
+.d-details .dp-menu-head { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.d-details .dp-icon { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: var(--r-tile); overflow: hidden; }
+.d-details .dp-photo img { width: 100%; height: 100%; object-fit: cover; }
+.d-details .dp-text { display: grid; min-width: 0; }
+.d-details .dp-name { font-weight: 600; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.d-details .dp-meta { font-size: var(--fs-secondary); color: var(--text-3); }
+
+/* The phone drawer already says Drive in its header: no second "Drive" heading over the sections. */
+:root.phone-sidebar .sidebar .d-sections-head {
+  display: none;
+}

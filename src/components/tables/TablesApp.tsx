@@ -1,13 +1,13 @@
 import { Sheet } from '../ui/Sheet';
 import { useState } from 'react';
-import { ChevronRight, Link2, Menu, Plus, Table2, X } from 'lucide-react';
+import { ChevronRight, Link2, Menu, Pencil, Plus, Table2, Trash2, X } from 'lucide-react';
 import { useActionMenu } from '../ui/ActionSheet';
 import { toast } from '../../toast';
 import { Group } from '../ui/Grouped';
 import { usePhone } from '../../mobile/media';
 import type { Client, DataTable, TableRow } from '../../types';
 import { term } from '../../terms';
-import { uid } from '../../utils';
+import { relative, uid } from '../../utils';
 import { SmoothHeight } from '../ui/Smooth';
 import { ProjectPicker } from '../ProjectPicker';
 import { TABLE_COLORS, TEMPLATES, templateFields, type TemplateId } from './fields';
@@ -58,7 +58,7 @@ export function TablesSidebar({ tables, clients, current, onOpen, onNew }: { tab
 
 export function NewTableDialog({ clients, clientId: startClient, onCreate, onClose }: { clients: Client[]; clientId?: string; onCreate: (d: { name: string; clientId?: string; template: TemplateId }) => void; onClose: () => void }) {
   const phoneSheet = usePhone();
-  const [template, setTemplate] = useState<TemplateId>('leads');
+  const [template, setTemplate] = useState<TemplateId>('blank'); // a quick list starts blank, as in Notion; the templates sit right there
   const [clientId, setClientId] = useState(startClient ?? '');
   const tplName = TEMPLATES.find((x) => x.id === template)!.name;
   const project = clients.find((c) => c.id === clientId);
@@ -135,18 +135,65 @@ export function makeTable(d: { name: string; clientId?: string; template: Templa
 
 /* ---------- a project's tables (its Tables tab) ---------- */
 
-export function ProjectTables({ tables, rows, onOpen, onNew, bare }: { tables: DataTable[]; rows: TableRow[]; onOpen: (id: string) => void; onNew: () => void; bare?: boolean }) {
-  // Right-click a table's card: open it, or copy a link to it to paste in chat or mail.
+/** What a table's card or row offers when right-clicked or held: open, copy a link, rename, delete (with Undo). */
+type TableActions = { onOpen: (id: string) => void; onRename?: (id: string, name: string) => void; onDelete?: (id: string) => void };
+function useTableMenu({ onOpen, onRename, onDelete }: TableActions) {
   const [hit, setHit] = useState<DataTable | null>(null);
-  const cardMenu = useActionMenu(() =>
-    !hit
-      ? []
-      : [
-          { label: t('Open'), icon: ChevronRight, run: () => onOpen(hit.id) },
-          { label: t('Copy link'), icon: Link2, run: () => void navigator.clipboard?.writeText(tableLink(hit.id)).then(() => toast({ text: t('Link copied') })) },
-        ],
+  const [renaming, setRenaming] = useState<DataTable | null>(null);
+  const menu = useActionMenu(
+    () =>
+      !hit
+        ? []
+        : [
+            { label: t('Open'), icon: ChevronRight, run: () => onOpen(hit.id) },
+            { label: t('Copy link'), icon: Link2, run: () => void navigator.clipboard?.writeText(tableLink(hit.id)).then(() => toast({ text: t('Link copied') })) },
+            ...(onRename ? [{ label: t('Rename'), icon: Pencil, run: () => setRenaming(hit) }] : []),
+            ...(onDelete ? [{ label: t('Delete'), icon: Trash2, danger: true, group: 'end', run: () => onDelete(hit.id) }] : []),
+          ],
     { title: hit?.name },
   );
+  const bind = (tb: DataTable) => ({ ...menu.bind, onContextMenu: (e: React.MouseEvent<HTMLElement>) => (setHit(tb), menu.bind.onContextMenu(e)), onPointerDown: (e: React.PointerEvent<HTMLElement>) => (setHit(tb), menu.bind.onPointerDown?.(e)) });
+  const extra = (
+    <>
+      {menu.menu}
+      {renaming && onRename && <RenameSheet name={renaming.name} onSave={(name) => onRename(renaming.id, name)} onClose={() => setRenaming(null)} />}
+    </>
+  );
+  return { bind, extra };
+}
+
+function RenameSheet({ name, onSave, onClose }: { name: string; onSave: (name: string) => void; onClose: () => void }) {
+  const [v, setV] = useState(name);
+  const save = () => (v.trim() && v.trim() !== name && onSave(v.trim()), onClose());
+  return (
+    <Sheet
+      title={t('Rename table')}
+      onClose={onClose}
+      footer={
+        <>
+          <button type="button" className="ghost-btn" onClick={onClose}>
+            {t('Cancel')}
+          </button>
+          <button type="button" className="primary-btn" disabled={!v.trim()} onClick={save}>
+            {t('Save')}
+          </button>
+        </>
+      }
+    >
+      <input className="input" autoFocus value={v} aria-label={t('Table name')} onChange={(e) => setV(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && save()} />
+    </Sheet>
+  );
+}
+
+/** "Edited 2 hours ago": the newest row change, or when the table was made. */
+function editedAgo(tb: DataTable, rows: TableRow[]) {
+  const last = rows.reduce((m, r) => (r.tableId === tb.id && r.updatedAt > m ? r.updatedAt : m), tb.createdAt);
+  return t('Edited {when}', { when: relative(last) });
+}
+
+export function ProjectTables({ tables, rows, onOpen, onNew, onRename, onDelete, bare }: { tables: DataTable[]; rows: TableRow[]; onOpen: (id: string) => void; onNew: () => void; bare?: boolean } & Omit<TableActions, 'onOpen'>) {
+  // Right-click a table's card: open it, copy a link to it, rename or delete it.
+  const cardMenu = useTableMenu({ onOpen, onRename, onDelete });
   if (!tables.length)
     return (
       <EmptyState
@@ -170,21 +217,20 @@ export function ProjectTables({ tables, rows, onOpen, onNew, bare }: { tables: D
       </div>}
       <div className="tb-cards">
         {tables.map((tb, i) => {
-          const n = rows.filter((r) => r.tableId === tb.id).length;
           return (
-            <button key={tb.id} className="tb-table-card" style={{ ['--i' as string]: i }} onClick={() => onOpen(tb.id)} {...cardMenu.bind} onContextMenu={(e) => (setHit(tb), cardMenu.bind.onContextMenu(e))} onPointerDown={(e) => (setHit(tb), cardMenu.bind.onPointerDown?.(e))}>
+            <button key={tb.id} className="tb-table-card" style={{ ['--i' as string]: i }} onClick={() => onOpen(tb.id)} {...cardMenu.bind(tb)}>
               <span className="client-badge" style={{ background: tb.color }}>
                 {tb.name.charAt(0).toUpperCase()}
               </span>
               <span className="tb-tc-text">
                 <strong>{tb.name}</strong>
-                <small>{tb.description || `${tn(n, '{n} row', '{n} rows')} · ${tn(tb.fields.length, '{n} field', '{n} fields')}`}</small>
+                <small>{tb.description || editedAgo(tb, rows)}</small>
               </span>
             </button>
           );
         })}
       </div>
-      {cardMenu.menu}
+      {cardMenu.extra}
     </div>
   );
 }
@@ -192,11 +238,12 @@ export function ProjectTables({ tables, rows, onOpen, onNew, bare }: { tables: D
 /* ---------- the table screen ---------- */
 
 /** Tables with none open: every table as a card (company first, then each project's), or how to start. */
-export function TablesHome({ tables, rows, clients, onOpen, onNew, onMenu }: { tables: DataTable[]; rows: TableRow[]; clients: Client[]; onOpen: (id: string) => void; onNew: () => void; onMenu: () => void }) {
+export function TablesHome({ tables, rows, clients, onOpen, onNew, onMenu, onRename, onDelete }: { tables: DataTable[]; rows: TableRow[]; clients: Client[]; onOpen: (id: string) => void; onNew: () => void; onMenu: () => void } & Omit<TableActions, 'onOpen'>) {
   useCreateAction('tables', { label: t('New table'), icon: Plus, run: onNew });
   useTableLinkOpen(null, onOpen); // a link to a table, a view or a row
   const groups = [{ id: '', name: t('Company'), list: tables.filter((tb) => !tb.clientId) }, ...clients.map((c) => ({ id: c.id, name: c.name, list: tables.filter((tb) => tb.clientId === c.id) }))].filter((g) => g.list.length);
   const phone = usePhone();
+  const rowMenu = useTableMenu({ onOpen, onRename, onDelete }); // phones: hold a row
   // Phones: Notion's home, as iOS grouped rows under who they belong to: the table's tile, its name, how many rows.
   if (phone && tables.length)
     return (
@@ -205,17 +252,19 @@ export function TablesHome({ tables, rows, clients, onOpen, onNew, onMenu }: { t
           {groups.map((g) => (
             <Group key={g.id || 'company'} title={g.name}>
               {g.list.map((tb) => (
-                <button key={tb.id} type="button" className="g-row has-icon tb-home-row" onClick={() => onOpen(tb.id)}>
+                <button key={tb.id} type="button" className="g-row has-icon tb-home-row" onClick={() => onOpen(tb.id)} {...rowMenu.bind(tb)}>
                   <IconTile letter={tb.name} color={tb.color} size={32} className="tb-home-tile" />
                   <span className="g-label">
                     <span className="g-text">{tb.name}</span>
                   </span>
+                  <span className="g-val">{tn(rows.filter((r) => r.tableId === tb.id).length, '{n} row', '{n} rows')}</span>
                   <ChevronRight size={18} className="g-chev" aria-hidden />
                 </button>
               ))}
             </Group>
           ))}
         </div>
+        {rowMenu.extra}
       </section>
     );
   return (
@@ -226,11 +275,8 @@ export function TablesHome({ tables, rows, clients, onOpen, onNew, onMenu }: { t
         </button>
         <div className="th-text">
           <h1>{t('Tables')}</h1>
-          <p>{t('Your own databases: leads, pipelines, lists of anything. Your columns, as a grid or a board.')}</p>
         </div>
-        <button className="primary-btn sm" onClick={onNew}>
-          <Plus size={14} /> {t('New table')}
-        </button>
+        {/* No New table here: the sidebar's button is the one way in (as in Drive). */}
       </header>
       <div className="tracking-scroll">
         {!tables.length ? (
@@ -240,7 +286,8 @@ export function TablesHome({ tables, rows, clients, onOpen, onNew, onMenu }: { t
             text={t('Start from Leads, a content pipeline or a blank table. Add your own columns any time.')}
             action={
               // Phones: the create button is the one way in, so no second "New table" here.
-              !phone && <button className="primary-btn sm" onClick={onNew}>
+              // With the sidebar open its New table is the one button (tables.css hides this one).
+              !phone && <button className="primary-btn sm tb-empty-new" onClick={onNew}>
                 <Plus size={14} /> {t('New table')}
               </button>
             }
@@ -249,7 +296,7 @@ export function TablesHome({ tables, rows, clients, onOpen, onNew, onMenu }: { t
           groups.map((g) => (
             <div key={g.id || 'company'} className="tb-home-group">
               <h3 className="tb-home-group-head">{g.name}</h3>
-              <ProjectTables tables={g.list} rows={rows} onOpen={onOpen} onNew={onNew} bare />
+              <ProjectTables tables={g.list} rows={rows} onOpen={onOpen} onNew={onNew} onRename={onRename} onDelete={onDelete} bare />
             </div>
           ))
         )}

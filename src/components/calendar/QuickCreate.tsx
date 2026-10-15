@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState, type RefObject } from 'react';
-import { Users, X } from 'lucide-react';
+import { CalendarDays, Users, X } from 'lucide-react';
 import type { CalEvent, CalendarDef, Person, User } from '../../types';
 import { fmtTimeRange } from '../../calendarUtils';
 import { Sheet } from '../ui/Sheet';
 import { ActionSheet } from '../ui/ActionSheet';
+import { Select } from '../ui/Select';
+import { calLabel } from '../../data/calendar';
 import { GuestPicker } from './GuestPicker';
 import { draftEvent, draftOf, type Draft } from './EventForm';
 import { t, tx } from '../../i18n';
@@ -39,10 +41,12 @@ export function QuickCreate({
 }) {
   const [title, setTitle] = useState('');
   const [guests, setGuests] = useState<Person[]>([]);
-  const draft: Draft = { ...draftOf(quick.start, quick.end, calendars[0].id), title, guests };
+  const [kind, setKind] = useState<'event' | 'task'>('event');
+  const [calendarId, setCalendarId] = useState(calendars[0].id);
+  const draft: Draft = { ...draftOf(quick.start, quick.end, calendarId), kind, title, guests: kind === 'task' ? [] : guests };
   const valid = !!title.trim();
-  const save = () => valid && onSave(draftEvent(draft), 'event');
-  const more = () => onMore({ title, guests });
+  const save = () => valid && onSave(draftEvent(draft), kind);
+  const more = () => onMore({ kind, title, calendarId, guests: draft.guests });
   const [asking, setAsking] = useState(false);
   const close = () => (title.trim() ? setAsking(true) : onClose());
 
@@ -87,6 +91,13 @@ export function QuickCreate({
         }
       >
         <div ref={box} className="quick-body">
+          <div className="segmented qc-kind" role="group" aria-label={t('Event or task')}>
+            {(['event', 'task'] as const).map((k) => (
+              <button key={k} type="button" className={kind === k ? 'on' : ''} aria-pressed={kind === k} onClick={() => setKind(k)}>
+                {k === 'event' ? t('Event') : t('Task')}
+              </button>
+            ))}
+          </div>
           <input
             ref={titleRef}
             className="qc-title"
@@ -100,13 +111,30 @@ export function QuickCreate({
           <button type="button" className="qc-when" onClick={more} aria-label={t('{when}. More options', { when: `${fmtDate(quick.start, { weekday: 'short', day: 'numeric', month: 'short' })}, ${fmtTimeRange(quick.start, quick.end)}` })}>
             {fmtDate(quick.start, { weekday: 'short', day: 'numeric', month: 'short' })} · {fmtTimeRange(quick.start, quick.end)}
           </button>
-          <div className="er-row top qc-guests">
-            <span className="er-icon">
-              <Users size={20} />
-            </span>
-            <div className="er-body">
-              <GuestPicker value={guests} onChange={setGuests} team={team} contacts={contacts} me={me} rows />
+          {kind === 'event' && (
+            <div className="er-row top qc-guests">
+              <span className="er-icon">
+                <Users size={20} />
+              </span>
+              <div className="er-body">
+                <GuestPicker value={guests} onChange={setGuests} team={team} contacts={contacts} me={me} rows />
+              </div>
             </div>
+          )}
+          {calendars.length > 1 && (
+            <div className="er-row qc-cal">
+              <span className="er-icon">
+                <CalendarDays size={20} />
+              </span>
+              <div className="er-body">
+                <Select value={calendarId} onChange={setCalendarId} options={calendars.map((c) => ({ value: c.id, label: calLabel(c), icon: <i className="qc-dot" style={{ background: c.color }} /> }))} label={t('Calendar')} title={t('Calendar')} className="er-sel" />
+              </div>
+            </div>
+          )}
+          <div className="qc-foot">
+            <button type="button" className="link-btn qc-more" onClick={more}>
+              {t('More options')}
+            </button>
           </div>
         </div>
       </Sheet>

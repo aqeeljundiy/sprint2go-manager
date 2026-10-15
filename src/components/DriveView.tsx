@@ -32,7 +32,7 @@ interface Props {
   onStar: (id: string) => void;
   onTrash: (id: string) => void;
   onRestore: (id: string) => void;
-  onDeleteForever: (id: string) => void;
+  onDeleteForever: (id: string | string[]) => void;
   onStartRename: (id: string) => void;
   onRename: (id: string, name: string | null) => void;
   onPickFiles: () => void;
@@ -78,26 +78,50 @@ export function DriveView(props: Props) {
 
   const live = items.filter((i) => !i.trashed);
   const q = query.trim().toLowerCase();
+  // The same per-place order as phones (P115): Name, Modified or Size from the list header.
+  const [sorts, setSorts] = usePersisted<Record<string, Sort>>('pm-drive-sorts', {});
+  const sort: Sort = sorts[section] ?? defaultSort(section);
+  const sortBy = (by: Sort['by']) => setSorts((x) => ({ ...x, [section]: sort.by === by ? { by, dir: sort.dir === 1 ? -1 : 1 } : { by, dir: by === 'name' ? 1 : -1 } }));
+  const [recentAll, setRecentAll] = useState(false);
+  const recentMore = section === 'recent' && !q && !recentAll && live.filter((i) => i.kind !== 'folder').length > RECENT;
 
   const shown = useMemo(() => {
-    if (q) return live.filter((i) => i.name.toLowerCase().includes(q)).sort(byName);
+    if (q) return live.filter((i) => i.name.toLowerCase().includes(q)).sort(sorter(sort));
     switch (section) {
       case 'my':
-        return live.filter((i) => i.parentId === folderId && !i.id.startsWith('att:')).sort(byName);
+        return live.filter((i) => i.parentId === folderId && !i.id.startsWith('att:')).sort(sorter(sort));
       case 'recent':
-        return live.filter((i) => i.kind !== 'folder').sort(byDate).slice(0, 30);
+        return live.filter((i) => i.kind !== 'folder').sort(byDate).slice(0, recentAll ? undefined : RECENT).sort(sorter(sort));
       case 'media':
-        return live.filter((i) => i.kind === 'image' || i.kind === 'video').sort(byDate);
+        return live.filter((i) => i.kind === 'image' || i.kind === 'video').sort(sorter(sort));
       case 'email':
-        return live.filter((i) => i.id.startsWith('att:')).sort(byDate);
+        return live.filter((i) => i.id.startsWith('att:')).sort(sorter(sort));
       case 'starred':
-        return live.filter((i) => i.starred).sort(byName);
+        return live.filter((i) => i.starred).sort(sorter(sort));
       case 'shared':
-        return live.filter(sharedWithMe).sort(byDate);
+        return live.filter(sharedWithMe).sort(sorter(sort));
       case 'trash':
         return items.filter((i) => i.trashed).sort(byDate);
     }
-  }, [items, section, folderId, q]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [items, section, folderId, q, sort.by, sort.dir, recentAll]); // eslint-disable-line react-hooks/exhaustive-deps
+  /** Where a file lives, for search results (P124). */
+  const pathOf = (f: DriveItem) => {
+    if (f.id.startsWith('att:')) return t('From email');
+    const names: string[] = [t('My Drive')];
+    for (let x = f.parentId, n = 0; x && n < 20; n++) {
+      const p = items.find((i) => i.id === x);
+      if (!p) break;
+      names.splice(1, 0, p.name);
+      x = p.parentId;
+    }
+    return names.join(' / ');
+  };
+  const emptyTrash = () => {
+    const ids = items.filter((i) => i.trashed).map((i) => i.id);
+    if (ids.length) props.onDeleteForever(ids);
+    setConfirmEmpty(false);
+  };
+  const [confirmEmpty, setConfirmEmpty] = useState(false);
 
   const folders = shown.filter((i) => i.kind === 'folder');
   const files = shown.filter((i) => i.kind !== 'folder');
@@ -127,8 +151,8 @@ export function DriveView(props: Props) {
         <button className="icon-btn sm" title={t('Restore')} onClick={() => props.onRestore(i.id)}>
           <RotateCcw size={14} />
         </button>
-        <button className="icon-btn sm" title={t('Delete forever')} onClick={() => props.onDeleteForever(i.id)}>
-          <X size={14} />
+        <button className="icon-btn sm d-danger" title={t('Delete forever')} onClick={() => props.onDeleteForever(i.id)}>
+          <Trash2 size={14} />
         </button>
       </>
     ) : i.id.startsWith('att:') ? (
@@ -168,7 +192,7 @@ export function DriveView(props: Props) {
     if (section === 'trash')
       return [
         { label: t('Restore'), icon: RotateCcw, run: () => props.onRestore(i.id) },
-        { label: t('Delete forever'), icon: X, danger: true, group: 'end', run: () => props.onDeleteForever(i.id) },
+        { label: t('Delete forever'), icon: Trash2, danger: true, group: 'end', run: () => props.onDeleteForever(i.id) },
       ];
     const own = !i.id.startsWith('att:');
     const canLink = !!i.url && !i.url.startsWith('data:');
@@ -180,6 +204,7 @@ export function DriveView(props: Props) {
       ...(own ? [{ label: i.starred ? t('Remove star') : t('Star'), icon: Star, group: 'file', run: () => props.onStar(i.id) }] : []),
       ...(own ? [{ label: t('Rename'), icon: PenLine, group: 'file', run: () => props.onStartRename(i.id) }] : []),
       ...(own && props.onMove ? [{ label: t('Move to folder'), icon: FolderInput, group: 'file', run: () => setMoving(i) }] : []),
+      { label: t('Details'), icon: Info, group: 'file', run: () => setDetails(i) },
       ...(own ? [{ label: t('Move to trash'), icon: Trash2, danger: true, group: 'end', run: () => props.onTrash(i.id) }] : []),
     ];
   };
@@ -220,7 +245,7 @@ export function DriveView(props: Props) {
       const by = i.uploadedBy === props.me ? t('You uploaded') : who(i) ? t('{name} uploaded', { name: who(i) }) : '';
       return [by, fmtDay(i.modified), fmtSize(i.size)].filter(Boolean).join(' · ');
     };
-    const phoneMenu = (i: DriveItem) => (): SheetAction[] => {
+    const phoneMenu = (i: DriveItem, list: DriveItem[]) => (): SheetAction[] => {
       if (section === 'trash') return menuFor(i)();
       const own = !i.id.startsWith('att:');
       const canLink = !!i.url && !i.url.startsWith('data:');
@@ -232,7 +257,7 @@ export function DriveView(props: Props) {
             { label: t('Move to trash'), icon: Trash2, danger: true, group: 'end', run: () => props.onTrash(i.id) },
           ]
         : [
-            { label: t('Open'), icon: Eye, run: () => props.onOpen(i, [i]) },
+            { label: t('Open'), icon: Eye, run: () => props.onOpen(i, list.filter((x) => x.kind !== 'folder')) },
             ...(canLink ? [{ label: t('Share link'), icon: Link2, run: () => shareLink(i) }] : []),
             ...(i.url ? [{ label: t('Download'), icon: Download, run: () => download(i) }] : []),
             ...(own ? [{ label: i.starred ? t('Remove star') : t('Star'), icon: Star, run: () => props.onStar(i.id) }] : []),
@@ -245,8 +270,9 @@ export function DriveView(props: Props) {
     };
     return (
       <>
-        <DrivePhone {...props} live={live} q={q} query={query} setQuery={setQuery} crumbs={crumbs} sectionName={sectionName} menuFor={phoneMenu} onNew={() => setNewOpen(true)} open={(i, list) => (i.kind === 'folder' ? props.onFolder(i.id) : props.onOpen(i, list))} meta={phoneMeta} />
+        <DrivePhone {...props} live={live} q={q} query={query} setQuery={setQuery} crumbs={crumbs} sectionName={sectionName} menuFor={phoneMenu} onNew={() => setNewOpen(true)} onEmptyTrash={() => setConfirmEmpty(true)} open={(i, list) => (i.kind === 'folder' ? props.onFolder(i.id) : props.onOpen(i, list))} meta={phoneMeta} />
         <ActionSheet open={newOpen} onClose={() => setNewOpen(false)} title={t('New')} actions={newActions} />
+        {confirmEmpty && <EmptyTrashSheet count={items.filter((i) => i.trashed).length} onConfirm={emptyTrash} onClose={() => setConfirmEmpty(false)} />}
         {naming && (
           <NameSheet
             title={naming.kind === 'new' ? t('New folder') : t('Rename')}
@@ -339,6 +365,7 @@ export function DriveView(props: Props) {
             </button>
           )}
         </label>
+        {layout === 'grid' && section !== 'trash' && <SortButton sort={sort} onSort={sortBy} />}
         <div className="segmented icon-seg">
           <button className={layout === 'grid' ? 'on' : ''} onClick={() => setLayout('grid')} title={t('Grid')}>
             <LayoutGrid size={15} />
@@ -356,7 +383,14 @@ export function DriveView(props: Props) {
             <Mail size={14} /> {t('Attachments from your emails appear here automatically.')}
           </p>
         )}
-        {section === 'trash' && shown.length > 0 && <p className="drive-note">{t('Items in trash are deleted forever after 30 days.')}</p>}
+        {section === 'trash' && shown.length > 0 && (
+          <p className="drive-note d-trash-note">
+            <span>{t('Items in trash are deleted forever after 30 days.')}</span>
+            <button type="button" className="link-btn d-empty-trash" onClick={() => setConfirmEmpty(true)}>
+              {t('Empty trash')}
+            </button>
+          </p>
+        )}
 
         {shown.length === 0 ? (
           <EmptyState
@@ -366,11 +400,18 @@ export function DriveView(props: Props) {
             text={q ? t('Nothing matches “{q}”.', { q: query.trim() }) : section === 'trash' ? '' : phone ? t('Tap + to add files.') : t('Drag files here or press Upload.')}
           />
         ) : layout === 'list' ? (
-          <div className="d-table">
+          <div className={`d-table ${q ? 'd-search' : ''}`}>
             <div className="d-tr d-th">
-              <span>{t('Name')}</span>
-              <span className="hide-mobile">{t('Modified')}</span>
-              <span className="hide-mobile">{t('Size')}</span>
+              {([['name', t('Name')], ...(q ? [['loc', t('Location')]] : []), ['modified', t('Modified')], ['size', t('Size')]] as [Sort['by'] | 'loc', string][]).map(([by, label]) =>
+                by === 'loc' || section === 'trash' ? (
+                  <span key={by} className={by === 'name' ? '' : 'hide-mobile'}>{label}</span>
+                ) : (
+                  <button key={by} type="button" className={`d-sort-h ${by === 'name' ? '' : 'hide-mobile'} ${sort.by === by ? 'on' : ''}`} onClick={() => sortBy(by)} aria-sort={sort.by === by ? (sort.dir === 1 ? 'ascending' : 'descending') : undefined}>
+                    {label}
+                    {sort.by === by && (sort.dir === 1 ? <ArrowUp size={12} /> : <ArrowDown size={12} />)}
+                  </button>
+                ),
+              )}
               <span />
             </div>
             {shown.map((i, n) => (
@@ -380,6 +421,7 @@ export function DriveView(props: Props) {
                   {name(i)}
                   {i.starred && section !== 'starred' && <Star size={12} className="star-mark" />}
                 </span>
+                {q && <span className="muted hide-mobile d-loc" title={pathOf(i)}>{pathOf(i)}</span>}
                 <span className="muted hide-mobile">{relative(i.modified)}</span>
                 <span className="muted hide-mobile">{i.kind === 'folder' ? '' : fmtSize(i.size)}</span>
                 <span className="d-actions" onClick={(e) => e.stopPropagation()}>
@@ -420,6 +462,7 @@ export function DriveView(props: Props) {
                         <span className="fc-text">
                           {name(f)}
                           <small>{meta(f)}</small>
+                          {q && <small className="d-loc">{t('in {place}', { place: pathOf(f) })}</small>}
                         </span>
                       ) : null}
                       <span className="d-actions" onClick={(e) => e.stopPropagation()}>
@@ -431,6 +474,11 @@ export function DriveView(props: Props) {
               </>
             )}
           </>
+        )}
+        {recentMore && shown.length > 0 && (
+          <button type="button" className="ghost-btn d-show-more" onClick={() => setRecentAll(true)}>
+            {t('Show more')}
+          </button>
         )}
       </div>
 
@@ -451,6 +499,14 @@ export function DriveView(props: Props) {
         />
       )}
       {moving && <MoveSheet item={moving} items={items} onMove={(parentId) => props.onMove?.(moving.id, parentId)} onClose={() => setMoving(null)} />}
+      {details && (
+        <Sheet title={t('Details')} onClose={() => setDetails(null)}>
+          <div className="d-details">
+            <DetailsBody item={details} items={items} who={details.uploadedBy ? (details.uploadedBy === props.me ? t('You') : (props.nameOf?.(details.uploadedBy) ?? '')) : ''} from={details.threadId ? props.senderOf(details.threadId) : undefined} />
+          </div>
+        </Sheet>
+      )}
+      {confirmEmpty && <EmptyTrashSheet count={items.filter((i) => i.trashed).length} onConfirm={emptyTrash} onClose={() => setConfirmEmpty(false)} />}
     </section>
   );
 }
@@ -497,6 +553,11 @@ const SORTS: { by: Sort['by']; label: string }[] = [
   { by: 'size', label: mark('Size') },
 ];
 
+/** My Drive and Starred by name, the rest newest first (Google Drive does the same). */
+const defaultSort = (section: DriveSection): Sort => (section === 'my' || section === 'starred' ? { by: 'name', dir: 1 } : { by: 'modified', dir: -1 });
+/** Recent shows this many, then "Show more" (P125). */
+const RECENT = 30;
+
 function sorter(s: Sort) {
   return (a: DriveItem, b: DriveItem) => {
     // Folders first, whichever way it's sorted (Drive does the same).
@@ -532,14 +593,15 @@ const TYPE_WORDS: Record<DriveItem['kind'], string> = {
   other: mark('File'),
 };
 
-function DrivePhone(props: Props & { live: DriveItem[]; q: string; query: string; setQuery: (q: string) => void; crumbs: DriveItem[]; sectionName: string; menuFor: (i: DriveItem) => () => SheetAction[]; onNew: () => void; open: (i: DriveItem, list: DriveItem[]) => void; meta: (i: DriveItem) => string }) {
+function DrivePhone(props: Props & { live: DriveItem[]; q: string; query: string; setQuery: (q: string) => void; crumbs: DriveItem[]; sectionName: string; menuFor: (i: DriveItem, list: DriveItem[]) => () => SheetAction[]; onNew: () => void; onEmptyTrash: () => void; open: (i: DriveItem, list: DriveItem[]) => void; meta: (i: DriveItem) => string }) {
   const { items, section, live, q, crumbs } = props;
   const [layout, setLayout] = usePersisted<'grid' | 'list'>('pm-drive-layout-phone', 'list');
   // Each place keeps its own order: My Drive and Starred by name, the rest newest first (Google Drive does the same).
   const [sorts, setSorts] = usePersisted<Record<string, Sort>>('pm-drive-sorts', {});
-  const sort: Sort = sorts[section] ?? (section === 'my' || section === 'starred' ? { by: 'name', dir: 1 } : { by: 'modified', dir: -1 });
+  const sort: Sort = sorts[section] ?? defaultSort(section);
   const setSort = (s: Sort) => setSorts((x) => ({ ...x, [section]: s }));
   const [sortOpen, setSortOpen] = useState(false);
+  const [recentAll, setRecentAll] = useState(false);
 
   const listIn = (folder: string | null): DriveItem[] => {
     if (q) return live.filter((i) => i.name.toLowerCase().includes(q)).sort(sorter(sort));
@@ -547,7 +609,7 @@ function DrivePhone(props: Props & { live: DriveItem[]; q: string; query: string
       case 'my':
         return live.filter((i) => i.parentId === folder && !i.id.startsWith('att:')).sort(sorter(sort));
       case 'recent':
-        return live.filter((i) => i.kind !== 'folder').sort(byDate).slice(0, 30).sort(sorter(sort));
+        return live.filter((i) => i.kind !== 'folder').sort(byDate).slice(0, recentAll ? undefined : RECENT).sort(sorter(sort));
       case 'media':
         return live.filter((i) => i.kind === 'image' || i.kind === 'video').sort(sorter(sort));
       case 'email':
@@ -573,65 +635,92 @@ function DrivePhone(props: Props & { live: DriveItem[]; q: string; query: string
       </span>
     );
 
+  const where = (f: DriveItem) => {
+    if (f.id.startsWith('att:')) return t('From email');
+    const names: string[] = [t('My Drive')];
+    for (let x = f.parentId, n = 0; x && n < 20; n++) {
+      const p = items.find((i) => i.id === x);
+      if (!p) break;
+      names.splice(1, 0, p.name);
+      x = p.parentId;
+    }
+    return names.join(' / ');
+  };
   const body = (folder: string | null) => {
     const list = listIn(folder);
     const files = list.filter((i) => i.kind !== 'folder');
+    const recentMore = section === 'recent' && !q && !recentAll && live.filter((i) => i.kind !== 'folder').length > RECENT;
+    // The sort row stays when a place is empty, so switching places never shifts the page (MA6-19).
+    const sortRow = (
+      <div className="dp-sort">
+        {sortable ? (
+          <button type="button" className="dp-sort-btn" disabled={!list.length} onClick={() => setSortOpen(true)}>
+            {t(SORTS.find((s) => s.by === (sort.by === 'size' && !files.length ? 'name' : sort.by))!.label)}
+            {sort.dir === 1 ? <ArrowUp size={15} /> : <ArrowDown size={15} />}
+          </button>
+        ) : (
+          <span className="dp-sort-note">{t('Deleted forever after 30 days')}</span>
+        )}
+        {section === 'trash' && list.length > 0 ? (
+          <button type="button" className="dp-sort-btn dp-empty-trash" onClick={props.onEmptyTrash}>
+            {t('Empty trash')}
+          </button>
+        ) : (
+          <button type="button" className="icon-btn dp-layout" disabled={!list.length} onClick={() => setLayout(layout === 'list' ? 'grid' : 'list')} aria-label={layout === 'list' ? t('Show as a grid') : t('Show as a list')}>
+            {layout === 'list' ? <LayoutGrid size={20} /> : <List size={20} />}
+          </button>
+        )}
+      </div>
+    );
     if (!list.length)
       return (
-        <EmptyState
-          icon={section === 'trash' ? <Trash2 size={24} /> : q ? <Search size={24} /> : section === 'starred' ? <Star size={24} /> : section === 'media' ? <ImageIcon size={24} /> : <Folder size={24} />}
-          title={q ? t('No files found') : section === 'trash' ? t('Trash is empty') : section === 'my' ? t('This folder is empty') : section === 'starred' ? t('No starred files') : section === 'media' ? t('No photos or videos yet') : t('Nothing here yet')}
-          action={
-            !q && section === 'my' && folder ? (
-              <button type="button" className="primary-btn" onClick={props.onNew}>
-                <Upload size={16} /> {t('Upload')}
-              </button>
-            ) : undefined
-          }
-          text={
-            q
-              ? t('Nothing matches “{q}”.', { q: props.query.trim() })
-              : section === 'my'
-                ? folder
-                  ? t('Add files or folders here')
-                  : t('Files you upload and folders you make live here. Files from chat and email stay in Recent and Shared.')
-                : section === 'media'
-                  ? t('Photos and videos you upload or receive show here.')
-                : section === 'starred'
-                  ? t('Star a file from its menu and it waits for you here.')
-                  : section === 'trash'
-                    ? t('Deleted files stay here for 30 days.')
-                    : section === 'shared'
-                      ? t('Files people send you in chat, by email or from a guest show here.')
-                      : t('Files you open, upload or get show here, newest first.')
-          }
-        />
+        <>
+          {sortRow}
+          <EmptyState
+            icon={section === 'trash' ? <Trash2 size={24} /> : q ? <Search size={24} /> : section === 'starred' ? <Star size={24} /> : section === 'media' ? <ImageIcon size={24} /> : section === 'email' ? <Mail size={24} /> : <Folder size={24} />}
+            title={q ? t('No files found') : section === 'trash' ? t('Trash is empty') : section === 'my' ? t('This folder is empty') : section === 'starred' ? t('No starred files') : section === 'media' ? t('No photos or videos yet') : t('Nothing here yet')}
+            action={
+              !q && section === 'my' ? (
+                <button type="button" className="primary-btn" onClick={props.onNew}>
+                  <Plus size={16} /> {t('New')}
+                </button>
+              ) : undefined
+            }
+            text={
+              q
+                ? t('Nothing matches “{q}”.', { q: props.query.trim() })
+                : section === 'my'
+                  ? folder
+                    ? t('Add files or folders here')
+                    : t('Upload files or make a folder to get started.')
+                  : section === 'media'
+                    ? t('Photos and videos you upload or receive show here.')
+                    : section === 'email'
+                      ? t('Attachments from your emails appear here automatically.')
+                      : section === 'starred'
+                        ? t('Star a file from its menu and it waits for you here.')
+                        : section === 'trash'
+                          ? t('Deleted files stay here for 30 days.')
+                          : section === 'shared'
+                            ? t('Files people send you in chat, by email or from a guest show here.')
+                            : t('Files you upload or open show here, newest first.')
+            }
+          />
+        </>
       );
     return (
       <>
-        <div className="dp-sort">
-          {sortable ? (
-            <button type="button" className="dp-sort-btn" onClick={() => setSortOpen(true)}>
-              {t(SORTS.find((s) => s.by === (sort.by === 'size' && !files.length ? 'name' : sort.by))!.label)}
-              {sort.dir === 1 ? <ArrowUp size={15} /> : <ArrowDown size={15} />}
-            </button>
-          ) : (
-            <span className="dp-sort-note">{section === 'trash' ? t('Deleted forever after 30 days') : t('Newest first')}</span>
-          )}
-          <button type="button" className="icon-btn dp-layout" onClick={() => setLayout(layout === 'list' ? 'grid' : 'list')} aria-label={layout === 'list' ? t('Show as a grid') : t('Show as a list')}>
-            {layout === 'list' ? <LayoutGrid size={20} /> : <List size={20} />}
-          </button>
-        </div>
+        {sortRow}
         {layout === 'list' ? (
           <div className="dp-list" key="list">
             {list.map((i, n) => (
-              <DriveItemCard key={i.id} className="dp-row" style={{ ['--i' as string]: Math.min(n, 12) }} label={i.name} header={<DriveMenuHead i={i} meta={props.meta(i)} />} actions={props.menuFor(i)} onOpen={() => props.open(i, files)}>
+              <DriveItemCard key={i.id} className="dp-row" style={{ ['--i' as string]: Math.min(n, 12) }} label={i.name} header={<DriveMenuHead i={i} meta={props.meta(i)} />} actions={props.menuFor(i, list)} onOpen={() => props.open(i, files)}>
                 {icon(i)}
                 <span className="dp-text">
                   <Middle name={i.name} />
                   <span className="dp-meta">
                     {i.starred && <Star size={12} className="dp-star" fill="currentColor" />}
-                    {props.meta(i)}
+                    {q ? `${where(i)} · ${fmtDay(i.modified)}` : props.meta(i)}
                   </span>
                 </span>
               </DriveItemCard>
@@ -640,7 +729,7 @@ function DrivePhone(props: Props & { live: DriveItem[]; q: string; query: string
         ) : (
           <div className={section === 'media' && !q ? 'media-grid' : 'dp-grid drv-grid'} key="grid">
             {list.map((i, n) => (
-              <DriveItemCard key={i.id} className="file-card dp-tile" style={{ ['--i' as string]: Math.min(n, 16) }} label={i.name} header={<DriveMenuHead i={i} meta={props.meta(i)} />} actions={props.menuFor(i)} onOpen={() => props.open(i, files)}>
+              <DriveItemCard key={i.id} className="file-card dp-tile" style={{ ['--i' as string]: Math.min(n, 16) }} label={i.name} header={<DriveMenuHead i={i} meta={props.meta(i)} />} actions={props.menuFor(i, list)} onOpen={() => props.open(i, files)}>
                 {i.thumb ? (
                   <span className="d-thumb">
                     <img src={i.thumb} alt="" loading="lazy" draggable={false} />
@@ -652,12 +741,23 @@ function DrivePhone(props: Props & { live: DriveItem[]; q: string; query: string
                 )}
                 {(section !== 'media' || q) && (
                   <span className="fc-text">
-                    <span className="d-name" title={i.name}>{i.name}</span>
+                    <span className="dp-tile-text">
+                      <span className="d-name" title={i.name}>
+                        {i.starred && <Star size={12} className="dp-star" fill="currentColor" />}
+                        {i.name}
+                      </span>
+                      <span className="dp-tile-date">{q ? where(i) : fmtDay(i.modified)}</span>
+                    </span>
                   </span>
                 )}
               </DriveItemCard>
             ))}
           </div>
+        )}
+        {recentMore && (
+          <button type="button" className="dp-show-more" onClick={() => setRecentAll(true)}>
+            {t('Show more')}
+          </button>
         )}
       </>
     );
@@ -677,7 +777,9 @@ function DrivePhone(props: Props & { live: DriveItem[]; q: string; query: string
             </button>
           )}
         </label>
-        {section === 'email' && !q && <p className="drive-note dp-caption">{t('Email attachments land here automatically.')}</p>}
+        {/* A search looks through all of Drive, whatever the title says the place is (MJ6-1). */}
+        {q && <p className="drive-note dp-caption">{t('Results from all of Drive')}</p>}
+        {section === 'email' && !q && live.some((i) => i.id.startsWith('att:')) && <p className="drive-note dp-caption">{t('Email attachments land here automatically.')}</p>}
         {body(null)}
       </div>
       {section === 'my' &&
@@ -812,7 +914,7 @@ function MoveSheet({ item, items, onMove, onClose }: { item: DriveItem; items: D
 }
 
 /** Details & activity: what it is, how big, where it lives, who put it there and when. */
-function DetailsScreen({ item, items, who, from, onBack, onOpen, onShare, onDownload }: { item: DriveItem; items: DriveItem[]; who: string; from?: string; onBack: () => void; onOpen: () => void; onShare?: () => void; onDownload?: () => void }) {
+function DetailsBody({ item, items, who, from }: { item: DriveItem; items: DriveItem[]; who: string; from?: string }) {
   const where: string[] = [];
   for (let x = item.parentId; x; ) {
     const p = items.find((i) => i.id === x);
@@ -821,16 +923,59 @@ function DetailsScreen({ item, items, who, from, onBack, onOpen, onShare, onDown
     x = p.parentId;
   }
   return (
+    <>
+      <DriveMenuHead i={item} meta={tn(items.filter((x) => x.parentId === item.id && !x.trashed).length, '{n} item', '{n} items')} />
+      <Group>
+        {!from && <GRow label={t('Location')} value={item.id.startsWith('att:') ? t('From email') : [t('My Drive'), ...where].join(' / ')} />}
+        <GRow label={t('Modified')} value={fmtDay(item.modified)} />
+        {item.kind !== 'folder' && <GRow label={t('Size')} value={fmtSize(item.size)} />}
+        {who && <GRow label={t('Uploaded by')} value={item.uploadedBy ? <PersonName who={item.uploadedBy}>{who}</PersonName> : who} />}
+        {from && <GRow label={t('Saved from an email by')} value={from} />}
+        {item.starred && <GRow label={t('Starred')} value={t('Yes')} />}
+      </Group>
+    </>
+  );
+}
+
+/** Computers in grid view: the same Name / Modified / Size order as the list header, from one button (P115). */
+function SortButton({ sort, onSort }: { sort: Sort; onSort: (by: Sort['by']) => void }) {
+  const btn = useRef<HTMLButtonElement>(null);
+  const menu = useActionMenu(() => SORTS.map((s) => ({ label: t(s.label), checked: sort.by === s.by, run: () => onSort(s.by) })), { menu: true, width: 200 });
+  return (
+    <>
+      <button ref={btn} type="button" className="ghost-btn d-sort-btn" onClick={() => menu.openFrom(btn)} title={t('Sort by')}>
+        {t(SORTS.find((s) => s.by === sort.by)!.label)}
+        {sort.dir === 1 ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
+      </button>
+      {menu.menu}
+    </>
+  );
+}
+
+/** Empty trash: one question, then everything in it goes (one Undo toast comes from App). */
+function EmptyTrashSheet({ count, onConfirm, onClose }: { count: number; onConfirm: () => void; onClose: () => void }) {
+  return (
+    <Sheet title={t('Empty trash?')} onClose={onClose}>
+      <div className="d-confirm">
+        <p>{tn(count, '{n} item will be deleted forever.', '{n} items will be deleted forever.')}</p>
+        <div className="d-confirm-actions">
+          <button type="button" className="ghost-btn" onClick={onClose}>
+            {t('Cancel')}
+          </button>
+          <button type="button" className="danger-btn" onClick={onConfirm}>
+            <Trash2 size={16} /> {t('Empty trash')}
+          </button>
+        </div>
+      </div>
+    </Sheet>
+  );
+}
+
+function DetailsScreen({ item, items, who, from, onBack, onOpen, onShare, onDownload }: { item: DriveItem; items: DriveItem[]; who: string; from?: string; onBack: () => void; onOpen: () => void; onShare?: () => void; onDownload?: () => void }) {
+  return (
     <PushScreen title={t('Details')} backLabel={t('Drive')} onBack={onBack} className="g-page dp-details">
       <div className="dp-details-body">
-        <DriveMenuHead i={item} meta={tn(items.filter((x) => x.parentId === item.id && !x.trashed).length, '{n} item', '{n} items')} />
-        <Group>
-          {!from && <GRow label={t('Location')} value={item.id.startsWith('att:') ? t('From email') : [t('My Drive'), ...where].join(' / ')} />}
-          <GRow label={t('Modified')} value={fmtDay(item.modified)} />
-          {who && <GRow label={t('Uploaded by')} value={item.uploadedBy ? <PersonName who={item.uploadedBy}>{who}</PersonName> : who} />}
-          {from && <GRow label={t('Saved from an email by')} value={from} />}
-          {item.starred && <GRow label={t('Starred')} value={t('Yes')} />}
-        </Group>
+        <DetailsBody item={item} items={items} who={who} from={from} />
         <div className="dp-details-actions">
           <button type="button" className="primary-btn" onClick={onOpen}>
             <Eye size={16} /> {t('Open')}

@@ -414,7 +414,7 @@
   padding-left: 4px;
 }
 /* Tables home on phones: grouped rows, a 32 px letter tile in the table's colour, the name at 17 px. */
-.tasks-pane.tb-home-phone > .tracking-scroll {
+.tasks-pane.tb-home-phone:not(.has-list):not(.scope-briefs):not(.tasks-browse) > .tracking-scroll {
   padding: 16px 0 var(--fab-space);
 }
 .tb-home-row.g-row {
@@ -775,10 +775,10 @@ button.tb-page-title:active {
   flex: 1;
   min-width: 0;
   display: grid;
-  grid-template-columns: 120px minmax(0, 1fr);
+  grid-template-columns: 112px minmax(0, 1fr); /* a narrower label column: values get the room */
   align-items: center;
   column-gap: 12px;
-  min-height: 44px;
+  min-height: 48px;
   margin: 0 -8px;
   padding: 8px 8px;
   text-align: left;
@@ -795,7 +795,7 @@ button.tb-page-title:active {
 }
 .tb-pf > .tb-pf-label {
   flex: none;
-  width: 120px;
+  width: 112px;
 }
 .tb-pf-label {
   display: inline-flex;
@@ -1500,4 +1500,60 @@ button.tb-page-title:active {
 }
 @media (hover: none) {
   .tb-grid-wrap.touch .tb-row:hover .tb-cell { background: var(--surface); }
+}
+/* Cells breathe: 12px inside each, so values never run into the next column. */
+.tb-grid-wrap.touch .tb-cell,
+.tb-grid-wrap.touch .tb-th {
+  padding-inline: 12px;
+}
+.tb-grid-wrap.touch .tb-first .tb-cell,
+.tb-grid-wrap.touch .tb-th.tb-pinned {
+  padding-left: 16px;
+}
+/* Scrolled sideways: the pinned name gets an 8px edge shadow, so the columns under it read as passing beneath. */
+.tb-grid-wrap.touch .tb-first,
+.tb-grid-wrap.touch .tb-th.tb-pinned {
+  transition: box-shadow 0.2s ease;
+}
+.tb-grid-wrap.touch.scrolled-x .tb-first,
+.tb-grid-wrap.touch.scrolled-x .tb-th.tb-pinned {
+  box-shadow: inset -1px -1px 0 var(--line), 8px 0 8px -8px color-mix(in srgb, var(--text) 25%, transparent);
+}
+/* Add a column: a full 44px target. */
+.tb-grid-wrap.touch .tb-add-col .icon-btn {
+  width: var(--tap);
+  height: var(--tap);
+}
+
+/* Column menu as a sheet on phones: 44px rows at the 15px body size, icons at 20, and Move left / Move right as
+   two plain rows (not a cramped split row). */
+@media (max-width: 767px) {
+  .tb-colmenu {
+    gap: 0;
+    padding: 0 4px;
+  }
+  .tb-colmenu > button,
+  .tb-colmenu-row button {
+    min-height: var(--tap);
+    gap: 12px;
+    padding: 0 12px;
+    border-radius: var(--r-control);
+    font: var(--t-body);
+  }
+  .tb-colmenu > button > svg,
+  .tb-colmenu-row button > svg {
+    width: 20px;
+    height: 20px;
+  }
+  .tb-colmenu-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .tb-colmenu-row button:last-child {
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+  }
+  .tb-colmenu-sep {
+    margin: 4px 12px;
+  }
 }

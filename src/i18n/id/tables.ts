@@ -182,6 +182,7 @@ const id: Record<string, string> = {
   'Create table': 'Buat tabel',
   'No tables for this {project} yet': 'Belum ada tabel untuk {project} ini',
   'Leads, a content pipeline, a list of anything: your own columns, as a grid or a board.': 'Prospek, alur konten, daftar apa saja: kolom Anda sendiri, sebagai tabel atau papan.',
+  '{n} row': '{n} baris',
   '{n} rows': '{n} baris',
   '{n} fields': '{n} kolom',
   'Your own databases: leads, pipelines, lists of anything. Your columns, as a grid or a board.': 'Database Anda sendiri: prospek, pipeline, daftar apa saja. Kolom Anda, sebagai tabel atau papan.',
@@ -1057,6 +1058,11 @@ const id: Record<string, string> = {
   'Show {n} row': 'Tampilkan {n} baris',
   // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
   "Table colour": "Warna tabel",
+  "Choice deleted": "Pilihan dihapus",
+  "Click a column’s name for its options.": "Klik nama kolom untuk melihat opsinya.",
+  "Deleted the rule “{name}”": "Aturan “{name}” dihapus",
+  "Rename table": "Ganti nama tabel",
+  "View settings": "Pengaturan tampilan",
 };
 
 export default id;

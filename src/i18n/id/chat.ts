@@ -6,6 +6,8 @@ const id: Record<string, string> = {
   // ChatApp, the composer, a conversation and its messages, huddles, drafts, Chat in App.tsx
   // The sidebar and the phone's chat list (ChatApp.tsx): views, sections, tiles, rows
   'Company default': 'Bawaan',
+  'Sections (default)': 'Bagian (bawaan)',
+  'Go to channel': 'Buka channel',
   'Sections your admins set for everyone': 'Bagian yang diatur admin untuk semua orang',
   'Built in': 'Siap pakai',
   'Unread first': 'Belum dibaca dulu',

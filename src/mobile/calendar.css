@@ -359,12 +359,15 @@
   .md-chips {
     display: flex;
     align-items: center;
-    gap: 8px;
-    height: 48px;
-    margin: 0 -8px;
+    gap: 4px;
+    height: 52px;
+    margin: 0;
     padding: 0 16px;
     overflow-x: auto;
+    scroll-padding-inline: 16px;
     scrollbar-width: none;
+    /* The chips scroll: they fade out at the 16 gutter instead of being cut at the screen's edge. */
+    mask-image: linear-gradient(90deg, transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%);
   }
   .md-chips::-webkit-scrollbar {
     display: none;
@@ -373,9 +376,9 @@
     flex: none;
     display: grid;
     place-items: center;
-    height: 32px;
+    height: var(--tap);
     padding: 0 16px;
-    border-radius: var(--r-card);
+    border-radius: var(--r-pill);
     font-size: var(--fs-caption);
     font-weight: 600;
     color: var(--text-2);
@@ -700,6 +703,31 @@
   .qc-guests {
     min-height: 48px;
   }
+  /* Event or task, above the title; the calendar it goes in; More options says where the full editor is. */
+  .qc-kind {
+    margin: 0 16px 8px;
+  }
+  .qc-kind > button {
+    min-height: var(--tap);
+  }
+  .qc-cal {
+    min-height: var(--row-1);
+  }
+  .qc-dot {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: var(--r-round);
+  }
+  .qc-foot {
+    display: flex;
+    justify-content: flex-end;
+    padding: 8px 16px 0;
+  }
+  .qc-more {
+    min-height: var(--tap);
+    font-size: var(--fs-body);
+  }
   .qc-guests .er-icon,
   .qc-guests .er-body,
   .qc-guests .er-line {
@@ -898,6 +926,10 @@
     font: var(--t-heading);
     letter-spacing: 0;
     background: none;
+  }
+  .is-phone .sch-gap {
+    padding-left: 60px;
+    font-size: var(--fs-secondary);
   }
   .is-phone .sch-week {
     display: flex;
@@ -1280,137 +1312,6 @@
     left: auto;
     right: 4px;
   }
-
-  /* ---------- Month (Google's): six weeks fill the screen, the events as small solid chips ---------- */
-
-  .mg-chips {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-  }
-  .mg-chips .mg-head {
-    display: grid;
-    grid-template-columns: repeat(7, minmax(0, 1fr));
-    flex: none;
-    height: 24px;
-    border-bottom: 1px solid var(--border);
-  }
-  .mg-chips .mg-head span {
-    display: grid;
-    place-items: center;
-    padding: 0;
-    font-size: var(--fs-caption);
-    font-weight: 600;
-    color: var(--text-3);
-  }
-  .mg-chips .mg-body {
-    flex: 1;
-    min-height: 0;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: repeat(6, minmax(0, 1fr));
-    padding: 0;
-    overflow: hidden;
-    touch-action: pan-y;
-    animation: fade 0.18s ease-out;
-  }
-  .mg-chips .mg-week {
-    --mg-num: 32px;
-    --mg-lane: 17px; /* system: a 16 px chip and the 1 px between chips (Google's month) */
-  }
-  .mg-chips .mg-cell {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    justify-content: flex-start;
-    gap: 0px;
-    min-width: 0;
-    min-height: 0;
-    padding: 4px 0 0;
-    overflow: hidden;
-    border: 0;
-    border-bottom: 1px solid var(--border);
-    border-left: 1px solid var(--border);
-    background: none;
-    cursor: pointer;
-    text-align: center;
-    transition: background-color 0.15s;
-  }
-  .mg-chips .mg-cell:nth-child(1) {
-    border-left: 0;
-  }
-  .mg-chips .mg-cell.out {
-    background: var(--surface-2);
-  }
-  .mg-chips .mg-cell:active {
-    background: var(--hover);
-  }
-  .mg-chips .mg-num {
-    display: grid;
-    place-items: center;
-    align-self: center;
-    width: 22px;
-    min-width: 0;
-    height: 24px;
-    margin-bottom: 4px;
-    padding: 0;
-    border-radius: 50%;
-    font-size: var(--fs-caption);
-    font-weight: 600;
-    color: var(--text);
-  }
-  .mg-chips .mg-cell.out .mg-num {
-    color: var(--text-3);
-  }
-  .mg-chips .mg-cell.today .mg-num {
-    background: var(--accent);
-    color: #fff;
-  }
-  /* Chips and bars sit over the days; a tap goes through to the day under the finger. */
-  .mg-chips .mg-week > :not(.mg-cell) {
-    margin: 0 4px 1px; /* system: the 1 px between chips */
-    pointer-events: none;
-  }
-  .mg-chip {
-    flex: none;
-    display: block;
-    height: 16px;
-    padding: 0 4px;
-    border-radius: var(--r-tile);
-    background: var(--c);
-    color: var(--on, #fff);
-    font-size: var(--fs-caption);
-    font-weight: 600;
-    line-height: 16px;
-    text-align: left;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .mg-chip.pending {
-    background: var(--surface);
-    box-shadow: inset 0 0 0 1.5px var(--c);
-    color: color-mix(in srgb, var(--c) 80%, var(--text));
-  }
-  .mg-chips .mg-week > .mg-go-l {
-    margin-left: 0;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-  }
-  .mg-chips .mg-week > .mg-go-r {
-    margin-right: 0;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-  }
-  .mg-more-n {
-    flex: none;
-    padding: 0 4px;
-    font-size: var(--fs-caption);
-    font-weight: 600;
-    line-height: 16px;
-    color: var(--text-2);
-    text-align: left;
-  }
 }
 
 /* Dark: the colours a little deeper behind white text, so it stays readable (Google's dark cards). */
@@ -1423,11 +1324,6 @@
 @media (max-width: 359px) {
   .tg-phone {
     --cal-gutter: 48px;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .mg-chips .mg-body {
-    animation: none;
   }
 }
 
@@ -1722,11 +1618,6 @@
   .ev-card.solid .ev-card-place {
     color: var(--text-2);
   }
-  .mg-chip {
-    background: color-mix(in srgb, var(--c) var(--tile-tint), var(--surface));
-    box-shadow: inset 2px 0 0 var(--c);
-    color: var(--text);
-  }
 }
 
 @media (max-width: 767px) {
@@ -1833,6 +1724,25 @@
   .mp-list-head {
     margin: 0;
     font: var(--t-heading);
+  }
+  /* The picked day's heading opens it in Day view. */
+  .mp-list-open {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-height: var(--tap);
+    margin: 0 -8px;
+    padding: 0 8px;
+    border-radius: var(--r-tile);
+    font: inherit;
+    color: inherit;
+    transition: background 0.15s;
+  }
+  .mp-list-open:active {
+    background: var(--hover);
+  }
+  .mp-list-open > svg {
+    color: var(--text-3);
   }
   .mp-free {
     justify-self: start;

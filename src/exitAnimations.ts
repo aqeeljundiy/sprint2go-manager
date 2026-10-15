@@ -30,6 +30,7 @@ const LEAVING = [
   '.later-menu',
   '.track-menu',
   '.tb-popup',
+  '.tb-tip',
   '.mention-pop',
   '.recip-suggest',
   '.lightbox',

@@ -54,7 +54,7 @@ export function AgencySection({ ws, canManage, brandingAddon, onWorkspace, onBil
                   })
             }
           >
-            <SwitchRow label={t('Show our brand instead of sprint2go')} on={wl.enabled} disabled={!canManage} onChange={() => set({ enabled: !wl.enabled, slug })} />
+            <SwitchRow label={t('Use our brand')} on={wl.enabled} disabled={!canManage} onChange={() => set({ enabled: !wl.enabled, slug })} />
           </Group>
           <div className={`fold ${wl.enabled ? 'open' : ''}`}>
             <div className="fold-in">

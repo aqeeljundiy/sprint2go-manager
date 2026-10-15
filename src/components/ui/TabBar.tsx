@@ -44,7 +44,9 @@ export function TabBar({
   onOrder,
   role = 'tablist',
   canHide = true,
+  defaults,
 }: {
+  defaults?: TabPrefs; // built-in order and hidden tabs, until this person or the company sets their own
   canHide?: boolean; // false: tabs can be moved, not hidden (e.g. a table's views, shared by everyone)
   storageKey: string;
   items: TabItem[];
@@ -60,7 +62,7 @@ export function TabBar({
 }) {
   const shared = useContext(TabDefaultsCtx);
   const [mine, setMine] = usePersisted<TabPrefs | null>(`s2g-tabs:${storageKey}`, null);
-  const prefs = (onOrder ? order : (mine ?? order)) ?? shared.defaults[storageKey] ?? null; // shared data order, unless you can't change it (then your own)
+  const prefs = (onOrder ? order : (mine ?? order)) ?? shared.defaults[storageKey] ?? defaults ?? null; // shared data order, unless you can't change it (then your own)
   const setPrefs = (p: TabPrefs) => (onOrder ? onOrder(p) : setMine(p));
   const all = arrange(items, prefs);
   const hidden = new Set((prefs?.hidden ?? []).filter((id) => !fixed.includes(id)));

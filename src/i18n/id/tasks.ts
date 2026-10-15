@@ -775,6 +775,13 @@ const id: Record<string, string> = {
   'Send the notetaker to your next call with {name} and its notes land here.': 'Kirim pencatat ke panggilan berikutnya dengan {name}, dan notulennya masuk ke sini.',
   'Share in the channel': 'Bagikan di channel',
   'company.com': 'perusahaan.com',
+  'Nothing due today': 'Tidak ada yang jatuh tempo hari ini',
+  'Nothing late either. Plan ahead in Upcoming.': 'Tidak ada yang terlambat juga. Rencanakan di Mendatang.',
+  'Brain dump: paste notes, get tasks': 'Brain dump: tempel catatan, jadi tugas',
+  'Late or due today': 'Terlambat atau jatuh tempo hari ini',
+  'All company tasks': 'Semua tugas perusahaan',
+  'Every open task in the company': 'Semua tugas terbuka di perusahaan',
+  'Late': 'Terlambat',
 };
 
 export default id;

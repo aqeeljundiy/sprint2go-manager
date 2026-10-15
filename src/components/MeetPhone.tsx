@@ -1,5 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react';
-import { Bot, ChevronRight, Folder, Home, Inbox, ListChecks, Mic, MicOff, Search, Settings, Video, X } from 'lucide-react';
+import { Bot, Clock, ChevronRight, Folder, Inbox, ListChecks, Search, Settings, Users, Video, X } from 'lucide-react';
 import type { CalEvent, Client, Meeting, MeetingSettings, Role, Todo, Workspace } from '../types';
 import { JOIN_MODES, MEETING_NAME, joinsByRule, meetingLinkOf, notetakerJoins, type MeetingKind } from '../meetingLinks';
 import { isMine } from '../identity';
@@ -14,7 +14,7 @@ import { ProjectBadge } from './ProjectBadge';
 import { IconTile } from './ui/IconTile';
 import type { MeetPage } from './MeetApp';
 import { LIVE, STATUS_LABEL } from './MeetApp';
-import { t, tn } from '../i18n';
+import { mark, t, tn } from '../i18n';
 import { fmtDate, fmtList } from '../i18n/format';
 import { term } from '../terms';
 
@@ -47,7 +47,7 @@ export function MeetDrawer({ page, clients, meetings, company, onPage, onClose, 
   const unfiled = meetings.filter((m) => !m.clientId).length;
   return (
     <AppDrawer label={t('Meet')} company={company} onClose={onClose}>
-      <DrawerRow icon={<Home size={20} />} label={t('Home')} on={page.kind === 'list'} onClick={() => go({ kind: 'list' })} />
+      <DrawerRow icon={<Video size={20} />} label={t('Meetings')} on={page.kind === 'list'} onClick={() => go({ kind: 'list' })} />
       <DrawerRow icon={<ListChecks size={20} />} label={t('Tasks from meetings')} on={page.kind === 'tasks'} onClick={() => go({ kind: 'tasks' })} />
       <DrawerRow icon={<Inbox size={20} />} label={t('Unfiled')} sub={unfiled ? tn(unfiled, '{n} to file', '{n} to file') : undefined} on={page.kind === 'unfiled'} onClick={() => go({ kind: 'unfiled' })} />
       {clients.length > 0 && (
@@ -60,7 +60,7 @@ export function MeetDrawer({ page, clients, meetings, company, onPage, onClose, 
         </>
       )}
       <DrawerDivider />
-      <DrawerRow icon={<Settings size={20} />} label={t('Settings')} onClick={() => (onClose(), onSettings())} />
+      <DrawerRow icon={<Settings size={20} />} label={t('Meet settings')} onClick={() => (onClose(), onSettings())} />
     </AppDrawer>
   );
 }
@@ -87,7 +87,7 @@ export function MeetSettingsScreen({ settings, rows, myRole, autoJoin, onJoinMod
             {autoJoin === 'off'
               ? t('The notetaker isn’t available on this server yet, so it can’t join meetings. Recordings and notes start working as soon as it is.')
               : admin
-                ? t('It joins a minute before each meeting with a Google Meet or Zoom link, for everyone in the company. Read only: it never changes your calendar.')
+                ? t('{mode}, a minute before the start. Read only: it never changes your calendar.', { mode: t(JOIN_MODES.find((x) => x.value === mode)?.label ?? '') })
                 : t('{mode}, for everyone in the company. An admin can change it in Settings, Meetings. Use the switch on a meeting to change just that one.', { mode: t(JOIN_MODES.find((x) => x.value === mode)?.label ?? '') })}
           </p>
           {autoJoin !== 'off' && admin && <Select value={mode} onChange={onJoinMode} label={t('Notetaker joins automatically')} className="ms-sel" options={JOIN_MODES.map((x) => ({ value: x.value, label: t(x.label), hint: t(x.hint) }))} />}
@@ -114,6 +114,8 @@ interface HomeProps {
   onFolder: (id: string, clientId: string | null, remember: boolean) => void;
   onOverride: (eventId: string, join: boolean | null) => void;
   onOpenEvent?: (id: string) => void;
+  /** What just happened, with Undo when it can be undone. */
+  toast?: (text: string, undo?: () => void) => void;
   /** The empty list's one action: send the notetaker (when it works here). */
   onSend?: () => void;
   canSendBot?: boolean;
@@ -137,31 +139,34 @@ function useJoins(p: Pick<HomeProps, 'settings' | 'overrides' | 'demo' | 'autoJo
   };
 }
 
-/** One meeting coming up: its call, title, when and who; the mic says whether the notetaker joins (tap to change). */
+/** One meeting coming up: its call, title, when and who; a labelled pill says whether the notetaker joins (tap to change). */
 function ComingRow({ e, p, j }: { e: CalEvent; p: HomeProps; j: ReturnType<typeof useJoins> }) {
   const [open, setOpen] = useState(false);
   const k = callOf(e, p.demo);
   const on = j.joins(e);
-  const others = e.guests?.length ?? 0;
+  const guests = e.guests ?? [];
   const start = new Date(e.start);
+  const url = meetingLinkOf(e)?.url;
+  // The people, by first name, so the row says who (not "2 others").
+  const who = fmtList(guests.map((g) => (g.name || g.email).split(/[\s@]/)[0]));
+  const flip = () => {
+    const want = !on;
+    p.onOverride(e.id, want === j.byRule(e) ? null : want);
+    p.toast?.(want ? t('The notetaker joins {title}', { title: e.title }) : t('The notetaker won’t join {title}', { title: e.title }), () => p.onOverride(e.id, e.id in p.overrides ? p.overrides[e.id] : null));
+  };
+  const soon = start.getTime() - Date.now() < 10 * 60_000;
   return (
     <div className="mh-row">
       <button type="button" className="mh-main" onClick={() => setOpen(true)}>
         <CallMark kind={k} />
         <span className="mh-text">
           <strong>{e.title}</strong>
-          <small>{[fmtTimeRange(e.start, e.end), others ? tn(others, '{n} other', '{n} others') : ''].filter(Boolean).join(' · ')}</small>
+          <small className="mh-two">{[fmtTimeRange(e.start, e.end), who].filter(Boolean).join(' · ')}</small>
         </span>
       </button>
       {j.can(e) && (
-        <button
-          type="button"
-          className={`mh-mic${on ? ' on' : ''}`}
-          aria-pressed={on}
-          aria-label={on ? t('The notetaker will join. Tap so it doesn’t') : t('The notetaker won’t join. Tap so it does')}
-          onClick={() => p.onOverride(e.id, !on === j.byRule(e) ? null : !on)}
-        >
-          {on ? <Mic size={20} /> : <MicOff size={20} />}
+        <button type="button" role="switch" className={`mh-nt${on ? ' on' : ''}`} aria-checked={on} aria-label={t('Notetaker')} onClick={flip}>
+          <span>{on ? t('Notes on') : t('Notes off')}</span>
         </button>
       )}
       {open && (
@@ -170,17 +175,55 @@ function ComingRow({ e, p, j }: { e: CalEvent; p: HomeProps; j: ReturnType<typeo
           onClose={() => setOpen(false)}
           className="mh-event"
           footer={
-            p.onOpenEvent ? (
-              <button type="button" className="primary-btn" onClick={() => (setOpen(false), p.onOpenEvent!(e.id))}>
-                {t('Open in Calendar')}
-              </button>
-            ) : undefined
+            <>
+              {p.onOpenEvent && (
+                <button type="button" className="ghost-btn" onClick={() => (setOpen(false), p.onOpenEvent!(e.id))}>
+                  {t('Open in Calendar')}
+                </button>
+              )}
+              {url && (
+                <a className={soon ? 'primary-btn' : 'ghost-btn'} href={url} target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)}>
+                  <Video size={18} /> {t('Join')}
+                </a>
+              )}
+            </>
           }
         >
-          <p className="mhe-line">{[dayWord(start), fmtTimeRange(e.start, e.end)].join(' · ')}</p>
-          {others > 0 && <p className="mhe-line">{fmtList((e.guests ?? []).map((g) => g.name || g.email))}</p>}
-          {k && <p className="mhe-line">{MEETING_NAME[k]}</p>}
-          {j.can(e) && <p className="mhe-line">{on ? t('The notetaker joins and takes notes.') : t('The notetaker won’t join this one.')}</p>}
+          <div className="mhe-rows">
+            <div className="dr-row">
+              <span className="dr-icon">
+                <Clock size={20} />
+              </span>
+              <span className="dr-text">{[dayWord(start), fmtTimeRange(e.start, e.end)].join(' · ')}</span>
+            </div>
+            {k && (
+              <div className="dr-row">
+                <span className="dr-icon">
+                  <Video size={20} />
+                </span>
+                <span className="dr-text">{MEETING_NAME[k]}</span>
+              </div>
+            )}
+            {guests.length > 0 && (
+              <div className="dr-row">
+                <span className="dr-icon">
+                  <Users size={20} />
+                </span>
+                <span className="dr-text">{fmtList(guests.map((g) => g.name || g.email))}</span>
+              </div>
+            )}
+            {j.can(e) && (
+              <div className="dr-row">
+                <span className="dr-icon">
+                  <Bot size={20} />
+                </span>
+                <span className="dr-text">{t('Notetaker')}</span>
+                <button type="button" role="switch" aria-checked={on} aria-label={t('Notetaker')} className={`switch ${on ? 'on' : ''}`} onClick={flip}>
+                  <span />
+                </button>
+              </div>
+            )}
+          </div>
         </Sheet>
       )}
     </div>
@@ -188,10 +231,9 @@ function ComingRow({ e, p, j }: { e: CalEvent; p: HomeProps; j: ReturnType<typeo
 }
 
 const FILTERS = [
-  ['all', 'All'],
-  ['recording', 'Recording'],
-  ['tasks', 'Has tasks'],
-  ['failed', 'Failed'],
+  ['all', mark('All')],
+  ['tasks', mark('Has tasks')],
+  ['live', mark('Live now')],
 ] as const;
 
 /**
@@ -212,7 +254,7 @@ export function MeetHome(p: HomeProps) {
   const past = useMemo(() => {
     const s = q.trim().toLowerCase();
     return [...base]
-      .filter((m) => filter === 'all' || (filter === 'recording' ? LIVE.has(m.status ?? 'done') : filter === 'failed' ? m.status === 'failed' : p.tasks.some((tk) => tk.meetingId === m.id)))
+      .filter((m) => filter === 'all' || (filter === 'live' ? LIVE.has(m.status ?? 'done') : p.tasks.some((tk) => tk.meetingId === m.id)))
       .filter((m) => !s || m.title.toLowerCase().includes(s) || m.summary.toLowerCase().includes(s) || (m.transcript ?? []).some((l) => l.text.toLowerCase().includes(s)))
       .sort((a, b) => b.at.localeCompare(a.at));
   }, [base, p.tasks, q, filter]);
@@ -224,7 +266,7 @@ export function MeetHome(p: HomeProps) {
         {(base.length > 0 || filtering) && (
         <label className="mh-search">
           <Search size={20} />
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('Search meetings, notes and transcripts')} aria-label={t('Search meetings')} enterKeyHint="search" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('Search meetings')} aria-label={t('Search meetings')} enterKeyHint="search" />
           {q && (
             <button type="button" className="icon-btn" onClick={() => setQ('')} aria-label={t('Clear')}>
               <X size={18} />
@@ -244,7 +286,7 @@ export function MeetHome(p: HomeProps) {
 
         {!p.unfiled && !p.notesOnly && !q && filter === 'all' && coming.length > 0 && (
           <>
-            <h2 className="mh-head">{t('Coming up')}</h2>
+            <h2 className="mh-head">{t('Upcoming')}</h2>
             <div className="mh-card">
               {coming.slice(0, 3).map((e) => (
                 <ComingRow key={e.id} e={e} p={p} j={j} />
@@ -328,7 +370,7 @@ export function MeetHome(p: HomeProps) {
 /** Everything coming up in the next 7 days (from "See all"): the same rows, by day. */
 export function MeetUpcomingScreen(p: HomeProps & { onBack: () => void; onSendNow: (e: CalEvent) => void }) {
   return (
-    <PushScreen title={t('Coming up')} onBack={p.onBack} className="meet-upcoming">
+    <PushScreen title={t('Upcoming')} onBack={p.onBack} className="meet-upcoming">
       <MeetComingList {...p} />
     </PushScreen>
   );
@@ -414,7 +456,7 @@ function MeetComingList(p: HomeProps) {
             </div>
           </div>
         ))}
-        {!soon.length && <EmptyState compact text={t('No meetings in the next 7 days. Connect a calendar in Calendar, or send the bot to a meeting link.')} />}
+        {!soon.length && <EmptyState compact text={t('No meetings in the next 7 days. Connect a calendar in Calendar, or send the notetaker to a meeting link.')} />}
       </div>
   );
 }
@@ -444,7 +486,7 @@ export function MeetFolders({ clients, meetings, onPage, onSettings }: { clients
         {clients.length > 0 && (
           <>
             <h2 className="mh-head">{term.Many}</h2>
-            <div className="mh-card">
+            <div className="mh-card mh-folders">
               {clients.map((c) => {
                 const n = meetings.filter((m) => m.clientId === c.id).length;
                 return row(c.id, <IconTile letter={c.name} color={c.color} size={32} />, c.name, n ? tn(n, '{n} meeting', '{n} meetings') : t('No meetings yet'), { kind: 'folder', clientId: c.id });

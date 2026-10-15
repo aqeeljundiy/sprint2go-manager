@@ -12,7 +12,9 @@ import { t, tn, tx } from '../../i18n';
 import { useLang } from '../../i18n/useLang';
 
 const DEFAULT_W: Partial<Record<TableField['type'], number>> = { button: 150, text: 200, longtext: 240, email: 210, phone: 180, url: 190, checkbox: 90, number: 120, money: 150, date: 130, person: 170, select: 150, multi: 200, link: 200, files: 160, rating: 130, formula: 160, rollup: 140, created: 170, edited: 170, creator: 160 };
-const widthOf = (view: TableViewDef, f: TableField, first: boolean) => view.widths?.[f.id] ?? (first ? 240 : DEFAULT_W[f.type] ?? 160);
+// On a touch screen (an iPad) the name column starts narrower, so more columns fit beside it.
+const COARSE = typeof matchMedia !== 'undefined' && matchMedia('(pointer: coarse)').matches;
+const widthOf = (view: TableViewDef, f: TableField, first: boolean) => view.widths?.[f.id] ?? (first ? (COARSE ? 180 : 240) : DEFAULT_W[f.type] ?? 160);
 const SEL_W = 56;
 
 export interface GridProps {
@@ -559,7 +561,15 @@ export function GridView(p: GridProps) {
   };
 
   return (
-    <div className={`tb-grid-wrap${p.touch ? ' touch' : ''}`} ref={wrapRef} onKeyDown={onKey} onCopy={onCopy} onPaste={onPasteEv}>
+    <div
+      className={`tb-grid-wrap${p.touch ? ' touch' : ''}`}
+      ref={wrapRef}
+      onKeyDown={onKey}
+      onCopy={onCopy}
+      onPaste={onPasteEv}
+      // Phones: the pinned name casts a soft edge once the other columns slide under it (class only set on a change).
+      onScroll={p.touch ? (e) => { const el = e.currentTarget, on = el.scrollLeft > 0; if (el.classList.contains('scrolled-x') !== on) el.classList.toggle('scrolled-x', on); } : undefined}
+    >
       <div className="tb-grid" role="grid" style={{ ['--cols' as string]: cols }} aria-rowcount={flat.length}>
         <div className="tb-tr tb-head" role="row" onDrop={(e) => (e.preventDefault(), colDrop())} onDragEnd={() => setColDrag(null)}>
           <div className="tb-th tb-sel sticky0">{!p.readOnly && !p.locked && <input type="checkbox" aria-label={t('Select all')} checked={selAll} onChange={() => p.onSelect(selAll ? new Set() : new Set(flat.map((r) => r.id)))} />}</div>
@@ -629,7 +639,8 @@ export function GridView(p: GridProps) {
           );
         })}
 
-        {p.rows.length > 0 && (
+        {/* Calculations are a computer's summary bar: not on a phone. */}
+        {p.rows.length > 0 && !p.touch && (
           <div className="tb-tr tb-foot" role="row">
             <div className="tb-foot-cell sticky0" />
             {fields.map((f, i) => (

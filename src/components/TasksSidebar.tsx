@@ -1,7 +1,7 @@
 import { ProjectBadge } from './ProjectBadge';
 import { useState } from 'react';
 import { PROJECT_TYPES, term } from '../terms';
-import { Archive, CalendarRange, Eye, FileText, CircleCheck, LayoutGrid, Layers, Plus, Send, Sparkles, Building2, Sun, Users } from 'lucide-react';
+import { Archive, CalendarRange, Eye, FileText, CircleCheck, LayoutGrid, Layers, Plus, Send, Sparkles, Building2, Sun, Users, ChevronRight } from 'lucide-react';
 import type { Client, Team, Todo } from '../types';
 import { doers, isBrief, type TaskScope } from './TasksView';
 import { kindOf } from '../stages';
@@ -22,14 +22,15 @@ interface Props {
   myClientIds: string[];
   onScope: (s: TaskScope) => void;
   onBrainDump: () => void;
+  onAddTask: () => void;
   onAddClient?: (name: string, domain?: string, type?: string) => void;
   projectsApp?: boolean; // projects have their own app: no project list here
 }
 
-export function TasksSidebar({ scope, tasks, clients: allClients, teams: allTeams, me, isAdmin, myTeamIds, myClientIds, onScope, onBrainDump, onAddClient, projectsApp }: Props) {
+export function TasksSidebar({ scope, tasks, clients: allClients, teams: allTeams, me, isAdmin, myTeamIds, myClientIds, onScope, onBrainDump, onAddTask, onAddClient, projectsApp }: Props) {
   const teams = isAdmin ? allTeams : allTeams.filter((tm) => myTeamIds.includes(tm.id));
   const mineOrAll = isAdmin ? allClients : allClients.filter((c) => myClientIds.includes(c.id));
-  const [typeFilter, setTypeFilter] = usePersisted<string>('s2g-project-type', '');
+  const [typeFilter, setTypeFilter] = usePersisted<string>('s2g-tasks-project-type', ''); // its own key: Projects keeps a separate filter
   const types = [...new Set(mineOrAll.filter((c) => c.status !== 'ended' && c.type).map((c) => c.type!))];
   const clients = mineOrAll.filter((c) => c.status !== 'ended' && (!typeFilter || !types.includes(typeFilter) || c.type === typeFilter));
   const past = mineOrAll.filter((c) => c.status === 'ended');
@@ -43,6 +44,39 @@ export function TasksSidebar({ scope, tasks, clients: allClients, teams: allTeam
   const urgent = (x: Todo) => !!x.due && x.due <= today; // late or due today: the only counts worth showing
   const is = (s: TaskScope) => s.kind === scope.kind && (!('id' in s) || ('id' in scope && scope.id === s.id));
 
+  type Row = [TaskScope, typeof Sun, string, number, string, boolean?]; // scope, icon, label, count, what it counts, red (late work only)
+  const main: Row[] = [
+    [{ kind: 'today' }, Sun, t('Today'), open.filter((x) => doers(x).includes(me) && urgent(x)).length, t('Late or due today'), open.some((x) => doers(x).includes(me) && !!x.due && x.due < today)],
+    [{ kind: 'upcoming' }, CalendarRange, t('Upcoming'), 0, ''],
+    [{ kind: 'mine' }, CircleCheck, t('My tasks'), 0, ''], // not Inbox: in Todoist that's where unfiled tasks land, which this isn't
+  ];
+  const more: Row[] = [
+    [{ kind: 'supervising' }, Eye, t('Supervising'), open.filter((x) => x.supervisorId === me && kindOf(x) === 'review').length, t('Waiting for your review')],
+    [{ kind: 'delegated' }, Send, t('Assigned by me'), open.filter((x) => x.createdBy === me && !doers(x).includes(me) && !!x.due && x.due < today).length, t('Late'), true],
+    [{ kind: 'myteams' }, Users, t('My teams'), 0, ''],
+    [{ kind: 'myclients' }, Building2, t('My {projects}', { projects: term.many }), 0, ''],
+    [{ kind: 'briefs' }, FileText, t('Briefs'), 0, ''],
+    ...(isAdmin
+      ? ([
+          [{ kind: 'all' }, Layers, t('All company tasks'), 0, ''],
+          [{ kind: 'grid' }, LayoutGrid, t('{Projects} × teams', { projects: term.many }), 0, ''],
+        ] as Row[])
+      : []),
+  ];
+  const [moreStored, setMoreOpen] = usePersisted<boolean>('s2g-tasks-more', false);
+  const moreOpen = moreStored || more.some(([s]) => is(s)); // open while one of its views is in use
+  const row = ([s, Icon, label, count, hint, red]: Row) => (
+    <button key={s.kind} className={`nav-item ${is(s) ? 'active' : ''}`} onClick={() => onScope(s)} title={s.kind === 'all' ? t('Every open task in the company') : label}>
+      <Icon size={17} />
+      <span className="sb-label">{label}</span>
+      {count ? (
+        <span className={`count${red ? ' warn-count' : ''}`} title={hint}>
+          {count}
+        </span>
+      ) : null}
+    </button>
+  );
+
   const save = () => {
     if (!name.trim()) return;
     onAddClient?.(name.trim(), domain.trim().replace(/^@/, '') || undefined, type || undefined);
@@ -54,36 +88,26 @@ export function TasksSidebar({ scope, tasks, clients: allClients, teams: allTeam
 
   return (
     <>
-      <button className="compose-btn" onClick={onBrainDump} title={t('Brain dump')}>
-        <Sparkles size={16} />
-        <span className="sb-label">{t('Brain dump')}</span>
+      {/* Todoist's top action: add one task. Brain dump (notes in, tasks out) sits just under it. */}
+      <button className="compose-btn" onClick={onAddTask} title={t('Add task')}>
+        <Plus size={16} />
+        <span className="sb-label">{t('Add task')}</span>
       </button>
       <nav className="nav">
-        {(
-          [
-            [{ kind: 'mine' }, CircleCheck, t('My tasks'), 0], // not Inbox: in Todoist that's where unfiled tasks land, which this isn't
-            [{ kind: 'today' }, Sun, t('Today'), open.filter((x) => doers(x).includes(me) && urgent(x)).length],
-            [{ kind: 'upcoming' }, CalendarRange, t('Upcoming'), 0],
-            [{ kind: 'supervising' }, Eye, t('Supervising'), open.filter((x) => x.supervisorId === me && kindOf(x) === 'review').length],
-            [{ kind: 'myteams' }, Users, t('My teams'), 0],
-            [{ kind: 'myclients' }, Building2, t('My {projects}', { projects: term.many }), 0],
-            [{ kind: 'delegated' }, Send, t('Assigned by me'), open.filter((x) => x.createdBy === me && !doers(x).includes(me) && !!x.due && x.due < today).length],
-            [{ kind: 'briefs' }, FileText, t('Briefs'), 0],
-            ...(isAdmin
-              ? ([
-                  [{ kind: 'all' }, Layers, t('Everything'), 0],
-                  [{ kind: 'grid' }, LayoutGrid, t('{Projects} × teams', { projects: term.many }), 0],
-                ] as const)
-              : []),
-          ] as const
-        ).map(([s, Icon, label, count]) => (
-          <button key={s.kind} className={`nav-item ${is(s) ? 'active' : ''}`} onClick={() => onScope(s)} title={label}>
-            <Icon size={17} />
-            <span className="sb-label">{label}</span>
-            {count ? <span className="count warn-count">{count}</span> : null}
-          </button>
-        ))}
+        <button className="nav-item" onClick={onBrainDump} title={t('Brain dump: paste notes, get tasks')}>
+          <Sparkles size={17} />
+          <span className="sb-label">{t('Brain dump')}</span>
+        </button>
+        {main.map(row)}
       </nav>
+      <button type="button" className="nav-more-head sb-label" aria-expanded={moreOpen} onClick={() => setMoreOpen(!moreOpen)}>
+        <ChevronRight size={14} className={`rot-chev${moreOpen ? ' open' : ''}`} /> {t('More views')}
+      </button>
+      <div className={`fold${moreOpen ? ' open' : ''}`}>
+        <div className="fold-in">
+          <nav className="nav">{more.map(row)}</nav>
+        </div>
+      </div>
 
       {teams.length > 0 && (
         <>
@@ -97,7 +121,7 @@ export function TasksSidebar({ scope, tasks, clients: allClients, teams: allTeam
                   <span className="team-square" style={{ background: tm.color }} />
                   <span className="sb-label">{tm.name}</span>
                   {waiting ? (
-                    <span className="count warn-count" title={tn(waiting, '{n} not assigned', '{n} not assigned')}>
+                    <span className="count" title={tn(waiting, '{n} not assigned', '{n} not assigned')}>
                       {waiting}
                     </span>
                   ) : null}

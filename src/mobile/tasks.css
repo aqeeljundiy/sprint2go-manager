@@ -125,6 +125,30 @@
   .t-heading > b {
     display: none; /* the rows show how many */
   }
+  /* A section's own "+ Add task" row: the plus on the rings' column, the words on the titles'. */
+  .t-add-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    min-height: var(--row-1);
+    padding: 0 16px;
+    border: 0;
+    background: none;
+    color: var(--text-3);
+    font: var(--t-body);
+    text-align: left;
+    cursor: pointer;
+    transition: color 0.15s var(--ease), background 0.15s var(--ease);
+  }
+  .t-add-row svg {
+    flex: none;
+    width: 24px;
+    color: var(--accent);
+  }
+  .t-add-row:active {
+    background: var(--hover);
+  }
   .t-h-label {
     gap: 8px;
   }
@@ -1422,6 +1446,10 @@
     white-space: nowrap;
     text-overflow: ellipsis;
   }
+  .tbr-label .badge {
+    margin-left: 8px;
+    vertical-align: 2px;
+  }
   .tbr-row.muted .tbr-label,
   .tbr-row.muted .tbr-icon {
     color: var(--text-3);
@@ -1445,8 +1473,11 @@
   }
 }
 @media (max-width: 767px) and (prefers-reduced-motion: reduce) {
-  .tbr-group {
-    animation: none;
+  .tbr-group,
+  .tdp-row,
+  .task-bulk,
+  .task-bulk.is-leaving {
+    animation-duration: 0.01ms; /* still fires animationend, so leaving rows finish */
   }
 }
 

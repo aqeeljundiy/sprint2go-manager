@@ -21,11 +21,12 @@ export function ViewTabs({ views, current, canEdit, onSelect, onMenu, onReorder,
   const box = useRef<HTMLDivElement>(null);
   const measure = useRef<HTMLDivElement>(null);
   const moreRef = useRef<HTMLButtonElement>(null);
+  const addRef = useRef<HTMLButtonElement>(null);
   const [fit, setFit] = useState(views.length);
   const [more, setMore] = useState(false);
   const [drag, setDrag] = useState<string | null>(null);
   const [over, setOver] = useState<{ id: string; after: boolean } | null>(null);
-  const sig = views.map((v) => `${v.id}:${v.name}:${v.kind}`).join('|');
+  const sig = `${current}|${views.map((v) => `${v.id}:${v.name}:${v.kind}`).join('|')}`;
 
   // How many tabs fit: measured from a hidden copy of every tab, against the room the row has.
   useLayoutEffect(() => {
@@ -33,13 +34,16 @@ export function ViewTabs({ views, current, canEdit, onSelect, onMenu, onReorder,
     const m = measure.current;
     if (!el || !m || typeof ResizeObserver === 'undefined') return;
     const work = () => {
-      const widths = [...m.children].map((c) => (c as HTMLElement).offsetWidth + 4);
-      const room = el.clientWidth - 48 /* add */ - 4;
+      // The real widths of "N more" and +, measured (a longer translation must not overlap the tabs).
+      const kids = [...m.children] as HTMLElement[];
+      const moreW = kids.pop()!.offsetWidth + 4;
+      const widths = kids.map((c) => c.offsetWidth + 4);
+      const room = el.clientWidth - (addRef.current ? addRef.current.offsetWidth + 4 : 0) - 4;
       let used = 0;
       let n = 0;
       for (const w of widths) {
         const last = n === widths.length - 1;
-        if (used + w > room - (last ? 0 : 92 /* "N more" */)) break;
+        if (used + w > room - (last ? 0 : moreW)) break;
         used += w;
         n++;
       }
@@ -72,9 +76,14 @@ export function ViewTabs({ views, current, canEdit, onSelect, onMenu, onReorder,
           return (
             <span key={v.id} className="tb-vtab-m">
               <I size={13} /> {v.name}
+              {v.id === current && onMenu && <ChevronDown size={12} className="tb-vtab-chev" />}
             </span>
           );
         })}
+        <span className="tb-vmore">
+          {tn(views.length, '{n} more', '{n} more')}
+          <ChevronDown size={13} />
+        </span>
       </div>
       <div className="client-tabs tb-views" role="tablist" aria-label={t('Views')} onDragOver={(e) => drag && e.preventDefault()} onDrop={(e) => (e.preventDefault(), drop())}>
         {shown.map((v) => {
@@ -128,7 +137,7 @@ export function ViewTabs({ views, current, canEdit, onSelect, onMenu, onReorder,
         </>
       )}
       {onAdd && (
-        <button type="button" className="tb-add-view icon-btn sm" onClick={(e) => onAdd(e.currentTarget)} title={t('Add a view')} aria-label={t('Add a view')}>
+        <button ref={addRef} type="button" className="tb-add-view icon-btn sm" onClick={(e) => onAdd(e.currentTarget)} title={t('Add a view')} aria-label={t('Add a view')}>
           <Plus size={15} />
         </button>
       )}

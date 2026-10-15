@@ -284,6 +284,7 @@ const id: Record<string, string> = {
     '{Whos} Anda masuk di alamat Anda sendiri dan melihat nama serta logo Anda, bukan milik kami: di halaman masuk, di ruang bersama mereka, dan di ponsel mereka. Tim Anda tetap memakai aplikasi lengkap.',
   'Part of the branding add-on.': 'Bagian dari add-on branding.',
   'Show our brand instead of sprint2go': 'Tampilkan brand kami, bukan sprint2go',
+  'Use our brand': 'Pakai brand kami',
   'Sign-in page, the app, the shared space, invites and the install prompt.': 'Halaman masuk, aplikasi, ruang bersama, undangan, dan ajakan memasang aplikasi.',
   'Colour': 'Warna',
   'The branding add-on is on your plan page: {link}': 'Add-on branding ada di halaman paket Anda: {link}',

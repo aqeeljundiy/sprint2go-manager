@@ -105,7 +105,62 @@
   color: var(--text-2);
 }
 .nl-deleted-acts {
+  display: flex;
+  gap: 4px;
   margin-top: 4px;
+}
+.nl-deleted-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.nl-deleted-head .nl-deleted-note {
+  flex: 1;
+}
+.nl-delete-all {
+  flex: none;
+  margin-right: 16px;
+  color: var(--danger, #dc2626);
+}
+/* Desktop: Delete for good shows quietly next to Put back on hover. */
+@media (hover: hover) {
+  .nl-del-good {
+    opacity: 0;
+    transition: opacity 0.15s, background 0.15s, color 0.15s;
+  }
+  .note-item:hover .nl-del-good,
+  .nl-del-good:focus-visible {
+    opacity: 1;
+  }
+}
+/* Desktop search: the phone's ways to narrow it, under the field while it has focus. */
+.notes-facets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 12px 8px;
+}
+.notes-facets .nl-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.notes-facets .nl-chip:hover {
+  background: var(--hover);
+}
+.notes-facets .nl-chip.on {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-text, var(--accent));
 }
 
 /* ---------- The open note ---------- */
@@ -779,6 +834,19 @@
   .note-text .note-task,
   .note-line-dots,
   .nb-tools {
+    animation: none;
+  }
+}
+
+/* The save line cross-fades when it changes (Saving, Saved, Edited 2 min ago). */
+.note-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  animation: fade-in 0.2s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .note-status {
     animation: none;
   }
 }

@@ -14,6 +14,7 @@ export interface SheetAction {
   disabled?: boolean;
   checked?: boolean; // a tick on the right (Mute: on)
   group?: string; // actions with the same group sit together; a new group starts after a divider
+  heading?: string; // a small caption over the group, shown on its first action
   run: () => void;
 }
 
@@ -61,6 +62,7 @@ export function ActionSheet({
         return (
           <div key={a.id ?? a.label} role="none">
             {divide && <div className="as-sep" role="separator" />}
+            {a.heading && (i === 0 || divide) && <div className="as-group">{a.heading}</div>}
             <button type="button" role="menuitem" className={`as-item${a.danger ? ' danger' : ''}`} disabled={a.disabled} onClick={() => (onClose(), a.run())}>
               {Icon && <Icon size={18} className="as-icon" />}
               <span className="as-label">

@@ -31,7 +31,7 @@ import { accessFor } from '../clientView';
 import { Select } from './ui/Select';
 import { zoneOptions } from './ui/zones';
 import { SUMMARY_HOUR, companyTz } from '../jobTimes';
-import { changePassword, server } from '../sync';
+import { changePassword, server, signOut } from '../sync';
 import { EmailSetupGuide, providerLabel } from './EmailSetupGuide';
 import { caps } from '../caps';
 import { hasBranding } from '../data/pricing';
@@ -56,7 +56,7 @@ import { Avatar } from './Avatar';
 import { SettingsSearch } from './SettingsSearch';
 import { registerSettings } from '../settingsIndex';
 import { ChoiceRow, Group, GRow } from './ui/Grouped';
-import { AccountPhone, DeleteAccountPhone, MailPhone, MailboxesPhone, MembersPhone, PasswordPhone, WorkspacePhone } from './SettingsPhone';
+import { AccountPhone, DeleteAccountPhone, DeleteFacts, deleteTyped, MailPhone, MailboxesPhone, MembersPhone, PasswordPhone, WorkspacePhone } from './SettingsPhone';
 import { SignaturesDesktop, WritingDesktop } from './mail/MailWriting';
 import { fmtSize } from '../data/drive';
 import { planName } from '../data/pricing';
@@ -237,6 +237,12 @@ function SettingsList({ sections, company, me, values, onOpen }: { sections: typ
           </Group>
         );
       })}
+      {/* Settings ends with Sign out and the version, as Slack and Linear do. */}
+      {server.on && (
+        <Group footer={`${product.name} ${t('version {v}', { v: '0.1.0' })}`}>
+          <GRow label={t('Sign out')} danger onClick={() => void signOut()} />
+        </Group>
+      )}
     </div>
   );
 }
@@ -272,6 +278,8 @@ export function SettingsPage({ email, settings: s, update, section, onSection, u
   // Members see the company's money (plan, billing, AI costs) only when the company allows it.
   // The demo company has no money, keys, mail delivery or sign-in rules of its own: those are the real company's.
   const sections = SECTIONS.filter((x) => (canManage || perms.seeBilling || (x.id !== 'billing' && x.id !== 'ai' && x.id !== 'storage')) && (canManage || (x.id !== 'import' && x.id !== 'mailrules' && x.id !== 'domains')) && !(demo?.inDemo && DEMO_OUT.includes(x.id)));
+  // The side list starts with your own settings, as the phone list does; the company's follow under its name.
+  const navSections = [...sections].sort((x, y) => (x.group === 'Company' ? 1 : 0) - (y.group === 'Company' ? 1 : 0));
   const [routingOpen, setRoutingOpen] = useState(false);
   // Mail routing (some mail stays with Google or Microsoft): in place on desktop, its own screen on phones.
   const routingBlock = (
@@ -333,11 +341,11 @@ export function SettingsPage({ email, settings: s, update, section, onSection, u
       <div className="settings-body">
         <nav className="settings-nav">
           <SettingsSearch pages={sections} phone={false} onOpen={(id) => onSection(id as SettingsSection)}>
-          {sections.map(({ id, name, icon: Icon, group }, i) => (
+          {navSections.map(({ id, name, icon: Icon, group }, i) => (
             <span key={id} className="settings-nav-item">
-              {(i === 0 || sections[i - 1].group !== group) && <span className="settings-group">{group === 'Company' ? ws.name || t('Company') : t('You')}</span>}
-              <button className={section === id ? 'on' : ''} onClick={() => onSection(id)}>
-                <Icon size={16} /> {t(name)}
+              {(i === 0 || navSections[i - 1].group !== group) && <span className="settings-group">{group === 'Company' ? ws.name || t('Company') : t('You')}</span>}
+              <button className={section === id ? 'on' : ''} onClick={() => onSection(id)} title={t(name)}>
+                <Icon size={16} /> <span className="nav-name">{t(name)}</span>
               </button>
             </span>
           ))}
@@ -730,12 +738,15 @@ export function SettingsPage({ email, settings: s, update, section, onSection, u
                 ))}
               </div>
               <h3>{t('Accent colour')}</h3>
-              <p className="set-hint" style={{ marginTop: 0 }}>
-                {t('Comes from your workspace’s brand colour.')}{' '}
-                <button className="link-btn" onClick={() => onSection('workspace')}>
-                  {t('Change it in Workspace')}
-                </button>
-              </p>
+              {/* One tappable row to the brand colour (it was an 18px link). */}
+              <button type="button" className="accent-row" onClick={() => onSection('workspace')}>
+                <i className="accent-dot" aria-hidden />
+                <span>
+                  <strong>{t('Change it in Workspace')}</strong>
+                  <small>{t('Comes from your workspace’s brand colour.')}</small>
+                </span>
+                <ChevronRight size={18} className="g-chev" aria-hidden />
+              </button>
               <h3>{t('Density')}</h3>
               <div className="segmented">
                 {(['comfortable', 'compact'] as const).map((d) => (
@@ -1023,9 +1034,8 @@ export function PasswordRow() {
   );
 }
 
-/** Deletes the signed-in account after a last confirm; an error from the server comes back to show. */
+/** Deletes the signed-in account (the caller asked for the password and a typed DELETE); an error from the server comes back to show. */
 async function deleteAccount(password: string): Promise<string | null> {
-  if (!confirm(t('Delete your account? This can’t be undone. Your tasks, messages and files stay with your company.'))) return null;
   const r = await fetch('/api/account/delete', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ password }) });
   const d = (await r.json().catch(() => ({}))) as { error?: string };
   if (!r.ok) return d.error ?? mark('Couldn’t delete the account.');
@@ -1039,8 +1049,8 @@ function DeleteAccountRow() {
   const [pw, setPw] = useState('');
   const [msg, setMsg] = useState('');
   const [busy, setBusy] = useState(false);
+  const [typed, setTyped] = useState('');
   const go = async () => {
-    if (!confirm(t('Delete your account? This can’t be undone. Your tasks, messages and files stay with your company.'))) return;
     setBusy(true);
     const r = await fetch('/api/account/delete', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ password: pw }) });
     const d = (await r.json().catch(() => ({}))) as { error?: string };
@@ -1062,9 +1072,11 @@ function DeleteAccountRow() {
       </div>
       <div className={`fold ${open ? 'open' : ''}`}>
         <div className="fold-in pw-form">
+          <DeleteFacts />
           <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} placeholder={t('Your password, to be sure it’s you')} autoComplete="current-password" />
+          <input value={typed} onChange={(e) => setTyped(e.target.value)} placeholder={t('Type DELETE to confirm')} aria-label={t('Type DELETE to confirm')} autoCapitalize="characters" autoComplete="off" />
           {msg && <p className="err small">{t(msg)}</p>}
-          <button type="button" className="primary-btn sm danger" disabled={!pw || busy} onClick={() => void go()}>
+          <button type="button" className="primary-btn sm danger" disabled={!pw || !deleteTyped(typed) || busy} onClick={() => void go()}>
             {busy ? t('Deleting…') : t('Delete my account')}
           </button>
         </div>

@@ -45,7 +45,7 @@ export const isPast = (e: CalEvent, now = Date.now()) => new Date(e.end).getTime
 /** "in 12 min", "now", "in 1 h 5 min". */
 export function startsIn(e: CalEvent, now = Date.now()) {
   const m = Math.round((new Date(e.start).getTime() - now) / 60_000);
-  if (m <= 0) return t('now');
+  if (m <= 0) return t('Now');
   if (m < 60) return t('in {n} min', { n: m });
   const h = Math.floor(m / 60);
   return m % 60 ? t('in {h} h {m} min', { h, m: m % 60 }) : t('in {h} h', { h });

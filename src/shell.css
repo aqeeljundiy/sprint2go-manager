@@ -1817,9 +1817,6 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   }
 }
 @media (max-width: 1099px) {
-  .cal-new span {
-    display: none;
-  }
   .settings-nav {
     width: 190px;
   }
@@ -2792,7 +2789,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   display: flex;
   align-items: center;
   gap: 4px;
-  margin: 12px 0 4px;
+  margin: 12px 0 12px;
 }
 .inbox-switch-btn {
   flex: 1;

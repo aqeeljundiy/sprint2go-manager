@@ -332,6 +332,20 @@
   white-space: nowrap;
   cursor: pointer;
 }
+.htd-ev-main,
+.htd-ev-sub {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.htd-ev-sub {
+  font-size: 12px;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+.setup-card .setup-go {
+  color: var(--accent-text);
+}
 .htd-tasks {
   display: grid;
 }
@@ -425,4 +439,14 @@
   .home-row {
     transition: none;
   }
+}
+
+/* One link style on Home: the section links read like the cards' links (no underline). */
+.hsec-h .link-btn {
+  text-decoration: none;
+}
+/* Customise sits on the greeting's baseline, not the date line above it. */
+.home-head .customise-btn {
+  align-self: flex-end;
+  margin: 0 0 6px;
 }

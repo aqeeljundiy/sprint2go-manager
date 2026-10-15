@@ -1,4 +1,5 @@
 import { Sheet } from '../ui/Sheet';
+import { ConfirmSheet } from '../chat/Sheets';
 import { useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Check, ChevronRight, Crown, LogOut, Mail, Menu, Plus, Search, Trash2, UserPlus, Users, X } from 'lucide-react';
 import { useActionMenu } from '../ui/ActionSheet';
@@ -92,7 +93,7 @@ export function TeamsSidebar({ teams, me, current, canCreate, onOpen, onNew }: {
 
 /** Join, ask to join, or a note that you're in it. */
 function JoinButton({ tm, me, actions, small }: { tm: Team; me: string; actions: TeamActions; small?: boolean }) {
-  const cls = small ? 'ghost-btn sm' : 'primary-btn sm';
+  const cls = small ? 'ghost-btn sm tonal' : 'primary-btn sm';
   if (tm.members.includes(me))
     return (
       <span className="team-in small">
@@ -287,23 +288,46 @@ function TeamsPhone({ teams, users, tasks, me, actions, onOpen, people: everyone
         <section className="tdir-sec">
           <h2 className="tdir-head">{t('People')}</h2>
           <div className="tdir-list">
-            {people.map((u) => {
-              const theirs = teams.filter((tm) => tm.members.includes(u.id));
-              return (
-                <div key={u.id} className="tdir-row" role={theirs[0] ? 'button' : undefined} onClick={theirs[0] ? () => onOpen(theirs[0].id) : undefined}>
-                  <Avatar person={u} size={36} card={u.id} />
-                  <span className="tdir-text">
-                    <strong>{u.name}</strong>
-                    <small>{[u.title, theirs.map((x) => x.name).join(', ')].filter(Boolean).join(' · ') || u.email}</small>
-                  </span>
-                </div>
-              );
-            })}
+            {people.map((u) => (
+              <PersonRow key={u.id} u={u} teams={teams} onOpen={onOpen} />
+            ))}
           </div>
         </section>
       )}
       {query && (everyone || !shown.length) && !people.length && <p className="tdir-none">{t('Nothing matches “{q}”.', { q: q.trim() })}</p>}
     </div>
+  );
+}
+
+/** A person in the directory: tap for their profile, with Email and each of their teams. */
+function PersonRow({ u, teams, onOpen }: { u: User; teams: Team[]; onOpen: (id: string) => void }) {
+  const theirs = teams.filter((tm) => tm.members.includes(u.id));
+  const menu = useActionMenu(
+    () => [
+      ...(u.email ? [{ label: t('Email {name}', { name: u.name.split(' ')[0] }), icon: Mail, run: () => void (location.href = `mailto:${u.email}`) }] : []),
+      ...theirs.map((tm) => ({ label: t('Open {team}', { team: tm.name }), icon: Users, run: () => onOpen(tm.id) })),
+    ],
+    {
+      header: (
+        <div className="tdir-profile">
+          <Avatar person={u} size={56} />
+          <strong>{u.name}</strong>
+          <small>{[u.title, u.email].filter(Boolean).join(' · ')}</small>
+        </div>
+      ),
+    },
+  );
+  return (
+    <>
+      <div className="tdir-row lp" role="button" tabIndex={0} {...menu.bind} onClick={(e) => menu.openAt(e.clientX, e.clientY)} onKeyDown={(e) => e.key === 'Enter' && menu.openAt(0, 0)}>
+        <Avatar person={u} size={36} card={u.id} />
+        <span className="tdir-text">
+          <strong>{u.name}</strong>
+          <small>{[u.title, theirs.map((x) => x.name).join(', ')].filter(Boolean).join(' · ') || u.email}</small>
+        </span>
+      </div>
+      {menu.menu}
+    </>
   );
 }
 
@@ -340,7 +364,7 @@ function MemberRow({ u, tm, teams, me, manage, actions }: { u: User; tm: Team; t
         <span className="tdir-text">
           <strong>
             {u.name}
-            {u.id === me && <Badge tone="accent">{t('You')}</Badge>}
+            {u.id === me && <Badge>{t('You')}</Badge>}
             {tm.leadId === u.id && <Badge>{t('Lead')}</Badge>}
           </strong>
           <small>{u.title || u.email}</small>
@@ -484,7 +508,7 @@ function MembersTab({ tm, teams, users, me, manage, actions }: { tm: Team; teams
                 card={u.id}
                 badges={
                   <>
-                    {u.id === me && <Badge tone="accent">{t('You')}</Badge>}
+                    {u.id === me && <Badge>{t('You')}</Badge>}
                     {tm.leadId === u.id && <Badge>{t('Lead')}</Badge>}
                   </>
                 }
@@ -612,7 +636,6 @@ function WorkloadTab({ tm, tasks, users, onOpenTask }: { tm: Team; tasks: Todo[]
   if (!rows.length) return <p className="muted small team-empty">{t('Add people to the team to see who has how much.')}</p>;
   return (
     <div className="team-sec">
-      <p className="muted small">{t('Everything each person has open, from every team and project. Late work first; open someone to see their list.')}</p>
       <div className="team-block">
         {rows.map(({ u, mine, late, week, here }) => (
           <div key={u.id} className="team-load">
@@ -648,8 +671,19 @@ function WorkloadTab({ tm, tasks, users, onOpenTask }: { tm: Team; tasks: Todo[]
 
 function SettingsTab({ tm, users, isAdmin, actions, homeTemplate, onHomeTemplate, tasks, teams, me, companyName, wordsKey, onMoveTasks }: { tm: Team; users: User[]; isAdmin: boolean; actions: TeamActions; homeTemplate?: HomeTemplateId; onHomeTemplate: (v: HomeTemplateId) => void; tasks: Todo[]; teams: Team[]; me: string; companyName: string; wordsKey: string; onMoveTasks: (moves: Move[]) => void }) {
   const patch = (p: Partial<Team>) => actions.patch(tm.id, p);
+  const [ask, setAsk] = useState(false);
+  const owned = tasks.filter((x) => x.teamId === tm.id).length;
   return (
     <div className="team-sec team-settings">
+      {ask && (
+        <ConfirmSheet
+          title={t('Delete {team}?', { team: tm.name })}
+          text={owned ? tn(owned, '{n} task leaves the team and keeps its {projects}.', '{n} tasks leave the team and keep their {projects}.', { projects: term.many }) : t('The team has no tasks, so no work is lost.')}
+          yes={t('Delete team')}
+          onYes={() => actions.remove(tm)}
+          onClose={() => setAsk(false)}
+        />
+      )}
       <label className="team-field">
         <span>{t('Name')}</span>
         {/* Saved when you leave the field, never empty (a cleared name goes back to what it was). */}
@@ -734,7 +768,7 @@ function SettingsTab({ tm, users, isAdmin, actions, homeTemplate, onHomeTemplate
       </div>
       {isAdmin && (
         <div className="team-danger">
-          <button className="ghost-btn sm danger" onClick={() => confirm(t('Delete {team}? Its tasks keep their {projects}.', { team: tm.name, projects: term.many })) && actions.remove(tm)}>
+          <button className="ghost-btn sm danger" onClick={() => setAsk(true)}>
             <Trash2 size={14} /> {t('Delete team')}
           </button>
         </div>

@@ -513,6 +513,7 @@ const id: Record<string, string> = {
   'Mail sent to {email} lands here. {left}.': 'Email yang dikirim ke {email} masuk ke sini. {left}.',
   'Send a test email': 'Kirim email uji coba',
   Mailboxes: 'Kotak surat',
+  'Temporary addresses': 'Alamat sementara',
   '{n} open': '{n} terbuka',
   'Emails that asked you to do something': 'Email yang meminta Anda melakukan sesuatu',
   Labels: 'Label',

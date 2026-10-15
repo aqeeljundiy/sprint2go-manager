@@ -1,10 +1,9 @@
 import { ProjectBadge } from './ProjectBadge';
 import { Sheet } from './ui/Sheet';
 import { IconTile } from './ui/IconTile';
-import { useRef, useState } from 'react';
-import { usePersisted } from '../settings';
-import { Popover } from './ui/Popover';
-import { Archive, ArrowRight, Check, FolderOpen, ListChecks, Mail, Menu, MessagesSquare, Pause, Play, Plus, Search, SlidersHorizontal } from 'lucide-react';
+import { useState } from 'react';
+import { Archive, ArrowRight, Check, ChevronRight, Menu, Pause, Play, Plus, Search } from 'lucide-react';
+import { projectTabIcon } from './ProjectPhone';
 import { useActionMenu } from './ui/ActionSheet';
 import type { Client, Todo, User } from '../types';
 import { PROJECT_TYPES, term } from '../terms';
@@ -25,7 +24,7 @@ import { fmtDay } from '../i18n/format';
  * The Projects app's home: every project, the ones that need something first. Each card says what's wrong (late,
  * nobody on it, waiting on a guest) or that it's on track, and opens the project's hub.
  */
-export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu, startAdding, onPast, onOpenPart, onPause, onEnd }: { startAdding?: boolean; projects: Client[]; tasks: Todo[]; users: User[]; onOpen: (id: string) => void; onCreate?: (name: string, type?: string) => void; onPast?: () => void; onMenu: () => void; onOpenPart?: (id: string, part: 'tasks' | 'chat' | 'emails' | 'files') => void; onPause?: (id: string, paused: boolean) => void; onEnd?: (id: string) => void }) {
+export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu, startAdding, onPast, onOpenPart, onPause, onEnd }: { startAdding?: boolean; projects: Client[]; tasks: Todo[]; users: User[]; onOpen: (id: string) => void; onCreate?: (name: string, type?: string, domain?: string) => void; onPast?: () => void; onMenu: () => void; onOpenPart?: (id: string, part: 'tasks' | 'chat' | 'emails' | 'files') => void; onPause?: (id: string, paused: boolean) => void; onEnd?: (id: string) => void }) {
   const [adding, setAdding] = useState(!!startAdding);
   const phone = usePhone();
   const [find, setFind] = useState(''); // desktop: "Find a project"
@@ -38,10 +37,11 @@ export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu,
           { label: t('Open'), icon: ArrowRight, run: () => onOpen(hit.id) },
           ...(onOpenPart
             ? [
-                { label: t('Tasks'), icon: ListChecks, group: 'parts', run: () => onOpenPart(hit.id, 'tasks') },
-                { label: t('Chat'), icon: MessagesSquare, group: 'parts', run: () => onOpenPart(hit.id, 'chat') },
-                { label: t('Emails'), icon: Mail, group: 'parts', run: () => onOpenPart(hit.id, 'emails') },
-                { label: t('Files'), icon: FolderOpen, group: 'parts', run: () => onOpenPart(hit.id, 'files') },
+                // The same names and icons as the project's tabs (ProjectPhone's projectTabs).
+                { label: t('Tasks'), icon: projectTabIcon('tasks'), group: 'parts', run: () => onOpenPart(hit.id, 'tasks') },
+                { label: t('Chat'), icon: projectTabIcon('chat'), group: 'parts', run: () => onOpenPart(hit.id, 'chat') },
+                { label: t('Mail'), icon: projectTabIcon('emails'), group: 'parts', run: () => onOpenPart(hit.id, 'emails') },
+                { label: t('Files'), icon: projectTabIcon('files'), group: 'parts', run: () => onOpenPart(hit.id, 'files') },
               ]
             : []),
           ...(onPause ? [{ label: hit.status === 'paused' ? t('Resume') : t('Pause'), icon: hit.status === 'paused' ? Play : Pause, group: 'manage', run: () => onPause(hit.id, hit.status !== 'paused') }] : []),
@@ -51,13 +51,13 @@ export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu,
   useCreateAction('projects', !!onCreate && { label: t('New {project}', { project: term.one }), icon: Plus, run: () => setAdding(true) });
   const [name, setName] = useState('');
   const [type, setType] = useState('');
-  // What each card shows, chosen by each person.
-  const [cardFields, setCardFields] = usePersisted<string[]>('s2g-project-card-fields', ['type', 'owner', 'state', 'next', 'updated']);
-  const [fieldsOpen, setFieldsOpen] = useState(false);
-  const fieldsBtn = useRef<HTMLButtonElement>(null);
-  const on = (id: string) => cardFields.includes(id);
+  const [domain, setDomain] = useState('');
+  const [more, setMore] = useState(false);
+  // Every card shows the same things: type, owner, what needs a look, next deadline, last activity.
+  const on = (id: string) => id !== 'people';
   const today = localDay();
   const live = projects.filter((c) => c.status !== 'ended');
+  const pastCount = projects.length - live.length;
   const stats = (c: Client) => {
     const open = tasks.filter((x) => x.clientId === c.id && !x.done && !isBrief(x));
     const late = open.filter((x) => x.due && x.due < today).length;
@@ -71,14 +71,33 @@ export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu,
     const next = open.filter((x) => x.due && x.due >= today).sort((a, b) => a.due!.localeCompare(b.due!))[0];
     return { late, nobody, guest, open: open.length, last, next };
   };
-  const rows = live.map((c) => ({ c, s: stats(c) })).sort((a, b) => b.s.late - a.s.late || b.s.nobody - a.s.nobody || a.c.name.localeCompare(b.c.name));
+  // Name order, once, on every device: cards stay where you left them (Basecamp's way); late work shows on its badge.
+  const rows = live.map((c) => ({ c, s: stats(c) })).sort((a, b) => a.c.name.localeCompare(b.c.name));
   const save = () => {
     if (!name.trim()) return;
-    onCreate?.(name.trim(), type || undefined);
+    onCreate?.(name.trim(), type || undefined, domain.trim().replace(/^@/, '') || undefined);
     setName('');
     setType('');
+    setDomain('');
+    setMore(false);
     setAdding(false);
   };
+  // Optional: mail from this domain files into the project. Folded away so the form asks for a name and a type.
+  const moreOptions = (
+    <div className="proj-new-more">
+      <button type="button" className="link-btn small" aria-expanded={more} onClick={() => setMore((m) => !m)}>
+        {t('More options')} <ChevronRight size={14} className={`rot-chev${more ? ' open' : ''}`} />
+      </button>
+      <div className={`fold${more ? ' open' : ''}`}>
+        <div>
+          <label className="proj-new-domain">
+            <input value={domain} onChange={(e) => setDomain(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && save()} placeholder="example.com" aria-label={t('Email domain')} tabIndex={more ? 0 : -1} />
+            <small className="muted">{t('Mail from this domain files here.')}</small>
+          </label>
+        </div>
+      </div>
+    </div>
+  );
   // Phones: a bottom sheet with the name field focused (it rides above the keyboard), not a form at the top.
   const newForm = phone ? (
     adding && (
@@ -101,6 +120,7 @@ export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu,
             </button>
           ))}
         </div>
+        {moreOptions}
       </Sheet>
     )
   ) : (
@@ -115,6 +135,7 @@ export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu,
           <button className="primary-btn sm" disabled={!name.trim()} onClick={save}>
             {t('Add')}
           </button>
+          {moreOptions}
         </div>
       )}
     </SmoothHeight>
@@ -129,13 +150,18 @@ export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu,
       label: c.name,
       icon: c.photo ? <span className="tbr-photo"><ProjectBadge p={c} kind="client-badge" /></span> : <IconTile letter={c.name} color={c.color} />, // N4: a project is a tile with its initial everywhere
       ...hint(s),
+      sub: s.next
+        ? t('Next: {title}, {when}', { title: s.next.title, when: fmtDay(s.next.due!) })
+        : s.last
+          ? t('Updated {when}', { when: relative(s.last) })
+          : t('No activity yet'),
       run: () => onOpen(c.id),
     });
     const groups: BrowseGroup[] = [
       { id: 'active', title: t('Active'), rows: rows.filter((r) => r.c.status === 'active').map(row) },
       { id: 'lead', title: t('Leads'), rows: rows.filter((r) => r.c.status === 'lead').map(row) },
       { id: 'paused', title: t('Paused'), rows: rows.filter((r) => r.c.status === 'paused').map(row) },
-      ...(onPast ? [{ id: 'past', rows: [{ id: 'past', label: t('Past {projects}', { projects: term.many }), icon: <Archive size={22} />, muted: true, run: onPast }] }] : []),
+      ...(onPast ? [{ id: 'past', title: t('Archived'), rows: [{ id: 'past', label: t('Past {projects}', { projects: term.many }), icon: <Archive size={22} />, muted: true, run: onPast }] }] : []),
     ];
     return (
       <TasksBrowse
@@ -165,34 +191,12 @@ export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu,
         <div className="th-text">
           <h1>{term.Many}</h1>
         </div>
-        {rows.length > 6 && (
+        {rows.length > 0 && (
           <label className="search proj-search">
             <Search size={15} />
             <input value={find} onChange={(e) => setFind(e.target.value)} placeholder={t('Find a {project}', { project: term.one })} aria-label={t('Find a {project}', { project: term.one })} />
           </label>
         )}
-        <button ref={fieldsBtn} className="icon-btn" onClick={() => setFieldsOpen(true)} title={t('What cards show')} aria-label={t('What cards show')}>
-          <SlidersHorizontal size={16} />
-        </button>
-        <Popover anchor={fieldsBtn} open={fieldsOpen} onClose={() => setFieldsOpen(false)} width={240} align="end" title={t('On each card')}>
-          <div className="tab-edit-list">
-            <p className="muted small">{t('What each {project} card shows. Just for you.', { project: term.one })}</p>
-            {(
-              [
-                ['type', t('Type and status')],
-                ['owner', t('Owner')],
-                ['people', t('People on it')],
-                ['state', t('What needs attention')],
-                ['next', t('Next deadline')],
-                ['updated', t('Last activity')],
-              ] as const
-            ).map(([id, name]) => (
-              <label key={id} className="check-row tb-field-toggle">
-                <input type="checkbox" checked={on(id)} onChange={(e) => setCardFields(e.target.checked ? [...cardFields, id] : cardFields.filter((x) => x !== id))} /> {name}
-              </label>
-            ))}
-          </div>
-        </Popover>
         {/* No "New project" here: the sidebar's button is on screen already (one primary action per screen). */}
       </header>
       <div className="tracking-scroll">
@@ -219,7 +223,7 @@ export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu,
             ['paused', t('Paused')],
           ] as const).map(([status, heading]) => {
             const q = find.trim().toLowerCase();
-            const list = rows.filter((r) => r.c.status === status && (!q || r.c.name.toLowerCase().includes(q))).sort((a, b) => a.c.name.localeCompare(b.c.name));
+            const list = rows.filter((r) => r.c.status === status && (!q || r.c.name.toLowerCase().includes(q)));
             if (!list.length) return null;
             return (
           <section key={status} className="proj-group">
@@ -257,7 +261,10 @@ export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu,
                   )}
                   {on('state') && <span className={`proj-state ${issues.length ? (s.late ? 'bad' : 'warn') : 'ok'}`}>
                     {issues.length ? (
-                      issues.join(' · ')
+                      <span title={issues.length > 1 ? issues.join(' · ') : undefined}>
+                        {issues[0]}
+                        {issues.length > 1 && <span className="proj-state-more"> +{issues.length - 1}</span>}
+                      </span>
                     ) : (
                       <>
                         <Check size={13} /> {s.open ? t('On track') : t('Nothing open')}
@@ -275,6 +282,11 @@ export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu,
           </section>
             );
           })
+        )}
+        {onPast && pastCount > 0 && !find.trim() && (
+          <button type="button" className="link-btn small proj-past-link" onClick={onPast}>
+            <Archive size={14} /> {t('Past {projects}', { projects: term.many })} ({pastCount})
+          </button>
         )}
         {rows.length > 0 && find.trim() && !rows.some((r) => r.c.name.toLowerCase().includes(find.trim().toLowerCase())) && <p className="muted">{t('No {projects} match “{q}”.', { projects: term.many, q: find.trim() })}</p>}
       </div>

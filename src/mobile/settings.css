@@ -611,10 +611,10 @@
     height: var(--av-m);
     border-radius: var(--r-round);
   }
-  /* A group's header lines up with its rows' text (32 from the edge), like its footer. */
+  /* A group's header sits 20 from the edge, as on the root list (its footer and cards start at 16). */
   .settings-push .set-rows .g-head {
     margin: 0 0 8px;
-    padding: 0 32px;
+    padding: 0 20px;
   }
   .settings-push .set-rows .g-group:first-child {
     margin-top: 8px;
@@ -1380,4 +1380,31 @@
   .so-all .so-all-btn:active {
     opacity: 0.8;
   }
+}
+
+/* Account delete: what goes and what stays, above the typed confirm */
+.delete-facts { margin: 0 0 4px; padding-left: 18px; display: grid; gap: 4px; font-size: 13px; line-height: 1.45; color: var(--text-2); }
+.delete-facts strong { color: var(--text); }
+
+/* Appearance: the accent colour is a full row to Workspace, 44px or taller */
+.accent-row { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--r-card); background: var(--surface); color: var(--text); text-align: left; cursor: pointer; transition: background-color 0.18s ease, transform 0.18s ease; }
+.accent-row:hover { background: var(--hover, var(--surface)); }
+.accent-row:active { transform: scale(0.99); }
+.accent-row > span { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.accent-row small { color: var(--text-3); font-size: var(--fs-secondary); }
+.accent-dot { width: 24px; height: 24px; border-radius: 50%; background: var(--accent); flex: none; box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--text) 12%, transparent); }
+@media (prefers-reduced-motion: reduce) { .accent-row { transition: none; } }
+
+/* Account on phones: the avatar centred at the top, Edit photo under it */
+.acct-hero { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; min-height: 44px; margin: 4px 0 24px; padding: 0; border: 0; background: none; color: var(--accent); font: inherit; font-size: var(--fs-secondary); font-weight: 600; cursor: pointer; transition: opacity 0.18s ease; }
+.acct-hero:active { opacity: 0.7; }
+
+/* The side list: group headers ("You", the company) kept their height (flex shrank them to 0), long names end in an
+   ellipsis with the full name on hover, and iPads give the list room. */
+.settings-nav .settings-group { flex-shrink: 0; min-height: 16px; }
+.settings-nav .settings-nav-item:first-child .settings-group { margin-top: 8px; }
+.settings-nav button { flex-shrink: 0; min-width: 0; }
+.settings-nav button .nav-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+@media (min-width: 768px) and (max-width: 1023px) {
+  .settings-nav { width: 240px; }
 }

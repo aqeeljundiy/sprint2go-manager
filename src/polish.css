@@ -1114,6 +1114,8 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
 
 /* ---------- Vault ---------- */
 .vault-note { display: flex; gap: 6px; align-items: flex-start; margin-top: 12px; line-height: 1.4; }
+.vault-note svg { flex: none; margin-top: 1px; }
+.compose-btn:disabled { opacity: 0.4; cursor: default; box-shadow: none; }
 .vault-row { cursor: default; }
 .vault-icon { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 14%, transparent); color: var(--accent); font-weight: 700; }
 .vault-row .task-meta .src { display: inline-flex; align-items: center; gap: 3px; }
@@ -1152,13 +1154,18 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
   gap: 4px;
   padding: 2px 10px 6px;
 }
+@media (pointer: coarse) {
+  .type-chips button {
+    min-height: var(--tap);
+  }
+}
 .type-chips button {
-  padding: 2px 9px;
+  padding: 4px 10px;
   border-radius: 9999px;
   border: 1px solid var(--border);
   background: transparent;
   color: var(--text-2);
-  font-size: 11.5px;
+  font-size: 12px;
   cursor: pointer;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
@@ -2639,16 +2646,20 @@ select,
   font-weight: 600;
 }
 .proj-state.ok {
-  background: #dcfce7;
-  color: #15803d;
+  background: color-mix(in srgb, var(--ok) 15%, transparent);
+  color: var(--ok);
 }
 .proj-state.warn {
   background: var(--warn-soft, #fdecd8);
   color: var(--warn, #b45309);
 }
 .proj-state.bad {
-  background: #fee2e2;
-  color: #b91c1c;
+  background: color-mix(in srgb, var(--danger) 15%, transparent);
+  color: var(--danger);
+}
+.proj-state-more {
+  font-weight: 700;
+  opacity: 0.8;
 }
 .proj-foot {
   display: flex;
@@ -2664,6 +2675,29 @@ select,
 .proj-card:hover .proj-foot svg {
   opacity: 1;
   transform: none;
+}
+/* Touch (iPad): no hover, so the arrow stays faintly in view. */
+@media (hover: none) {
+  .proj-foot svg {
+    opacity: 0.5;
+    transform: none;
+  }
+}
+.proj-past-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  margin-top: 8px;
+  color: var(--text-3);
+}
+.proj-new-more {
+  flex-basis: 100%;
+}
+.proj-new-domain {
+  display: grid;
+  gap: 4px;
+  padding-top: 8px;
 }
 .proj-new {
   display: flex;
@@ -2735,6 +2769,9 @@ select,
 @media (prefers-reduced-motion: reduce) {
   .proj-card {
     animation: none;
+  }
+  .proj-card:hover {
+    transform: none;
   }
 }
 
@@ -2883,37 +2920,10 @@ kbd {
   }
 }
 
-/* Notes list: a letter tile per note when the sidebar is folded (the full card only when it's open). */
-.note-item .ni-dot {
-  display: none;
-}
-.sidebar.collapsed .note-item {
-  width: 40px;
-  height: 40px;
-  margin: 2px auto;
-  padding: 0;
-  display: grid;
-  place-items: center;
-}
-.sidebar.collapsed .note-item > :not(.ni-dot),
+/* Notes list: folded, the sidebar keeps only New note (Apple Notes hides the list). */
+.sidebar.collapsed .notes-nav,
 .sidebar.collapsed .sb-note {
   display: none;
-}
-.sidebar.collapsed .note-item .ni-dot {
-  display: grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--text) 8%, transparent);
-  color: var(--text-2);
-  font-size: 13px;
-  transition: background 0.15s, color 0.15s;
-  font-weight: 600;
-}
-.sidebar.collapsed .note-item.active .ni-dot {
-  background: var(--accent);
-  color: #fff;
 }
 /* "1 live" becomes a red dot on the icon when the sidebar is folded. */
 .sidebar.collapsed .nav-item {

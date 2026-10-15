@@ -390,7 +390,7 @@ function ColumnHead({ c, count, editable, canHide, group, options, onSaveOptions
             <button
               type="button"
               className="danger"
-              onClick={() => confirm(tn(count, 'Delete “{name}”? Its {n} card moves to “{none}”.', 'Delete “{name}”? Its {n} cards move to “{none}”.', { name: c.label, none: group ? noValue(group) : t('No status') })) && (onSaveOptions(options.filter((o) => o.id !== c.id)), setOpen(false))}
+              onClick={() => (onSaveOptions(options.filter((o) => o.id !== c.id)), setOpen(false))}
             >
               <Trash2 size={14} /> {t('Delete this choice')}
             </button>

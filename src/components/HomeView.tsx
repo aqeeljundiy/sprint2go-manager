@@ -413,6 +413,8 @@ export function HomeView(p: Props) {
     },
     risk: {
       icon: <AlertTriangle size={15} />,
+      // Nothing at risk: no card (an empty card is noise). It still shows while customising, so it can be moved.
+      show: editing || d.risk.length > 0,
       body: () =>
         d.risk.length === 0 ? (
           empty(t('No {project} has late or stuck work.', { project: term.one }))
@@ -436,6 +438,7 @@ export function HomeView(p: Props) {
     },
     lateByTeam: {
       icon: <Users size={15} />,
+      show: editing || d.byTeam.some((x) => x.late || x.waiting),
       body: () =>
         d.byTeam.every((x) => !x.late && !x.waiting) ? (
           empty(t('No team has late or unassigned work.'))
@@ -530,6 +533,7 @@ export function HomeView(p: Props) {
     briefs: {
       icon: <FileText size={15} />,
       link: [t('All briefs'), p.onOpenBriefs],
+      show: editing || (layout.template === 'founder' ? d.briefs : d.myBriefs).length > 0,
       body: () => {
         const list = layout.template === 'founder' ? d.briefs : d.myBriefs;
         return list.length === 0 ? (
@@ -803,12 +807,11 @@ export function HomeView(p: Props) {
       <ul>
         {todo.map((x) => (
           <li key={x.key}>
-            <span className="setup-mark" />
             <button type="button" className="setup-text" onClick={x.onOpen}>
               <strong>{x.label}</strong>
               <small>{x.hint}</small>
             </button>
-            <button type="button" className="ghost-btn sm" onClick={x.onOpen}>
+            <button type="button" className="ghost-btn sm setup-go" onClick={x.onOpen}>
               {t('Set up')}
             </button>
           </li>
@@ -1011,6 +1014,8 @@ export function HomeView(p: Props) {
         {p.calls && p.onJoinHuddle && <LiveCalls calls={p.calls} onJoin={p.onJoinHuddle} />}
 
         <div className="home-top">
+          {/* Clear, and Today below already shows what's next: no "You're clear" card repeating it. */}
+          {(needList.length > 0 || (!dueToday.length && !laterToday.length)) && (
           <section className={`hsec needs${needList.length ? '' : ' clear'}`} aria-label={t('Needs you')}>
             <h2 className="hsec-h">
               <span>{needList.length ? t('Needs you') : t('You’re clear for now')}</span>
@@ -1049,6 +1054,7 @@ export function HomeView(p: Props) {
               )}
             </SmoothHeight>
           </section>
+          )}
           {(dueToday.length > 0 || laterToday.length > 0) && (
             <TodayBlock
               tasks={dueToday}

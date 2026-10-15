@@ -175,6 +175,12 @@ const id: Record<string, string> = {
   "Re-save to encrypt": "Simpan ulang untuk mengenkripsi",
   "Logins can be added once the server is on and you are in your real company.": "Login bisa ditambahkan setelah server menyala dan Anda berada di perusahaan asli.",
   "Setup key or otpauth link": "Kunci penyiapan atau tautan otpauth",
+  "If you forget it, nobody can open your logins, not even an admin. Set a new passphrase, and anyone who still has a login can share it with you again.": "Jika Anda lupa, tidak ada yang bisa membuka login Anda, bahkan admin. Atur frasa sandi baru, dan siapa pun yang masih memegang login bisa membagikannya lagi kepada Anda.",
+  "Confirm passphrase": "Konfirmasi frasa sandi",
+  "Passphrase strength": "Kekuatan frasa sandi",
+  "Length {n}": "Panjang {n}",
+  "Numbers": "Angka",
+  "Symbols": "Simbol",
 };
 
 export default id;

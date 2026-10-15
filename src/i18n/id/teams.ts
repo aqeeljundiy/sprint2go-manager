@@ -79,6 +79,12 @@ const id: Record<string, string> = {
   "Leave team": "Keluar dari tim",
   // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
   "Who’s busy": "Siapa yang sibuk",
+  // Delete team sheet, and a person's profile in the directory
+  'Delete {team}?': 'Hapus {team}?',
+  '{n} task leaves the team and keeps its {projects}.': '{n} tugas keluar dari tim dan tetap di {projects}-nya.',
+  '{n} tasks leave the team and keep their {projects}.': '{n} tugas keluar dari tim dan tetap di {projects} masing-masing.',
+  'The team has no tasks, so no work is lost.': 'Tim ini tidak punya tugas, jadi tidak ada pekerjaan yang hilang.',
+  'Open {team}': 'Buka {team}',
 };
 
 export default id;

@@ -14,6 +14,7 @@
   min-height: 24px;
 }
 .team-card-x .proj-foot button svg,
+.team-card-x .proj-foot .team-in svg,
 .team-in svg {
   opacity: 1;
   transform: none;
@@ -277,6 +278,13 @@ button.team-row:hover,
   }
   .team-row {
     min-height: 48px;
+  }
+  /* The Tasks filter is a chip, not a framed box. */
+  .team-filter .person-sel {
+    min-height: var(--tap);
+    border-color: transparent;
+    border-radius: var(--r-pill);
+    background: var(--surface-2);
   }
 }
 /* The narrowest phones: four tabs still fit when their words are longer (Indonesian). */

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { ChevronDown, ChevronRight, ChevronUp, Copy, CopyPlus, GripVertical, LayoutTemplate, Link2, Maximize2, Minimize2, MoreHorizontal, Plus, Send, Trash2, X } from 'lucide-react';
+import { ChevronDown, ChevronRight, ChevronUp, CopyPlus, GripVertical, LayoutTemplate, Link2, Maximize2, Minimize2, MoreHorizontal, Plus, Send, Trash2, X } from 'lucide-react';
 import type { CellValue, Channel, DataTable, TableField, TablePage, TableRow, User } from '../../types';
 import { FieldMenu } from './FieldMenu';
 import { Avatar } from '../Avatar';
@@ -337,6 +337,15 @@ function RecordPanel({ table, row, ctx, me, onCell, onComment, onDelete, onDupli
   const [overId, setOverId] = useState<string | null>(null);
   const addRef = useRef<HTMLButtonElement>(null);
   const [adding, setAdding] = useState(false);
+  // Copy link, Duplicate and Delete live in one … menu, away from Close (as on the row page).
+  const moreRef = useRef<HTMLButtonElement>(null);
+  const more = useActionMenu(
+    () => [
+      ...(onCopyLink ? [{ label: t('Copy link'), icon: Link2, run: onCopyLink }] : []),
+      ...(!readOnly && !guest ? [{ label: t('Duplicate'), icon: CopyPlus, run: onDuplicate }, { label: t('Delete'), icon: Trash2, danger: true, group: 'end', run: onDelete }] : []),
+    ],
+    { title: rowName(table, row) },
+  );
   const bodyRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     bodyRef.current?.scrollTo({ top: 0 }); // (newer browsers return a promise from scrollTo: never hand it to React)
@@ -396,27 +405,17 @@ function RecordPanel({ table, row, ctx, me, onCell, onComment, onDelete, onDupli
             </span>
           )}
           <span className="spacer" />
-          {onCopyLink && (
-            <button type="button" className="icon-btn sm" title={t('Copy a link to this row')} aria-label={t('Copy link')} onClick={onCopyLink}>
-              <Link2 size={15} />
-            </button>
-          )}
           {onToggleFull && (
             <button type="button" className="icon-btn sm tb-rd-full" title={full ? t('Open as a side panel') : t('Open as a page')} aria-label={full ? t('Open as a side panel') : t('Open as a page')} onClick={onToggleFull}>
               {full ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
             </button>
           )}
-          {!readOnly && !guest && (
-            <>
-              <button type="button" className="icon-btn sm" title={t('Duplicate row')} aria-label={t('Duplicate row')} onClick={onDuplicate}>
-                <Copy size={15} />
-              </button>
-              <span className="tb-rd-sep" aria-hidden />
-              <button type="button" className="icon-btn sm" title={t('Delete row')} aria-label={t('Delete row')} onClick={() => confirm(t('Delete “{name}”?', { name: rowName(table, row) })) && onDelete()}>
-                <Trash2 size={15} />
-              </button>
-            </>
+          {(onCopyLink || (!readOnly && !guest)) && (
+            <button ref={moreRef} type="button" className="icon-btn sm" title={t('Row options')} aria-label={t('Row options')} onClick={() => more.openFrom(moreRef)}>
+              <MoreHorizontal size={16} />
+            </button>
           )}
+          {more.menu}
           <button type="button" className="icon-btn sm" onClick={onClose} aria-label={t('Close')} title={t('Close (Esc)')}>
             <X size={16} />
           </button>
@@ -564,7 +563,7 @@ function RecordPage({ table, row, ctx, me, onCell, onComment, onDelete, onDuplic
   const more = useActionMenu(
     () => [
       ...(onCopyLink ? [{ label: t('Copy link'), icon: Link2, run: onCopyLink }] : []),
-      ...(!readOnly && !guest ? [{ label: t('Duplicate'), icon: CopyPlus, run: onDuplicate }, { label: t('Delete'), icon: Trash2, danger: true, group: 'end', run: () => confirm(t('Delete “{name}”?', { name: rowName(table, row) })) && onDelete() }] : []),
+      ...(!readOnly && !guest ? [{ label: t('Duplicate'), icon: CopyPlus, run: onDuplicate }, { label: t('Delete'), icon: Trash2, danger: true, group: 'end', run: onDelete }] : []),
     ],
     // When and by whom it was added lives here (Notion keeps it out of the page's way).
     { title: rowName(table, row), header: <div className="tb-page-meta"><Meta row={row} ctx={ctx} /></div> },
@@ -617,11 +616,23 @@ function RecordPage({ table, row, ctx, me, onCell, onComment, onDelete, onDuplic
       onBack={onClose}
       className="tb-page"
       actions={
-        more.open || (!readOnly && !guest) || onCopyLink ? (
-          <button ref={moreBtn} type="button" className="icon-btn" aria-label={t('Row options')} onClick={() => more.openFrom(moreBtn)}>
-            <MoreHorizontal size={20} />
-          </button>
-        ) : undefined
+        <>
+          {nav && nav.count > 1 && (
+            <>
+              <button type="button" className="icon-btn" disabled={!nav.prev} onClick={nav.prev} aria-label={t('Previous row')}>
+                <ChevronUp size={20} />
+              </button>
+              <button type="button" className="icon-btn" disabled={!nav.next} onClick={nav.next} aria-label={t('Next row')}>
+                <ChevronDown size={20} />
+              </button>
+            </>
+          )}
+          {(more.open || (!readOnly && !guest) || onCopyLink) && (
+            <button ref={moreBtn} type="button" className="icon-btn" aria-label={t('Row options')} onClick={() => more.openFrom(moreBtn)}>
+              <MoreHorizontal size={20} />
+            </button>
+          )}
+        </>
       }
       footer={footer}
     >

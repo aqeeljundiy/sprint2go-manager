@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
-import { ArrowDown, ArrowUp, Bold, Check, ChevronDown, Cloud, CloudOff, Copy, Eye, Highlighter, Italic, Link2, List, ListChecks, ListOrdered, ListTodo, MoreHorizontal, NotebookPen, Pin, PinOff, Quote, RotateCcw, Share, SquareCheck, Strikethrough, Trash2, Type, Underline, Undo2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, Bold, Check, ChevronDown, Cloud, CloudOff, Copy, Eye, Highlighter, Italic, Link2, List, ListChecks, ListOrdered, ListTodo, MoreHorizontal, NotebookPen, Quote, Redo2, RotateCcw, SquareCheck, Strikethrough, Trash2, Type, Underline, Undo2 } from 'lucide-react';
 import type { Note, Todo } from '../../types';
 import { relative } from '../../utils';
 import { toast } from '../../toast';
@@ -11,7 +11,8 @@ import { ProjectPicker } from '../ProjectPicker';
 import { term } from '../../terms';
 import { NoteBar } from './NoteBar';
 import { NoteText, type Caret, type NoteTextHandle } from './NoteText';
-import { FormatPanel, HIGHLIGHTS, LinkPanel, MentionPanel, whoSees } from './NoteSheets';
+import { FormatPanel, HIGHLIGHTS, LinkPanel, MentionPanel, PALETTE, whoSees } from './NoteSheets';
+import { htmlToText } from '../../sanitize';
 import { lineText, linkedFrom, noteLink } from './noteHtml';
 import { noteActions } from './noteMenu';
 import { canEditNote, useNoteMenu, type NotesApi } from './useNoteMenu';
@@ -49,7 +50,7 @@ export function NoteEditor(p: NoteEditorProps) {
   if (!note)
     return (
       <section className="notes-pane view-enter">
-        <EmptyState icon={<NotebookPen size={22} />} title={t('Pick a note, or write a new one')} text={t('Private notes, meeting prep, how-tos for the team. Link a note to a {project} and it shows on their page.', { project: term.one })} />
+        <EmptyState icon={<NotebookPen size={22} />} title={t('No note open')} />
       </section>
     );
   return <Open key={note.id} {...p} note={note} />;
@@ -82,7 +83,32 @@ function Open(p: NoteEditorProps & { note: Note }) {
   const linkBtn = useRef<HTMLButtonElement>(null);
   const file = useRef<HTMLInputElement>(null);
   const dots = useRef<HTMLButtonElement>(null);
-  const menu = useActionMenu(() => noteActions(note, ctx), { title: note.title || t('Untitled') });
+  // Desktop: the header's project chip moves the note, so the menu doesn't repeat it.
+  const menu = useActionMenu(() => noteActions(note, ctx, { noMove: !phone }), { title: note.title || t('Untitled') });
+  // "Saved" for a few seconds after an edit, then when it was edited (a timer, so it changes on its own).
+  const [justSaved, setJustSaved] = useState(false);
+  const savedTimer = useRef<number | undefined>(undefined);
+  useEffect(() => () => clearTimeout(savedTimer.current), []);
+  // Redo shows next to Undo once something was undone, until the next edit.
+  const [canRedo, setCanRedo] = useState(false);
+  const [hlSheet, setHlSheet] = useState(false);
+
+  // A note left empty (New note, then Back) goes quietly, as in Apple Notes. Deferred a tick so a remount (the same
+  // note opened again at once) keeps it.
+  const latest = useRef(note);
+  latest.current = note;
+  useEffect(() => {
+    OPEN.add(note.id);
+    return () => {
+      OPEN.delete(note.id);
+      const id = note.id;
+      setTimeout(() => {
+        const n = latest.current;
+        if (OPEN.has(id) || n.ownerId !== me || n.deletedAt || n.title.trim() || htmlToText(n.html).trim() || /<(img|hr|ul|ol|table)|note-task/.test(n.html)) return;
+        api.discard(id);
+      }, 0);
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Opened from a search: the match, marked for a moment. A new note: straight onto its title.
   useEffect(() => {
@@ -111,6 +137,10 @@ function Open(p: NoteEditorProps & { note: Note }) {
     const next = { ...note, ...patch };
     keepDraft(note.id, next.title, next.html);
     save.edited();
+    setCanRedo(false);
+    setJustSaved(true);
+    clearTimeout(savedTimer.current);
+    savedTimer.current = window.setTimeout(() => setJustSaved(false), 8000);
     api.patch(note.id, patch);
   };
 
@@ -185,7 +215,7 @@ function Open(p: NoteEditorProps & { note: Note }) {
     indent: (dir: 1 | -1) => text.current?.cmd(dir > 0 ? 'indent' : 'outdent'),
     move: (dir: -1 | 1) => text.current?.moveLine(dir),
     cmd: (c: string) => text.current?.cmd(c),
-    highlight: () => text.current?.highlight(hl),
+    highlight: () => (phone ? (text.current?.save(), setHlSheet(true)) : text.current?.highlight(hl)),
     link: () => openPanel('link'),
   };
   const fmt = { block: (t: 'P' | 'H1' | 'H2' | 'H3' | 'BLOCKQUOTE' | 'PRE') => text.current?.block(t), cmd: (c: string) => text.current?.cmd(c), checklist: () => text.current?.checklist(), highlight: (c: string | null) => text.current?.highlight(c), color: (c: string | null) => text.current?.color(c), code: () => text.current?.code(), callout: () => text.current?.callout() };
@@ -208,15 +238,17 @@ function Open(p: NoteEditorProps & { note: Note }) {
       <>
         <Cloud size={13} /> {t('Saving…')}
       </>
-    ) : Date.now() - Date.parse(note.updatedAt) < 8000 && note.updatedBy === me ? (
+    ) : justSaved ? (
       <>
         <Cloud size={13} /> {t('Saved')}
       </>
     ) : (
       <>
-        {editedBy ? (editedBy.id === me ? t('Edited {when} by you', { when: relative(note.updatedAt) }) : t('Edited {when} by {name}', { when: relative(note.updatedAt), name: editedBy.name.split(' ')[0] })) : t('Edited {when}', { when: relative(note.updatedAt) })}
+        {editedBy ? (editedBy.id === me ? t('Edited {when}', { when: relative(note.updatedAt) }) : t('Edited {when} by {name}', { when: relative(note.updatedAt), name: editedBy.name.split(' ')[0] })) : t('Edited {when}', { when: relative(note.updatedAt) })}
       </>
     );
+
+  const statusKey = save.state === 'saved' ? (justSaved ? 'just' : 'edited') : save.state;
 
   const linked = (links.notes.length > 0 || links.tasks.length > 0) && (
     <section className="note-linked" aria-label={t('Linked from')}>
@@ -258,7 +290,7 @@ function Open(p: NoteEditorProps & { note: Note }) {
             </div>
           )}
           {/* Phones: saving and when it was last edited, one quiet line above the title (Apple Notes puts the date there), never floating mid-page. */}
-          {phone && <p className="note-meta note-meta-top">{status}</p>}
+          {phone && <p className="note-meta note-meta-top"><span key={statusKey} className="note-status">{status}</span></p>}
           <textarea
             ref={title}
             className="note-title"
@@ -286,13 +318,13 @@ function Open(p: NoteEditorProps & { note: Note }) {
             aria-label={tx('note', 'Title')}
             enterKeyHint="next"
           />
-          {!phone && <p className="note-meta">{status}</p>}
+          {!phone && <p className="note-meta"><span key={statusKey} className="note-status">{status}</span></p>}
           <NoteText
             ref={text}
             html={note.html}
             editable={canEdit && editing}
             tasks={tasks}
-            placeholder={canEdit ? t('Write here. A line can become a task: put the caret on it and tap Make task.') : ''}
+            placeholder={canEdit ? t('Start writing') : ''}
             onChange={(html) => change({ html })}
             onCaret={setCaret}
             onFocus={(on) => setFocus((f) => (on ? 'text' : f === 'text' ? null : f))}
@@ -365,6 +397,19 @@ function Open(p: NoteEditorProps & { note: Note }) {
         />
       )}
       {lineMenu && <ActionSheet open onClose={() => setLineMenu(null)} title={lineText(lineMenu.block).slice(0, 60) || t('This line')} actions={lineActions(lineMenu.block)} at={phone ? null : { x: lineMenu.x, y: lineMenu.y }} />}
+      {hlSheet && (
+        <ActionSheet
+          open
+          onClose={() => (setHlSheet(false), back())}
+          title={t('Colour')}
+          actions={[
+            ...HIGHLIGHTS.map((c) => ({ label: t(c.name), icon: Highlighter, group: 'bg', heading: t('Highlight'), run: () => (back(), text.current?.highlight(c.color)) })),
+            { label: t('No highlight'), icon: Highlighter, group: 'bg', run: () => (back(), text.current?.highlight(null)) },
+            ...PALETTE.filter((c) => ['Red', 'Orange', 'Green', 'Blue', 'Purple'].includes(c.name)).map((c) => ({ label: t(c.name), icon: Type, group: 'text', heading: t('Text colour'), run: () => (back(), text.current?.color(c.text)) })),
+            { label: t('Default colour'), icon: Type, group: 'text', run: () => (back(), text.current?.color(null)) },
+          ]}
+        />
+      )}
       {menu.menu}
       {sheets}
     </div>
@@ -378,10 +423,11 @@ function Open(p: NoteEditorProps & { note: Note }) {
     </button>
   );
 
-  // Phones (Apple Notes): Share and "…" while reading; Undo (hold for Redo), Share and a round Done while writing.
+  // Phones (Apple Notes): who sees it and "…" while reading; Undo (then Redo), who sees it and a round Done while writing.
+  // The icon says what it opens (Only me or the team), not the system share sheet.
   const share = owner && !note.deletedAt && (
     <button type="button" className="icon-btn note-top-btn" onPointerDown={(e) => focus && e.preventDefault()} onClick={() => ctx.share(note)} aria-label={t('Who sees it: {who}. Change', { who: who.label })}>
-      <Share size={21} />
+      <who.icon size={21} />
     </button>
   );
   if (phone)
@@ -394,7 +440,12 @@ function Open(p: NoteEditorProps & { note: Note }) {
         actions={
           focus ? (
             <span className="note-top-acts" key="writing">
-              <UndoButton onUndo={() => text.current?.cmd('undo')} onRedo={() => text.current?.cmd('redo')} />
+              <UndoButton onUndo={() => (text.current?.cmd('undo'), setCanRedo(true))} onRedo={() => text.current?.cmd('redo')} />
+              {canRedo && (
+                <button type="button" className="icon-btn note-top-btn note-redo" onPointerDown={(e) => e.preventDefault()} onClick={() => text.current?.cmd('redo')} aria-label={t('Redo')} title={t('Redo')}>
+                  <Redo2 size={21} />
+                </button>
+              )}
               {share}
               <button type="button" className="note-done-circle" onPointerDown={(e) => e.preventDefault()} onClick={done} aria-label={t('Done')}>
                 <Check size={20} strokeWidth={2.6} />
@@ -402,6 +453,11 @@ function Open(p: NoteEditorProps & { note: Note }) {
             </span>
           ) : (
             <span className="note-top-acts" key="reading">
+              {canEdit && !note.deletedAt && (
+                <button type="button" className="icon-btn note-top-btn" onClick={() => (text.current?.focus(true), openPanel('format'))} aria-label={t('Text styles')} title={t('Text styles')}>
+                  <Type size={21} />
+                </button>
+              )}
               {share}
               <button ref={dots} type="button" className="icon-btn note-top-btn" onClick={() => menu.openFrom(dots)} aria-label={t('Note actions')}>
                 <MoreHorizontal size={21} />
@@ -421,11 +477,6 @@ function Open(p: NoteEditorProps & { note: Note }) {
         {whoBtn}
         {canEdit && <ProjectPicker value={note.clientId ?? ''} onChange={(v) => change({ clientId: v || undefined })} projects={api.clients} none={t('No {project}', { project: term.one })} className="sel-flat" />}
         <span className="spacer" />
-        {canEdit && (
-          <button className="icon-btn sm" onClick={() => ctx.pin(note)} title={note.pinned ? t('Unpin') : t('Pin to the top')} aria-label={note.pinned ? t('Unpin') : t('Pin to the top')}>
-            {note.pinned ? <PinOff size={15} /> : <Pin size={15} />}
-          </button>
-        )}
         <button ref={dots} className="icon-btn sm" onClick={() => menu.openFrom(dots)} aria-label={t('Note actions')} title={t('More')}>
           <MoreHorizontal size={16} />
         </button>
@@ -479,6 +530,8 @@ function Open(p: NoteEditorProps & { note: Note }) {
 }
 
 /** Undo, and Redo when held (Apple Notes). Keeps the keyboard and the caret where they are. */
+const OPEN = new Set<string>(); // notes open on screen now
+
 function UndoButton({ onUndo, onRedo }: { onUndo: () => void; onRedo: () => void }) {
   const timer = useRef<number | undefined>(undefined);
   const held = useRef(false);

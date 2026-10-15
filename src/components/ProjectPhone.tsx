@@ -53,11 +53,14 @@ export function projectTabs(o: { late: number; unreadMail: number; quotes: boole
   ];
 }
 
+/** Built-in: the six parts most projects use; Workload, Tables, Logins (and Quotes until one exists) start hidden, shown again from tab settings. */
+export const projectTabDefaults = (hasQuote: boolean): TabPrefs => ({ order: [], hidden: ['workload', 'tables', 'logins', ...(hasQuote ? [] : ['quotes'])] });
+
 /** The tabs in the order this person (or the company) chose on desktop, with the ones they hid left out. */
-function useArranged(items: TabItem[]) {
+function useArranged(items: TabItem[], defaults?: TabPrefs) {
   const shared = useContext(TabDefaultsCtx);
   const [mine] = usePersisted<TabPrefs | null>('s2g-tabs:project-tabs', null);
-  const prefs = mine ?? shared.defaults['project-tabs'] ?? null;
+  const prefs = mine ?? shared.defaults['project-tabs'] ?? defaults ?? null;
   const hidden = new Set((prefs?.hidden ?? []).filter((id) => id !== 'overview'));
   return { all: arrange(items, prefs), shown: arrange(items, prefs).filter((t) => !hidden.has(t.id)) };
 }
@@ -68,7 +71,7 @@ const noteOf = (tab: TabItem & { note?: string }) => tab.note ?? '';
 /** A part's icon (the "…" menu and the overview's rows). */
 export const projectTabIcon = (id: string): LucideIcon => ICONS[id as ProjectTab] ?? FileText;
 /** The project's parts in the order this person (or the company) chose, without the hidden ones. */
-export const useProjectParts = (items: TabItem[]) => useArranged(items).shown as (TabItem & { note?: string })[];
+export const useProjectParts = (items: TabItem[], defaults?: TabPrefs) => useArranged(items, defaults).shown as (TabItem & { note?: string })[];
 
 /**
  * Back for a project's page on phones. Call it before any early return. A project opens on its tasks (`home`); its
@@ -87,9 +90,9 @@ export function useProjectPhone({ client, tab, home, onTab }: { client: Client |
 }
 
 /** The project's home on phones: its parts as rows, with what needs a look on the right. Hidden on desktop (tabs). */
-export function ProjectSections({ items, onTab, actions = [] }: { items: TabItem[]; onTab: (t: ProjectTab) => void; actions?: { id: string; label: string; danger?: boolean; run: () => void }[] }) {
+export function ProjectSections({ items, onTab, actions = [], defaults }: { items: TabItem[]; onTab: (t: ProjectTab) => void; defaults?: TabPrefs; actions?: { id: string; label: string; icon?: LucideIcon; danger?: boolean; run: () => void }[] }) {
   const phone = usePhone();
-  const { shown } = useArranged(items);
+  const { shown } = useArranged(items, defaults);
   if (!phone) return null;
   return (
     <>
@@ -118,7 +121,7 @@ export function ProjectSections({ items, onTab, actions = [] }: { items: TabItem
         <div className="proj-sections">
           {actions.map((a) => (
             <button key={a.id} type="button" className={`proj-sec-row${a.danger ? ' danger' : ''}`} onClick={a.run}>
-              <span className="proj-sec-icon">{a.danger ? <Archive size={20} /> : <LayoutTemplate size={20} />}</span>
+              <span className="proj-sec-icon">{(() => { const I = a.icon ?? (a.danger ? Archive : LayoutTemplate); return <I size={20} />; })()}</span>
               <span className="proj-sec-name">{a.label}</span>
             </button>
           ))}

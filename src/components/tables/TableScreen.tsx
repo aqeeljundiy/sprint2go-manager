@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowRightLeft, ArrowUpDown, Check, CheckSquare, ChevronDown, Copy, CopyPlus, Download, EyeOff, FileUp, Filter, Group, LayoutTemplate, Link2, Maximize2, Menu, MoreHorizontal, Palette, PanelRight, Plus, Search, SlidersHorizontal, Table2, Trash2, Undo2, Users, X, Zap } from 'lucide-react';
+import { ArrowRightLeft, ArrowUpDown, Check, CheckSquare, ChevronDown, Copy, CopyPlus, Download, EyeOff, FileUp, Filter, Group, LayoutTemplate, Link2, Maximize2, Menu, MoreHorizontal, Palette, PanelRight, Plus, Search, SlidersHorizontal, Table2, Trash2, Users, X, Zap } from 'lucide-react';
 import type { CellValue, Channel, Client, DataTable, RowTemplate, TableField, TableRow, TableViewDef, TableViewTweak, User } from '../../types';
 import { term, brand as product } from '../../terms';
 import { uid } from '../../utils';
@@ -31,6 +31,7 @@ import { BulkBar, BulkEditSheet, FilterLine, FilterSheet, QuickCreate, SettingsS
 import { EditSheet } from './EditSheet';
 import { EmptyState } from '../ui/EmptyState';
 import { VIEW_KINDS, kindDefaults, newView, viewIcon, viewName, isDefaultViewName } from './viewKinds';
+import { ConfirmSheet } from '../chat/Sheets';
 import { NARROW_PANE, clearTableLink, readTableLink, tableLink, usePaneWidth, useTweaks } from './hooks';
 import { download, rowsToCsv } from './csv';
 import { TABLE_COLORS, cellText, convertValue, filterCount, isComputed, isEmpty, noteOf, opsFor, optionsFromValues, parseIncoming, rowName, sortsOf, templateValues, viewFields, visibleRows } from './fields';
@@ -53,7 +54,7 @@ interface ScreenProps {
   setOpenRow: (id: string | null) => void;
   onDeleted: () => void;
   onMenu: () => void;
-  toast: (tb: { text: string; action?: { label: string; run: () => void } }) => void;
+  toast: (tb: { text: string; action?: { label: string; run: () => void }; ms?: number }) => void;
   channels: Channel[];
   isAdmin: boolean;
   canEditTables?: boolean; // Members may change columns, views and automations (company setting)
@@ -92,8 +93,6 @@ export function TableScreen(p: ScreenProps) {
   const tabAnchor = useRef<HTMLElement | null>(null);
   const addViewAnchor = useRef<HTMLElement | null>(null);
   const [name, setName] = useState(tb.name);
-  const badgeRef = useRef<HTMLButtonElement>(null);
-  const [colorsOpen, setColorsOpen] = useState(false);
   const [renamingView, setRenamingView] = useState('');
   const [autoOpen, setAutoOpen] = useState(false);
   const [buttonFor, setButtonFor] = useState<string | null>(null);
@@ -114,6 +113,7 @@ export function TableScreen(p: ScreenProps) {
   const canDeleteTable = !g && (p.isAdmin || !!p.canDeleteThings || tb.createdBy === p.me);
   const [running, setRunning] = useState<Set<string>>(new Set());
   const [asking, setAsking] = useState<{ row: TableRow; f: TableField } | null>(null);
+  const [confirming, setConfirming] = useState<{ row: TableRow; f: TableField } | null>(null); // a button that asks first, in the app's own sheet
   useEffect(() => setName(tb.name), [tb.name]);
 
   // A link to a view or a row (/tables?t=…&v=…&r=…): open what it points at.
@@ -231,6 +231,8 @@ export function TableScreen(p: ScreenProps) {
           return r;
         }),
       );
+      // A choice deleted (a board column too) can come back with its cards.
+      if (before.options?.some((o) => !keep.has(o.id))) p.toast({ text: t('Choice deleted'), action: { label: t('Undo'), run: undoLast } });
     }
     patchTable({ fields: tb.fields.map((x) => (x.id === f.id ? next : x)) });
   };
@@ -415,10 +417,12 @@ export function TableScreen(p: ScreenProps) {
     void navigator.clipboard?.writeText(tableLink(tb.id, base?.id, rowId)).then(() => p.toast({ text: rowId ? t('Link to the row copied') : t('Link to the view copied') }));
   };
   const deleteTable = () => {
-    if (!confirm(tn(mine.length, 'Delete “{name}” and its {n} row? This can’t be undone.', 'Delete “{name}” and its {n} rows? This can’t be undone.', { name: tb.name }))) return;
+    // Gone at once, with 10 seconds to bring the table and its rows back.
+    const table = tb, kept = mine;
     p.setRows((rs) => rs.filter((r) => r.tableId !== tb.id));
     p.setTables((ts) => ts.filter((x) => x.id !== tb.id));
     p.onDeleted();
+    p.toast({ text: t('Deleted “{name}”', { name: table.name }), ms: 10000, action: { label: t('Undo'), run: () => (p.setTables((ts) => (ts.some((x) => x.id === table.id) ? ts : [...ts, table])), p.setRows((rs) => [...rs.filter((r) => r.tableId !== table.id), ...kept])) } });
   };
 
   /* CSV */
@@ -470,7 +474,7 @@ export function TableScreen(p: ScreenProps) {
     const b = f.button;
     if (!b) return;
     if (b.ask?.length) return setAsking({ row, f });
-    if (b.confirm && !confirm(t('{button}: run this for “{row}”?', { button: b.label || f.name, row: rowName(tb, row) }))) return;
+    if (b.confirm) return setConfirming({ row, f });
     void press(row, f);
   };
 
@@ -481,6 +485,9 @@ export function TableScreen(p: ScreenProps) {
   const setFilters = (fs: typeof filters) => patchView({ filters: fs });
   const openRow = p.openRow ? mine.find((r) => r.id === p.openRow) : undefined;
   const fieldsHidden = view?.hidden?.length ?? 0;
+  // Under 1080px (an iPad) Group folds into one labelled "View settings" button with Fields and Colours; touch has no hover titles.
+  const compact = paneW < 1080;
+  const listy = !!view && (view.kind === 'grid' || view.kind === 'list');
   const groupField = view?.groupBy ? tb.fields.find((f) => f.id === view.groupBy) : undefined;
   const openRowFull = (id: string, wantFull = false) => (setFull(wantFull), p.setOpenRow(id));
   const filterBy = (fieldId: string) => {
@@ -631,34 +638,17 @@ export function TableScreen(p: ScreenProps) {
           <button className="icon-btn menu-btn" onClick={p.onMenu} aria-label={t('Open menu')}>
             <Menu size={18} />
           </button>
-          {/* The badge opens the colours to pick from (it used to jump to the next colour on each click, which read as a bug). */}
-          <button ref={badgeRef} type="button" className="client-badge tb-badge" style={{ background: tb.color }} title={g || !structure ? tb.name : t('Change colour')} disabled={!!g || !structure} onClick={() => setColorsOpen(true)} aria-haspopup="dialog">
+          {/* Just the table's letter: its colour is picked in the … menu. */}
+          <span className="client-badge tb-badge" style={{ background: tb.color }} aria-hidden>
             {tb.name.charAt(0).toUpperCase()}
-          </button>
-          <Popover anchor={badgeRef} open={colorsOpen} onClose={() => setColorsOpen(false)} title={t('Table colour')} width={220}>
-            <div className="tb-colors">
-              {TABLE_COLORS.map((c) => (
-                <button key={c} type="button" className={`swatch${tb.color === c ? ' on' : ''}`} style={{ background: c }} aria-label={t('Colour {color}', { color: c })} aria-pressed={tb.color === c} onClick={() => (patchTable({ color: c }), setColorsOpen(false))} />
-              ))}
-            </div>
-          </Popover>
+          </span>
           <div className="th-text">
             <input className="tb-title" value={name} readOnly={!!g || !structure} aria-label={t('Table name')} onChange={(e) => setName(e.target.value)} onBlur={() => (name.trim() ? name.trim() !== tb.name && patchTable({ name: name.trim() }) : setName(tb.name))} onKeyDown={(e) => e.key === 'Enter' && (e.target as HTMLInputElement).blur()} />
             {g || !structure ? tb.description && <span className="muted small tb-desc">{tb.description}</span> : <ProjectPicker value={tb.clientId ?? ''} onChange={(v) => patchTable({ clientId: v || undefined })} projects={p.clients} none={t('Whole company')} label={t('Belongs to')} className="sel-flat" />}
           </div>
-          {!g && !narrow && (
-            <button className="icon-btn" onClick={undoLast} title={t('Undo (Cmd/Ctrl+Z)')} aria-label={t('Undo')}>
-              <Undo2 size={16} />
-            </button>
-          )}
           {!g && !narrow && structure && tb.clientId && (
             <button className={`ghost-btn sm tb-share-btn${tb.share?.enabled ? ' on' : ''}`} onClick={() => setSharing(true)} title={t('What the {project}’s guests see', { project: term.one })}>
               <Users size={13} /> <span className="lbl">{tb.share?.enabled ? t('Shared') : t('Share')}</span>
-            </button>
-          )}
-          {structure && !narrow && (
-            <button className={`ghost-btn sm tb-auto-btn${tb.intake?.enabled || tb.rules?.some((r) => r.enabled) ? ' on' : ''}`} onClick={() => setAutoOpen(true)} title={t('Data coming in, rules, webhooks')}>
-              <Zap size={13} /> <span className="lbl">{t('Automations')}</span>
             </button>
           )}
           {g ? (
@@ -681,6 +671,22 @@ export function TableScreen(p: ScreenProps) {
                   <span className="muted small">{t('Description')}</span>
                   <textarea rows={2} defaultValue={tb.description ?? ''} placeholder={t('What this table is for')} onBlur={(e) => e.target.value.trim() !== (tb.description ?? '') && patchTable({ description: e.target.value.trim() || undefined })} />
                 </label>
+              )}
+              {structure && (
+                <div className="tb-menu-colors">
+                  <span className="muted small">{t('Colour')}</span>
+                  <div className="tb-colors">
+                    {TABLE_COLORS.map((c) => (
+                      <button key={c} type="button" className={`swatch${tb.color === c ? ' on' : ''}`} style={{ background: c }} aria-label={t('Colour {color}', { color: c })} aria-pressed={tb.color === c} onClick={() => patchTable({ color: c })} />
+                    ))}
+                  </div>
+                </div>
+              )}
+              {structure && (
+                <button type="button" onClick={() => (setPop(null), setAutoOpen(true))}>
+                  <Zap size={14} /> {t('Automations')}
+                  {(tb.intake?.enabled || tb.rules?.some((r) => r.enabled)) && <span className="tb-on-dot" aria-label={t('On')} />}
+                </button>
               )}
               {structure && (
                 <button type="button" onClick={() => (setPop(null), setTemplating(true))}>
@@ -758,7 +764,7 @@ export function TableScreen(p: ScreenProps) {
           )}
         </div>
       ) : (
-        <div className="tb-bar">
+        <div className={`tb-bar${paneW < 900 ? ' tb-bar-wrap' : ''}`}>
           <ViewTabs
             views={tb.views}
             current={base?.id ?? ''}
@@ -828,11 +834,11 @@ export function TableScreen(p: ScreenProps) {
                 <Filter size={13} /> <span className="lbl">{nFilters ? tn(nFilters, '{n} filter', '{n} filters') : t('Filter')}</span>
               </button>
               {view.kind !== 'calendar' && (
-                <button ref={refs.sort} className={`ghost-btn sm tb-quiet${sorts.length ? ' on' : ''}`} onClick={() => setPop('sort')} title={t('Sort')} aria-label={t('Sort')}>
+                <button ref={refs.sort} className={`ghost-btn sm${sorts.length ? ' on' : ''}`} onClick={() => setPop('sort')} title={t('Sort')} aria-label={t('Sort')}>
                   <ArrowUpDown size={13} /> <span className="lbl">{sorts.length ? (sorts.length > 1 ? t('Sorted ({n})', { n: sorts.length }) : t('Sorted: {field}', { field: tb.fields.find((f) => f.id === sorts[0].fieldId)?.name ?? '' })) : t('Sort')}</span>
                 </button>
               )}
-              {structure && (view.kind === 'grid' || view.kind === 'list') && (
+              {structure && listy && !compact && (
                 <button ref={refs.group} className={`ghost-btn sm tb-quiet${groupField ? ' on' : ''}`} onClick={() => setPop('group')} title={groupField ? (view.subGroupBy ? t('Grouped by {field}, then by {sub}', { field: groupField.name, sub: tb.fields.find((f) => f.id === view.subGroupBy)?.name ?? t('another field') }) : t('Grouped by {field}', { field: groupField.name })) : t('Group')} aria-label={t('Group')}>
                   <Group size={13} /> <span className="lbl">{groupField ? t('By {field}', { field: groupField.name }) : t('Group')}</span>
                 </button>
@@ -844,12 +850,13 @@ export function TableScreen(p: ScreenProps) {
                 structure &&
                 view.kind !== 'calendar' &&
                 view.kind !== 'timeline' && (
-                  <button ref={refs.fields} className={`ghost-btn sm tb-quiet${fieldsHidden ? ' on' : ''}`} onClick={() => setPop('fields')} title={t('Fields in this view')} aria-label={t('Fields')}>
-                    <EyeOff size={13} /> <span className="lbl">{fieldsHidden ? tn(fieldsHidden, '{n} hidden', '{n} hidden') : t('Fields')}</span>
+                  <button ref={refs.fields} className={`ghost-btn sm${fieldsHidden || (compact && groupField) ? ' on' : ''}`} onClick={() => setPop('fields')} title={compact ? t('View settings') : t('Fields in this view')} aria-label={compact ? t('View settings') : t('Fields')}>
+                    {compact ? <SlidersHorizontal size={13} /> : <EyeOff size={13} />} <span className="lbl">{compact ? t('View settings') : fieldsHidden ? tn(fieldsHidden, '{n} hidden', '{n} hidden') : t('Fields')}</span>
+                    {!!view.colors?.length && <i className="tb-btn-dot" aria-hidden />}
                   </button>
                 )
               )}
-              {structure && view.kind !== 'calendar' && view.kind !== 'timeline' && (
+              {structure && view.kind === 'board' && (
                 <button ref={refs.colors} className={`ghost-btn sm tb-quiet${view.colors?.length ? ' on' : ''}`} onClick={() => setPop('colors')} title={t('Colours')} aria-label={t('Colours')}>
                   <Palette size={13} /> <span className="lbl">{view.colors?.length ? t('Colours ({n})', { n: view.colors.length }) : t('Colours')}</span>
                 </button>
@@ -901,13 +908,24 @@ export function TableScreen(p: ScreenProps) {
               <Popover anchor={refs.sort} open={pop === 'sort'} onClose={() => setPop(null)} width={420} title={t('Sort')}>
                 <SortEditor table={tb} sorts={sorts} onChange={(s) => patchView({ sorts: s })} />
               </Popover>
-              <Popover anchor={refs.group} open={pop === 'group'} onClose={() => setPop(null)} width={320} title={view.kind === 'board' ? t('Columns and swimlanes') : t('Group by')}>
+              <Popover anchor={compact && listy ? refs.fields : refs.group} open={pop === 'group'} onClose={() => setPop(null)} width={320} title={view.kind === 'board' ? t('Columns and swimlanes') : t('Group by')}>
                 <GroupEditor t={tb} view={view} onView={patchShared} board={view.kind === 'board'} />
               </Popover>
               <Popover anchor={refs.fields} open={pop === 'fields'} onClose={() => setPop(null)} width={300} title={t('Fields in this view')}>
                 <FieldsEditor t={tb} view={view} onView={patchShared} all={viewFields(tb, view, true)} />
+                {/* Group (on an iPad) and Colours open from here: less used than Filter and Sort. */}
+                <div className="tb-menu tb-view-more">
+                  {compact && listy && (
+                    <button type="button" className={groupField ? 'on' : ''} onClick={() => setPop('group')}>
+                      <Group size={14} /> {groupField ? t('By {field}', { field: groupField.name }) : t('Group')}
+                    </button>
+                  )}
+                  <button type="button" className={view.colors?.length ? 'on' : ''} onClick={() => setPop('colors')}>
+                    <Palette size={14} /> {view.colors?.length ? t('Colours ({n})', { n: view.colors.length }) : t('Colours')}
+                  </button>
+                </div>
               </Popover>
-              <Popover anchor={refs.colors} open={pop === 'colors'} onClose={() => setPop(null)} width={520} title={t('Colours')}>
+              <Popover anchor={view.kind === 'board' ? refs.colors : refs.fields} open={pop === 'colors'} onClose={() => setPop(null)} width={520} title={t('Colours')}>
                 <ColorRulesEditor table={tb} view={view} users={p.users} me={p.me} onView={patchShared} />
               </Popover>
             </>
@@ -938,7 +956,7 @@ export function TableScreen(p: ScreenProps) {
 
       {!g && !narrow && tip && view?.kind === 'grid' && (
         <div className="tb-tip">
-          <span>{t('Click a column’s name to rename it, change its type, sort, filter or hide it. Drag columns and rows to move them. Click a cell once to choose it, again to edit; copy and paste blocks of cells, even from a spreadsheet.')}</span>
+          <span>{t('Click a column’s name for its options.')}</span>
           <button className="icon-btn sm" onClick={() => setTip(false)} aria-label={t('Got it')}>
             <X size={13} />
           </button>
@@ -1063,7 +1081,7 @@ export function TableScreen(p: ScreenProps) {
           canDelete={!g}
           onEdit={() => setSheet('bulk')}
           onDuplicate={canAdd ? () => duplicateMany([...selected]) : undefined}
-          onDelete={() => confirm(tn(selected.size, 'Delete {n} row?', 'Delete {n} rows?')) && deleteRows([...selected])}
+          onDelete={() => deleteRows([...selected])}
           onAll={narrow && selected.size < shown.length ? () => setSelected(new Set(shown.map((r) => r.id))) : undefined}
           onCancel={() => (setSelected(new Set()), setSelecting(false))}
         />
@@ -1140,6 +1158,7 @@ export function TableScreen(p: ScreenProps) {
       {laying && <PageLayoutDialog t={tb} onSave={(page) => (patchTable({ page }), p.toast({ text: t('Row page layout saved') }))} onClose={() => setLaying(false)} />}
       {autoOpen && <AutomationsPanel t={tb} tables={p.tables} users={p.users} channels={p.channels} onPatch={patchTable} onClose={() => setAutoOpen(false)} toast={(text) => p.toast({ text })} />}
       {buttonField && <ButtonDialog key={buttonField.id} field={buttonField} t={tb} tables={p.tables} users={p.users} channels={p.channels} onSave={(button) => saveField({ ...buttonField, button })} onClose={() => setButtonFor(null)} />}
+      {confirming && <ConfirmSheet safe title={confirming.f.button?.label || confirming.f.name} text={t('{button}: run this for “{row}”?', { button: confirming.f.button?.label || confirming.f.name, row: rowName(tb, confirming.row) })} yes={t('Run')} onYes={() => void press(confirming.row, confirming.f)} onClose={() => setConfirming(null)} />}
       {asking && (
         <AskDialog
           table={tb}

@@ -111,7 +111,7 @@ export function MonthDrop({
 
   if (bare)
     return (
-      <div className={`fold month-drop bare${open ? ' open' : ''}`} aria-hidden={!open}>
+      <div className={`fold month-drop bare${open ? ' open' : ''}`} aria-hidden={!open} inert={!open || undefined}>
         <div className="fold-in">
           <div className={`md-wrap${chipsOnly ? ' chips-only' : ''}`}>
             {!chipsOnly && days}
@@ -134,7 +134,7 @@ export function MonthDrop({
     );
 
   return (
-    <div className={`fold month-drop${open ? ' open' : ''}`} aria-hidden={!open}>
+    <div className={`fold month-drop${open ? ' open' : ''}`} aria-hidden={!open} inert={!open || undefined}>
       <div className="fold-in">
         <div className="md-wrap">
           <div className="md-head">

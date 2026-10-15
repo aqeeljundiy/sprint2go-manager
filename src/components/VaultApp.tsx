@@ -1,5 +1,5 @@
 import { ProjectBadge } from './ProjectBadge';
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useReducer, useRef, useState, type ReactNode } from 'react';
 import { ProjectPicker } from './ProjectPicker';
 import { SmoothHeight } from './ui/Smooth';
 import { term, brand as product } from '../terms';
@@ -12,7 +12,7 @@ import { server } from '../sync';
 import { isSandboxId } from '../sandbox';
 import { Popover } from './ui/Popover';
 import { PeoplePicker } from './ui/PeoplePicker';
-import { decryptSecret, encryptSecret, isEncrypted, makeVaultKeys, newItemKeys, rewrapVaultKey, setVaultUnlocked, totp as totpCode, unlockVaultKey, unwrapWith, vaultUnlocked, wrapFor, type VaultKeyRecord, type WrappedKey } from '../vaultCrypto';
+import { decryptSecret, encryptSecret, isEncrypted, makeVaultKeys, newItemKeys, rewrapVaultKey, setVaultUnlocked, vaultAnyUnlocked, onVaultLockChange, totp as totpCode, unlockVaultKey, unwrapWith, vaultUnlocked, wrapFor, type VaultKeyRecord, type WrappedKey } from '../vaultCrypto';
 import { EmptyState } from './ui/EmptyState';
 import { PushScreen } from './ui/PushScreen';
 import { Sheet } from './ui/Sheet';
@@ -77,9 +77,13 @@ const copySecret = async (text: string) => {
 /** The sidebar: all logins, or one client's. */
 export function VaultSidebar({ items, clients, filter, onFilter, onNew, workspaceId }: { items: VaultItem[]; clients: Client[]; filter: string; onFilter: (f: string) => void; onNew: () => void; workspaceId?: string }) {
   const withItems = clients.filter((c) => items.some((i) => i.meta.clientId === c.id));
+  // Locked: adding a login needs the key, so the button waits until the passphrase is typed.
+  const [, redraw] = useReducer((n: number) => n + 1, 0);
+  useEffect(() => onVaultLockChange(redraw), []);
+  const locked = !vaultAnyUnlocked();
   return (
     <>
-      <button className="compose-btn" onClick={onNew} disabled={!server.on || isSandboxId(workspaceId)} title={t('Add a login')}>
+      <button className="compose-btn" onClick={onNew} disabled={!server.on || isSandboxId(workspaceId) || locked} title={locked ? t('Unlock the Vault first.') : t('Add a login')}>
         <Plus size={16} />
         <span className="sb-label">{t('Add a login')}</span>
       </button>
@@ -303,11 +307,8 @@ export function VaultView({
       toast((e as Error).message);
     }
   };
-  /** Asks first: a sheet on phones, the browser's question on desktop. */
-  const askDelete = (it: VaultItem) => {
-    if (phone) return setConfirmDel(it);
-    if (confirm(t('Delete the login “{title}”? This can’t be undone.', { title: it.meta.title }))) void remove(it);
-  };
+  /** Asks first: a sheet on phones, the same sheet as a centred panel on wider screens. */
+  const askDelete = (it: VaultItem) => setConfirmDel(it);
   const openLog = async (it: VaultItem) => {
     try {
       const { log: rows } = await api<{ log: { userId: string; what: string; at: string }[] }>(`/api/vault/${it.id}/log`);
@@ -316,7 +317,7 @@ export function VaultView({
       toast((e as Error).message);
     }
   };
-  const copyUsername = (it: VaultItem) => void navigator.clipboard?.writeText(it.meta.username ?? '').then(() => toast(t('Username copied')));
+  const copyUsername = (it: VaultItem) => void copySecret(it.meta.username ?? '').then(() => toast(t('Username copied')));
   const copyCode = async (it: VaultItem) => {
     try {
       const r = it.meta.keys ? await totpCode(await secretOf(it, 'totp')) : await api<{ code: string; secondsLeft: number }>(`/api/vault/${it.id}/code`, { method: 'POST' });
@@ -328,6 +329,22 @@ export function VaultView({
     }
   };
   const ops: VaultOps = { copyPassword, copyUsername, copyCode, showCode: (id) => void showCode(id), secretOf, askDelete, openLog, edit: (it) => setEditing(it), accessLabel, who, toast };
+
+  const confirmSheet = confirmDel && (
+          <Sheet title={t('Delete “{title}”?', { title: confirmDel.meta.title })} onClose={() => setConfirmDel(null)} className="vp-confirm">
+            <p className="vp-confirm-text">{t('Everyone who uses it loses it too. This can’t be undone.')}</p>
+            <div className="as-list">
+              <button type="button" className="as-item danger" onClick={() => (setConfirmDel(null), void remove(confirmDel))}>
+                <Trash2 size={18} className="as-icon" />
+                <span className="as-label">{t('Delete login')}</span>
+              </button>
+              <button type="button" className="as-item" onClick={() => setConfirmDel(null)}>
+                <X size={18} className="as-icon" />
+                <span className="as-label">{t('Cancel')}</span>
+              </button>
+            </div>
+          </Sheet>
+  );
 
   if (phone) {
     const query = q.trim().toLowerCase();
@@ -361,21 +378,7 @@ export function VaultView({
           {shown.length > 0 && <p className="vp-foot">{t('End-to-end encrypted. Copying a password is logged.')}</p>}
         </div>
         {open && <VaultItemScreen it={open} clients={clients} me={me} ops={ops} code={code?.id === open.id ? code : null} onBack={() => setOpenId(null)} />}
-        {confirmDel && (
-          <Sheet title={t('Delete “{title}”?', { title: confirmDel.meta.title })} onClose={() => setConfirmDel(null)} className="vp-confirm">
-            <p className="vp-confirm-text">{t('Everyone who uses it loses it too. This can’t be undone.')}</p>
-            <div className="as-list">
-              <button type="button" className="as-item danger" onClick={() => (setConfirmDel(null), void remove(confirmDel))}>
-                <Trash2 size={18} className="as-icon" />
-                <span className="as-label">{t('Delete login')}</span>
-              </button>
-              <button type="button" className="as-item" onClick={() => setConfirmDel(null)}>
-                <X size={18} className="as-icon" />
-                <span className="as-label">{t('Cancel')}</span>
-              </button>
-            </div>
-          </Sheet>
-        )}
+        {confirmSheet}
         {log && (
           <PushScreen title={t('Activity')} backLabel={log.item.meta.title} onBack={() => setLog(null)} className="g-page">
             <div className="vp-detail">
@@ -488,7 +491,7 @@ export function VaultView({
                   )
                 )}
                 {it.meta.username && (
-                  <button className="icon-btn sm" title={t('Copy username')} onClick={() => void navigator.clipboard?.writeText(it.meta.username!).then(() => toast(t('Username copied')))}>
+                  <button className="icon-btn sm" title={t('Copy username')} onClick={() => copyUsername(it)}>
                     <Copy size={14} />
                   </button>
                 )}
@@ -559,14 +562,7 @@ export function VaultView({
                   className="sel-opt danger"
                   onClick={async () => {
                     setMenu(null);
-                    if (!confirm(t('Delete the login “{title}”? This can’t be undone.', { title: current.meta.title }))) return;
-                    try {
-                      await api(`/api/vault/${current.id}`, { method: 'DELETE' });
-                      reload();
-                      toast(t('Login deleted'));
-                    } catch (e) {
-                      toast((e as Error).message);
-                    }
+                    askDelete(current);
                   }}
                 >
                   <Trash2 size={14} /> {t('Delete')}
@@ -642,6 +638,7 @@ export function VaultView({
           </div>
         </div>
       )}
+      {confirmSheet}
     </section>
   );
 }
@@ -673,14 +670,26 @@ function VaultTile({ title, size = 40 }: { title: string; size?: number }) {
   );
 }
 
+/** The A-Z section a login sits under ('#' for digits and symbols). */
+const letterOf = (title: string) => {
+  const c = title.trim().charAt(0).toUpperCase();
+  return /\p{L}/u.test(c) ? c : '#';
+};
+
 /** The phone's list: Apple Passwords' rows. Tap opens the login, hold for its menu, swipe left to copy or delete. */
 function VaultPhoneList({ items, clients, me, ops, onOpen }: { items: VaultItem[]; clients: Client[]; me: string; ops: VaultOps; onOpen: (id: string) => void }) {
   const rows = useLeaving(items, (i) => i.id);
   return (
     <div className="vp-list">
-      {rows.map(({ item, leaving }) => (
-        <VaultPhoneRow key={item.id} it={item} leaving={leaving} clients={clients} me={me} ops={ops} onOpen={() => onOpen(item.id)} />
-      ))}
+      {rows.map(({ item, leaving }, i) => {
+        const letter = letterOf(item.meta.title);
+        return (
+          <Fragment key={item.id}>
+            {(i === 0 || letterOf(rows[i - 1].item.meta.title) !== letter) && <h3 className="vp-letter">{letter}</h3>}
+            <VaultPhoneRow it={item} leaving={leaving} clients={clients} me={me} ops={ops} onOpen={() => onOpen(item.id)} />
+          </Fragment>
+        );
+      })}
     </div>
   );
 }
@@ -722,6 +731,11 @@ function VaultPhoneRow({ it, leaving, clients, me, ops, onOpen }: { it: VaultIte
               {shared && <Users size={16} className="vp-mark" aria-label={t('Shared')} />}
             </span>
           )}
+          {it.hasPassword && (
+            <button type="button" className="vp-copy" aria-label={t('Copy password')} onClick={(e) => (e.stopPropagation(), void ops.copyPassword(it))} onKeyDown={(e) => e.stopPropagation()}>
+              <Copy size={18} />
+            </button>
+          )}
         </div>
       </SwipeRow>
       {menu.menu}
@@ -758,7 +772,7 @@ function VaultItemScreen({ it, clients, me, ops, code, onBack }: { it: VaultItem
   };
   return (
     <PushScreen
-      title=""
+      title={it.meta.title}
       backLabel={t('Vault')}
       onBack={onBack}
       className="g-page vp-screen"
@@ -873,9 +887,9 @@ const parseTotp = (raw: string) => {
   }
   return s.replace(/\s+/g, '');
 };
-const strongPassword = () => {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%&*?';
-  const a = new Uint32Array(20);
+const strongPassword = (length = 20, symbols = true, digits = true) => {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz' + (digits ? '23456789' : '') + (symbols ? '!@#$%&*?' : '');
+  const a = new Uint32Array(length);
   crypto.getRandomValues(a);
   return [...a].map((n) => chars[n % chars.length]).join('');
 };
@@ -918,6 +932,8 @@ function VaultEditor({
   const [userIds, setUserIds] = useState<string[]>(item?.meta.access.userIds ?? []);
   const [teamIds, setTeamIds] = useState<string[]>(item?.meta.access.teamIds ?? []);
   const [showPw, setShowPw] = useState(false);
+  const [gen, setGen] = useState<{ length: number; symbols: boolean; digits: boolean } | null>(null);
+  const makePw = (o: { length: number; symbols: boolean; digits: boolean }) => (setGen(o), setPassword(strongPassword(o.length, o.symbols, o.digits)), setShowPw(true));
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [noKey, setNoKey] = useState<string[]>([]); // people who'd get access but haven't set up their Vault yet
@@ -990,10 +1006,26 @@ function VaultEditor({
                 <button type="button" className="icon-btn sm" onClick={() => setShowPw((s) => !s)} title={showPw ? t('Hide') : t('Show')}>
                   <Eye size={14} />
                 </button>
-                <button type="button" className="ghost-btn sm" onClick={() => (setPassword(strongPassword()), setShowPw(true))}>
+                <button type="button" className="ghost-btn sm vault-gen" onClick={() => makePw(gen ?? { length: 20, symbols: true, digits: true })}>
                   {t('Generate')}
                 </button>
               </span>
+              <div className={`fold${gen ? ' open' : ''}`} aria-hidden={!gen}>
+                <div className="fold-in">
+                  <div className="vault-gen-opts">
+                    <label className="vault-gen-len">
+                      <span>{t('Length {n}', { n: gen?.length ?? 20 })}</span>
+                      <input type="range" min={8} max={40} value={gen?.length ?? 20} onChange={(e) => gen && makePw({ ...gen, length: Number(e.target.value) })} tabIndex={gen ? 0 : -1} />
+                    </label>
+                    <label className="vault-gen-check">
+                      <input type="checkbox" checked={gen?.digits ?? true} onChange={(e) => gen && makePw({ ...gen, digits: e.target.checked })} tabIndex={gen ? 0 : -1} /> {t('Numbers')}
+                    </label>
+                    <label className="vault-gen-check">
+                      <input type="checkbox" checked={gen?.symbols ?? true} onChange={(e) => gen && makePw({ ...gen, symbols: e.target.checked })} tabIndex={gen ? 0 : -1} /> {t('Symbols')}
+                    </label>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           {/* The optional parts in one group (on phones, one card), the project as a row with its value on the right. */}
@@ -1096,6 +1128,9 @@ function VaultGate({ record, me, onUnlocked }: { record?: VaultKeyRecord; me: st
   const fresh = !record;
   const phone = usePhone();
   const [how, setHow] = useState(false);
+  const [showPass, setShowPass] = useState(false);
+  // A rough strength: length, plus a little for mixing kinds of characters. 0 to 4.
+  const strength = !pass ? 0 : Math.min(4, Math.floor(pass.length / 6) + (/[^a-zA-Z]/.test(pass) && /[a-zA-Z]/.test(pass) ? 1 : 0));
   const go = async () => {
     setBusy(true);
     setError('');
@@ -1134,7 +1169,7 @@ function VaultGate({ record, me, onUnlocked }: { record?: VaultKeyRecord; me: st
               </button>
               <div className={`fold${how ? ' open' : ''}`} aria-hidden={!how}>
                 <div className="fold-in">
-                  <p className="muted vg-how-text">{t('The server never sees a password: logins are locked on your devices. If the passphrase is lost, teammates share the logins with you again.')}</p>
+                  <p className="muted vg-how-text">{t('If you forget it, nobody can open your logins, not even an admin. Set a new passphrase, and anyone who still has a login can share it with you again.')}</p>
                 </div>
               </div>
             </>
@@ -1145,8 +1180,18 @@ function VaultGate({ record, me, onUnlocked }: { record?: VaultKeyRecord; me: st
               void go();
             }}
           >
-            <input type="password" autoFocus={!phone} value={pass} onChange={(e) => setPass(e.target.value)} placeholder={t('Passphrase')} autoComplete={fresh ? 'new-password' : 'current-password'} />
-            {fresh && <input type="password" value={again} onChange={(e) => setAgain(e.target.value)} placeholder={t('Once more')} autoComplete="new-password" />}
+            <span className="vg-pass">
+              <input type={showPass ? 'text' : 'password'} autoFocus={!phone} value={pass} onChange={(e) => setPass(e.target.value)} placeholder={t('Passphrase')} aria-label={t('Passphrase')} autoComplete={fresh ? 'new-password' : 'current-password'} />
+              <button type="button" className="vg-eye" onClick={() => setShowPass((s) => !s)} aria-label={showPass ? t('Hide') : t('Show')} aria-pressed={showPass}>
+                {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </span>
+            {fresh && (
+              <span className="vg-meter" data-level={strength} role="meter" aria-label={t('Passphrase strength')} aria-valuemin={0} aria-valuemax={4} aria-valuenow={strength}>
+                <i /><i /><i /><i />
+              </span>
+            )}
+            {fresh && <input type={showPass ? 'text' : 'password'} value={again} onChange={(e) => setAgain(e.target.value)} placeholder={t('Confirm passphrase')} aria-label={t('Confirm passphrase')} autoComplete="new-password" />}
             {error && <p className="err small">{error}</p>}
             <button className="primary-btn" disabled={busy || !pass}>
               {busy ? t('Working…') : fresh ? t('Set and open') : t('Unlock')}

@@ -302,6 +302,36 @@
     min-height: var(--tap);
     border-radius: var(--r-pill);
   }
+  /* Disabled until there is a name: a neutral bar, not a washed-out green one. */
+  .proj-new-sheet .sheet-foot .primary-btn:disabled {
+    background: var(--surface-2);
+    color: var(--text-3);
+    opacity: 1;
+  }
+  .proj-new-sheet .proj-new-more {
+    padding: 8px 16px 0;
+  }
+  .proj-new-sheet .proj-new-domain input {
+    width: 100%;
+    min-height: 44px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: var(--r-tile);
+    background: var(--surface-2);
+    color: var(--text);
+    font: var(--t-field);
+  }
+  /* The Projects drawer's type chips: 32 px to see, 44 px to tap. */
+  :root.phone-sidebar .sidebar .type-chips button {
+    position: relative;
+    min-height: 32px;
+    padding-inline: 12px;
+  }
+  :root.phone-sidebar .sidebar .type-chips button::after {
+    content: '';
+    position: absolute;
+    inset: -6px -2px;
+  }
 }
 
 /* Notes, Logins, Quotes and Meetings: their create is the floating button (useCreateAction), so it shows on these focused
@@ -435,5 +465,22 @@
   }
   100% {
     mask-image: none;
+  }
+}
+
+@media (max-width: 767px) {
+  /* A Browse row with a second line (a project's next deadline or last update): a 64 two-line row. */
+  .tbr-row:has(.tbr-two) {
+    min-height: var(--row-2);
+  }
+  .tbr-label.tbr-two {
+    display: grid;
+  }
+  .tbr-sub {
+    overflow: hidden;
+    font: var(--t-secondary);
+    color: var(--text-3);
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 }

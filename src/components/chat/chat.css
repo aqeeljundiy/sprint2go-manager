@@ -1518,8 +1518,10 @@
 @media (prefers-reduced-motion: reduce) {
   .ht-tile,
   .ht-video,
-  .huddle-full {
+  .huddle-full,
+  .is-leaving.huddle-full {
     animation: none;
+    transition: opacity 0.15s;
   }
 }
 /* The card keeps its width whatever the video's own size is. */
@@ -1588,6 +1590,7 @@
 @media (min-width: 768px) {
   .page-activity .act-feed {
     max-width: 760px;
+    margin-inline: auto;
   }
   .page-activity .act-chips {
     display: flex;
@@ -1723,4 +1726,29 @@
 /* The view editor's "find them with ⌘K" hint has a phone wording (no keyboard there). */
 .ve-k-phone {
   display: none;
+}
+/* Activity chips answer the pointer like every other desktop control. */
+@media (min-width: 768px) and (hover: hover) {
+  .page-activity .act-chip:not(.on):hover {
+    background: var(--hover);
+    color: var(--text);
+  }
+}
+/* Message text keeps a readable line length on wide screens; attachments still use the full column. */
+@media (min-width: 768px) {
+  .chat-msg .cm-text {
+    max-width: 72ch;
+  }
+}
+/* Channel tabs scroll sideways when they don't fit (iPad portrait): a soft right edge says there's more. */
+.chan-tabs {
+  mask-image: linear-gradient(to right, #000 calc(100% - 16px), transparent);
+}
+/* The kudos emoji sits in the same 18px icon column as the svg icons in the + sheet. */
+.as-icon.emoji-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  font-size: 16px;
 }

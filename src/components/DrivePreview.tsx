@@ -1,10 +1,11 @@
-import { useEffect, useRef } from 'react';
-import { ChevronLeft, ChevronRight, Download, Mail, Star, Trash2, X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { ChevronLeft, ChevronRight, Download, Link2, Mail, Star, Trash2, X } from 'lucide-react';
 import type { DriveItem } from '../types';
 import { fmtSize } from '../data/drive';
 import { fullDate } from '../utils';
 import { FileIcon } from './FileIcon';
 import { t } from '../i18n';
+import { toast } from '../toast';
 import { useFocusedScreen } from '../mobile/chrome';
 
 interface Props {
@@ -17,30 +18,55 @@ interface Props {
   onOpenThread: (threadId: string) => void;
 }
 
-/** Full-screen preview with ←/→ (or a sideways swipe on phones) to flip through the folder. */
+/** Full-screen preview with ←/→ (or a sideways swipe on phones) to flip through the folder; a swipe down closes it. */
 export function DrivePreview({ item, list, onNav, onClose, onStar, onTrash, onOpenThread }: Props) {
   const idx = list.findIndex((i) => i.id === item.id);
   const prev = idx > 0 ? list[idx - 1] : null;
   const next = idx >= 0 && idx < list.length - 1 ? list[idx + 1] : null;
   const fromEmail = item.id.startsWith('att:');
   const isBlob = item.thumb?.startsWith('blob:');
+  const href = item.url ?? (isBlob ? item.thumb : undefined);
+  const link = item.url && !item.url.startsWith('data:') && !item.url.startsWith('blob:') ? new URL(item.url, location.href).href : '';
   useFocusedScreen(true, onClose); // phones: the tab bar and the create button step aside under the viewer
+
+  // The next file slides in from the side it comes from; the first open zooms (P120).
+  const [dir, setDir] = useState<'' | 'from-left' | 'from-right'>('');
+  const go = (to: DriveItem | null, way: 'from-left' | 'from-right') => {
+    if (!to) return;
+    setDir(way);
+    onNav(to);
+  };
 
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
-      if (e.key === 'ArrowLeft' && prev) onNav(prev);
-      if (e.key === 'ArrowRight' && next) onNav(next);
+      if (e.key === 'ArrowLeft' && prev) (setDir('from-left'), onNav(prev));
+      if (e.key === 'ArrowRight' && next) (setDir('from-right'), onNav(next));
     };
     addEventListener('keydown', key);
     return () => removeEventListener('keydown', key);
   }, [prev, next, onNav, onClose]);
 
-  // A sideways swipe flips to the next or previous file; anything more up-and-down than sideways is left alone.
+  // Sideways flips to the next or previous file; down closes, with the picture following the finger (P121).
   const touch = useRef<{ x: number; y: number } | null>(null);
+  const stage = useRef<HTMLDivElement>(null);
+  const box = useRef<HTMLDivElement>(null);
+  const follow = (dy: number) => {
+    const s = stage.current;
+    const b = box.current;
+    if (s) (s.style.transform = dy > 0 ? `translateY(${dy}px)` : ''), (s.style.transition = dy ? 'none' : '');
+    if (b) b.style.backgroundColor = dy > 0 ? `rgb(8 8 12 / ${Math.max(0.3, 1 - dy / 400)})` : '';
+  };
   const swipe = {
     onTouchStart: (e: React.TouchEvent) => {
       touch.current = e.touches.length === 1 ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : null;
+    },
+    onTouchMove: (e: React.TouchEvent) => {
+      const start = touch.current;
+      if (!start) return;
+      const dx = e.touches[0].clientX - start.x;
+      const dy = e.touches[0].clientY - start.y;
+      if (dy > 0 && dy > Math.abs(dx) * 1.5) follow(dy);
     },
     onTouchEnd: (e: React.TouchEvent) => {
       const start = touch.current;
@@ -48,14 +74,17 @@ export function DrivePreview({ item, list, onNav, onClose, onStar, onTrash, onOp
       if (!start) return;
       const dx = e.changedTouches[0].clientX - start.x;
       const dy = e.changedTouches[0].clientY - start.y;
+      if (dy > 100 && dy > Math.abs(dx) * 1.5) return onClose();
+      if (stage.current) stage.current.style.transition = '';
+      follow(0);
       if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
-      if (dx < 0 && next) onNav(next);
-      if (dx > 0 && prev) onNav(prev);
+      if (dx < 0) go(next, 'from-right');
+      if (dx > 0) go(prev, 'from-left');
     },
   };
 
   return (
-    <div className="lightbox" onClick={onClose} {...swipe}>
+    <div className="lightbox" ref={box} onClick={onClose} {...swipe}>
       <header className="lb-bar" onClick={(e) => e.stopPropagation()}>
         <FileIcon kind={item.kind} size={14} />
         <div className="lb-title">
@@ -69,8 +98,13 @@ export function DrivePreview({ item, list, onNav, onClose, onStar, onTrash, onOp
             <Mail size={17} />
           </button>
         )}
-        {isBlob && (
-          <a className="lb-btn" href={item.thumb} download={item.name} title={t('Download')}>
+        {link && (
+          <button className="lb-btn" onClick={() => void navigator.clipboard?.writeText(link).then(() => toast({ text: t('Link copied') }))} title={t('Copy link')}>
+            <Link2 size={17} />
+          </button>
+        )}
+        {href && (
+          <a className="lb-btn" href={href} download={item.name} rel="noreferrer" title={t('Download')}>
             <Download size={17} />
           </a>
         )}
@@ -82,8 +116,11 @@ export function DrivePreview({ item, list, onNav, onClose, onStar, onTrash, onOp
             <button
               className="lb-btn"
               onClick={() => {
+                // Move on to the next file, as Drive and Photos do; close only when nothing is left (P118).
+                const to = next ?? prev;
+                if (to) go(to, next ? 'from-right' : 'from-left');
                 onTrash(item.id);
-                onClose();
+                if (!to) onClose();
               }}
               title={t('Move to trash')}
             >
@@ -96,20 +133,19 @@ export function DrivePreview({ item, list, onNav, onClose, onStar, onTrash, onOp
         </button>
       </header>
 
-      <div className="lb-stage" key={item.id}>
-        {item.kind === 'video' && isBlob ? (
-          <video src={item.thumb} controls autoPlay onClick={(e) => e.stopPropagation()} />
+      <div className={`lb-stage ${dir}`} key={item.id} ref={stage}>
+        {item.kind === 'video' && (isBlob || item.url) ? (
+          <video src={isBlob ? item.thumb : item.url} controls autoPlay onClick={(e) => e.stopPropagation()} />
         ) : item.thumb ? (
           <div className="lb-media" onClick={(e) => e.stopPropagation()}>
             <img src={item.thumb} alt={item.name} />
-            {item.kind === 'video' && <span className="lb-note">{t('Sample video. Upload your own to play it here')}</span>}
           </div>
         ) : (
           <div className="lb-doc" onClick={(e) => e.stopPropagation()}>
             <FileIcon kind={item.kind} size={40} />
             <strong>{item.name}</strong>
             <span>{fmtSize(item.size)}</span>
-            <small>{t('Previews for documents arrive with the real file server.')}</small>
+            <small>{t('No preview for this file type')}</small>
             {item.url ? (
               <a className="primary-btn lb-action" href={item.url} download={item.name} rel="noreferrer">
                 <Download size={16} /> {t('Download')}
@@ -126,10 +162,10 @@ export function DrivePreview({ item, list, onNav, onClose, onStar, onTrash, onOp
       {/* Previous and next come as a pair: the one with nowhere to go stays, dimmed. */}
       {list.length > 1 && (
         <>
-          <button className="lb-nav left" disabled={!prev} onClick={(e) => (e.stopPropagation(), prev && onNav(prev))} aria-label={t('Previous file')}>
+          <button className="lb-nav left" disabled={!prev} onClick={(e) => (e.stopPropagation(), go(prev, 'from-left'))} aria-label={t('Previous file')}>
             <ChevronLeft size={24} />
           </button>
-          <button className="lb-nav right" disabled={!next} onClick={(e) => (e.stopPropagation(), next && onNav(next))} aria-label={t('Next file')}>
+          <button className="lb-nav right" disabled={!next} onClick={(e) => (e.stopPropagation(), go(next, 'from-right'))} aria-label={t('Next file')}>
             <ChevronRight size={24} />
           </button>
         </>

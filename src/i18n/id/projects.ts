@@ -163,6 +163,7 @@ const id: Record<string, string> = {
   // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
   "No {projects} match “{q}”.": "Tidak ada {projects} yang cocok dengan “{q}”.",
   "Find a {project}": "Cari {project}",
+  "Mail from this domain files here.": "Email dari domain ini masuk ke sini.",
 };
 
 export default id;

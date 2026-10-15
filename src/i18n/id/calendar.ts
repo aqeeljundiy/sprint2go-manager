@@ -462,6 +462,9 @@ const id: Record<string, string> = {
   "Previous year": "Tahun sebelumnya",
   "Next month": "Bulan berikutnya",
   "Previous month": "Bulan sebelumnya",
+  "Nothing planned this month": "Tidak ada rencana bulan ini",
+  "Send notetaker now": "Kirim notulis sekarang",
+  "{day}. Open the day": "{day}. Buka harinya",
 };
 
 export default id;

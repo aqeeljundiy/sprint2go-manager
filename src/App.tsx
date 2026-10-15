@@ -425,8 +425,14 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
   const tablet = useMedia(TABLET);
   const [collapsedWide, setCollapsedWide] = usePersisted('pm-sidebar-collapsed', false);
   const [collapsedTablet, setCollapsedTablet] = usePersisted('pm-sidebar-collapsed-tablet', true);
-  const collapsed = tablet ? collapsedTablet : collapsedWide;
-  const setCollapsed = tablet ? setCollapsedTablet : setCollapsedWide;
+  // Notes on the iPad: the note list is the sidebar, so it opens full (Apple Notes' split view) until folded.
+  const [notesTablet, setNotesTablet] = usePersisted('pm-sidebar-collapsed-tablet-notes', false);
+  // Chat on the iPad: channel names, not a rail of identical "#" icons (Slack iPad), until folded.
+  const [chatTablet, setChatTablet] = usePersisted('pm-sidebar-collapsed-tablet-chat', false);
+  // Vault on the iPad: project logins are identical dots, so names show until folded.
+  const [vaultTablet, setVaultTablet] = usePersisted('pm-sidebar-collapsed-tablet-vault', false);
+  const collapsed = tablet ? (mode === 'notes' ? notesTablet : mode === 'chat' ? chatTablet : mode === 'vault' ? vaultTablet : collapsedTablet) : collapsedWide;
+  const setCollapsed = tablet ? (mode === 'notes' ? setNotesTablet : mode === 'chat' ? setChatTablet : mode === 'vault' ? setVaultTablet : setCollapsedTablet) : setCollapsedWide;
   const [sidebarW, setSidebarW] = usePersisted('pm-sidebar-w', 248);
   const [listW, setListW] = usePersisted('pm-list-w', 400);
   const [sidebarOpen, setSidebarOpen] = useState(false); // mobile drawer
@@ -1492,8 +1498,9 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
           added += next.length;
         }
       } catch {
-        // AI unavailable — try again on the next scan
-        scanned.delete(`${user.id}:${t.id}:${last.id}`);
+        // AI unavailable or rate limited (429): stop asking now and try this one and the rest on the next scan.
+        for (const r of fresh.slice(fresh.indexOf(t))) scanned.delete(`${user.id}:${r.id}:${r.messages[r.messages.length - 1].id}`);
+        break;
       }
     }
     setScanning(false);
@@ -2515,6 +2522,8 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
     remove: deleteNote,
     restore: restoreNote,
     purge: purgeNote,
+    // A note left empty goes quietly (Apple Notes): no toast, nothing in Recently deleted.
+    discard: (id) => (setNotes((ns) => ns.filter((x) => x.id !== id)), setNoteId((cur) => (cur === id ? null : cur))),
     duplicate: duplicateNote,
   };
   // A link to a note (/notes/<id>) opens it; something shared from another app (/notes/new) is in quick capture.
@@ -3626,9 +3635,15 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
     showToast({ text: t('Moved to trash'), action: { label: t('Undo'), run: () => patchDrive(id, { trashed: false }) } });
   };
 
-  const deleteForever = (id: string) => {
+  const deleteForever = (id: string | string[]) => {
     const snapshot = drive;
-    setDrive((d) => d.filter((i) => i.id !== id && i.parentId !== id));
+    // Everything under a deleted folder goes too, however deep (P113); a list empties the trash in one go.
+    const gone = new Set(Array.isArray(id) ? id : [id]);
+    for (let grew = true; grew; ) {
+      grew = false;
+      for (const i of drive) if (i.parentId && gone.has(i.parentId) && !gone.has(i.id)) (gone.add(i.id), (grew = true));
+    }
+    setDrive((d) => d.filter((i) => !gone.has(i.id)));
     showToast({ text: t('Deleted forever'), action: { label: t('Undo'), run: () => setDrive(snapshot) } });
   };
 
@@ -4649,7 +4664,12 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
             onPatchTask={patchTask}
             onBulk={(ids, action) =>
               action === 'delete'
-                ? setTodos((ts) => ts.filter((t) => !ids.includes(t.id)))
+                ? (() => {
+                    // Deleted straight away; Undo puts them back where they were.
+                    const gone = todos.filter((x) => ids.includes(x.id));
+                    setTodos((ts) => ts.filter((t) => !ids.includes(t.id)));
+                    showToast({ text: tn(gone.length, '{n} task deleted', '{n} tasks deleted'), action: { label: t('Undo'), run: () => setTodos((ts) => [...ts, ...gone.filter((g) => !ts.some((x) => x.id === g.id))]) } });
+                  })()
                 : setTodos((ts) => ts.map((t) => (ids.includes(t.id) ? { ...t, done: action === 'done', status: stageIdFor(t, action === 'done' ? 'done' : 'open'), doneAt: action === 'done' ? nowIso() : undefined, doneBy: action === 'done' ? user.id : undefined } : t)))
             }
             onAddTask={(t) => createTask({ ...t, source: t.meetingId ? 'meeting' : 'manual' }, { chat: true })}
@@ -4666,7 +4686,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
             onSend={() => openSendBot()}
             canSendBot={botOn}
             onMenu={() => setSidebarOpen(true)}
-            toast={(text) => showToast({ text })}
+            toast={(text, undo) => showToast({ text, action: undo && { label: t('Undo'), run: undo } })}
             company={ws}
             appSettings={settingsRows}
             onOpenEvent={(id) => {
@@ -4843,14 +4863,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
               setProjScope(sc);
               setSidebarOpen(false);
             }}
-            onAddClient={
-              canCreateProjects
-                ? (name, domain, type) => {
-                    const c = createProject(name, { domain, type });
-                    setProjScope({ kind: 'client', id: c.id });
-                  }
-                : undefined
-            }
+            onNew={canCreateProjects ? () => (setProjScope({ kind: 'projects' }), setProjNew((n) => n + 1), setSidebarOpen(false)) : undefined}
           />
           ) : appMode === 'tasks' ? (
           <TasksSidebar
@@ -4867,6 +4880,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
               setSidebarOpen(false);
             }}
             projectsApp={enabled.has('projects')}
+            onAddTask={() => (['grid', 'briefs', 'past'].includes(taskScope.kind) && openTasks({ kind: 'mine' }), setTaskAdd((n) => n + 1))}
             onBrainDump={() => openDump('')}
             onAddClient={
               canCreateProjects
@@ -5002,7 +5016,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
             back={chrome.back /* Home is a main screen: the launcher button, never a back arrow */}
             onLauncher={showAppBar ? undefined : toLauncher}
             launcherDot={launcherDot}
-            onMenu={appDrawer ? () => setSidebarOpen(true) : undefined}
+            onMenu={appDrawer ? () => (mode === 'calendar' ? window.dispatchEvent(new Event('calendar-drawer')) : setSidebarOpen(true)) : undefined /* Calendar: its own phone drawer (CalendarView) */}
             workspaces={workspaces}
             current={ws}
             unreadByWs={wsUnread}
@@ -5276,8 +5290,8 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
             onPast={mobile ? undefined : () => setProjScope({ kind: 'past' })}
             onCreate={
               canCreateProjects
-                ? (name, type) => {
-                    const c = createProject(name, { type });
+                ? (name, type, domain) => {
+                    const c = createProject(name, { type, domain });
                     setProjScope({ kind: 'client', id: c.id });
                   }
                 : undefined
@@ -5751,7 +5765,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
             me={user.id}
             dueTasks={myDueTasks}
             onToggleTask={toggleTodo}
-            onOpenTask={openTask}
+            onOpenTask={(id) => setTaskOpen(id) /* the task sheet opens over the calendar, which stays behind it */}
             calendarsPanel={calendarPanel}
             dialogOpen={!!connectCal}
             company={ws}
@@ -5846,7 +5860,24 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
               onCompose={(m) => openCompose({ initial: { to: m.to ? [{ name: m.to, email: m.to }] : [], cc: [], subject: m.subject, html: textToHtml(m.body) + settings.signature, text: m.body, files: [], track: settings.trackByDefault, trackOptions: DEFAULT_TRACK_OPTIONS, fromId: (myAccounts.find((a) => a.kind === 'personal') ?? myAccounts[0])?.id ?? '' } })}
             />
           ) : (
-            <TablesHome tables={wsTables} rows={wsTableRows} clients={wsClientsAll} onOpen={openTable} onNew={() => setNewTableFor({})} onMenu={() => setSidebarOpen(true)} />
+            <TablesHome
+              tables={wsTables}
+              rows={wsTableRows}
+              clients={wsClientsAll}
+              onOpen={openTable}
+              onNew={() => setNewTableFor({})}
+              onMenu={() => setSidebarOpen(true)}
+              onRename={perms.editTables || isAdmin ? (id, name) => setTables((ts) => ts.map((x) => (x.id === id ? { ...x, name } : x))) : undefined}
+              onDelete={(id) => {
+                // Gone at once, with 10 seconds to bring the table and its rows back.
+                const table = wsTables.find((x) => x.id === id);
+                if (!table || !(isAdmin || perms.deleteThings || table.createdBy === user.id)) return;
+                const kept = wsTableRows.filter((r) => r.tableId === id);
+                setTableRows((rs) => rs.filter((r) => r.tableId !== id));
+                setTables((ts) => ts.filter((x) => x.id !== id));
+                showToast({ text: t('Deleted “{name}”', { name: table.name }), ms: 10000, action: { label: t('Undo'), run: () => (setTables((ts) => (ts.some((x) => x.id === id) ? ts : [...ts, table])), setTableRows((rs) => [...rs.filter((r) => r.tableId !== id), ...kept])) } });
+              }}
+            />
           ))}
         {mode === 'teams' &&
           (() => {
@@ -6131,12 +6162,11 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
       {newOpen && (
         <Sheet onClose={() => setNewOpen(false)} title={t('New')} className="new-sheet">
           <div className="as-list">
-            {[...(aiOn && enabled.has('tasks') ? [{ id: 'dump', label: t('Brain dump'), hint: t('Type what’s on your mind; AI turns it into tasks'), icon: Sparkles, run: () => openDump('') }] : []), ...makeLinks].map((m) => (
+            {[...(aiOn && enabled.has('tasks') ? [{ id: 'dump', label: t('Brain dump'), icon: Sparkles, run: () => openDump('') }] : []), ...makeLinks].map((m) => (
               <button key={m.id} type="button" className="as-item" onClick={() => (setNewOpen(false), m.run())}>
                 <m.icon size={20} className="as-icon" />
                 <span className="as-label">
                   {m.label}
-                  {'hint' in m && m.hint && <small>{m.hint}</small>}
                 </span>
               </button>
             ))}
@@ -6349,7 +6379,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
       {preview && (
         <DrivePreview
           item={allDrive.find((i) => i.id === preview.item.id) ?? preview.item}
-          list={preview.list}
+          list={preview.list.filter((i) => !allDrive.find((x) => x.id === i.id)?.trashed)}
           onNav={(item) => setPreview((p) => p && { ...p, item })}
           onClose={() => setPreview(null)}
           onStar={(id) => patchDrive(id, { starred: !drive.find((i) => i.id === id)?.starred })}

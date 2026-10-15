@@ -24,8 +24,9 @@ export function usePaneWidth(ref: RefObject<HTMLElement | null>) {
   return w;
 }
 
-/** Under this pane width a table shows cards, one toolbar row and sheets: the phone layout. */
-export const NARROW_PANE = 600;
+/** Under this pane width a table shows cards, one toolbar row and sheets: the phone layout. An iPad pane (about 600
+ * wide next to the folded sidebar) keeps the tablet toolbar, its quieter tools folded to icons. */
+export const NARROW_PANE = 520;
 
 /**
  * Each person's own filters and sorts per view, on top of what everyone sees, until they're saved for everyone.

@@ -243,11 +243,17 @@
   .home-phone .htd-ev-title {
     flex: 1;
     min-width: 0;
-    min-height: var(--row-1);
+    min-height: var(--row-2);
     display: flex;
-    align-items: center;
-    gap: 4px;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 0;
     text-align: left;
+  }
+  .home-phone .htd-ev-sub {
+    font: var(--t-secondary);
+    color: var(--text-3);
   }
   .home-phone .htd-ev .ghost-btn {
     align-self: center;

@@ -1,14 +1,17 @@
 import type { ReactNode } from 'react';
 import { ChevronRight, Plus } from 'lucide-react';
 import { useActionMenu, type SheetAction } from '../ui/ActionSheet';
+import { Badge } from '../ui/Person';
 
 export interface BrowseRow {
   id: string;
   label: string;
   icon: ReactNode; // a 22 px line icon in the accent colour, or a project's coloured "#"
   hint?: string; // on the right: "3 late", "2 to review"
+  sub?: string; // a second line under the label (a project's next deadline): makes the row 64
   tone?: 'danger' | 'accent'; // the hint's colour (grey when not set)
-  muted?: boolean; // a grey row (Past projects)
+  badge?: string; // a pill on the name's line (Lead)
+  muted?: boolean; // a grey row
   run: () => void;
   menu?: SheetAction[]; // long-press (right-click on a computer)
 }
@@ -64,7 +67,17 @@ function Row({ r }: { r: BrowseRow }) {
     <>
       <button type="button" className={`tbr-row lp${r.muted ? ' muted' : ''}`} onClick={r.run} {...(r.menu?.length ? m.bind : {})}>
         <span className="tbr-icon">{r.icon}</span>
-        <span className="tbr-label">{r.label}</span>
+        {r.sub ? (
+          <span className="tbr-label tbr-two">
+            {r.label}
+            <small className="tbr-sub">{r.sub}</small>
+          </span>
+        ) : (
+          <span className="tbr-label">
+            {r.label}
+            {r.badge && <Badge small>{r.badge}</Badge>}
+          </span>
+        )}
         {r.hint && <span className={`tbr-hint${r.tone ? ` ${r.tone}` : ''}`}>{r.hint}</span>}
         <ChevronRight size={16} className="tbr-chev" />
       </button>

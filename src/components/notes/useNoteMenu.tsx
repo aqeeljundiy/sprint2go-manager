@@ -3,6 +3,7 @@ import type { Client, Note, User } from '../../types';
 import { toast } from '../../toast';
 import { MoveSheet, ShareSheet } from './NoteSheets';
 import { noteUrl } from './noteHtml';
+import { htmlToText } from '../../sanitize';
 import type { NoteMenuCtx } from './noteMenu';
 import { t } from '../../i18n';
 
@@ -18,6 +19,7 @@ export interface NotesApi {
   remove: (id: string) => void; // to Recently deleted
   restore: (id: string) => void;
   purge: (id: string) => void; // gone for good
+  discard: (id: string) => void; // an empty note left behind: gone quietly
   duplicate: (id: string) => void;
 }
 
@@ -41,6 +43,16 @@ export function useNoteMenu(api: NotesApi) {
         () => toast({ text: n.visibility === 'team' ? t('Link copied') : t('Link copied. Only you can open it until you share the note') }),
         () => toast({ text: t('Couldn’t copy the link here.') }),
       ),
+    sendCopy: (n) => {
+      // The device's share sheet with the note as plain text; where there is none, the text goes to the clipboard.
+      const title = n.title || t('Untitled');
+      const text = `${title}\n\n${htmlToText(n.html)}`.trim();
+      if (navigator.share) return void navigator.share({ title, text }).catch(() => {});
+      navigator.clipboard?.writeText(text).then(
+        () => toast({ text: t('Note copied as text') }),
+        () => toast({ text: t('Couldn’t copy the note here.') }),
+      );
+    },
     duplicate: (n) => api.duplicate(n.id),
     remove: (n) => api.remove(n.id),
   };

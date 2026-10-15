@@ -7,6 +7,7 @@ import { SmoothHeight, TabPane, useLeaving } from '../ui/Smooth';
 import { EmptyState } from '../ui/EmptyState';
 import { loadStorage, type StorageInfo } from './teamsApi';
 import { BusyButton } from './teamsBits';
+import { useActionMenu } from '../ui/ActionSheet';
 import { mark, t, tn } from '../../i18n';
 import { fmtDay } from '../../i18n/format';
 import './teams.css';
@@ -32,6 +33,13 @@ export function MailStorage({ ws, onDelete, onEmpty, onOpen }: { ws: Workspace; 
   const d = info && info !== 'failed' ? info : null;
   const largest = useLeaving((d?.largest ?? []).filter((x) => !gone.has(x.threadId)), (x) => x.threadId);
   const files = useLeaving((d?.attachments ?? []).filter((x) => !gone.has(x.threadId)), (x) => `${x.threadId}:${x.name}`);
+  // Emptying deletes for good, so it asks first (a sheet on phones, a menu by the button on desktop).
+  const [emptyWhere, setEmptyWhere] = useState<'spam' | 'trash'>('trash');
+  const emptyCount = d?.[emptyWhere].count ?? 0;
+  const confirmEmpty = useActionMenu(
+    () => [{ label: tn(emptyCount, 'Delete {n} for good', 'Delete {n} for good'), icon: Trash2, danger: true, run: () => (onEmpty(emptyWhere), setTimeout(load, 1500)) }],
+    { title: emptyWhere === 'spam' ? t('Empty Spam') : t('Empty Trash') },
+  );
   if (!server.on)
     return (
       <>
@@ -95,7 +103,7 @@ export function MailStorage({ ws, onDelete, onEmpty, onOpen }: { ws: Workspace; 
                       </span>
                     </span>
                     {x.count > 0 && (
-                    <button type="button" className="link-btn danger mx-empty-btn" onClick={() => (onEmpty(w), setTimeout(load, 1500))}>
+                    <button type="button" className="link-btn danger mx-empty-btn" onClick={(e) => (setEmptyWhere(w), confirmEmpty.openAt(e.clientX, e.clientY))}>
                       {w === 'spam' ? t('Empty Spam') : t('Empty Trash')}
                     </button>
                     )}
@@ -169,6 +177,7 @@ export function MailStorage({ ws, onDelete, onEmpty, onOpen }: { ws: Workspace; 
           </div>
         )}
       </SmoothHeight>
+      {confirmEmpty.menu}
     </>
   );
 }

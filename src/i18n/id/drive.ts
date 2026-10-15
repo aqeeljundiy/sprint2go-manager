@@ -40,6 +40,7 @@ const id: Record<string, string> = {
   'No photos or videos yet': 'Belum ada foto atau video',
   'Photos and videos you upload or receive show here.': 'Foto dan video yang Anda unggah atau terima muncul di sini.',
   'Email attachments land here automatically.': 'Lampiran email masuk ke sini secara otomatis.',
+  'Results from all of Drive': 'Hasil dari seluruh Drive',
   'Star a file from its menu and it waits for you here.': 'Beri bintang pada file dari menunya dan file itu menunggu Anda di sini.',
   'Deleted files stay here for 30 days.': 'File yang dihapus tersimpan di sini selama 30 hari.',
   'Files people send you in chat, by email or from a guest show here.': 'File yang dikirim orang lewat chat, email, atau dari tamu muncul di sini.',
@@ -110,6 +111,16 @@ const id: Record<string, string> = {
   Spreadsheet: 'Spreadsheet',
   // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
   "Tap + to add files.": "Ketuk + untuk menambah file.",
+  // Drive round 4
+  'Empty trash': 'Kosongkan sampah',
+  'Empty trash?': 'Kosongkan sampah?',
+  'Files you upload or open show here, newest first.': 'File yang Anda unggah atau buka muncul di sini, terbaru di atas.',
+  'No preview for this file type': 'Tidak ada pratinjau untuk jenis file ini',
+  'Show more': 'Tampilkan lebih banyak',
+  'Upload files or make a folder to get started.': 'Unggah file atau buat folder untuk memulai.',
+  'in {place}': 'di {place}',
+  '{n} item will be deleted forever.': '{n} item akan dihapus permanen.',
+  '{n} items will be deleted forever.': '{n} item akan dihapus permanen.',
 };
 
 export default id;

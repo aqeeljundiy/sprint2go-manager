@@ -242,7 +242,7 @@ export function CalendarSidebar(props: Props) {
       )}
 
       <div className="nav-heading sb-label">{t('My calendars')}</div>
-      <nav className="nav">
+      <nav className="nav cal-list">
         {calendars.map((c) => {
           const on = !hidden.has(c.id);
           return (
@@ -257,7 +257,7 @@ export function CalendarSidebar(props: Props) {
       </nav>
 
       {accounts.map((acc) => (
-        <div key={acc}>
+        <div key={acc} className="cal-list">
           <div className="nav-heading sb-label cal-acc">
             {(() => {
               const first = external.find((c) => groupOf(c) === acc)!;
@@ -265,7 +265,7 @@ export function CalendarSidebar(props: Props) {
             })()}
             <span>{acc === 'Public holidays' || acc === 'Calendar links' ? t(acc) : acc}</span>
           </div>
-          <nav className="nav">
+          <nav className="nav cal-list">
             {external
               .filter((c) => groupOf(c) === acc)
               .map((c) => {
@@ -302,7 +302,7 @@ export function CalendarSidebar(props: Props) {
           </nav>
         </div>
       ))}
-      <nav className="nav">
+      <nav className="nav cal-list">
         <button className="nav-item" onClick={onAddCalendar} title={t('Add a calendar')}>
           <Plus size={16} />
           <span className="sb-label">{t('Add a calendar')}</span>
@@ -312,7 +312,7 @@ export function CalendarSidebar(props: Props) {
       {teammates.length > 0 && (
         <>
           <div className="nav-heading sb-label">{t('Teammates')}</div>
-          <nav className="nav">
+          <nav className="nav cal-list">
             {teammates.map((u) => {
               const on = shownMates.has(u.id);
               return (

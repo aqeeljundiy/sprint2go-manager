@@ -29,7 +29,7 @@ export function UpNext({ events, color, onOpen, botWill }: { events: CalEvent[];
   const link = ev ? meetingLinkOf(ev) : null;
   const bot = ev && link && notetakerJoins(link.kind) && botWill ? botWill(ev) : undefined;
   return (
-    <div className={`fold cal-upnext-fold${e ? ' open' : ''}`} aria-hidden={!e}>
+    <div className={`fold cal-upnext-fold${e ? ' open' : ''}`} aria-hidden={!e} inert={!e || undefined}>
       <div>
         {ev && (
           <div className="cal-upnext" style={{ ['--c' as string]: color(ev.calendarId) }}>

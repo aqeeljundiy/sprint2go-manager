@@ -244,9 +244,11 @@ export function AccountPhone({ s, update, email, me, onPhoto, security }: { s: S
   const person = { name: s.name || me?.name || email, email, color: s.avatarColor, photo: me?.photo };
   return (
     <>
-      <Group>
-        <GRow pic={<Avatar person={person} size={40} />} label={t('Photo and colour')} onClick={() => setPhoto(true)} />
-      </Group>
+      {/* A large centred avatar with Edit under it, as Slack and Linear open a profile. */}
+      <button type="button" className="acct-hero" onClick={() => setPhoto(true)}>
+        <Avatar person={person} size={80} />
+        <span>{t('Edit photo')}</span>
+      </button>
       {/* Account is the person, not one company's mailbox: the address you sign in with, the same in every company. */}
       <Group footer={me?.email && me.email !== email ? t('You sign in with this address in every company. Your mailbox here is {email}.', { email }) : t('You sign in with this address in every company.')}>
         <TextRow label={t('Display name')} value={s.name} allowEmpty={false} autoComplete="name" onSave={(v) => update({ name: v })} />
@@ -361,17 +363,21 @@ function PasswordScreen({ save, onBack }: { save: (cur: string, next: string) =>
 export function DeleteAccountPhone({ go }: { go: (pw: string) => Promise<string | null> }) {
   const [open, setOpen] = useState(false);
   const [pw, setPw] = useState('');
+  const [typed, setTyped] = useState('');
   return (
     <>
       <Group footer={t('Your sign-in goes for good. What you made stays with the company, marked as a deleted account.')}>
         <GRow label={t('Delete your account')} danger onClick={() => setOpen(true)} />
       </Group>
       {open && (
-        <EditScreen title={t('Delete your account')} saveLabel={t('Delete')} danger onBack={() => (setOpen(false), setPw(''))} canSave={!!pw} onSave={() => go(pw)}>
-          <p className="g-note">{t('Your sign-in goes for good. What you made stays with the company, marked as a deleted account.')}</p>
+        <EditScreen title={t('Delete your account')} saveLabel={t('Delete')} danger onBack={() => (setOpen(false), setPw(''), setTyped(''))} canSave={!!pw && deleteTyped(typed)} onSave={() => go(pw)}>
+          <div className="g-note"><DeleteFacts /></div>
           <Group>
             <div className="g-row g-field-row">
               <input className="g-input" type="password" value={pw} onChange={(e) => setPw(e.target.value)} placeholder={t('Your password, to be sure it’s you')} aria-label={t('Password')} autoComplete="current-password" autoFocus />
+            </div>
+            <div className="g-row g-field-row">
+              <input className="g-input" value={typed} onChange={(e) => setTyped(e.target.value)} placeholder={t('Type DELETE to confirm')} aria-label={t('Type DELETE to confirm')} autoCapitalize="characters" autoComplete="off" />
             </div>
           </Group>
         </EditScreen>
@@ -380,3 +386,16 @@ export function DeleteAccountPhone({ go }: { go: (pw: string) => Promise<string 
   );
 }
 
+
+/** The typed word that unlocks deleting an account: DELETE, or the Indonesian HAPUS. */
+export const deleteTyped = (v: string) => ['DELETE', 'HAPUS'].includes(v.trim().toUpperCase());
+
+/** What goes and what stays when an account is deleted, shown before the button unlocks. */
+export function DeleteFacts() {
+  return (
+    <ul className="delete-facts">
+      <li><strong>{t('Goes:')}</strong> {t('your sign-in, password, two-step sign-in and connected AI apps.')}</li>
+      <li><strong>{t('Stays:')}</strong> {t('tasks, messages and files you made, kept by the company under a deleted account.')}</li>
+    </ul>
+  );
+}

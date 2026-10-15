@@ -188,6 +188,18 @@ const id: Record<string, string> = {
   "Text colour": "Warna teks",
   "Text colour: {color}": "Warna teks: {color}",
   "Code block": "Blok kode",
+  "Default colour": "Warna bawaan",
+  "Delete all for good? This can’t be undone.": "Hapus semua selamanya? Ini tidak bisa dibatalkan.",
+  "Delete all": "Hapus semua",
+  "Delete {n} note for good": "Hapus {n} catatan selamanya",
+  "Delete {n} notes for good": "Hapus {n} catatan selamanya",
+  "Delete “{title}” for good?": "Hapus “{title}” selamanya?",
+  "No note open": "Tidak ada catatan yang terbuka",
+  "Redo": "Ulangi",
+  "Start writing": "Mulai menulis",
+  "Send a copy": "Kirim salinan",
+  "Note copied as text": "Catatan disalin sebagai teks",
+  "Couldn’t copy the note here.": "Catatan tidak bisa disalin di sini.",
 };
 
 export default id;

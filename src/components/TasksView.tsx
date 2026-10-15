@@ -34,7 +34,7 @@ import { TasksBrowse, type BrowseGroup } from './tasks/TasksBrowse';
 import { QuickAdd } from './tasks/QuickAdd';
 import type { NewTask, TaskOps } from './tasks/taskOps';
 import { saveDisplay } from './tasks/display';
-import { projectTabIcon, projectTabs, ProjectSections, useProjectParts, useProjectPhone, type ProjectTab } from './ProjectPhone';
+import { projectTabDefaults, projectTabIcon, projectTabs, ProjectSections, useProjectParts, useProjectPhone, type ProjectTab } from './ProjectPhone';
 import { t, textOf, tn, tx } from '../i18n';
 import { tj } from '../i18n/tj';
 import { fmtDate, fmtDay, fmtNumber, fmtWeekday } from '../i18n/format';
@@ -351,7 +351,8 @@ export function TasksView(p: Props) {
             id: `project:${c.id}`,
             label: c.name,
             icon: <span className="tbr-hash" style={{ color: c.color }}>#</span>,
-            hint: n ? tn(n, '{n} late', '{n} late') : c.status === 'lead' ? tx('status', 'Lead') : undefined,
+            hint: n ? tn(n, '{n} late', '{n} late') : undefined,
+            badge: c.status === 'lead' ? tx('status', 'Lead') : undefined,
             tone: n ? ('danger' as const) : undefined,
             run: () => go({ kind: 'project', id: c.id }),
             menu: p.onOpenProject
@@ -362,7 +363,7 @@ export function TasksView(p: Props) {
               : undefined,
           };
         }),
-        ...(p.onPastProjects ? [{ id: 'past', label: t('Past {projects}', { projects: term.many }), icon: <Archive size={22} />, muted: true, run: () => p.onPastProjects!() }] : []),
+        ...(p.onPastProjects ? [{ id: 'past', label: t('Past {projects}', { projects: term.many }), icon: <Archive size={22} />, run: () => p.onPastProjects!() }] : []),
       ],
     },
     {
@@ -632,7 +633,8 @@ export function TasksView(p: Props) {
   // A project's parts: tabs on desktop; on phones its tasks first, the rest in its "…" (ProjectPhone.tsx).
   const tabItems = projectTabs({ late: overdue, unreadMail: clientThreads.filter((t) => t.unread).length, quotes: !!p.onQuote, quoteWaiting: !!client && (p.quotes ?? []).some((q) => q.clientId === client.id && q.status === 'sent'), tables: !!p.onOpenTable });
   useProjectPhone({ client, tab: clientTab, home: homeTab, onTab: setClientTab });
-  const parts = useProjectParts(tabItems);
+  const tabDefaults = projectTabDefaults(!!client && (p.quotes ?? []).some((q) => q.clientId === client.id));
+  const parts = useProjectParts(tabItems, tabDefaults);
 
   // Admins, the owner and the project's Leads manage a project: its status, people, guests and their access.
   const projectManage = !!client && (p.canManage || client.ownerId === p.me || (client.members ?? []).some((m) => m.userId === p.me && m.role === 'lead'));
@@ -808,7 +810,7 @@ export function TasksView(p: Props) {
         {client && <ProjectPeople client={client} users={p.users} me={p.me} canEdit={projectManage} canInvite={projectManage || !!p.canInviteGuests} onPatch={(x) => p.onPatchClient(client.id, x)} onGuests={() => setClientTab('portal')} />}
         {/* The task list's own actions (layout, Display, New task) sit here, on the title's row (TaskViews). */}
         <span className="tq-head-slot" id="tq-head-slot" />
-        {!(client && projectManage && client.status !== 'ended') && (
+        {(client || project) && !(client && projectManage && client.status !== 'ended') && (
           <button className="ghost-btn sm tpl-btn" onClick={p.onTemplate} title={t('Start from a template')}>
             <LayoutTemplate size={14} /> <span>{t('Template')}</span>
           </button>
@@ -828,6 +830,7 @@ export function TasksView(p: Props) {
       {client && (
         <TabBar
           storageKey="project-tabs"
+          defaults={tabDefaults}
           value={clientTab}
           onSelect={(id) => setClientTab(id as typeof clientTab)}
           fixed={['overview']}
@@ -969,7 +972,7 @@ export function TasksView(p: Props) {
                 </div>
               );
             })()}
-            <ProjectSections items={tabItems} onTab={setClientTab} actions={client.status === 'ended' ? [] : [{ id: 'template', label: t('Start from a template'), run: p.onTemplate }, ...(projectManage ? [{ id: 'end', label: t('End work'), danger: true, run: () => p.onEndClient(client.id) }] : [])]} />
+            <ProjectSections items={tabItems} defaults={tabDefaults} onTab={setClientTab} actions={client.status === 'ended' ? [] : [{ id: 'template', label: t('Start from a template'), icon: LayoutTemplate, run: p.onTemplate }, ...(projectManage ? [{ id: 'end', label: t('End work'), icon: Archive, danger: true, run: () => p.onEndClient(client.id) }] : [])]} />
             <div className="side-card client-notes-card">
               <h3>
                 {t('Notes')}

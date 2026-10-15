@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { createPortal, flushSync } from 'react-dom';
-import { CalendarDays, CalendarPlus, Check, CheckSquare, Clock, Columns3, Copy, Flag, Hand, LayoutList, Link2, MoreHorizontal, Plus, SlidersHorizontal, Sparkles, Trash2, UserRound, CalendarRange, ChevronRight, Wand2 } from 'lucide-react';
+import { CalendarDays, CalendarPlus, Check, CheckSquare, Clock, Columns3, Copy, Flag, Hand, LayoutList, Link2, MoreHorizontal, Plus, SlidersHorizontal, Sparkles, Trash2, UserRound, CalendarRange, ChevronRight, Wand2, CircleCheck } from 'lucide-react';
 import { useLeaving } from '../ui/Smooth';
 import { EmptyState } from '../ui/EmptyState';
 import { TabBar } from '../ui/TabBar';
@@ -455,10 +455,10 @@ export function TaskViews({
       return <EmptyState icon={<SlidersHorizontal size={22} />} title={t('Nothing matches these filters')} text={t('Showing: {filters}.', { filters: words.join(', ') })} action={<button type="button" className="ghost-btn sm" onClick={() => setD({ ...d, who: 'any', people: [], only: [] })}>{t('Clear filters')}</button>} />;
     // Today is your own tasks due today; reviews, replies and requests live in Home's "Needs you". Saying so keeps the
     // two from contradicting each other ("All done" here while Home lists things).
-    if (kind === 'today') return <EmptyState icon={<Check size={22} />} title={t('No tasks due today')} text={t('Reviews, replies and requests waiting on you are in Needs you on Home. Plan ahead in Upcoming.')} action={<button type="button" className="link-btn" onClick={() => onScope({ kind: 'upcoming' })}>{t('See Upcoming')}</button>} />;
-    if (kind === 'supervising') return <EmptyState icon="✓" title={t('Nothing to check')} text={t('When someone finishes work you supervise, it waits here for you.')} />;
-    if (triage) return <EmptyState icon="✓" title={t('The queue is empty')} text={t('Every task in this team has someone on it.')} action={action} />;
-    return <EmptyState icon="✓" title={t('Nothing open')} text={t('Add one, or use Brain dump to turn your thoughts into tasks.')} action={action} />;
+    if (kind === 'today') return <EmptyState icon={<CircleCheck size={22} />} title={t('Nothing due today')} text={t('Nothing late either. Plan ahead in Upcoming.')} action={<>{action}<button type="button" className="link-btn" onClick={() => onScope({ kind: 'upcoming' })}>{t('See Upcoming')}</button></>} />;
+    if (kind === 'supervising') return <EmptyState icon={<CircleCheck size={22} />} title={t('Nothing to check')} text={t('When someone finishes work you supervise, it waits here for you.')} />;
+    if (triage) return <EmptyState icon={<CircleCheck size={22} />} title={t('The queue is empty')} text={t('Every task in this team has someone on it.')} action={action} />;
+    return <EmptyState icon={<CircleCheck size={22} />} title={t('Nothing open')} text={t('Add one, or use Brain dump to turn your thoughts into tasks.')} action={action} />;
   })();
 
   const boardHidden = layout === 'board' && !open.length && !asleep.length && words.length > 0 && tasks.some((task) => !task.done);
@@ -526,6 +526,12 @@ export function TaskViews({
               </div>
             )}
             <Rows items={g.items} row={(task, l) => row(task, l, undefined, d.group === 'date' ? g.key : undefined)} />
+            {/* Phones: Todoist's inline add under each section, so a task lands in that stage straight away. */}
+            {phone && canAdd && d.group === 'stage' && (
+              <button type="button" className="t-add-row" onClick={() => openAdd({ status: g.key })}>
+                <Plus size={20} /> {t('Add task')}
+              </button>
+            )}
           </div>
         ))}
         {asleep.length > 0 && (

@@ -31,13 +31,13 @@ export function DriveSidebar({ section, used, quota, onSection, onUpload, onNewF
         <Upload size={16} />
         <span className="sb-label">{t('Upload')}</span>
       </button>
-      <nav className="nav">
+      <nav className="nav d-new-nav">
         <button className="nav-item" onClick={onNewFolder} title={t('New folder')}>
           <FolderPlus size={17} />
           <span className="sb-label">{t('New folder')}</span>
         </button>
       </nav>
-      <div className="nav-heading sb-label">{t('Drive')}</div>
+      <div className="nav-heading sb-label d-sections-head">{t('Drive')}</div>
       <nav className="nav">
         {DRIVE_SECTIONS.filter((s) => !s.phone).map(({ id, name, icon: Icon }) => (
           <button key={id} className={`nav-item ${section === id ? 'active' : ''}`} onClick={() => onSection(id)} title={t(name)}>

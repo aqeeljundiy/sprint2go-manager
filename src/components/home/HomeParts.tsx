@@ -346,8 +346,11 @@ export function TodayBlock({
               <div key={e.id} className="htd-ev">
                 <time>{fmtTime(e.start)}</time>
                 <button type="button" className="htd-ev-title" onClick={() => onOpenEvent(e.id)}>
-                  {e.title}
-                  {e.rrule && <Repeat size={12} className="h-repeat" aria-label={t('Repeats')} />}
+                  <span className="htd-ev-main">
+                    {e.title}
+                    {e.rrule && <Repeat size={12} className="h-repeat" aria-label={t('Repeats')} />}
+                  </span>
+                  <small className="htd-ev-sub">{[`${fmtTime(e.start)}-${fmtTime(e.end)}`, e.location].filter(Boolean).join(' · ')}</small>
                 </button>
                 {link && (
                   <a className="ghost-btn sm" href={link.url} target="_blank" rel="noopener noreferrer">

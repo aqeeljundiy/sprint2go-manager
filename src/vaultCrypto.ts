@@ -147,4 +147,13 @@ let unlocked: { userId: string; priv: CryptoKey } | null = null;
 export const vaultUnlocked = (userId: string) => (unlocked?.userId === userId ? unlocked.priv : null);
 export const setVaultUnlocked = (userId: string, priv: CryptoKey | null) => {
   unlocked = priv ? { userId, priv } : null;
+  lockListeners.forEach((f) => f());
+};
+/** Whether anyone's key is open in this tab (the sidebar has no user id to hand). */
+export const vaultAnyUnlocked = () => !!unlocked;
+const lockListeners = new Set<() => void>();
+/** Calls `f` whenever the Vault locks or unlocks; returns the unsubscribe. */
+export const onVaultLockChange = (f: () => void) => {
+  lockListeners.add(f);
+  return () => void lockListeners.delete(f);
 };

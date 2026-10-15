@@ -159,7 +159,7 @@ export function ColumnMenu({
           </button>
         )}
         {fixed ? null : !first ? (
-          <button type="button" className="danger" onClick={() => confirm(t('Delete the “{name}” column and everything in it?', { name: field.name })) && act('delete')}>
+          <button type="button" className="danger" onClick={() => act('delete')}>
             <Trash2 size={14} /> {t('Delete column')}
           </button>
         ) : (

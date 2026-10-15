@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Check, ChevronUp, Circle, CircleCheck } from 'lucide-react';
+import { Check, Circle, CircleCheck } from 'lucide-react';
 import type { CalEvent } from '../../types';
 import { addDays, eventsOn, sameDay, startOfDay, startOfWeek } from '../../calendarUtils';
 import { EventCard, type CardKit } from './EventCard';
@@ -47,7 +47,9 @@ export function ScheduleView({
   const scroll = useRef<HTMLDivElement>(null);
   const frame = useRef(0);
   const [from, setFrom] = useState(() => startOfWeek(cursor));
-  const [weeks, setWeeks] = useState(WEEKS);
+  const [weeks, setWeeks] = useState(WEEKS); // from the picked week on
+  const [back, setBack] = useState(0); // earlier weeks loaded above it
+  const span = weeks + back;
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 60_000);
@@ -58,10 +60,11 @@ export function ScheduleView({
   const target = useRef<Date>(cursor);
   const goTo = (d: Date) => {
     target.current = d;
-    const inRange = d >= from && d < addDays(from, weeks * 7);
+    const inRange = d >= from && d < addDays(from, span * 7);
     if (!inRange) {
       setFrom(startOfWeek(d));
       setWeeks(WEEKS);
+      setBack(0);
     } else jump(d);
   };
   useEffect(() => goTo(cursor), [cursor.toDateString()]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -89,11 +92,11 @@ export function ScheduleView({
   }
 
   // Repeating events: their dates in the weeks shown (more as it scrolls).
-  const dated = useMemo(() => expandEvents(events, from.getTime(), addDays(from, weeks * 7).getTime()), [events, from, weeks]);
+  const dated = useMemo(() => expandEvents(events, from.getTime(), addDays(from, span * 7).getTime()), [events, from, span]);
   const days = useMemo(() => {
     const out: { day: Date; list: CalEvent[]; tasks: DueTask[] }[] = [];
     const today = new Date(now);
-    for (let i = 0; i < weeks * 7; i++) {
+    for (let i = 0; i < span * 7; i++) {
       const day = addDays(from, i);
       const key = `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`;
       const list = eventsOn(dated, day).sort((a, b) => Number(!!b.allDay) - Number(!!a.allDay) || a.start.localeCompare(b.start));
@@ -101,7 +104,7 @@ export function ScheduleView({
       if (list.length || tasks.length || sameDay(day, today) || sameDay(day, cursor)) out.push({ day, list, tasks });
     }
     return out;
-  }, [dated, from, weeks, dueTasks, now, cursor]);
+  }, [dated, from, span, dueTasks, now, cursor]);
 
   // Near the bottom: four more weeks.
   const end = useRef<HTMLDivElement>(null);
@@ -120,18 +123,38 @@ export function ScheduleView({
     if (el.getBoundingClientRect().top < box.getBoundingClientRect().bottom + 400) setWeeks((w) => Math.min(w + 13, MAX_WEEKS));
   }, [weeks]);
 
-  // Earlier weeks go on top without the list jumping under the finger.
+  // Scrolling near the top loads earlier weeks (Google's), without the list jumping under the finger; up to two years back.
+  const loading = useRef(false);
   const earlier = () => {
     const box = scroll.current;
-    const before = box ? box.scrollHeight - box.scrollTop : 0;
+    if (loading.current || !box || from.getTime() <= addDays(new Date(now), -MAX_WEEKS * 7).getTime()) return;
+    loading.current = true;
+    const before = box.scrollHeight - box.scrollTop;
     setFrom((f) => addDays(f, -28));
-    setWeeks((w) => w + 4);
-    requestAnimationFrame(() => box && (box.scrollTop = box.scrollHeight - before));
+    setBack((b) => b + 4);
+    requestAnimationFrame(() => {
+      box.scrollTop = box.scrollHeight - before;
+      loading.current = false;
+    });
   };
 
   const today = new Date(now);
   let month = -1;
   let week = -1;
+  let prev: Date | null = null;
+  const monthName = (d: Date) => fmtDate(d, { month: 'long', year: d.getFullYear() !== today.getFullYear() ? 'numeric' : undefined });
+  /** Whole months with nothing on them still get their name and one quiet line, so the list never seems to skip one. */
+  const quietMonths = (day: Date) => {
+    const out: Date[] = [];
+    if (prev) for (let m = new Date(prev.getFullYear(), prev.getMonth() + 1, 1); m < new Date(day.getFullYear(), day.getMonth(), 1); m = new Date(m.getFullYear(), m.getMonth() + 1, 1)) out.push(m);
+    prev = day;
+    return out.map((m) => (
+      <Fragment key={`q${m.getTime()}`}>
+        <div className="sch-month">{monthName(m)}</div>
+        <div className="sch-gap">{t('Nothing planned this month')}</div>
+      </Fragment>
+    ));
+  };
   /** Phones (Google's schedule): a quiet "12 to 18 Oct" row at the start of each week that has something on it. */
   const weekRows = (day: Date) => {
     if (!kit.phone) return null;
@@ -156,8 +179,9 @@ export function ScheduleView({
       className="sch"
       ref={scroll}
       onScroll={(e) => {
-        if (!onTopDay || frame.current) return;
         const box = e.currentTarget;
+        if (box.scrollTop < 240) earlier();
+        if (!onTopDay || frame.current) return;
         frame.current = requestAnimationFrame(() => {
           frame.current = 0;
           const row = [...box.querySelectorAll<HTMLElement>('[data-day]')].find((r) => r.offsetTop + r.offsetHeight > box.scrollTop + 8);
@@ -165,19 +189,18 @@ export function ScheduleView({
         });
       }}
     >
-      <button type="button" className="sch-earlier" onClick={earlier}>
-        <ChevronUp size={15} /> {t('Earlier')}
-      </button>
       {days.map(({ day, list, tasks }) => {
         const isToday = sameDay(day, today);
         // Phones: the bar already says the month on screen, so the list names only the other months.
         const barMonth = kit.phone && day.getMonth() === cursor.getMonth() && day.getFullYear() === cursor.getFullYear();
-        const mh = day.getMonth() !== month && !barMonth ? fmtDate(day, { month: 'long', year: day.getFullYear() !== today.getFullYear() ? 'numeric' : undefined }) : null;
+        const quiet = quietMonths(day);
+        const mh = day.getMonth() !== month && !barMonth ? monthName(day) : null;
         month = day.getMonth();
         // Today: the "now" line goes before the first thing that hasn't ended.
         const nowAt = isToday ? list.findIndex((e) => !e.allDay && new Date(e.end).getTime() > now) : -2;
         return (
           <Fragment key={day.toDateString()}>
+            {quiet}
             {mh && <div className="sch-month">{mh}</div>}
             {weekRows(day)}
             <section className={`sch-day${isToday ? ' today' : ''}`} data-day={startOfDay(day).getTime()} aria-label={fmtWeekdayLong(day)}>
@@ -213,8 +236,9 @@ export function ScheduleView({
           </Fragment>
         );
       })}
+      {/* The end line only once everything ahead has been looked at; until then the same room, empty. */}
       <div ref={end} className="sch-end">
-        {t('Nothing planned after this')}
+        {weeks >= MAX_WEEKS && t('Nothing planned after this')}
       </div>
     </div>
   );

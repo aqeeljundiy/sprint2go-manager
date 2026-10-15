@@ -37,13 +37,13 @@ export function InboxSwitcher(p: {
   const menu = useActionMenu(
     () => [
       ...(many ? [{ label: t('All inboxes'), icon: Layers, hint: p.unread.all ? tn(p.unread.all, '{n} unread', '{n} unread') : undefined, checked: p.active === 'all', run: () => p.onPick('all') }] : []),
-      ...boxes.map((a) => ({ label: a.email, icon: iconOf(a), hint: subOf(a) || undefined, checked: p.active === a.id, group: 'boxes', run: () => p.onPick(a.id) })),
-      ...temps.map((a) => ({ label: a.email, icon: Timer, hint: subOf(a) || undefined, checked: p.active === a.id, group: 'temp', run: () => p.onPick(a.id) })),
+      ...boxes.map((a) => ({ label: a.email, icon: iconOf(a), hint: subOf(a) || undefined, checked: p.active === a.id, group: 'boxes', heading: temps.length ? t('Mailboxes') : undefined, run: () => p.onPick(a.id) })),
+      ...temps.map((a) => ({ label: a.email, icon: Timer, hint: subOf(a) || undefined, checked: p.active === a.id, group: 'temp', heading: t('Temporary addresses'), run: () => p.onPick(a.id) })),
       ...(p.onNewTemp ? [{ label: t('New temporary address'), icon: Plus, hint: t('Made in seconds, deleted by itself'), group: 'add', run: p.onNewTemp }] : []),
       ...(p.onAddAccount ? [{ label: t('Add an email address'), icon: Plus, group: 'add', run: p.onAddAccount }] : []),
     ],
     // A menu by the button on computers; a sheet from the bottom on phones.
-    { menu: !phone, className: 'inbox-switch-menu', title: t('Inboxes'), width: 320 /* a whole address fits */ },
+    { menu: !phone, className: 'inbox-switch-menu', title: many ? t('Inboxes') : t('Add an address'), width: 320 /* a whole address fits */ },
   );
   const cur = p.accounts.find((a) => a.id === p.active);
   const Icon = cur ? iconOf(cur) : Layers;

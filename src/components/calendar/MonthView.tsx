@@ -1,25 +1,25 @@
 import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type RefObject } from 'react';
-import { Repeat } from 'lucide-react';
+import { ChevronRight, Repeat } from 'lucide-react';
 import type { CalEvent } from '../../types';
 import { eventsOn, fmtTime, monthGrid, sameDay, startOfDay } from '../../calendarUtils';
 import { EventCard } from './EventCard';
 import type { CardKit } from './EventCard';
-import { isPending, onColor } from './calTools';
+import { isPending } from './calTools';
 import { monthLayout, type MonthPiece } from './monthLayout';
 import { useSwipeNav } from './useSwipeNav';
 import { t, tn } from '../../i18n';
 import { fmtDate, fmtMonth, fmtWeekdayLong } from '../../i18n/format';
 
 /** The heights the lanes are worked out from (px): the date's row, one lane, the room left under the last one. */
-const ROOM = { phone: { num: 32, lane: 17, end: 2 }, desk: { num: 34, lane: 22, end: 4 } };
+const ROOM = { num: 34, lane: 22, end: 4 };
 
 /**
- * How many lanes fit in a week's row (Google's month fills the screen on phones; on a computer the rows are at least
- * 96 px and the grid scrolls). Measured on the first week; every week has the same height.
+ * How many lanes fit in a week's row (the rows are at least 96 px and the grid scrolls). Measured on the first week;
+ * every week has the same height.
  */
-function useLanes(body: RefObject<HTMLDivElement | null>, phone: boolean) {
-  const room = phone ? ROOM.phone : ROOM.desk;
-  const [fit, setFit] = useState(phone ? 4 : 3);
+function useLanes(body: RefObject<HTMLDivElement | null>) {
+  const room = ROOM;
+  const [fit, setFit] = useState(3);
   useLayoutEffect(() => {
     const el = body.current;
     if (!el) return;
@@ -41,8 +41,8 @@ function useLanes(body: RefObject<HTMLDivElement | null>, phone: boolean) {
 /**
  * Month: six weeks, each a row with lanes under the dates (Google Calendar's). An event over several days is one bar
  * across them, carried on in the next row at the week's end; a day with more than fits says "+N". On a computer: click a
- * day for a new event at 9:00, its date or "+N" for the day, an event to open it. On a phone: the events as small solid
- * chips and bars, tap a day for that day, swipe for other months.
+ * day for a new event at 9:00, its date or "+N" for the day, an event to open it. Phones get PhoneMonth (dots under
+ * the dates and the picked day's list).
  */
 export function MonthView({
   cursor,
@@ -63,12 +63,13 @@ export function MonthView({
   onStep: (dir: 1 | -1) => void;
 }) {
   if (phone) return <PhoneMonth cursor={cursor} events={events} kit={kit} onDay={onDay} onCreate={onCreate} onStep={onStep} />;
-  return <GridMonth cursor={cursor} events={events} phone={phone} kit={kit} onDay={onDay} onCreate={onCreate} onStep={onStep} />;
+  return <GridMonth cursor={cursor} events={events} kit={kit} onDay={onDay} onCreate={onCreate} onStep={onStep} />;
 }
 
 /**
  * Phones (iOS Calendar's month): the dates with up to three coloured dots under each, no text in the cells, and the
- * picked day's events listed under the grid. Tap a day to pick it, tap it again to open it; swipe for other months.
+ * picked day's events listed under the grid. Tap a day to pick it; its heading over the list opens it; swipe for other
+ * months.
  */
 function PhoneMonth({ cursor, events, kit, onDay, onCreate, onStep }: { cursor: Date; events: CalEvent[]; kit: CardKit; onDay: (d: Date) => void; onCreate: (start: Date) => void; onStep: (dir: 1 | -1) => void }) {
   const grid = useRef<HTMLDivElement>(null);
@@ -76,13 +77,16 @@ function PhoneMonth({ cursor, events, kit, onDay, onCreate, onStep }: { cursor: 
   const cells = useMemo(() => monthGrid(cursor), [cursor]);
   const today = new Date();
   const inMonth = (d: Date) => d.getMonth() === cursor.getMonth() && d.getFullYear() === cursor.getFullYear();
-  const [picked, setPicked] = useState<Date>(() => (inMonth(today) ? today : new Date(cursor.getFullYear(), cursor.getMonth(), 1)));
-  // Another month on screen: pick today there, else its first day.
+  const first = new Date(cursor.getFullYear(), cursor.getMonth(), 1);
+  // The date asked for (the title's mini month) when there is one, else today in this month, else its first day.
+  const pickOf = () => (inMonth(cursor) ? cursor : inMonth(today) ? today : first);
   const monthKey = `${cursor.getFullYear()}-${cursor.getMonth()}`;
-  const [shownKey, setShownKey] = useState(monthKey);
-  if (shownKey !== monthKey) {
-    setShownKey(monthKey);
-    setPicked(inMonth(today) ? today : new Date(cursor.getFullYear(), cursor.getMonth(), 1));
+  const [picked, setPicked] = useState<Date>(pickOf);
+  const cursorKey = cursor.toDateString();
+  const [shownKey, setShownKey] = useState(cursorKey);
+  if (shownKey !== cursorKey) {
+    setShownKey(cursorKey);
+    setPicked(pickOf());
   }
   const dayList = eventsOn(events, picked).sort((a, b) => Number(!!b.allDay) - Number(!!a.allDay) || a.start.localeCompare(b.start));
   const nine = new Date(startOfDay(picked));
@@ -103,7 +107,7 @@ function PhoneMonth({ cursor, events, kit, onDay, onCreate, onStep }: { cursor: 
               key={d.toDateString()}
               type="button"
               className={`mp-day${inMonth(d) ? '' : ' out'}${sameDay(d, today) ? ' today' : ''}${on ? ' on' : ''}`}
-              onClick={() => (on ? onDay(d) : setPicked(d))}
+              onClick={() => setPicked(d)}
               aria-pressed={on}
               aria-label={list.length ? tn(list.length, '{day}, {n} event', '{day}, {n} events', { day: fmtWeekdayLong(d) }) : fmtWeekdayLong(d)}
             >
@@ -118,7 +122,12 @@ function PhoneMonth({ cursor, events, kit, onDay, onCreate, onStep }: { cursor: 
         })}
       </div>
       <div className="mp-list">
-        <h2 className="mp-list-head">{fmtWeekdayLong(picked)}</h2>
+        <h2 className="mp-list-head">
+          <button type="button" className="mp-list-open" onClick={() => onDay(picked)} aria-label={t('{day}. Open the day', { day: fmtWeekdayLong(picked) })}>
+            {fmtWeekdayLong(picked)}
+            <ChevronRight size={16} aria-hidden />
+          </button>
+        </h2>
         {dayList.length ? (
           dayList.map((e) => <EventCard key={e.id} e={e} kit={kit} now={Date.now()} />)
         ) : (
@@ -131,11 +140,12 @@ function PhoneMonth({ cursor, events, kit, onDay, onCreate, onStep }: { cursor: 
   );
 }
 
-function GridMonth({ cursor, events, phone, kit, onDay, onCreate, onStep }: { cursor: Date; events: CalEvent[]; phone: boolean; kit: CardKit; onDay: (d: Date) => void; onCreate: (start: Date) => void; onStep: (dir: 1 | -1) => void }) {
+/** Computers and tablets (phones get PhoneMonth). */
+function GridMonth({ cursor, events, kit, onDay, onCreate, onStep }: { cursor: Date; events: CalEvent[]; kit: CardKit; onDay: (d: Date) => void; onCreate: (start: Date) => void; onStep: (dir: 1 | -1) => void }) {
   const body = useRef<HTMLDivElement>(null);
-  useSwipeNav(body, onStep, !phone);
+  useSwipeNav(body, onStep, true);
   const cells = useMemo(() => monthGrid(cursor), [cursor]);
-  const fit = useLanes(body, phone);
+  const fit = useLanes(body);
   const weeks = useMemo(() => monthLayout(events, cells, fit), [events, cells, fit]);
   const today = new Date();
   const nine = (d: Date) => {
@@ -148,24 +158,20 @@ function GridMonth({ cursor, events, phone, kit, onDay, onCreate, onStep }: { cu
   const out = (d: Date) => d.getMonth() !== cursor.getMonth();
 
   return (
-    <div className={`mg mg-lanes${phone ? ' mg-chips' : ''}`}>
-      <div className="mg-head" aria-hidden={phone || undefined}>
+    <div className="mg mg-lanes">
+      <div className="mg-head">
         {cells.slice(0, 7).map((d) => (
-          <span key={d.getDay()}>{fmtDate(d, { weekday: phone ? 'narrow' : 'short' })}</span>
+          <span key={d.getDay()}>{fmtDate(d, { weekday: 'short' })}</span>
         ))}
       </div>
-      <div className="mg-body" ref={body} role={phone ? 'grid' : undefined} aria-label={phone ? fmtMonth(cursor) : undefined} key={phone ? `${cursor.getFullYear()}-${cursor.getMonth()}` : undefined}>
+      <div className="mg-body" ref={body}>
         {weeks.map((wk, w) => (
           <div key={w} className="mg-week" style={rows}>
             {cells.slice(w * 7, w * 7 + 7).map((d, c) => {
               const cls = `mg-cell${out(d) ? ' out' : ''}${sameDay(d, today) ? ' today' : ''}`;
-              const n = wk.byDay[c].length;
-              return phone ? (
-                <button key={c} type="button" className={cls} style={{ gridColumn: c + 1 }} onClick={() => onDay(d)} aria-label={n ? tn(n, '{day}, {n} event', '{day}, {n} events', { day: fmtWeekdayLong(d) }) : fmtWeekdayLong(d)}>
-                  <span className="mg-num">{d.getDate()}</span>
-                </button>
-              ) : (
-                <div key={c} className={cls} style={{ gridColumn: c + 1 }} onClick={() => onCreate(nine(d))}>
+              // With an event open, a click on a free spot only closes it (Google's), so a stray click never makes one.
+              return (
+                <div key={c} className={cls} style={{ gridColumn: c + 1 }} onClick={() => (kit.selectedId ? kit.onSelect(null) : onCreate(nine(d)))}>
                   <button
                     className="mg-num"
                     onClick={(e) => {
@@ -179,18 +185,14 @@ function GridMonth({ cursor, events, phone, kit, onDay, onCreate, onStep }: { cu
                 </div>
               );
             })}
-            {wk.pieces.map((p) => (phone ? <PhoneChip key={`${p.e.id}:${p.from}`} p={p} kit={kit} style={place(p)} /> : <DeskItem key={`${p.e.id}:${p.from}`} p={p} kit={kit} style={place(p)} />))}
-            {wk.more.map((m) =>
-              phone ? (
-                <span key={`m${m.col}`} className="mg-more-n" style={place({ from: m.col, to: m.col, lane: fit - 1 })} aria-hidden="true">
-                  +{m.n}
-                </span>
-              ) : (
-                <button key={`m${m.col}`} className="mg-more" style={place({ from: m.col, to: m.col, lane: fit - 1 })} onClick={() => onDay(cells[w * 7 + m.col])}>
-                  {tn(m.n, '+{n} more', '+{n} more')}
-                </button>
-              ),
-            )}
+            {wk.pieces.map((p) => (
+              <DeskItem key={`${p.e.id}:${p.from}`} p={p} kit={kit} style={place(p)} />
+            ))}
+            {wk.more.map((m) => (
+              <button key={`m${m.col}`} className="mg-more" style={place({ from: m.col, to: m.col, lane: fit - 1 })} onClick={() => onDay(cells[w * 7 + m.col])}>
+                {tn(m.n, '+{n} more', '+{n} more')}
+              </button>
+            ))}
           </div>
         ))}
       </div>
@@ -199,16 +201,6 @@ function GridMonth({ cursor, events, phone, kit, onDay, onCreate, onStep }: { cu
 }
 
 const edges = (p: MonthPiece) => `${p.before ? ' mg-go-l' : ''}${p.after ? ' mg-go-r' : ''}`;
-
-/** Phones: a solid chip with its title; a bar across its days. Taps go through to the day under the finger. */
-function PhoneChip({ p, kit, style }: { p: MonthPiece; kit: CardKit; style: CSSProperties }) {
-  const c = kit.color(p.e.calendarId);
-  return (
-    <span className={`mg-chip${p.bar && p.to > p.from ? ' mg-span' : ''}${edges(p)}${isPending(p.e) ? ' pending' : ''}`} style={{ ...style, ['--c' as string]: c, ['--on' as string]: onColor(c) }} aria-hidden="true">
-      {p.e.title}
-    </span>
-  );
-}
 
 /** Computers: a bar for all-day and multi-day events (its time on the first day when it has one), a dot and the time for the rest. */
 function DeskItem({ p, kit, style }: { p: MonthPiece; kit: CardKit; style: CSSProperties }) {

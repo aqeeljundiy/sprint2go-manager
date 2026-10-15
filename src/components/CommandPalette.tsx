@@ -164,7 +164,7 @@ export function CommandPalette({ items: all, onClose, queryActions, recentKey = 
             value={q}
             onChange={(e) => setQ(e.target.value)}
             ref={input}
-            placeholder={scope ? t('Search {app}', { app: appName(scope) }) : kind ? t('Search {kind}', { kind: t(kind).toLowerCase() }) : phone ? t('Search') : t('Search or jump to an app, {project} or person', { project: term.one })}
+            placeholder={scope ? t('Search {app}', { app: appName(scope) }) : kind ? t('Search {kind}', { kind: t(kind).toLowerCase() }) : phone ? t('Search or ask AI') : t('Search or jump to an app, {project} or person', { project: term.one })}
             onKeyDown={(e) => {
               if (e.key === 'ArrowDown') {
                 e.preventDefault();

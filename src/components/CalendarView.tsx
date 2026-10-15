@@ -1,12 +1,12 @@
 import { cloneElement, isValidElement, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactElement, type ReactNode } from 'react';
 import { flushSync } from 'react-dom';
-import { CalendarDays, CalendarPlus, CalendarX, Check, ChevronDown, ChevronLeft, ChevronRight, CircleCheck, Copy, CopyPlus, Link2, Layers, Mail, Pencil, Plus, SkipForward, Trash2, Video, X } from 'lucide-react';
+import { CalendarDays, CalendarPlus, CalendarX, Check, ChevronDown, ChevronLeft, ChevronRight, CircleCheck, Copy, CopyPlus, Link2, Mail, Pencil, Plus, SkipForward, Trash2, Video, X } from 'lucide-react';
 import type { CalEvent, CalendarDef, Person, RsvpStatus, User, Workspace } from '../types';
 import { addDays, eventsOn, monthGrid, sameDay, startOfDay } from '../calendarUtils';
 import { expandEvents, findEvent, type Scope } from '../repeat';
 import { askScope, type ScopeAt } from './calendar/RepeatScope';
 import { useCreateAction } from '../mobile/chrome';
-import { TopBar, TopBarButton } from '../mobile/TopBar';
+import { TopBar } from '../mobile/TopBar';
 import type { CalDrawer } from './CalendarSidebar';
 import { EventEditor, type EditorKind } from './EventEditor';
 import type { Draft } from './calendar/EventForm';
@@ -128,9 +128,9 @@ export function CalendarView(props: Props) {
   const canWeek = phone || paneW >= WEEK_MIN;
   const narrow = !phone && paneW < 720; // a tablet beside the panel: the views go in a dropdown
   const view = shownView(props.view, canWeek);
-  // Google Calendar's order on computers (Day, Week, Month, then Schedule and the few-days view); phones keep Schedule
-  // first, which is their default.
-  const views: CalView[] = phone ? (canWeek ? ['schedule', 'day', '3day', 'week', 'month'] : ['schedule', 'day', '3day', 'month']) : canWeek ? ['day', 'week', 'month', 'schedule', '3day'] : ['day', 'month', 'schedule', '3day'];
+  // Google Calendar's order on computers (Day, Week, Month, Schedule; the few-days view is a phone view, listed there
+  // only while it's the one on screen); phones keep Schedule first, which is their default.
+  const views: CalView[] = phone ? (canWeek ? ['schedule', 'day', '3day', 'week', 'month'] : ['schedule', 'day', '3day', 'month']) : [...(canWeek ? ['day', 'week', 'month', 'schedule'] : ['day', 'month', 'schedule']), ...(view === '3day' ? ['3day'] : [])] as CalView[];
   const days = useMemo(() => gridDays(view, cursor), [view, cursor]);
   const color = (id: string) => calendars.find((c) => c.id === id)?.color ?? '#888';
   const step = (dir: 1 | -1) => props.onCursor(stepOf(view, cursor, dir));
@@ -193,6 +193,12 @@ export function CalendarView(props: Props) {
   /* ---------- phones: the drawer (views, calendars, settings) from the Calendars button (the launcher button and the
      left edge go back to the launcher, research/launcher/plan.md) ---------- */
   const [drawer, setDrawer] = useState(false);
+  // The top bar's menu button opens this drawer, not the desktop side panel (App.tsx sends the event).
+  useEffect(() => {
+    const open = () => setDrawer(true);
+    window.addEventListener('calendar-drawer', open);
+    return () => window.removeEventListener('calendar-drawer', open);
+  }, []);
   useEffect(() => {
     if (props.dialogOpen) setDrawer(false);
   }, [props.dialogOpen]);
@@ -255,6 +261,8 @@ export function CalendarView(props: Props) {
   // A choice from the menu that asks which dates asks where the menu was.
   const menuAt = menu ? { x: menu.x, y: menu.y } : undefined;
   const editable = (e: CalEvent) => !isPending(e) && (props.canEdit?.(e) ?? true);
+  // Move to tomorrow is for task blocks and solo events: one click must never quietly move a meeting with guests.
+  const movable = (e: CalEvent) => !!props.taskOf?.(e) || !e.guests?.length;
   const actionsFor = (e: CalEvent): SheetAction[] => {
     const link = meetingLinkOf(e);
     const ended = new Date(e.end).getTime() < Date.now();
@@ -282,7 +290,7 @@ export function CalendarView(props: Props) {
         ? [
             { label: t('Edit'), icon: Pencil, run: () => props.onEdit(e.id) },
             { label: t('Duplicate'), icon: CopyPlus, run: () => props.onDuplicate(e.id) },
-            { label: t('Move to tomorrow'), icon: SkipForward, run: () => void moveTo(e.id, addDays(new Date(e.start), 1), addDays(new Date(e.end), 1), menuAt) },
+            ...(movable(e) ? [{ label: t('Move to tomorrow'), icon: SkipForward, run: () => void moveTo(e.id, addDays(new Date(e.start), 1), addDays(new Date(e.end), 1), menuAt) }] : []),
           ]
         : []),
       { label: link ? t('Copy call link') : t('Copy link'), icon: link ? Copy : Link2, group: 'copy', run: () => void copy(link ? link.url : eventLink(e.id), link ? t('Call link copied') : t('Link copied')) },
@@ -290,7 +298,7 @@ export function CalendarView(props: Props) {
     ];
   };
 
-  /** Phones: the details page's ⋮ (Google's): everything but Join and Edit, which have their own places there. */
+  /** The open event's ⋮ (Google's), on every screen: everything but Join and Edit, which have their own places there. */
   const detailMore = (e: CalEvent): SheetAction[] => {
     if (isPending(e)) return [];
     const link = meetingLinkOf(e);
@@ -303,7 +311,7 @@ export function CalendarView(props: Props) {
       ...(editable(e)
         ? [
             { label: t('Duplicate'), icon: CopyPlus, run: () => props.onDuplicate(e.id) },
-            { label: t('Move to tomorrow'), icon: SkipForward, run: () => void moveTo(e.id, addDays(new Date(e.start), 1), addDays(new Date(e.end), 1)) },
+            ...(movable(e) ? [{ label: t('Move to tomorrow'), icon: SkipForward, run: () => void moveTo(e.id, addDays(new Date(e.start), 1), addDays(new Date(e.end), 1)) }] : []),
           ]
         : []),
       { label: t('Copy link'), icon: Link2, group: 'copy', run: () => void copy(eventLink(e.id), t('Link copied')) },
@@ -350,7 +358,7 @@ export function CalendarView(props: Props) {
   const barTitle = drop && browsed ? fmtDate(browsed, { month: 'long', year: browsed.getFullYear() === today.getFullYear() ? undefined : 'numeric' }) : title;
 
   return (
-    <section className={`cal-pane view-${view}${phone ? ' is-phone' : ''}`} ref={pane}>
+    <section className={`cal-pane view-${view}${phone ? ' is-phone' : ''}${selected && !phone && paneW >= 900 ? ' has-detail' : ''}`} ref={pane}>
       {phone && (
         <TopBar
           app="calendar"
@@ -366,7 +374,6 @@ export function CalendarView(props: Props) {
               <button type="button" className="cal-today mt-cal-today" onClick={toToday} aria-label={t('Today, {date}', { date: fmtWeekdayLong(today) })}>
                 <span>{today.getDate()}</span>
               </button>
-              <TopBarButton icon={Layers} label={t('Calendars and views')} onClick={() => setDrawer(true)} />
             </>
           }
         />
@@ -379,15 +386,9 @@ export function CalendarView(props: Props) {
         </button>
           <>
             <div className="cal-nav">
-              {narrow ? (
-                <button type="button" className="cal-today" onClick={toToday} aria-label={t('Today')} title={t('Today (T)')}>
-                  <span>{today.getDate()}</span>
-                </button>
-              ) : (
-                <button className="ghost-btn outline sm" onClick={toToday} title={t('Today (T)')}>
-                  {t('Today')}
-                </button>
-              )}
+              <button className="ghost-btn outline sm" onClick={toToday} title={t('Today (T)')}>
+                {t('Today')}
+              </button>
               <button className="icon-btn" onClick={() => step(-1)} aria-label={t('Previous')}>
                 <ChevronLeft size={18} />
               </button>
@@ -395,17 +396,8 @@ export function CalendarView(props: Props) {
                 <ChevronRight size={18} />
               </button>
             </div>
-            {narrow ? (
-              <Select<CalView> value={view} onChange={props.onView} options={views.map((v) => ({ value: v, label: viewLabel(v) }))} label={tx('cal', 'View')} className="cal-view-sel" width={180} />
-            ) : (
-              <div className="segmented cal-views">
-                {views.map((v) => (
-                  <button key={v} className={view === v ? 'on' : ''} onClick={() => props.onView(v)}>
-                    {viewLabel(v)}
-                  </button>
-                ))}
-              </div>
-            )}
+            {/* Google's one view drop-down at every desktop width; D/W/M/A still switch from the keyboard. */}
+            <Select<CalView> value={view} onChange={props.onView} options={views.map((v) => ({ value: v, label: viewLabel(v) }))} label={tx('cal', 'View')} className="cal-view-sel" width={180} />
             {/* "New event" is the sidebar's button (and C); not repeated here, one primary per screen. */}
           </>
       </header>
@@ -486,7 +478,7 @@ export function CalendarView(props: Props) {
           onRsvp={props.onRsvp ? (s, at) => props.onRsvp!(selected, s, at) : undefined}
           answers={props.answersOf?.(selected)}
           inviteNote={props.inviteNote}
-          more={phone ? detailMore(selected) : undefined}
+          more={detailMore(selected)}
         />
       )}
 
@@ -503,7 +495,7 @@ export function CalendarView(props: Props) {
             props.onSave(e, kind);
           }}
           onMore={(seed) => {
-            setEditor({ start: quick.start, end: quick.end, kind: 'event', seed });
+            setEditor({ start: quick.start, end: quick.end, kind: seed.kind === 'task' ? 'task' : 'event', seed });
             setQuick(null);
           }}
           onClose={() => setQuick(null)}

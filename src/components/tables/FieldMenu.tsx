@@ -302,7 +302,7 @@ export function FieldMenu({
               </button>
             )}
             {onDelete && !isFirst && (
-              <button type="button" className="danger" onClick={() => confirm(t('Delete the “{name}” field and everything in it?', { name: field.name })) && (onDelete(), onClose())}>
+              <button type="button" className="danger" onClick={() => (onDelete(), onClose())}>
                 <Trash2 size={14} /> {t('Delete field')}
               </button>
             )}

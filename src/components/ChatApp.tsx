@@ -2,7 +2,7 @@ import { useMemo, useRef, useState, type ReactNode } from 'react';
 import { flushSync } from 'react-dom';
 import { SmoothHeight, TabPane } from './ui/Smooth';
 import { term } from '../terms';
-import { FolderPlus, ChevronUp, Handshake, ChevronDown, ChevronRight, Check, LayoutList, Pencil, Compass, Hash, Lock, MoreHorizontal, Plus, Settings, Star, Trash2, Users, X, Headphones, BellOff, Bell, Link2, LogOut, MailOpen, CheckCheck, Inbox, MessagesSquare, SendHorizontal, Bookmark, ArrowLeft, ArrowRight, EyeOff, GripVertical, Smile, LayoutGrid, PenLine, AtSign, MessageCircle, Folder, Briefcase, PartyPopper, ListFilter, Clock } from 'lucide-react';
+import { FolderPlus, ChevronUp, Handshake, ChevronDown, ChevronRight, Check, LayoutList, Pencil, Compass, Hash, Lock, MoreHorizontal, Plus, Settings, Star, Trash2, Users, X, Headphones, BellOff, Bell, Link2, LogOut, MailOpen, CheckCheck, Inbox, MessagesSquare, SendHorizontal, Bookmark, ArrowLeft, ArrowRight, EyeOff, GripVertical, Smile, LayoutGrid, PenLine, MessageCircle, Folder, Briefcase, PartyPopper, ListFilter, Clock } from 'lucide-react';
 import type { Channel, ChannelCategory, ChatLayout, ChatMessage, ChatSection, ChatView as ChatViewDef, Notice, Status, Team, User } from '../types';
 import { usePersisted } from '../settings';
 import { Avatar } from './Avatar';
@@ -228,7 +228,7 @@ export function ChatSidebar(p: SidebarProps) {
   const toggle = (key: string) => setCollapsed(collapsed.includes(key) ? collapsed.filter((k) => k !== key) : [...collapsed, key]);
 
   const viewOptions = [
-    { value: 'default', label: t('Company default'), hint: t('Sections your admins set for everyone'), group: t('Built in') },
+    { value: 'default', label: t('Sections (default)'), hint: t('Sections your admins set for everyone'), group: t('Built in') },
     { value: 'unread', label: t('Unread first'), hint: t('What needs you on top'), group: t('Built in') },
     { value: 'recent', label: t('Recent'), hint: t('Latest activity first'), group: t('Built in') },
     ...views.map((v) => ({ value: v.id, label: v.name, hint: tn(v.sections.length, '{n} section', '{n} sections'), group: t('Your views') })),
@@ -274,8 +274,8 @@ export function ChatSidebar(p: SidebarProps) {
     live: { icon: <Headphones size={18} />, line: live.length ? (live.length > 1 ? tn(live.length, '{n} on', '{n} on') : chanName(live[0], p.users, p.me)) : '', hot: true, hidden: !live.length },
   };
   // Phones show a shortcut only when it has something new or waiting: no "Caught up" or "Nothing saved" tiles.
-  // Catch up stays: it's the way through everything unread, and the place to land when you're caught up.
-  const waiting: Record<TileId, boolean> = { catchup: true, threads: newReplies > 0, drafts: draftCount + scheduled > 0, saved: !!nextReminder, live: live.length > 0 };
+  // Catch up too: a "Caught up" pill is a count nobody acts on (the Catch up page is still in the drawer).
+  const waiting: Record<TileId, boolean> = { catchup: unreadConvos.length > 0, threads: newReplies > 0, drafts: draftCount + scheduled > 0, saved: !!nextReminder, live: live.length > 0 };
   const tiles = chat.tiles.order.filter((id) => !chat.tiles.hidden.includes(id) && !tileState[id].hidden && (!phone || waiting[id]));
   const openTile = (id: TileId) => (id === 'live' ? live[0] && p.onOpen(live[0].id) : p.onPage(id));
 
@@ -361,8 +361,8 @@ export function ChatSidebar(p: SidebarProps) {
   const starredList = [...rooms, ...dms].filter((c) => star.has(c.id));
   // Phones: unread direct messages and mentions first, each only once.
   const topDms = phone ? dms.filter((c) => info[c.id]?.unread && !info[c.id].muted && !star.has(c.id)).sort((a, b) => recency(b).localeCompare(recency(a))) : [];
-  const topMentions = phone ? rooms.filter((c) => info[c.id]?.mentions && !star.has(c.id)).sort((a, b) => recency(b).localeCompare(recency(a))) : [];
-  const onTop = new Set([...topDms, ...topMentions].map((c) => c.id));
+  // Mentions live on the Activity tab (Slack's model); a mentioned channel stays in its own section with its badge.
+  const onTop = new Set(topDms.map((c) => c.id));
   const restRooms = rooms.filter((c) => !star.has(c.id) && !onTop.has(c.id));
   let body: ReactNode;
   if (active === 'default') {
@@ -395,7 +395,12 @@ export function ChatSidebar(p: SidebarProps) {
   const activityUnread = (p.notices ?? []).some((n) => !n.read);
   // Filter (DMs) or Mark all as read (Activity): next to the switch, or in the top bar when the parts are in the bar.
   const filterBtn = (
-    <button type="button" className="icon-btn chat-filter-btn" onClick={() => (part === 'activity' ? (p.onReadNotices?.((p.notices ?? []).filter((n) => !n.read).map((n) => n.id), true), toast({ text: t('All marked as read') })) : setFilterOpen(true))} aria-label={part === 'activity' ? t('Mark all as read') : t('Filter')} title={part === 'activity' ? t('Mark all as read') : t('Filter')} disabled={part === 'activity' && !activityUnread}>
+    <button type="button" className="icon-btn chat-filter-btn" onClick={() => {
+        if (part !== 'activity') return setFilterOpen(true);
+        const ids = (p.notices ?? []).filter((n) => !n.read).map((n) => n.id);
+        p.onReadNotices?.(ids, true);
+        toast({ text: t('All marked as read'), action: { label: t('Undo'), run: () => p.onReadNotices?.(ids, false) } });
+      }} aria-label={part === 'activity' ? t('Mark all as read') : t('Filter')} title={part === 'activity' ? t('Mark all as read') : t('Filter')} disabled={part === 'activity' && !activityUnread}>
       {part === 'activity' ? <CheckCheck size={20} /> : <ListFilter size={20} />}
     </button>
   );
@@ -415,7 +420,7 @@ export function ChatSidebar(p: SidebarProps) {
     <>
       {!phone && (
         <>
-          <button ref={statusBtn} className="status-btn sb-label" onClick={() => setStatusOpen(true)}>
+          <button ref={statusBtn} className="status-btn" onClick={() => setStatusOpen(true)}>
             <span className="st-emoji big">{myStatus?.emoji ?? '🙂'}</span>
             <span className="sb-label">{myStatus ? statusText(myStatus) : t('Set a status')}</span>
           </button>
@@ -463,7 +468,7 @@ export function ChatSidebar(p: SidebarProps) {
         </>
       )}
 
-      {phone && inBar && <TopBar app="chat" actions={part === 'home' || part === 'you' || (part === 'activity' && !activityUnread) ? undefined : filterBtn} />}
+      {phone && inBar && <TopBar app="chat" actions={part === 'home' || part === 'you' ? undefined : filterBtn} />}
       {phone && !inBar && (
         <div className="chat-switch-row" ref={switchRow}>
           <div className="segmented chat-switch" role="tablist" aria-label={t('Chat')}>
@@ -488,7 +493,7 @@ export function ChatSidebar(p: SidebarProps) {
               </button>
             ))}
           </div>
-          {part !== 'home' && !(part === 'activity' && !activityUnread) && filterBtn}
+          {part !== 'home' && filterBtn}
         </div>
       )}
       {phone ? (
@@ -517,16 +522,6 @@ export function ChatSidebar(p: SidebarProps) {
                 </div>
               )}
               {section('top-dms', t('Unread direct messages'), topDms, undefined, undefined, undefined, <MessageCircle size={14} />)}
-              {section('top-mentions', t('Mentions'), topMentions, undefined, undefined, undefined, <AtSign size={14} />)}
-              {section(
-                'recent-dms',
-                t('Direct messages'),
-                dms.filter((c) => !onTop.has(c.id) && !star.has(c.id)).sort((a, b) => recency(b).localeCompare(recency(a))).slice(0, 3),
-                undefined,
-                undefined,
-                undefined,
-                <MessageCircle size={14} />,
-              )}
               {section('starred', t('Starred'), starredList, undefined, undefined, undefined, <Star size={14} />)}
               {body}
               {(
@@ -1143,7 +1138,6 @@ export function StatusPicker({ status, onStatus }: { status?: Status; onStatus: 
           <X size={14} /> {t('Clear status')}
         </button>
       )}
-      <p className="muted small">{t('“In a meeting” is set for you automatically from your calendar.')}</p>
     </div>
   );
 }
@@ -1353,7 +1347,7 @@ function NewMessage(p: {
           </button>
         );
       })}
-      {chans.length > 0 && <div className="nm-group">{t('Channels')}</div>}
+      {chans.length > 0 && <div className="nm-group">{t('Go to channel')}</div>}
       {chans.map((c) => (
         <button key={c.id} type="button" className="nm-row" onClick={() => (p.onClose(), p.onPickChannel?.(c.id))}>
           <span className="nm-glyph">{c.category === 'shared' ? <Handshake size={18} /> : c.private ? <Lock size={17} /> : <Hash size={18} />}</span>

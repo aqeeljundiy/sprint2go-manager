@@ -128,10 +128,12 @@ export function firstLine(n: Note) {
 }
 
 export function snippetAround(n: Note, q: string) {
-  const text = `${n.title}\n${htmlToText(n.html)}`;
+  // The body only (the title is on the row already), starting a few words before the match.
+  const text = htmlToText(n.html);
   const i = q ? text.toLowerCase().indexOf(q.toLowerCase()) : -1;
   if (i < 0) return { before: htmlToText(n.html).slice(0, 110), hit: '', after: '' };
-  const from = Math.max(0, i - 40);
+  let from = Math.max(0, i - 24);
+  if (from > 0) from = text.lastIndexOf(' ', from) + 1 || from;
   return { before: (from > 0 ? '…' : '') + text.slice(from, i).replace(/\s+/g, ' '), hit: text.slice(i, i + q.length), after: text.slice(i + q.length, i + q.length + 70).replace(/\s+/g, ' ') };
 }
 

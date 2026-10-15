@@ -372,6 +372,18 @@
   flex-direction: column;
   min-height: 0;
 }
+/* An open event's card sits on the right: the grid makes room for it so the end of the week stays in view. */
+.cal-pane > :is(.tg, .mg, .sch) {
+  transition: margin-right 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.cal-pane.has-detail > :is(.tg, .mg, .sch) {
+  margin-right: 364px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cal-pane > :is(.tg, .mg, .sch) {
+    transition: none;
+  }
+}
 .mg-head {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -393,7 +405,7 @@
   overflow-y: auto;
 }
 /* A narrow month (a tablet beside the panel): titles only, the times would leave no room for them. */
-.mg-lanes:not(.mg-chips) .mg-body {
+.mg-lanes .mg-body {
   container-type: inline-size;
 }
 @container (max-width: 760px) {
@@ -1088,20 +1100,6 @@ a.ghost-btn {
 .cal-header .cal-nav {
   margin-left: auto;
 }
-.cal-views {
-  flex: none;
-}
-@container (max-width: 860px) {
-  .cal-new span {
-    display: none;
-  }
-}
-@container (max-width: 700px) {
-  .cal-views > button {
-    padding-left: 9px;
-    padding-right: 9px;
-  }
-}
 
 /* Today: a little calendar page with today's number (one colour always, as Google's). */
 .cal-today {
@@ -1292,20 +1290,14 @@ a.ghost-btn {
   overscroll-behavior: contain;
   padding: 0 0 24px;
 }
-.sch-earlier {
+/* A month with nothing on it: its name and one quiet line. */
+.sch-gap {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 4px;
-  width: 100%;
-  min-height: 40px;
+  min-height: 32px;
+  padding: 0 16px 0 68px;
   font-size: 13px;
-  font-weight: 600;
   color: var(--text-3);
-  transition: color 0.15s;
-}
-.sch-earlier:hover {
-  color: var(--text);
 }
 .sch-month {
   position: sticky;
@@ -1672,7 +1664,7 @@ a.ghost-btn {
   right: 8px;
 }
 .ev-detail .ev-title {
-  padding-right: 120px;
+  padding-right: 156px;
 }
 .ev-body {
   padding: 0 0 4px;
@@ -1701,6 +1693,29 @@ a.ghost-btn {
 .ev-join .ghost-btn,
 .ev-join .ev-bot-note {
   align-self: flex-start;
+}
+/* Notetaker joins: one switch row (on or off), the same words as on phones. */
+.ev-bot-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 8px;
+  margin: 0 -8px;
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 14px;
+  text-align: left;
+  transition: background 0.15s;
+}
+.ev-bot-row:hover {
+  background: var(--hover);
+}
+.ev-bot-row > svg {
+  color: var(--text-2);
+}
+.ev-bot-row > span:first-of-type {
+  flex: 1;
 }
 .ev-guest-name {
   min-width: 0;
@@ -2194,4 +2209,10 @@ a.ghost-btn {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* A folded sidebar has no room for names: the calendar and teammate checkboxes would be a column of unlabelled dots,
+   so they wait for the open sidebar (its toggle stays at the top). */
+.sidebar.collapsed .cal-list {
+  display: none;
 }

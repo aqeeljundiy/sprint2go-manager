@@ -13,6 +13,8 @@ import { deviceTz } from '../../jobTimes';
 import { t, tn, tx, textOf } from '../../i18n';
 import { tj } from '../../i18n/tj';
 import { fmtTime, weekdayName } from '../../i18n/format';
+import { ConfirmSheet } from '../chat/Sheets';
+import { toastUndo } from '../../toast';
 
 /** data.full_name -> Full name */
 const humanize = (k: string) => {
@@ -521,8 +523,9 @@ export function ButtonSettings({ field, t: tb, tables, users, channels, onChange
 export function AutomationsPanel({ t: tb, tables, users, channels, onPatch, onClose, toast }: { t: DataTable; tables: DataTable[]; users: User[]; channels: Channel[]; onPatch: (p: Partial<DataTable>) => void; onClose: () => void; toast: (text: string) => void }) {
   const [tab, setTab] = useState<'in' | 'rules' | 'log'>('in');
   const [editing, setEditing] = useState<string | null>(null);
+  const [ask, setAsk] = useState<{ title: string; text: string; run: () => void } | null>(null); // the app's own sheet before a secret is replaced
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && !document.querySelector('.pop') && onClose();
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && !document.querySelector('.pop, .sheet-scrim') && onClose();
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [onClose]);
@@ -629,7 +632,7 @@ export function AutomationsPanel({ t: tb, tables, users, channels, onPatch, onCl
                               <Copy size={14} />
                             </button>
                           </div>
-                          <button className="link-btn small" onClick={() => confirm(t('Make a new address? The old one stops working straight away, so update anything that posts to it.')) && setIntake({ token: secret() })}>
+                          <button className="link-btn small" onClick={() => setAsk({ title: t('New address'), text: t('Make a new address? The old one stops working straight away, so update anything that posts to it.'), run: () => setIntake({ token: secret() }) })}>
                             <RefreshCw size={12} /> {t('New address')}
                           </button>
                         </>
@@ -772,7 +775,7 @@ export function AutomationsPanel({ t: tb, tables, users, channels, onPatch, onCl
                             {when} · {r.actions.length ? r.actions.map((a) => actionSummary(a, tb, tables, users, channels)).join(', ') : t('no steps yet')}
                           </small>
                         </button>
-                        <button type="button" className="icon-btn sm" aria-label={t('Delete rule')} onClick={() => confirm(t('Delete the rule “{name}”?', { name: r.name })) && onPatch({ rules: rules.filter((x) => x.id !== r.id) })}>
+                        <button type="button" className="icon-btn sm" aria-label={t('Delete rule')} onClick={() => (onPatch({ rules: rules.filter((x) => x.id !== r.id) }), toastUndo(t('Deleted the rule “{name}”', { name: r.name }), () => onPatch({ rules })))}>
                           <Trash2 size={14} />
                         </button>
                       </header>
@@ -851,7 +854,7 @@ export function AutomationsPanel({ t: tb, tables, users, channels, onPatch, onCl
                     <button className="icon-btn sm" onClick={() => copy(tb.signingSecret!, t('Secret'))} aria-label={t('Copy secret')}>
                       <Copy size={14} />
                     </button>
-                    <button className="icon-btn sm" onClick={() => confirm(t('Make a new secret? Receivers checking the old one will reject webhooks until updated.')) && onPatch({ signingSecret: secret(32) })} aria-label={t('New secret')}>
+                    <button className="icon-btn sm" onClick={() => setAsk({ title: t('New secret'), text: t('Make a new secret? Receivers checking the old one will reject webhooks until updated.'), run: () => onPatch({ signingSecret: secret(32) }) })} aria-label={t('New secret')}>
                       <RefreshCw size={14} />
                     </button>
                   </div>
@@ -884,6 +887,7 @@ export function AutomationsPanel({ t: tb, tables, users, channels, onPatch, onCl
           </div>
         </div>
       </div>
+      {ask && <ConfirmSheet title={ask.title} text={ask.text} yes={ask.title} onYes={ask.run} onClose={() => setAsk(null)} />}
     </div>
   );
 }

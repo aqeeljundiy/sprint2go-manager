@@ -146,6 +146,7 @@ const id: Record<string, string> = {
   '{n} new': '{n} baru',
   '99+ new': '99+ baru',
   'Search or jump to an app, {project} or person': 'Cari aplikasi, {project}, atau orang',
+  'Search or ask AI': 'Cari atau tanya AI',
   New: 'Baru',
   Recent: 'Terbaru',
   'Account and settings': 'Akun dan pengaturan',

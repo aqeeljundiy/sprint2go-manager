@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type MutableRefObject } from 'react';
-import { Bell, ChevronDown, ChevronUp, Clock, Sparkles, Eye, EyeOff, FileText, HardDrive, Maximize2, MousePointerClick, Minimize2, Minus, MoreVertical, Paperclip, Send, SendHorizontal, Trash2, Type, X } from 'lucide-react';
+import { Bell, ChevronUp, Clock, Sparkles, Eye, EyeOff, FileText, HardDrive, Maximize2, MousePointerClick, Minimize2, Minus, MoreVertical, Paperclip, Send, SendHorizontal, Trash2, Type, X } from 'lucide-react';
 import { ActionSheet } from './ui/ActionSheet';
 import type { Person } from '../types';
 import { usePersisted } from '../settings';
@@ -335,7 +335,7 @@ export function Compose({ contacts, signature: baseSignature, signatureFor, work
               !showCc &&
               (phone ? (
                 <button type="button" className="icon-btn cc-caret" onClick={() => setShowCc(true)} aria-label={t('Add Cc and Bcc')} title="Cc/Bcc">
-                  <ChevronDown size={20} />
+                  Cc/Bcc
                 </button>
               ) : (
                 <button type="button" className="cc-toggle" onClick={() => setShowCc(true)}>

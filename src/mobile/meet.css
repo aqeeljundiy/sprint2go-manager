@@ -151,6 +151,13 @@
     border-top: 0;
     box-shadow: inset 68px 0 0 var(--surface), inset 0 1px 0 var(--line);
   }
+  /* Folders: the line starts at the text (a 20 px icon or a 32 px tile). */
+  .mh-card.mh-first > * + * {
+    box-shadow: inset 48px 0 0 var(--surface), inset 0 1px 0 var(--line);
+  }
+  .mh-card.mh-folders > * + * {
+    box-shadow: inset 60px 0 0 var(--surface), inset 0 1px 0 var(--line);
+  }
   .mh-card .swipe-face,
   .mh-swipe {
     background: var(--surface);
@@ -768,5 +775,160 @@
     flex: 1;
     width: 100%;
     justify-content: center;
+  }
+}
+
+/* ---------- Round 4: desktop and tablet bits ---------- */
+/* Meetings: the next calls above the past ones, "See all" at the heading's end. */
+.m-next-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.m-next {
+  margin-bottom: 8px;
+}
+/* Meet settings: its own group under the folders, not one of them. */
+.m-nav-settings {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+/* Who can see this: switches in rows, not native checkboxes. */
+.access-pop .m-access-switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 40px;
+}
+.ev-nolink {
+  margin: 16px 0 0;
+}
+/* At a glance: folder and type are plain values that open a picker, not framed buttons in the card. */
+.m-glance dd .sel.sel-flat {
+  min-height: 0;
+  padding: 0 4px 0 0;
+  border: 0;
+  background: none;
+  font: inherit;
+}
+.m-glance dd .sel.sel-flat:hover {
+  color: var(--accent-text, var(--accent));
+}
+.m-glance dd .m-filed {
+  display: block;
+}
+
+@media (max-width: 767px) {
+  /* Upcoming rows: who's coming can take a second line instead of an ellipsis. */
+  .mh-text small.mh-two {
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  /* The notetaker for one call: a labelled pill (on: the accent tint), with a 44 px tap area. */
+  .mh-nt {
+    position: relative;
+    flex: none;
+    display: grid;
+    place-items: center;
+    min-height: var(--tap);
+    margin-right: 16px;
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+  .mh-nt > span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    padding: 0 12px;
+    border-radius: var(--r-pill);
+    background: var(--surface-2);
+    font: var(--t-chip);
+    color: var(--text-2);
+    transition:
+      background 0.2s ease,
+      color 0.2s ease;
+  }
+  .mh-nt.on > span {
+    background: var(--accent-soft);
+    color: var(--accent-text, var(--accent));
+  }
+  /* The event sheet: icon rows on the 16 px gutter (the sheet body adds 4 px), the notetaker switch at the end. */
+  .mhe-rows {
+    margin-inline: -4px;
+  }
+  .mhe-rows .dr-row {
+    display: flex;
+    align-items: center;
+    min-height: 48px;
+    padding-right: 16px;
+  }
+  .mhe-rows .dr-icon {
+    flex: none;
+    display: grid;
+    place-items: center start;
+    width: 56px;
+    padding-left: 16px;
+    color: var(--text-3);
+  }
+  .mhe-rows .dr-text {
+    flex: 1;
+    min-width: 0;
+    font: var(--t-body);
+    color: var(--text);
+  }
+  .mh-event .sheet-foot {
+    gap: 8px;
+  }
+  .mh-event .sheet-foot > a {
+    flex: 1;
+    justify-content: center;
+    gap: 8px;
+  }
+  /* A meeting: the summary right under the title; folder, type and people move below the notes. */
+  .meet-page .m-facts {
+    order: 7;
+    margin-top: 24px;
+  }
+  /* Take notes: headings, calls and fields on one 16 px gutter (the sheet body adds 4 px). */
+  .tn-sheet .tn-body {
+    margin-inline: -4px;
+  }
+  /* A task's owner: a 24 px face before the name. */
+  .m-task-phone .mtp-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  /* The transcript: face, name and time on one line, the words under the name; the row seeks. */
+  .meet-page .tl {
+    grid-template-columns: 32px auto 1fr;
+    grid-template-areas: 'av name time' '. text text';
+    column-gap: 12px;
+    row-gap: 4px;
+    padding: 8px 0;
+    border-radius: 0;
+  }
+  .meet-page .tl > .avatar,
+  .meet-page .tl > .avatar-btn {
+    grid-area: av;
+  }
+  .meet-page .tl > b {
+    grid-area: name;
+    font: var(--t-body);
+    font-weight: 600;
+  }
+  .meet-page .tl > time {
+    grid-area: time;
+    align-self: center;
+    padding-top: 0;
+  }
+  .meet-page .tl > span:last-child {
+    grid-area: text;
+    grid-column: 2 / -1;
   }
 }

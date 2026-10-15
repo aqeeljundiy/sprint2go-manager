@@ -2081,3 +2081,14 @@
     inset: -6px 0;
   }
 }
+/* Aa bar: nine 44px buttons don't fit a phone; the right edge fades so it reads as a scroller. */
+@media (max-width: 767px) {
+  .composer.is-phone .cmp-fmt {
+    mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+  }
+  .composer.is-phone .cmp-fmt::after {
+    content: '';
+    flex: none;
+    width: 16px;
+  }
+}

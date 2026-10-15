@@ -597,6 +597,13 @@ const id: Record<string, string> = {
   "Under Advanced settings, switch on Developer mode.": "Di Advanced settings, nyalakan Developer mode.",
   "Works in Claude on the web, the desktop app and the phone app. On a Team or Enterprise plan, an owner may need to add it first.": "Bisa di Claude versi web, aplikasi desktop, dan aplikasi ponsel. Di paket Team atau Enterprise, pemilik mungkin perlu menambahkannya dulu.",
   "{company} switched AI apps off, so connections to it don’t work. An admin can switch them back on in Settings, Security & data.": "{company} mematikan aplikasi AI, jadi koneksi ke sana tidak berfungsi. Admin bisa menyalakannya lagi di Pengaturan, Keamanan & data.",
+  'Type DELETE to confirm': 'Ketik HAPUS untuk konfirmasi',
+  'Goes:': 'Hilang:',
+  'your sign-in, password, two-step sign-in and connected AI apps.': 'akses masuk, kata sandi, masuk dua langkah, dan aplikasi AI yang terhubung.',
+  'Stays:': 'Tetap ada:',
+  'tasks, messages and files you made, kept by the company under a deleted account.': 'tugas, pesan, dan file yang Anda buat, disimpan perusahaan atas nama akun yang dihapus.',
+  'version {v}': 'versi {v}',
+  'Edit photo': 'Ubah foto',
 };
 
 export default id;

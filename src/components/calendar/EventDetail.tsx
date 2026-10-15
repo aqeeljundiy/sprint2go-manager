@@ -62,6 +62,8 @@ export function EventDetail(p: DetailProps) {
   const { event } = p;
   const pending = isPending(event);
   const rsvp = p.onRsvp && (pending || !!event.inviteUid) ? <Rsvp value={pending ? undefined : event.rsvp} onPick={p.onRsvp} /> : null;
+  const dots = useRef<HTMLButtonElement>(null);
+  const [menu, setMenu] = useState(false);
   const actions = (
     <div className="ev-actions">
       {!p.readOnly && p.onEdit && (
@@ -72,6 +74,11 @@ export function EventDetail(p: DetailProps) {
       {!p.readOnly && (
         <button className="icon-btn" onClick={(e) => p.onDelete(e.currentTarget)} aria-label={t('Delete event')} title={t('Delete')}>
           <Trash2 size={17} />
+        </button>
+      )}
+      {!p.phone && !!p.more?.length && (
+        <button ref={dots} className="icon-btn" onClick={() => setMenu(true)} aria-label={t('More')} title={t('More')} aria-expanded={menu}>
+          <EllipsisVertical size={17} />
         </button>
       )}
       {!p.phone && (
@@ -87,23 +94,18 @@ export function EventDetail(p: DetailProps) {
       {actions}
       <DetailBody {...p} />
       {rsvp}
+      <ActionSheet open={menu} onClose={() => setMenu(false)} title={event.title} actions={p.more ?? []} anchor={dots} />
     </aside>
   );
 }
 
 function Rsvp({ value, onPick, phone }: { value?: RsvpStatus; onPick: (s: RsvpStatus, at?: Element) => void; phone?: boolean }) {
-  // Google's order on phones: Yes, No, Maybe.
-  const opts: [RsvpStatus, string][] = phone
-    ? [
-        ['accepted', t('Yes')],
-        ['declined', t('No')],
-        ['tentative', t('Maybe')],
-      ]
-    : [
-        ['accepted', t('Yes')],
-        ['tentative', t('Maybe')],
-        ['declined', t('No')],
-      ];
+  // Google's order, the same on every screen: Yes, No, Maybe.
+  const opts: [RsvpStatus, string][] = [
+    ['accepted', t('Yes')],
+    ['declined', t('No')],
+    ['tentative', t('Maybe')],
+  ];
   return (
     <div className={`ev-rsvp${phone ? ' phone' : ''}`} role="group" aria-label={t('Going?')}>
       <span className="ev-rsvp-q">{t('Going?')}</span>
@@ -144,6 +146,7 @@ function DetailBody(p: DetailProps) {
   const soon = !ended && startMs - now < 30 * 60_000;
   const startsSoon = startMs - now < 15 * 60_000;
   const guests = event.guests ?? [];
+  const place = placeOf(event, link?.url);
   return (
     <div className="ev-body" style={{ ['--c' as string]: calendar?.color }}>
       <div className="ev-title">
@@ -179,27 +182,24 @@ function DetailBody(p: DetailProps) {
             <button type="button" className="link-btn small" onClick={p.sentBot}>
               {t('The notetaker is on its way. Open the meeting')}
             </button>
-          ) : !notetakerJoins(link.kind) ? null : p.botWill ? (
-            <span className="ev-bot-note">
-              <Mic size={14} aria-hidden /> {t('The notetaker will join')}
-              <button type="button" className="link-btn small" onClick={() => p.onBotJoin?.(false)}>
-                {t('Don’t record')}
-              </button>
-            </span>
-          ) : p.onBotJoin && !startsSoon ? (
-            <button className="ghost-btn sm" onClick={() => p.onBotJoin!(true)}>
-              <Mic size={14} /> {t('Record this meeting')}
+          ) : !notetakerJoins(link.kind) ? null : p.onBotJoin && p.botWill !== undefined && (p.botWill || !startsSoon) ? (
+            <button type="button" className="ev-bot-row" role="switch" aria-checked={p.botWill} onClick={() => p.onBotJoin!(!p.botWill)}>
+              <Mic size={16} aria-hidden />
+              <span>{t('Notetaker joins')}</span>
+              <span className={`switch ${p.botWill ? 'on' : ''}`} aria-hidden>
+                <span />
+              </span>
             </button>
           ) : (
             p.onNotetaker && (
               <button className="ghost-btn sm" onClick={p.onNotetaker}>
-                <Mic size={14} /> {t('Send notetaker')}
+                <Mic size={14} /> {t('Send notetaker now')}
               </button>
             )
           )}
         </div>
       )}
-      {event.location && event.location !== link?.url && <Row icon={<MapPin size={16} />}>{event.location}</Row>}
+      {place && <Row icon={<MapPin size={16} />}>{place}</Row>}
       {(event.organizer || event.inviteUid) && (
         <Row icon={<Mail size={16} />} muted>
           {[event.organizer ? t('Invited by {name}', { name: event.organizer.name }) : t('From an invite'), isPending(event) ? t('You haven’t answered yet') : event.rsvp === 'tentative' ? t('You said maybe') : event.rsvp === 'accepted' ? t('You’re going') : ''].filter(Boolean).join('. ')}
@@ -440,7 +440,7 @@ function PhoneDetail(p: DetailProps & { rsvp: ReactNode }) {
             ) : (
               p.onNotetaker && (
                 <DRow icon={<Mic size={20} />} onClick={p.onNotetaker}>
-                  {t('Send notetaker')}
+                  {t('Send notetaker now')}
                 </DRow>
               )
             )
@@ -458,11 +458,7 @@ function PhoneDetail(p: DetailProps & { rsvp: ReactNode }) {
               <span className="dr-muted">{tx('event', 'No reminder')}</span>
             </DRow>
           )}
-          {canEdit && !people.length && (
-            <DRow icon={<Users size={20} />} onClick={p.onEdit}>
-              <span className="dr-muted">{t('Add guests')}</span>
-            </DRow>
-          )}
+          {/* Read mode shows real values only: no guests or notes means no row (Google's); Edit adds them. */}
 
           {people.length > 0 && (
             <div className="dr-guests">
@@ -498,16 +494,10 @@ function PhoneDetail(p: DetailProps & { rsvp: ReactNode }) {
             </div>
           )}
 
-          {event.notes ? (
+          {event.notes && (
             <DRow icon={<TextAlignStart size={20} />} className="top">
               <span className="dr-notes">{event.notes}</span>
             </DRow>
-          ) : (
-            canEdit && (
-              <DRow icon={<TextAlignStart size={20} />} onClick={p.onEdit}>
-                <span className="dr-muted">{t('Add a description')}</span>
-              </DRow>
-            )
           )}
           {calendar && (
             <DRow icon={<span className="dr-cal-dot" style={{ background: calendar.color }} />}>

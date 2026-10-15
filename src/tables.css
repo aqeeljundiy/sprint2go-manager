@@ -104,7 +104,7 @@
   }
 }
 @container (max-width: 767px) {
-  .tb-bar .ghost-btn .lbl {
+  .tb-bar .tb-quiet .lbl {
     display: none;
   }
   .tb-bar > .tb-views {
@@ -306,6 +306,23 @@
 .tb-tr.on .tb-sel,
 .tb-tr.on .tb-first {
   background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+}
+/* Touch (an iPad): a tap leaves :hover stuck on a row, which reads as picked. No hover look there. */
+@media (hover: none) {
+  .tb-tr:not(.tb-head):not(.on):hover,
+  .tb-tr:not(.on):hover .tb-sel,
+  .tb-tr:not(.on):hover .tb-first {
+    background: var(--surface);
+  }
+  .tb-tr:not(.on):hover .tb-sel input {
+    opacity: 0;
+  }
+  .tb-tr:not(.on):hover .tb-sel .tb-n {
+    opacity: 1;
+  }
+  .tb-grid:has(.tb-tr.on) .tb-sel input {
+    opacity: 1;
+  }
 }
 .tb-sel > * {
   grid-area: 1 / 1;
@@ -647,6 +664,25 @@
   display: grid;
   gap: 4px;
   padding: 4px 6px 8px;
+}
+/* The table's colour, picked in its … menu (the letter badge is not a control). */
+.tb-menu-colors {
+  display: grid;
+  gap: 6px;
+  padding: 4px 6px 8px;
+}
+.tb-menu > button .tb-on-dot {
+  margin-left: auto;
+}
+/* Colour rules are on: a small dot on the view settings button. */
+.tb-btn-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.tb-view-more {
+  border-top: 1px solid var(--line);
 }
 .tb-menu-desc textarea {
   width: 100%;
@@ -2134,6 +2170,28 @@
 .tb-tip span {
   flex: 1;
 }
+/* An empty Tables home: the open sidebar already has New table, so the empty state doesn't repeat it. */
+@media (min-width: 768px) {
+  .app:not(.sb-collapsed) .tb-empty-new {
+    display: none;
+  }
+}
+/* Got it: the tip folds away instead of vanishing. */
+.is-leaving.tb-tip {
+  overflow: hidden;
+  animation: tbTipOut 0.2s ease forwards !important;
+}
+@keyframes tbTipOut {
+  from {
+    max-height: 60px;
+  }
+  to {
+    max-height: 0;
+    opacity: 0;
+    margin-top: 0;
+    padding-block: 0;
+  }
+}
 
 /* Toolbar editors (sort, filter, fields, group, views). */
 .tb-menu-anchor {
@@ -2899,6 +2957,20 @@
   margin-left: -2px;
   opacity: 0.6;
 }
+/* A tab that comes back out of "N more" fades in rather than popping. */
+.tb-views > button {
+  animation: tbTabIn 0.18s ease-out backwards;
+}
+@keyframes tbTabIn {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tb-views > button {
+    animation: none;
+  }
+}
 .tb-vmore {
   flex: none;
   display: inline-flex;
@@ -2947,6 +3019,13 @@
 .tb-split {
   display: inline-flex;
   flex: none;
+  border-radius: 9999px; /* one control: one fill and one shadow, a hairline between its halves */
+  box-shadow: var(--shadow-btn);
+}
+.tb-split > .primary-btn,
+.tb-split > .primary-btn:hover {
+  box-shadow: none;
+  transform: none;
 }
 .tb-split > .tb-add-row:has(+ .tb-add-more) {
   border-top-right-radius: 0;
@@ -2956,7 +3035,7 @@
   padding: 0 8px;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
-  margin-left: 1px;
+  border-left: 1px solid color-mix(in srgb, #fff 35%, transparent);
 }
 
 /* "Just for you until you save them for everyone." */
@@ -3805,11 +3884,28 @@
   flex: 1 1 0;
   min-width: 120px;
 }
-/* A narrower pane still: every tool down to its icon, so the view tabs keep their room. */
+/* An iPad pane (under 900 wide): the view tabs get their own row, and the tools wrap rather than run off
+   (a class from the pane's width: a container can't query itself). */
+.tb-bar.tb-bar-wrap {
+  flex-wrap: wrap;
+}
+.tb-bar.tb-bar-wrap > .tb-viewtabs {
+  flex: 1 1 100%;
+}
+/* A narrower pane still: the quiet tools and New row down to their icons. Filter, Sort and View settings keep their
+   words (touch has no hover titles); a long "Sorted: …" is cut short. */
 @container (max-width: 900px) {
-  .tb-bar .ghost-btn .lbl,
+  .tb-bar .tb-quiet .lbl,
   .tb-bar .tb-add-row .lbl {
     display: none;
+  }
+  .tb-bar .ghost-btn:not(.tb-quiet) .lbl {
+    display: inline-block;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: bottom;
   }
   .tb-bar .tb-search input {
     width: 84px;

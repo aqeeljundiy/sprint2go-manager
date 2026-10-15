@@ -22,7 +22,6 @@ import {
   ListChecks,
   Lock,
   Menu,
-  MessageCircleQuestion,
   MoreHorizontal,
   Mic,
   Pause,
@@ -45,6 +44,7 @@ import {
   Languages,
   ChevronRight,
   FolderInput,
+  Settings,
 } from 'lucide-react';
 import type { CalEvent, Client, Meeting, MeetingSettings, MeetingType, Role, Todo, User, Workspace } from '../types';
 import { relative, fullDate } from '../utils';
@@ -95,14 +95,14 @@ const hoursOf = (min: number) => {
 
 /* ---------------- Sidebar ---------------- */
 
-export function MeetSidebar({ page, meetings, clients, canSend, onPage, onSend, onAsk, onSettings }: {
+export function MeetSidebar({ page, meetings, clients, canSend, onPage, onSend, onSettings }: {
   page: MeetPage;
   meetings: Meeting[];
   clients: Client[];
   canSend: boolean;
   onPage: (p: MeetPage) => void;
   onSend: () => void;
-  onAsk: () => void;
+  onAsk: () => void; // kept for callers: Ask AI across meetings is the app's own Ask AI (the rail's sparkle), not a nav item
   onSettings: () => void;
 }) {
   const is = (k: MeetPage['kind'], id?: string) => page.kind === k && (!id || ('clientId' in page && page.clientId === id));
@@ -130,10 +130,6 @@ export function MeetSidebar({ page, meetings, clients, canSend, onPage, onSend, 
           <ListChecks size={17} />
           <span className="sb-label">{t('Tasks from meetings')}</span>
         </button>
-        <button className="nav-item" onClick={onAsk} title={t('Ask AI about your meetings')}>
-          <MessageCircleQuestion size={17} />
-          <span className="sb-label">{t('Ask AI')}</span>
-        </button>
       </nav>
       <div className="nav-heading sb-label">{t('Folders')}</div>
       <nav className="nav">
@@ -148,11 +144,14 @@ export function MeetSidebar({ page, meetings, clients, canSend, onPage, onSend, 
         <button className={`nav-item ${is('unfiled') ? 'active' : ''}`} onClick={() => onPage({ kind: 'unfiled' })} title={t('Unfiled')}>
           <Inbox size={16} />
           <span className="sb-label">{t('Unfiled')}</span>
-          {unfiled ? <span className="count warn-count" title={t('Meetings to file')}>{unfiled}</span> : null}
+          {unfiled ? <span className="count" title={t('Meetings to file')}>{unfiled}</span> : null}
         </button>
-        <button className="nav-item" onClick={onSettings} title={t('Meeting settings')}>
-          <Folder size={16} />
-          <span className="sb-label">{t('Filing rules & settings')}</span>
+      </nav>
+      {/* Settings sits apart from the folders: it isn't one. */}
+      <nav className="nav m-nav-settings">
+        <button className="nav-item" onClick={onSettings} title={t('Meet settings')}>
+          <Settings size={16} />
+          <span className="sb-label">{t('Meet settings')}</span>
         </button>
       </nav>
     </>
@@ -200,7 +199,7 @@ export interface MeetProps {
   onSend: () => void;
   canSendBot?: boolean; // the notetaker works here (else Meet has no create button on phones)
   onMenu: () => void;
-  toast: (t: string) => void;
+  toast: (t: string, undo?: () => void) => void; // with Undo when it can be undone
   /** Phones: the company at the top of Meet's drawer, Meet's settings pages, and opening a calendar event. */
   company?: Pick<Workspace, 'name' | 'logo' | 'color'>;
   appSettings?: { id: string; label: string; hint?: string; run: () => void }[];
@@ -218,6 +217,8 @@ import { usePhone } from '../mobile/media';
 import { TopBar, TopBarBack, TopBarButton } from '../mobile/TopBar';
 import { CallMark, callOf, MeetComing, MeetFolders, MeetHome, MeetSettingsScreen, MeetUpcomingScreen } from './MeetPhone';
 import { Sheet } from './ui/Sheet';
+import { SwipeRow } from './ui/SwipeRow';
+import { ConfirmSheet } from './chat/Sheets';
 
 export function MeetView(p: MeetProps & { part?: 'meetings' | 'notes'; embedded?: boolean }) {
   const pg = p.page;
@@ -397,11 +398,44 @@ function MeetingList(p: MeetProps & { unfiled: boolean }) {
       {/* "Send notetaker" is the sidebar's button; not repeated here (one primary per screen). */}
       <Head title={p.unfiled ? t('Unfiled') : t('Meetings')} sub={p.unfiled ? t('Meetings that didn’t fit a {project} yet.', { project: term.one }) : undefined} onMenu={p.onMenu} />
       <div className="tracking-scroll">
+        {!p.unfiled && !filtering && <NextCalls {...p} />}
         {bar(t('Search titles, notes and transcripts'))}
         <MeetingRows list={shown} clients={p.clients} tasks={p.tasks} onOpen={(id) => p.onPage({ kind: 'meeting', id })} onFile={(id, cid) => p.onFolder(id, cid, false)} />
         {shown.length === 0 && <EmptyState compact text={filtering ? t('Nothing matches.') : t('No meetings here yet. Use “{send}”.', { send: t('Send notetaker') })} />}
       </div>
     </section>
+  );
+}
+
+/** Meetings on desktop and tablets: the next three calls with a link above the past ones, so the next call is in view. */
+function NextCalls(p: MeetProps) {
+  const now = Date.now();
+  const next = p.events
+    .filter((e) => !e.allDay && linkOf(e, p.demo) && new Date(e.end).getTime() > now && new Date(e.start).getTime() < now + 7 * 86_400_000)
+    .sort((a, b) => a.start.localeCompare(b.start))
+    .slice(0, 3);
+  if (!next.length) return null;
+  return (
+    <div className="m-next">
+      <div className="d-heading m-next-head">
+        <span>{t('Upcoming')}</span>
+        <button type="button" className="link-btn" onClick={() => p.onPage({ kind: 'upcoming' })}>
+          {t('See all')}
+        </button>
+      </div>
+      <div className="m-rows">
+        {next.map((e) => (
+          <div key={e.id} className="m-row" role="button" tabIndex={0} onClick={() => p.onPage({ kind: 'upcoming' })} onKeyDown={(ev) => ev.key === 'Enter' && p.onPage({ kind: 'upcoming' })}>
+            <CallMark kind={linkOf(e, p.demo)} size={28} />
+            <span className="m-main">
+              <strong>{e.title}</strong>
+              <small>{[fmtDay(e.start), fmtTime(e.start)].join(' · ')}</small>
+            </span>
+          </div>
+        ))}
+      </div>
+      <div className="d-heading">{tx('meet', 'Meetings')}</div>
+    </div>
   );
 }
 
@@ -414,6 +448,7 @@ function MeetingPage(p: MeetProps & { m: Meeting }) {
   const [playing, setPlaying] = useState(false);
   const [askRemember, setAskRemember] = useState<string | null>(null);
   const [newTask, setNewTask] = useState('');
+  const [addOpen, setAddOpen] = useState(false); // phones: the add-task sheet
   const [accessOpen, setAccessOpen] = useState(false);
   const accessBtn = useRef<HTMLButtonElement>(null);
   const tEnd = useRef<HTMLDivElement>(null);
@@ -468,7 +503,7 @@ function MeetingPage(p: MeetProps & { m: Meeting }) {
             : (m.log ?? []).map((l) => `${logTime(l.at)}  ${l.message}`);
     try {
       await navigator.clipboard.writeText(lines.join('\n'));
-      p.toast(tab === 'summary' ? t('Summary copied') : tab === 'tasks' ? t('Tasks copied') : tab === 'transcript' ? t('Transcript copied') : t('Bot log copied'));
+      p.toast(tab === 'summary' ? t('Summary copied') : tab === 'tasks' ? t('Tasks copied') : tab === 'transcript' ? t('Transcript copied') : t('Notetaker log copied'));
     } catch {
       p.toast(t('Copying isn’t allowed here'));
     }
@@ -489,17 +524,34 @@ function MeetingPage(p: MeetProps & { m: Meeting }) {
   const phone = usePhone();
   useFocusedScreen(true, phone ? undefined : () => p.onPage({ kind: 'list' }));
   const moreBtn = useRef<HTMLButtonElement>(null);
-  const regenerate = () => confirm(t('Regenerate the summary and tasks from the transcript? Tasks you edited are kept.')) && p.onRegenerate(m.id);
-  const remove = () => confirm(t('Delete this meeting, its recording, transcript and tasks?')) && p.onDelete(m.id);
+  // The app's own confirm (a sheet on phones, a centred panel on desktop) for what can't be taken back.
+  const [ask, setAsk] = useState<{ title: string; text: string; yes: string; safe?: boolean; run: () => void } | null>(null);
+  const canRegen = !live && (m.transcript?.length ?? 0) > 0;
+  const regenerate = () => setAsk({ title: t('Regenerate notes?'), text: t('Regenerate the summary and tasks from the transcript? Tasks you edited are kept.'), yes: t('Regenerate'), safe: true, run: () => p.onRegenerate(m.id) });
+  // Delete goes straight away: the toast's Undo brings it back.
+  const remove = () => p.onDelete(m.id);
+  const hasVideo = !!m.recording?.url && !!m.recording?.videoUrl;
+  const dropTo = (v: 'audio' | 'notes') =>
+    m.recording?.url
+      ? setAsk({
+          title: v === 'notes' ? t('Delete the recording?') : t('Delete the video?'),
+          text: v === 'notes' ? t('Delete the recording for good? This can’t be undone.') : t('Delete the video (the audio stays) for good? This can’t be undone.'),
+          yes: t('Delete'),
+          run: () => p.onPatch(m.id, { recording: { ...m.recording!, keep: v } }),
+        })
+      : p.onPatch(m.id, { recording: { ...m.recording, keep: v, sizeMb: v === 'audio' ? (m.minutes || 30) * 0.5 : 0.4 } } as Partial<Meeting>);
   const more = useActionMenu(
     () => [
-      // Share isn't here: it's always its own button next to ⋮.
-      { label: t('Ask about this meeting'), icon: Sparkles, run: () => p.onAsk({ kind: 'meeting', id: m.id }) },
-      ...(live && status !== 'stopping' && status !== 'processing' ? [{ label: t('Make bot leave'), icon: Square, run: () => p.onStop(m.id) }] : []),
-      ...(!live && (m.transcript?.length ?? 0) > 0 ? [{ label: t('Regenerate notes'), hint: t('From the transcript'), icon: RefreshCw, run: regenerate }] : []),
+      // Share isn't here: it's always its own button next to ⋮. On desktop, Ask AI is in "At a glance" and Ask the
+      // notetaker to leave is a header button.
+      ...(phone ? [{ label: t('Ask about this meeting'), icon: Sparkles, run: () => p.onAsk({ kind: 'meeting', id: m.id }) }] : []),
+      ...(phone && live && status !== 'stopping' && status !== 'processing' ? [{ label: t('Ask notetaker to leave'), icon: Square, run: () => p.onStop(m.id) }] : []),
+      ...(canRegen ? [{ label: t('Regenerate notes'), hint: t('From the transcript'), icon: RefreshCw, run: regenerate }] : []),
       ...(status === 'done' ? [{ label: t('Who can see this'), icon: Lock, run: () => setAccessOpen(true) }] : []),
-      { label: t('Bot log'), hint: t('What the notetaker did, step by step'), icon: FileText, run: () => setTab('log') },
-      { label: t('Delete'), icon: Trash2, danger: true, group: 'end', run: remove },
+      { label: t('Notetaker log'), hint: t('What the notetaker did, step by step'), icon: FileText, run: () => setTab('log') },
+      ...(status === 'done' && keep === 'video' && hasVideo ? [{ label: t('Delete the video'), hint: t('The audio stays'), icon: Trash2, danger: true, group: 'end', run: () => dropTo('audio') }] : []),
+      ...(status === 'done' && (keep === 'video' || keep === 'audio') ? [{ label: t('Delete recording'), hint: t('Notes and transcript stay'), icon: Trash2, danger: true, group: 'end', run: () => dropTo('notes') }] : []),
+      { label: t('Delete meeting'), icon: Trash2, danger: true, group: 'end', run: remove },
     ],
     { title: m.title },
   );
@@ -532,17 +584,10 @@ function MeetingPage(p: MeetProps & { m: Meeting }) {
           {t('Meetings')}
         </button>
         <StatusPill m={m} />
-        <ProjectPicker value={m.clientId ?? ''} onChange={(v) => {
-            const outsiders = speakers.filter((s) => !p.users.some((u) => u.name.split(' ')[0] === s.split(' ')[0]) && s !== 'You' && s !== `${term.One}`);
-            if (v && outsiders.length && m.clientId !== v) setAskRemember(v);
-            p.onFolder(m.id, v || null, false);
-          }} projects={p.clients} none={t('Unfiled')} label={t('Folder')} className="sel-flat" />
-        <Select value={m.type ?? null} onChange={(v) => p.onPatch(m.id, { type: v as MeetingType })} placeholder={t('Type…')} label={t('Type')} className="sel-flat" options={Object.entries(TYPE_LABEL).map(([v, l]) => ({ value: v, label: l }))} />
-        {m.filedBy && m.filedBy !== 'user' && <span className="muted small m-filed">{m.filedBy === 'ai' ? t('auto-filed') : t('filed by rule')}</span>}
         <span className="spacer" />
         {live && status !== 'stopping' && status !== 'processing' && (
           <button className="ghost-btn sm" onClick={() => p.onStop(m.id)}>
-            <Square size={13} /> {t('Make bot leave')}
+            <Square size={13} /> {t('Ask notetaker to leave')}
           </button>
         )}
         {/* Regenerate and Delete live in ⋮, so the header stays one row on tablets. */}
@@ -673,24 +718,11 @@ function MeetingPage(p: MeetProps & { m: Meeting }) {
             )}
             {status === 'done' && (
               <div className="keep-row">
-                <span className="muted small">{t('Keep:')}</span>
-                <Select
-                  value={keep ?? p.settings.keep}
-                  onChange={(v) => {
-                    if (m.recording?.url) {
-                      // A real recording: keeping less deletes it for good.
-                      const ask = v === 'notes' ? t('Delete the recording for good? This can’t be undone.') : v === 'audio' && keep === 'video' ? t('Delete the video (the audio stays) for good? This can’t be undone.') : '';
-                      if (ask && !confirm(ask)) return;
-                      return p.onPatch(m.id, { recording: { ...m.recording, keep: v } });
-                    }
-                    p.onPatch(m.id, { recording: { ...m.recording, keep: v, sizeMb: v === 'audio' ? (m.minutes || 30) * 0.5 : 0.4 } });
-                  }}
-                  label={t('What to keep')}
-                  className="sel-flat"
-                  width={280}
-                  options={(m.recording?.videoUrl ? (['video', 'audio', 'notes'] as const) : m.bot && !m.recording?.url ? (['notes'] as const) : (['audio', 'notes'] as const)).map((k) => ({ value: k, label: t(KEEP_LABEL[k]), hint: k === 'video' ? t('About {size}', { size: sizeOf(m.recording?.videoMb ?? 0) }) : k === 'audio' ? t('About {size}', { size: sizeOf(m.recording?.url ? m.recording.sizeMb : (m.minutes || 30) * 0.5) }) : t('Under 1 MB') }))}
-                />
-                {keep !== 'notes' && m.recording && <span className="muted small">{t('{size} of team storage', { size: sizeOf(m.recording.sizeMb + (keep === 'video' ? m.recording.videoMb ?? 0 : 0)) })}</span>}
+                {/* What's kept, as text: deleting the recording is a danger action in ⋮ that asks first. */}
+                <span className="muted small">
+                  {t('Kept: {what}', { what: t(KEEP_LABEL[keep ?? p.settings.keep]) })}
+                  {keep !== 'notes' && m.recording ? ` · ${t('{size} of team storage', { size: sizeOf(m.recording.sizeMb + (keep === 'video' ? m.recording.videoMb ?? 0 : 0)) })}` : ''}
+                </span>
                 <button ref={accessBtn} className="link-btn small" onClick={() => setAccessOpen(true)}>
                   <Lock size={12} /> {t('Who can see this')}
                 </button>
@@ -701,6 +733,30 @@ function MeetingPage(p: MeetProps & { m: Meeting }) {
           <div className="m-glance side-card">
             <h3>{t('At a glance')}</h3>
             <dl>
+              {!phone && (
+                <>
+                  <dt>{t('Folder')}</dt>
+                  <dd>
+                    <ProjectPicker
+                      value={m.clientId ?? ''}
+                      onChange={(v) => {
+                        const outsiders = speakers.filter((s) => !p.users.some((u) => u.name.split(' ')[0] === s.split(' ')[0]) && s !== 'You' && s !== `${term.One}`);
+                        if (v && outsiders.length && m.clientId !== v) setAskRemember(v);
+                        p.onFolder(m.id, v || null, false);
+                      }}
+                      projects={p.clients}
+                      none={t('Unfiled')}
+                      label={t('Folder')}
+                      className="sel-flat"
+                    />
+                    {m.filedBy && m.filedBy !== 'user' && <span className="muted small m-filed">{m.filedBy === 'ai' ? t('auto-filed') : t('filed by rule')}</span>}
+                  </dd>
+                  <dt>{t('Type')}</dt>
+                  <dd>
+                    <Select value={m.type ?? null} onChange={(v) => p.onPatch(m.id, { type: v as MeetingType })} placeholder={t('Type…')} label={t('Type')} className="sel-flat" options={Object.entries(TYPE_LABEL).map(([v, l]) => ({ value: v, label: l }))} />
+                  </dd>
+                </>
+              )}
               <dt>{t('Tasks')}</dt>
               <dd>
                 {t('{done}/{total} done', { done: doneN, total: mTasks.length })}
@@ -752,7 +808,7 @@ function MeetingPage(p: MeetProps & { m: Meeting }) {
               ['summary', t('Summary'), t('Summary')],
               ['tasks', t('Action items {n}', { n: mTasks.filter((tk) => !tk.done).length }), t('Action items')],
               ['transcript', t('Transcript'), t('Transcript')],
-              ['log', t('Bot log'), t('Bot log')],
+              ['log', t('Notetaker log'), t('Notetaker log')],
             ] as const
           )
             // The bot log is for checking what went wrong, not reading (Read AI keeps diagnostics out of sight): a tab
@@ -813,7 +869,17 @@ function MeetingPage(p: MeetProps & { m: Meeting }) {
               )}
             </div>
           ) : (
-            <EmptyState compact text={live ? t('Notes appear here when the meeting ends.') : t('No notes. The bot log says why (notes need a transcript and an AI provider in Settings → AI).')} />
+            <EmptyState
+              compact
+              text={live ? t('Notes appear here when the meeting ends.') : t('No notes for this meeting.')}
+              action={
+                canRegen ? (
+                  <button type="button" className="ghost-btn" onClick={regenerate}>
+                    <RefreshCw size={16} /> {t('Regenerate notes')}
+                  </button>
+                ) : undefined
+              }
+            />
           ))}
 
         {tab === 'tasks' && (
@@ -825,7 +891,7 @@ function MeetingPage(p: MeetProps & { m: Meeting }) {
             nameFor={nameFor}
             extra={
               mTasks.length > 0 && (
-                <button className="ghost-btn sm" onClick={() => confirm(tn(mTasks.length, 'Remove {n} task from this meeting? The summary stays.', 'Remove all {n} tasks from this meeting? The summary stays.')) && (p.onBulk(mTasks.map((tk) => tk.id), 'delete'), p.toast(t('Tasks cleared')))}>
+                <button className="ghost-btn sm" onClick={() => p.onBulk(mTasks.map((tk) => tk.id), 'delete')}>
                   {t('Clear all tasks')}
                 </button>
               )
@@ -833,7 +899,7 @@ function MeetingPage(p: MeetProps & { m: Meeting }) {
             empty={
               m.actions.some((a) => !a.taskId) ? (
                 <div className="te-empty">
-                  {t('No tasks (automatic tasks are off or were cleared). Action items mentioned in the meeting:')}
+                  {t('No tasks yet. Action items mentioned in the meeting:')}
                   <ul>
                     {m.actions.map((a) => (
                       <li key={a.title}>
@@ -848,6 +914,12 @@ function MeetingPage(p: MeetProps & { m: Meeting }) {
               )
             }
             footer={
+              phone ? (
+                <button type="button" className="mt-add-row" onClick={() => setAddOpen(true)}>
+                  <Plus size={20} />
+                  {t('Add a task')}
+                </button>
+              ) : (
               <div className="todo-add task-add">
                 <Plus size={16} />
                 <input value={newTask} onChange={(e) => setNewTask(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && newTask.trim() && (p.onAddTask({ title: newTask.trim(), userId: p.me, meetingId: m.id, clientId: m.clientId }), setNewTask(''))} placeholder={t('Add a task from this meeting…')} />
@@ -855,6 +927,7 @@ function MeetingPage(p: MeetProps & { m: Meeting }) {
                   {t('Add')}
                 </button>
               </div>
+              )
             }
             onSeek={(ms) => (setTab('summary'), seek(ms))}
           />
@@ -878,12 +951,14 @@ function MeetingPage(p: MeetProps & { m: Meeting }) {
             )}
             {(m.transcript ?? []).map((l, i) => (
               <button key={i} className={`tl ${time >= l.at && time < (m.transcript![i + 1]?.at ?? Infinity) && playing ? 'now' : ''}`} onClick={() => seek(l.at)}>
+                {/* Phones: the speaker's face, name and time on one line, the words under the name. */}
+                {phone && <Avatar person={p.users.find((u) => u.name === l.speaker) ?? p.users.find((u) => !!l.speaker && u.name.split(' ')[0] === l.speaker.split(' ')[0]) ?? { name: l.speaker || t('Unknown'), email: '' }} size={32} />}
                 <time>{mmss(l.at)}</time>
                 <b>{l.speaker || t('Unknown')}</b>
                 <span>{l.text}</span>
               </button>
             ))}
-            {!m.transcript?.length && <EmptyState compact text={live ? t('Waiting for people to talk… (captions must be on in the meeting)') : t('No transcript.')} />}
+            {!m.transcript?.length && <EmptyState compact text={live ? t('Waiting for people to talk.') : t('No transcript.')} />}
             <div ref={tEnd} />
           </div>
         )}
@@ -917,17 +992,38 @@ function MeetingPage(p: MeetProps & { m: Meeting }) {
               { value: 'attendees', label: t('Only people who were in the meeting') },
             ]}
           />
-          <label className="check-row">
-            <input type="checkbox" checked={m.access?.download ?? false} onChange={(e) => p.onPatch(m.id, { access: { watch: m.access?.watch ?? 'everyone', transcript: m.access?.transcript ?? 'everyone', download: e.target.checked } })} /> {t('Allow downloading the recording')}
-          </label>
+          <div className="set-row m-access-switch">
+            <span>{t('Allow downloading the recording')}</span>
+            <button type="button" role="switch" aria-checked={m.access?.download ?? false} aria-label={t('Allow downloading the recording')} className={`switch ${m.access?.download ? 'on' : ''}`} onClick={() => p.onPatch(m.id, { access: { watch: m.access?.watch ?? 'everyone', transcript: m.access?.transcript ?? 'everyone', download: !m.access?.download } })}>
+              <span />
+            </button>
+          </div>
           {client && (
-            <label className="check-row">
-              <input type="checkbox" checked={!!m.sharedWithClient} onChange={(e) => p.onPatch(m.id, { sharedWithClient: e.target.checked })} /> {t('{name} sees the notes in their portal', { name: client.name })}
-            </label>
+            <div className="set-row m-access-switch">
+              <span>{t('{name} sees the notes in their portal', { name: client.name })}</span>
+              <button type="button" role="switch" aria-checked={!!m.sharedWithClient} aria-label={t('{name} sees the notes in their portal', { name: client.name })} className={`switch ${m.sharedWithClient ? 'on' : ''}`} onClick={() => p.onPatch(m.id, { sharedWithClient: !m.sharedWithClient })}>
+                <span />
+              </button>
+            </div>
           )}
           <p className="muted small">{t('Recordings never go to the shared space. Use Share for a read-only link.')}</p>
         </div>
       </Popover>
+      {ask && <ConfirmSheet title={ask.title} text={ask.text} yes={ask.yes} safe={ask.safe} onYes={ask.run} onClose={() => setAsk(null)} />}
+      {addOpen && (
+        <Sheet
+          title={t('New task')}
+          onClose={() => setAddOpen(false)}
+          className="mt-quick"
+          footer={
+            <button type="button" className="primary-btn" disabled={!newTask.trim()} onClick={() => (p.onAddTask({ title: newTask.trim(), userId: p.me, meetingId: m.id, clientId: m.clientId }), setNewTask(''), setAddOpen(false))}>
+              {t('Add task')}
+            </button>
+          }
+        >
+          <input className="mt-quick-title" autoFocus value={newTask} onChange={(e) => setNewTask(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && newTask.trim() && (p.onAddTask({ title: newTask.trim(), userId: p.me, meetingId: m.id, clientId: m.clientId }), setNewTask(''), setAddOpen(false))} placeholder={t('What needs doing?')} aria-label={t('Task')} />
+        </Sheet>
+      )}
     </section>
   );
 }
@@ -940,9 +1036,9 @@ function TaskList(p: MeetProps & { list: Todo[]; meetingFor: (t: Todo) => Meetin
   const [sel, setSel] = useState<Set<string>>(new Set());
   const toggle = (id: string) => setSel((s) => (s.has(id) ? (s.delete(id), new Set(s)) : new Set(s.add(id))));
   const bulk = (a: 'done' | 'reopen' | 'delete') => {
-    if (a === 'delete' && !confirm(tn(sel.size, 'Delete {n} task?', 'Delete {n} tasks?'))) return;
     p.onBulk([...sel], a);
-    p.toast(a === 'done' ? tn(sel.size, '{n} task marked done', '{n} tasks marked done') : a === 'reopen' ? tn(sel.size, '{n} task reopened', '{n} tasks reopened') : tn(sel.size, '{n} task deleted', '{n} tasks deleted'));
+    // Delete's toast (with Undo) comes from the app.
+    if (a !== 'delete') p.toast(a === 'done' ? tn(sel.size, '{n} task marked done', '{n} tasks marked done') : tn(sel.size, '{n} task reopened', '{n} tasks reopened'));
     setSel(new Set());
     setSelecting(false);
   };
@@ -1005,23 +1101,30 @@ function TaskList(p: MeetProps & { list: Todo[]; meetingFor: (t: Todo) => Meetin
               const owner = p.ownerName?.(tk);
               const m = p.meetingFor(tk);
               if (phone && !selecting) {
-                const who = p.nameFor(tk)?.name ?? owner;
+                const person = p.nameFor(tk);
+                const who = person?.name ?? owner;
+                // Swipe right to tick it off (or reopen it), with Undo; the owner's face on the row.
                 return (
-                  <div key={tk.id} className={`m-task-phone${tk.done ? ' done' : ''}`}>
+                  <SwipeRow key={tk.id} start={[{ id: 'done', label: tk.done ? t('Reopen') : t('Mark done'), icon: CircleCheck, tone: 'ok', run: () => (p.onToggleTask(tk.id), () => p.onToggleTask(tk.id)) }]}>
+                  <div className={`m-task-phone${tk.done ? ' done' : ''}`}>
                     <button type="button" className="todo-check" onClick={() => p.onToggleTask(tk.id)} aria-label={tk.done ? t('Reopen') : t('Mark done')} aria-pressed={tk.done}>
                       {tk.done ? <CircleCheck size={20} /> : <span className="mtp-ring" />}
                     </button>
                     <button type="button" className="mtp-main" onClick={() => p.onOpenTask(tk.id)}>
                       <span className="mtp-title">{tk.title}</span>
-                      <small>{[who ?? t('Unassigned'), tk.due ? fmtDay(tk.due) : ''].filter(Boolean).join(' · ')}</small>
+                      <small className="mtp-meta">
+                        {person && <Avatar person={person} size={24} />}
+                        {[who ?? t('Unassigned'), tk.due ? fmtDay(tk.due) : ''].filter(Boolean).join(' · ')}
+                      </small>
                     </button>
                   </div>
+                  </SwipeRow>
                 );
               }
               return (
                 <div key={tk.id} className={`task m-task ${tk.done ? 'done' : ''}`} onClick={() => selecting && toggle(tk.id)} role="button" tabIndex={0} onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && e.target === e.currentTarget && (e.preventDefault(), selecting && toggle(tk.id))}>
                   {selecting && <input type="checkbox" checked={sel.has(tk.id)} onChange={() => toggle(tk.id)} onClick={(e) => e.stopPropagation()} />}
-                  <button className="todo-check" onClick={(e) => (e.stopPropagation(), p.onToggleTask(tk.id))} aria-label={t('Toggle done')}>
+                  <button className="todo-check" onClick={(e) => (e.stopPropagation(), p.onToggleTask(tk.id))} aria-label={tk.done ? t('Reopen') : t('Mark done')} aria-pressed={tk.done}>
                     {tk.done && <span>✓</span>}
                   </button>
                   <input className="task-title" value={tk.title} onChange={(e) => p.onPatchTask(tk.id, { title: e.target.value })} onClick={(e) => e.stopPropagation()} aria-label={t('Task')} />
@@ -1283,7 +1386,10 @@ const linkOf = (e: CalEvent, demo?: boolean): MeetingKind | null => meetingLinkO
 function Upcoming(p: MeetProps) {
   const mode = p.settings.joinMode ?? 'accepted';
   const now = Date.now();
-  const soon = p.events.filter((e) => !e.allDay && new Date(e.end).getTime() > now && new Date(e.start).getTime() < now + 7 * 86_400_000).sort((a, b) => a.start.localeCompare(b.start));
+  const week = p.events.filter((e) => !e.allDay && new Date(e.end).getTime() > now && new Date(e.start).getTime() < now + 7 * 86_400_000).sort((a, b) => a.start.localeCompare(b.start));
+  // Only calls the notetaker can join (Read AI's list); the rest are one quiet line at the end.
+  const soon = week.filter((e) => linkOf(e, p.demo));
+  const noLink = week.length - soon.length;
   const days = [...new Set(soon.map((e) => new Date(e.start).toDateString()))];
   const dayName = (d: string) => (d === new Date().toDateString() ? t('Today') : d === new Date(now + 86_400_000).toDateString() ? t('Tomorrow') : fmtDate(new Date(d), { weekday: 'long', day: 'numeric', month: 'short' }));
   const joins = (e: CalEvent) => {
@@ -1312,7 +1418,7 @@ function Upcoming(p: MeetProps) {
               {p.autoJoin === 'off'
                 ? t('The notetaker isn’t available on this server yet, so it can’t join meetings. Recordings and notes start working as soon as it is.')
                 : admin
-                  ? t('It joins a minute before each meeting with a Google Meet or Zoom link, for everyone in the company. Read only: it never changes your calendar.')
+                  ? t('{mode}, a minute before the start. Read only: it never changes your calendar.', { mode: modeLabel })
                   : t('{mode}, for everyone in the company. An admin can change it in Settings, Meetings. Use the switch on a meeting to change just that one.', { mode: modeLabel })}
             </small>
           </span>
@@ -1344,13 +1450,7 @@ function Upcoming(p: MeetProps) {
                         {link ? MEETING_NAME[link] : t('No meeting link')}
                         {link && !notetakerJoins(link) ? ` · ${t('the notetaker can’t join this yet')}` : ''}
                         {e.guests?.length ? ` · ${tn(e.guests.length, '{n} other', '{n} others')}` : ''}
-                        {e.id in p.overrides ? ` · ${t('set by you')}` : ''}
                       </small>
-                      {willJoin && (
-                        <small className="ev-bot-will">
-                          <Mic size={12} aria-hidden /> {t('The notetaker will join')}
-                        </small>
-                      )}
                     </span>
                     {mt ? (
                       <button className="link-btn" onClick={() => p.onPage({ kind: 'meeting', id: mt.id })}>
@@ -1371,8 +1471,8 @@ function Upcoming(p: MeetProps) {
                       </a>
                     )}
                     {bot && !mt && (
-                      <label className="ev-switch" title={t('Notetaker joins')}>
-                        <span className="muted small">{t('Notetaker joins')}</span>
+                      <label className="ev-switch" title={t('Notetaker')}>
+                        <span className="muted small">{t('Notetaker')}</span>
                         <button
                           type="button"
                           role="switch"
@@ -1392,7 +1492,8 @@ function Upcoming(p: MeetProps) {
               })}
           </div>
         ))}
-        {!soon.length && <EmptyState compact text={t('No meetings in the next 7 days. Connect a calendar in Calendar, or send the bot to a meeting link.')} />}
+        {noLink > 0 && <p className="muted small ev-nolink">{tn(noLink, '{n} more without a call link', '{n} more without a call link')}</p>}
+        {!soon.length && <EmptyState compact text={t('No meetings in the next 7 days. Connect a calendar in Calendar, or send the notetaker to a meeting link.')} />}
       </div>
     </section>
   );
@@ -1546,11 +1647,11 @@ export function SendBotDialog({ clients, botName, languages, real, workspaceId, 
                 <Bot size={20} />
               </span>
               <span className="er-body">
-                <input className="er-input" value={name} maxLength={40} onChange={(e) => setName(e.target.value)} placeholder={botName} aria-label={t('Bot name, for this meeting')} />
+                <input className="er-input" value={name} maxLength={40} onChange={(e) => setName(e.target.value)} placeholder={botName} aria-label={t('Notetaker name, for this meeting')} />
               </span>
             </div>
           </div>
-          {!real && <p className="tn-note">{t('Demo: no real bot is sent. You’ll see it join, record a short sample conversation and write the notes.')}</p>}
+          {!real && <p className="tn-note">{t('Demo: no real notetaker is sent. You’ll see it join, record a short sample conversation and write the notes.')}</p>}
           {minutesNote && <div className="tn-note">{minutesNote}</div>}
         </div>
       </Sheet>
@@ -1559,10 +1660,10 @@ export function SendBotDialog({ clients, botName, languages, real, workspaceId, 
 
   return (
     <div className="modal-scrim" onMouseDown={onClose}>
-      <div className="modal" role="dialog" aria-label={t('Send the bot to a meeting')} onMouseDown={(e) => e.stopPropagation()} onKeyDown={(e) => e.key === 'Escape' && !document.querySelector('.pop') && onClose()}>
+      <div className="modal" role="dialog" aria-label={t('Send notetaker')} onMouseDown={(e) => e.stopPropagation()} onKeyDown={(e) => e.key === 'Escape' && !document.querySelector('.pop') && onClose()}>
         <header className="modal-head">
           <span className="dump-title">
-            <Bot size={15} /> {t('Send the bot to a meeting')}
+            <Bot size={15} /> {t('Send notetaker')}
           </span>
           <button className="icon-btn sm" onClick={onClose} aria-label={t('Close')}>
             <X size={15} />
@@ -1570,7 +1671,7 @@ export function SendBotDialog({ clients, botName, languages, real, workspaceId, 
         </header>
         <div className="modal-body connect-form">
           <SmoothHeight>
-          <p className="modal-intro">{seed ? (seed.note ? t('{note} If the meeting also has a Google Meet or Zoom link, paste it here.', { note: t(seed.note) }) : t('“{title}” has no meeting link yet. Paste its Google Meet or Zoom link to send the notetaker. Someone in the call has to let it in.', { title: seed.title })) : t('Paste a Google Meet or Zoom link. Someone in the call has to let the bot in.')}</p>
+          <p className="modal-intro">{seed ? (seed.note ? t('{note} If the meeting also has a Google Meet or Zoom link, paste it here.', { note: t(seed.note) }) : t('“{title}” has no meeting link yet. Paste its Google Meet or Zoom link to send the notetaker. Someone in the call has to let it in.', { title: seed.title })) : t('Paste a Google Meet or Zoom link. Someone in the call has to let the notetaker in.')}</p>
           <label className="field">
             <span>{t('Meeting link')}</span>
             <input autoFocus value={url} onChange={(e) => (setUrl(e.target.value), setErr(''))} placeholder="https://meet.google.com/abc-defg-hij" onKeyDown={(e) => e.key === 'Enter' && send()} />
@@ -1581,7 +1682,7 @@ export function SendBotDialog({ clients, botName, languages, real, workspaceId, 
             <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t('Weekly sync with…')} />
           </label>
           <label className="field">
-            <span>{t('Bot name (optional, for this meeting)')}</span>
+            <span>{t('Notetaker name (optional, for this meeting)')}</span>
             <input value={name} maxLength={40} onChange={(e) => setName(e.target.value)} placeholder={botName} />
           </label>
           <div className="field">
@@ -1597,7 +1698,7 @@ export function SendBotDialog({ clients, botName, languages, real, workspaceId, 
               options={[{ value: '', label: languagesLabel(languages), hint: t('Your company’s meeting languages') }, ...MEETING_LANGUAGES.map((l) => ({ value: l.code, label: t(l.label), hint: t('Just this meeting') }))]}
             />
           </div>
-          {!real && <p className="muted small">{t('Demo: no real bot is sent. You’ll see it join, record a short sample conversation and write the notes.')}</p>}
+          {!real && <p className="muted small">{t('Demo: no real notetaker is sent. You’ll see it join, record a short sample conversation and write the notes.')}</p>}
           {minutesNote}
           </SmoothHeight>
         </div>

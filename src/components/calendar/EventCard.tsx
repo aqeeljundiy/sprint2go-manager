@@ -10,7 +10,7 @@ import { t } from '../../i18n';
 export interface CardKit {
   color: (calendarId: string) => string;
   selectedId?: string | null;
-  onSelect: (id: string) => void;
+  onSelect: (id: string | null) => void;
   /** Long-press (or right-click) for the event's menu. Phones have none: the actions live in its details (Google's). */
   onMenu?: (e: CalEvent, x: number, y: number) => void;
   taskOf?: (e: CalEvent) => { title: string; done: boolean } | null;

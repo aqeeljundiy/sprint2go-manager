@@ -3053,3 +3053,66 @@
     flex-basis: calc(100% + 2 * var(--gutter));
   }
 }
+/* Round 4: a 44px hit area on the sender line and "to me" (the look is unchanged); dock labels one step up from caption. */
+@media (max-width: 767px) {
+  .gm-msg-name {
+    position: relative;
+  }
+  .gm-msg-name::after {
+    content: '';
+    position: absolute;
+    inset: -12px 0 -2px;
+  }
+  .gm-msg-to {
+    min-height: var(--tap);
+    margin: -10px 0;
+  }
+  .gm-pill {
+    font-size: var(--fs-secondary);
+  }
+}
+/* Tablets and computers: the list's star sits bottom-right of the row, so the row's last line leaves room for it. */
+@media (min-width: 768px) {
+  .row .row-snippet:last-child,
+  .row .row-meta {
+    padding-right: 28px;
+  }
+}
+/* Compose on phones: the Cc/Bcc toggle says what it does (a bare chevron read as a menu). */
+@media (max-width: 767px) {
+  .compose.phone .cc-caret {
+    width: auto;
+    padding: 0 12px;
+    font: var(--t-segment);
+    color: var(--text-2);
+  }
+}
+/* One attachment: a full-width file row (preview, name) instead of a small card beside empty space. */
+@media (max-width: 767px) {
+  .gm-att-row > .gm-att:only-child {
+    flex: 1;
+    flex-direction: row;
+    width: auto;
+    min-width: 0;
+    height: 56px;
+  }
+  .gm-att-row > .gm-att:only-child .gm-att-preview {
+    flex: none;
+    width: 56px;
+  }
+  .gm-att-row > .gm-att:only-child .gm-att-ext {
+    font-size: var(--fs-caption);
+  }
+  .gm-att-row > .gm-att:only-child .gm-att-name {
+    flex: 1;
+    min-width: 0;
+    height: auto;
+  }
+}
+/* Mailbox access: Add next to the forwarding field is a full 44px target, not a 32px chip. */
+@media (max-width: 767px) {
+  .settings-push .mx-add-address button {
+    min-height: var(--tap);
+    padding: 0 16px;
+  }
+}
