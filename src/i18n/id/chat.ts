@@ -829,6 +829,12 @@ const id: Record<string, string> = {
   // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
   "Mentions and replies to you": "Sebutan dan balasan untuk Anda",
   "Mentions, replies and reactions to you": "Sebutan, balasan, dan reaksi untuk Anda",
+  'Anything you start writing and leave stays here until you send it.': 'Apa pun yang mulai Anda tulis lalu tinggalkan tetap di sini sampai Anda kirim.',
+  'Hold Send (or use its arrow) to send a message later.': 'Tahan Kirim (atau pakai panahnya) untuk mengirim pesan nanti.',
+  'Messages you send show up here.': 'Pesan yang Anda kirim muncul di sini.',
+  'Off: channels you didn’t place are hidden in this view (you can still find them in Search)': 'Nonaktif: channel yang tidak Anda tempatkan disembunyikan di tampilan ini (tetap bisa dicari lewat Cari)',
+  '{n}m': '{n} mnt',
+  '{n}h': '{n} jam',
 };
 
 export default id;

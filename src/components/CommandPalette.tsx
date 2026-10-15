@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { term } from '../terms';
-import { ArrowLeft, Brain, Building2, CalendarPlus, Check, Clock, FileText, Hash, ListChecks, Mail, PenLine, Search, User, X, type LucideIcon } from 'lucide-react';
+import { ArrowLeft, Brain, Building2, CalendarPlus, Clock, FileText, Hash, ListChecks, Mail, PenLine, Search, User, X, type LucideIcon } from 'lucide-react';
 import { isPhone } from '../mobile/media';
 import { lsKey } from '../settings';
 import { APPS } from './AppRail';
@@ -20,13 +20,13 @@ export interface PaletteItem {
 }
 
 /** Which app each kind of result belongs to, for searching inside one app and for grouping results by app. */
-const GROUP_APP: Record<string, AppId> = { Tasks: 'tasks', Emails: 'mail', Channels: 'chat', Messages: 'chat', Notes: 'notes', Meetings: 'meet', Rows: 'tables', Files: 'drive' };
+const GROUP_APP: Record<string, AppId> = { Tasks: 'tasks', Emails: 'mail', Channels: 'chat', Messages: 'chat', Notes: 'notes', Meetings: 'meet', Rows: 'tables', Files: 'drive', Logins: 'vault' };
 // The groups' words, for the language check (they're shown with t(group)).
-mark('Needs you'), mark('Actions'), mark('Go to'), mark('Recent'), mark('Recent searches'), mark('Recently opened'), mark('Apps'), mark('People'), mark('Emails'), mark('Channels'), mark('Messages'), mark('Meetings'), mark('Rows'), mark('Files'), mark('Settings');
+mark('Needs you'), mark('Actions'), mark('Go to'), mark('Recent'), mark('Recent searches'), mark('Recently opened'), mark('Apps'), mark('People'), mark('Emails'), mark('Channels'), mark('Messages'), mark('Meetings'), mark('Rows'), mark('Files'), mark('Logins'), mark('Settings');
 export const appOf = (i: PaletteItem): AppId | undefined => i.app ?? (i.group === term.Many ? 'projects' : GROUP_APP[i.group]);
 const appName = (id: AppId) => APPS.find((a) => a.id === id)?.name ?? id;
 /** Apps that have something to search in them (the others open search across all apps). */
-export const SEARCHABLE: AppId[] = ['mail', 'chat', 'tasks', 'projects', 'notes', 'meet', 'tables', 'drive'];
+export const SEARCHABLE: AppId[] = ['mail', 'chat', 'tasks', 'projects', 'notes', 'meet', 'tables', 'drive', 'vault'];
 
 interface Props {
   items: PaletteItem[];
@@ -183,18 +183,15 @@ export function CommandPalette({ items: all, onClose, queryActions, recentKey = 
         </label>
         <div className="palette-chips" role="toolbar" aria-label={t('Search in')}>
           <button type="button" className={!scope && !kind ? 'on' : ''} aria-pressed={!scope && !kind} onClick={() => narrow(null, null)}>
-            {!scope && !kind && <Check size={13} />}
             {t('All apps')}
           </button>
           {startScope && (
             <button type="button" className={`scope-chip${scope === startScope && !kind ? ' on' : ''}`} aria-pressed={scope === startScope && !kind} onClick={() => narrow(startScope, null)}>
-              {scope === startScope && !kind && <Check size={13} />}
               {appName(startScope)}
             </button>
           )}
-          {KINDS.map((k) => (
+          {KINDS.filter((k) => !startScope || t(k) !== t(appName(startScope))).map((k) => (
             <button key={k} type="button" className={kind === k ? 'on' : ''} aria-pressed={kind === k} onClick={() => narrow(null, kind === k ? null : k)}>
-              {kind === k && <Check size={13} />}
               {t(k)}
             </button>
           ))}

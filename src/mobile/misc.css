@@ -404,8 +404,10 @@
     font-weight: 400;
     color: var(--accent-text);
   }
-  .vg-how-text {
-    margin: 0 auto;
+  .vault-gate-card .vg-how-text {
+    margin: 8px auto 0;
+    text-wrap: pretty;
+    color: var(--text-2);
     max-width: 320px;
     font-size: var(--fs-body);
     line-height: 20px;
@@ -1272,4 +1274,57 @@
   font: inherit;
   font-size: var(--fs-field);
   line-height: 1.4;
+}
+
+/* ---------- Teams on a phone, round 2: the new-team sheet on the 16 gutter, full-width controls, tabs, task rows ---------- */
+@media (max-width: 767px) {
+  .new-sheet .team-new {
+    padding: 0 16px;
+  }
+  .new-sheet .team-new .team-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .new-sheet .team-new .segmented {
+    display: flex;
+    width: 100%;
+  }
+  .new-sheet .team-new .segmented > button {
+    flex: 1;
+    min-height: var(--tap);
+  }
+  .new-sheet .team-new .person-sel,
+  .new-sheet .team-new .people-btn {
+    width: 100%;
+    min-height: 48px;
+  }
+  /* The last tab scrolls into view: a fade at the right edge says there is more, and it can scroll clear of it. */
+  .team-page > .client-tabs.team-tabs {
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+  }
+  .team-page > .client-tabs.team-tabs::after {
+    content: '';
+    flex: none;
+    width: 16px;
+  }
+  /* Task rows sit on the text column, so the divider starts where the text does; two lines get room to breathe. */
+  .team-page .team-row.team-task {
+    width: 100%;
+    margin: 0;
+    padding: 12px 0;
+    min-height: var(--row-2);
+  }
+}
+
+/* Vault gate on touch tablets: full tap height and 16 px fields (no iPad zoom), at any width. */
+@media (pointer: coarse) and (min-width: 768px) {
+  .vault-gate-card input,
+  .vault-gate-card .primary-btn {
+    min-height: var(--tap);
+  }
+  .vault-gate-card input {
+    font-size: var(--fs-field);
+  }
 }

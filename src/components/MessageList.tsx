@@ -46,7 +46,7 @@ interface Props {
   /** Above the rows: the inbox tabs, multiple inboxes' sections, Spam's 30 days (components/mail/Sorting.tsx). */
   top?: React.ReactNode;
   /** What an empty list says instead (e.g. a temporary address waiting for its first email). */
-  empty?: { title: string; sub: string; action?: React.ReactNode };
+  empty?: { title: string; sub: string; action?: React.ReactNode; icon?: 'none' };
   title: string;
   threads: Thread[];
   clientOf: (t: Thread) => Client | undefined; // the project this email is with
@@ -326,7 +326,7 @@ export const MessageList = forwardRef<HTMLInputElement, Props>(function MessageL
                 onDone={() => (selList.some((th) => th.location === 'inbox') ? actions.done(selList.filter((th) => th.location === 'inbox').map((th) => th.id)) : actions.inbox([...sel]), endSelect())}
                 onTrash={() => (actions.trash([...sel]), endSelect())}
                 onRead={() => (actions.read([...sel], !selUnread), endSelect())}
-                onMore={() => setMenuFor({ ids: [...sel], anchor: selMore, title: tn(sel.size, '{n} selected', '{n} selected'), menu: true })}
+                onMore={() => setMenuFor({ ids: [...sel], anchor: phone ? undefined : selMore, title: tn(sel.size, '{n} selected', '{n} selected'), menu: !phone })}
               />
             ) : (
               undefined
@@ -424,7 +424,7 @@ export const MessageList = forwardRef<HTMLInputElement, Props>(function MessageL
       {threads.length === 0 ? (
         <div className={`empty ${pull ? 'pulled' : ''} ${dragging ? 'dragging' : ''}`} ref={(el) => void (bodyRef.current = el)} style={pull ? { transform: `translateY(${pull}px)` } : undefined}>
           {/* The tick only means "all caught up": a search or a filter that finds nothing says so with its own icon. */}
-          <div className="empty-art">{query ? <Search size={28} /> : filter !== 'all' ? <Mail size={28} /> : <Check size={28} />}</div>
+          <div className="empty-art">{query ? <Search size={28} /> : filter !== 'all' || props.empty?.icon ? <Mail size={28} /> : <Check size={28} />}</div>
           <p className="empty-title">{query ? t('No matches') : filter === 'unread' ? t('No unread emails') : filter === 'reply' ? t('Nothing needs your reply') : filter === 'assigned' ? t('Nothing assigned to you') : filter === 'files' ? t('No emails with attachments') : (props.empty?.title ?? t('All caught up'))}</p>
           <p className="empty-sub">
             {query

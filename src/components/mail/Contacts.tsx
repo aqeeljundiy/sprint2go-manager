@@ -135,7 +135,7 @@ export function ContactsView({ ws, users, me, onCompose, onMenu, toast }: { ws: 
       { label: t('Export as CSV (Google, Outlook)'), icon: Download, run: () => (location.href = `/api/mail/contacts/export?ws=${encodeURIComponent(ws.id)}&format=csv${label ? `&label=${encodeURIComponent(label)}` : ''}`) },
       { label: t('Import vCard or CSV'), icon: Upload, group: 'in', run: () => fileRef.current?.click() },
     ],
-    { title: t('Import and export'), menu: true },
+    { title: t('Import and export'), menu: !phone },
   );
   // Phones: the create button makes a contact while Contacts is open (Gmail's Compose comes back after).
   useCreateAction('mail', phone && server.on ? { label: t('New contact'), icon: UserPlus, run: () => setOpen({ draft: blank(), editing: true }) } : null);

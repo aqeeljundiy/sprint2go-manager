@@ -255,7 +255,7 @@ function Stage({ item, live }: { item: ViewItem; live: boolean }) {
       <video className="mv-video" src={a.url} controls preload="metadata" playsInline />
     );
   if (way === 'converted') return <Converted a={a} />;
-  return <NoPreview a={a} text={failed ? t('This picture can’t be shown here. Download it to open it.') : t('There’s no preview for this kind of file. Download it to open it.')} />;
+  return <NoPreview a={a} text={!a.url && !a.blocked ? t('This file’s contents aren’t available here, so it can’t be opened or downloaded.') : failed ? t('This picture can’t be shown here. Download it to open it.') : t('There’s no preview for this kind of file. Download it to open it.')} />;
 }
 
 function NoPreview({ a, text, icon, quiet }: { a: Attachment; text?: string; icon?: ReactNode; quiet?: boolean }) {

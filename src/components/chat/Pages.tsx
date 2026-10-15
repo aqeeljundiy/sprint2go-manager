@@ -420,7 +420,7 @@ function DraftsSent(p: PagesProps & { chat: ChatState }) {
   const [del, setDel] = useState<ChatMessage | null>(null);
   return (
     <div className="drafts-page">
-      <div className="segmented page-tabs" role="tablist">
+      <div className="client-tabs page-tabs" role="tablist">
         {(
           [
             ['drafts', t('Drafts')],
@@ -452,7 +452,7 @@ function DraftsSent(p: PagesProps & { chat: ChatState }) {
               ))}
             </div>
           ) : (
-            <EmptyState compact text={t('No drafts. Anything you start writing and leave stays here until you send it.')} />
+            <EmptyState icon={<PenLine size={22} />} title={t('No drafts')} text={t('Anything you start writing and leave stays here until you send it.')} />
           ))}
         {tab === 'scheduled' &&
           (waiting.length ? (
@@ -486,7 +486,7 @@ function DraftsSent(p: PagesProps & { chat: ChatState }) {
               ))}
             </div>
           ) : (
-            <EmptyState compact text={t('Nothing waiting. Hold Send (or use its arrow) to send a message later.')} />
+            <EmptyState icon={<Clock size={22} />} title={t('Nothing waiting')} text={t('Hold Send (or use its arrow) to send a message later.')} />
           ))}
         {tab === 'sent' &&
           (sent.length ? (
@@ -496,7 +496,7 @@ function DraftsSent(p: PagesProps & { chat: ChatState }) {
               ))}
             </div>
           ) : (
-            <EmptyState compact text={t('Nothing sent yet.')} />
+            <EmptyState icon={<SendHorizontal size={22} />} title={t('Nothing sent yet')} text={t('Messages you send show up here.')} />
           ))}
       </TabPane>
       {when && <WhenSheet title={t('Change when it goes')} kind="send" onPick={(at) => (p.onReschedule(when.id, at), toast({ text: t('Goes {when}', { when: whenText(at) }) }))} onClose={() => setWhen(null)} />}

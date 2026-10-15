@@ -1,5 +1,5 @@
 import { useMemo, useState, type ReactNode, type RefObject } from 'react';
-import { Bold, Check, Code, FileText, Italic, Link2, List, ListChecks, ListOrdered, Lock, Megaphone, Minus, Quote, Search, SquareCode, Strikethrough, Underline, Users } from 'lucide-react';
+import { Bold, Check, Code, FileText, Italic, Link2, List, ListChecks, ListOrdered, Lock, Megaphone, Minus, Quote, Search, SquareCode, SquarePen, Strikethrough, Underline, Users } from 'lucide-react';
 import type { Client, Note, User } from '../../types';
 import { term } from '../../terms';
 import { Avatar } from '../Avatar';
@@ -273,7 +273,7 @@ export function ShareSheet({ note, company, project, onChange, onClose }: { note
         <>
           <div className="as-group">{t('They can')}</div>
           <div className="as-list">
-            {row(can === 'edit', t('Edit'), t('Change it like you can'), <Check size={18} />, () => onChange({ teamCan: 'edit' }))}
+            {row(can === 'edit', t('Edit'), t('Change it like you can'), <SquarePen size={18} />, () => onChange({ teamCan: 'edit' }))}
             {row(can === 'view', t('Only read it'), t('Only you change it'), <FileText size={18} />, () => onChange({ teamCan: 'view' }))}
           </div>
         </>

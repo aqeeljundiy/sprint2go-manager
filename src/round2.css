@@ -44,6 +44,8 @@
   font-weight: 700;
 }
 .team-square {
+  display: inline-block;
+  vertical-align: middle;
   width: 14px;
   height: 14px;
   border-radius: 4px;
@@ -4611,4 +4613,10 @@ button.tl:hover,
 }
 .vault-e2e.on {
   color: var(--ok-solid, #0f9d6b);
+}
+.set-demo-after {
+  margin-top: 24px;
+}
+.set-block > .row:last-child {
+  border-bottom: 0;
 }

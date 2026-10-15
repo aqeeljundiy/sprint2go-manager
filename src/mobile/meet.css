@@ -544,8 +544,11 @@
 
 @media (max-width: 767px) {
   .mh-event .mhe-line {
+    display: flex;
+    align-items: center;
+    min-height: 48px;
     margin: 0;
-    padding: 4px 0;
+    padding: 0 12px; /* the sheet body adds 4 px: lines sit on the 16 px gutter */
     font: var(--t-body);
     color: var(--text-2);
   }
@@ -579,25 +582,41 @@
     background: var(--accent);
     color: #fff;
   }
-  /* N1: in-page filters are pill chips (Tasks from meetings, a folder's parts). */
-  .meet-pane .client-tabs {
+  /* In-page tabs (Tasks from meetings, a folder's parts): one underline pattern, 44 px, on the 16 px gutter. */
+  .meet-pane .client-tabs,
+  .meet-pane .client-tabs.flat {
     display: flex;
-    gap: 8px;
-    padding: 8px 16px;
+    gap: 16px;
+    margin: 0;
+    padding: 0 16px;
     border: 0;
+    border-bottom: 1px solid var(--line);
     overflow-x: auto;
   }
   .meet-pane .client-tabs > button {
-    min-height: 32px;
-    padding: 0 12px;
-    border: 1px solid var(--border);
-    border-radius: var(--r-pill);
+    min-height: 44px;
+    padding: 0;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+    background: none;
     font: var(--t-segment);
     color: var(--text-2);
+    transition: color 200ms ease;
   }
   .meet-pane .client-tabs > button.on {
-    border-color: transparent;
-    background: var(--accent-soft);
+    background: none;
+    border-bottom-color: var(--accent);
     color: var(--accent-text);
+  }
+  /* The sliding highlight is a 2 px underline at the bar's foot, not a pill. */
+  .meet-pane .client-tabs > .tab-ink {
+    border-radius: 0;
+    background: var(--accent);
+  }
+  .mh-event .sheet-foot > button {
+    flex: 1;
+    width: 100%;
+    justify-content: center;
   }
 }

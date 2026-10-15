@@ -1327,7 +1327,12 @@ body.resizing-x .pane-resize::after {
 }
 .drive-search {
   width: 260px;
+  flex: 0 1 260px;
+  min-width: 160px;
   height: 36px;
+}
+.drive-head .crumbs {
+  min-width: min(12ch, 40%);
 }
 .drive-search button {
   display: grid;

@@ -975,7 +975,7 @@ export function Reader(props: Props) {
             </button>
             <button type="button" className="gm-msg-to" onClick={() => setDetails((d) => (d.has(m.id) ? new Set([...d].filter((x) => x !== m.id)) : new Set([...d, m.id])))} aria-expanded={showDetails}>
               <span>{toWords(m)}</span>
-              <ChevronDown size={14} className={`rot-chev${showDetails ? ' open' : ''}`} />
+              <ChevronDown size={14} className={`rot-chev down${showDetails ? ' open' : ''}`} />
             </button>
             <span className="gm-msg-acts">
               <button type="button" className="gm-icon" onClick={() => startReply(undefined, props.defaultReply === 'all' && canAll)} aria-label={props.defaultReply === 'all' && canAll ? t('Reply all') : t('Reply')} title={props.defaultReply === 'all' && canAll ? t('Reply all') : t('Reply')}>

@@ -176,7 +176,7 @@ export function QuickAdd({ ops, defaults, mode, onClose, where, inputRef }: { op
     if (keys?.length) setOff((o) => [...o, ...keys]); // these words stay words
   };
 
-  const chips = text.trim().length > 0 || mode === 'inline';
+  const chips = text.trim().length > 0 || mode === 'inline' || !!defaults.due || !!defaults.status;
   const person = (id: string) => ops.users.find((u) => u.id === id);
   const chip = (id: PickerId, icon: ReactNode, label: string, on: boolean, fromText: boolean, extra = '') => (
     <button

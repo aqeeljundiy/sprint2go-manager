@@ -248,7 +248,7 @@ export function NotesList({
       </section>
     ))
   ) : (
-    <EmptyState icon={<SquarePen size={22} />} title={filter === 'all' ? t('No notes yet') : t('No notes here yet')} text={t('Tap the pen to write one.')} />
+    <EmptyState icon={<SquarePen size={22} />} title={filter === 'all' ? t('No notes yet') : t('No notes here yet')} text={filter === 'shared' ? t('Notes others share with you show up here.') : t('Tap the pen to write one.')} />
   );
   const people = [...new Set(live.filter((n) => n.ownerId !== me).map((n) => n.ownerId))].map((id) => api.users.find((u) => u.id === id)).filter(Boolean).slice(0, 4);
   const facets: { f: Facet; label: string; icon: React.ReactNode }[] = [
@@ -319,7 +319,7 @@ function NoteRow({ n, leaving, ctx, api, active, q, phone, mixed, onOpen }: { n:
             {snip.after}
           </span>
         ) : (
-          <span className="nl-first">{firstLine(n) || t('No more text')}</span>
+          <span className="nl-first">{firstLine(n)}</span>
         )}
       </span>
       {mixed && project && (

@@ -1437,7 +1437,7 @@ function ProjectWorkload({ tasks, people, users, me, onOpenTask }: { tasks: Todo
               <span className="team-bar" aria-hidden>
                 <i style={{ width: `${(mine.length / most) * 100}%` }} className={late ? 'bad' : ''} />
               </span>
-              <span className="team-count">{mine.length}</span>
+              {mine.length > 0 && <span className="team-count">{mine.length}</span>}
               <ChevronRight size={14} className={`rot-chev ${openId === u.id ? 'open' : ''}`} />
             </button>
             <div className={`fold ${openId === u.id ? 'open' : ''}`}>

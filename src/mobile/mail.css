@@ -2819,3 +2819,32 @@
 .gm-switch .inbox-switch-btn {
   min-height: var(--tap);
 }
+/* Phone reader: smart replies wrap instead of running off the edge; the dock has one primary action (Reply), spread full width. */
+@media (max-width: 767px) {
+  .gm-smart {
+    flex-wrap: wrap;
+    gap: 0 8px;
+    margin: 12px 0 0;
+    padding: 0;
+    overflow: visible;
+    mask-image: none;
+  }
+  .gm-reader-screen .push-foot {
+    border-top: 0;
+  }
+  .gm-dock-row {
+    justify-content: space-between;
+  }
+  .gm-dock-row .gm-pill {
+    border-color: transparent;
+    background: none;
+  }
+  .gm-dock-row > .gm-pill:first-child {
+    flex: 1;
+    background: var(--accent);
+    color: var(--surface);
+  }
+  .gm-dock-row > .gm-pill:first-child svg {
+    color: inherit;
+  }
+}

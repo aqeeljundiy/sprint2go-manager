@@ -1718,3 +1718,7 @@
     margin-top: 48px;
   }
 }
+/* The view editor's "find them with ⌘K" hint has a phone wording (no keyboard there). */
+.ve-k-phone {
+  display: none;
+}

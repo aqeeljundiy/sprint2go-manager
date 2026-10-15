@@ -371,7 +371,7 @@ function PhoneDetail(p: DetailProps & { rsvp: ReactNode }) {
               <X size={22} />
             </button>
             <span className="spacer" />
-            {!p.readOnly && p.onEdit && (
+            {!p.readOnly && p.onEdit && !(canEdit && !p.rsvp) && (
               <button type="button" className="icon-btn ev-page-act" onClick={p.onEdit} aria-label={t('Edit event')}>
                 <Pencil size={20} />
               </button>
@@ -546,7 +546,7 @@ function PhoneDetail(p: DetailProps & { rsvp: ReactNode }) {
           )}
         </div>
       </Sheet>
-      <ActionSheet open={menu} onClose={() => setMenu(false)} title={event.title} actions={p.more ?? []} anchor={dots} menu />
+      <ActionSheet open={menu} onClose={() => setMenu(false)} title={event.title} actions={p.more ?? []} />
     </>
   );
 }

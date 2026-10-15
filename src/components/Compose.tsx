@@ -491,8 +491,6 @@ export function Compose({ contacts, signature: baseSignature, signatureFor, work
         <ActionSheet
           open={attachMenu}
           onClose={() => setAttachMenu(false)}
-          anchor={clipBtn}
-          menu
           actions={[
             { label: t('Attach file'), icon: Paperclip, run: () => fileInput.current?.click() },
             { label: t('Insert from Drive'), icon: HardDrive, run: () => setDrivePick(true) },

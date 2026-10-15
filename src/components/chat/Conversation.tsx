@@ -553,6 +553,8 @@ export function ChatView(p: ViewProps) {
         let prev: ChatMessage | null = null;
         let prevDay = '';
         return top.map((m) => {
+          // The same celebration posted twice in a row says nothing new: show it once.
+          if (m.kind === 'celebration' && prev?.kind === 'celebration' && prev.text === m.text) return null;
           const day = new Date(m.at).toDateString();
           const showDay = day !== prevDay;
           const grouped = !!(!showDay && prev && prev.userId === m.userId && prev.kind !== 'celebration' && m.kind !== 'kudos' && m.id !== firstNew && new Date(m.at).getTime() - new Date(prev.at).getTime() < 5 * 60_000);

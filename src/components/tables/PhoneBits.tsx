@@ -89,7 +89,14 @@ export function FilterSheet({ table, view, rows, ctx, shown, onChange, onClose }
   return (
     <Sheet
       title={
-        <span className="tb-fs-title">{title}</span>
+        page ? (
+          <span className="tb-sheet-step">
+            <button type="button" className="icon-btn" onClick={() => setPage(null)} aria-label={t('Back')}><ChevronLeft size={24} /></button>
+            <span className="tb-fs-title">{title}</span>
+          </span>
+        ) : (
+          <span className="tb-fs-title">{title}</span>
+        )
       }
       label={title}
       onClose={onClose}
@@ -97,8 +104,8 @@ export function FilterSheet({ table, view, rows, ctx, shown, onChange, onClose }
       className="tb-sheet tb-filter-sheet"
       head={
         page ? (
-          <button type="button" className="tb-fs-head-btn" onClick={() => setPage(null)}>
-            <ChevronLeft size={18} /> {t('Back')}
+          <button type="button" className="tb-fs-head-btn strong" onClick={onClose}>
+            {t('Done')}
           </button>
         ) : (
           // The count lives on the button that shows them (iOS: "Show 2 rows"), not next to the title.

@@ -2222,6 +2222,10 @@ select,
     animation: none;
   }
 }
+/* A down chevron flips to up instead of turning sideways */
+.rot-chev.down.open {
+  transform: rotate(180deg);
+}
 /* One chevron that turns, instead of swapping arrow characters */
 .rot-chev {
   transition: transform 0.2s cubic-bezier(0.2, 0.7, 0.2, 1);
@@ -4280,4 +4284,10 @@ a.help-file:hover {
   .esg-check small {
     animation: none;
   }
+}
+@media (max-width: 640px) {
+  .pa-invite { flex-direction: column; gap: 8px; }
+  .pa-invite input { flex: none; width: 100%; min-height: 48px; font-size: 16px; }
+  .pa-invite > button { min-height: 48px; width: 100%; }
+  .portal-admin, .portal-admin p, .pa-hero { overflow-wrap: anywhere; min-width: 0; max-width: 100%; box-sizing: border-box; }
 }

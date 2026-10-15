@@ -200,6 +200,7 @@ function Comments({ row, ctx, me, onComment }: { row: TableRow; ctx: CellCtx; me
   return (
     <div className="tb-rd-sec">
       <h4>{t('Comments')}</h4>
+      {!row.comments?.length && <p className="tb-rd-empty">{t('No comments yet')}</p>}
       {(row.comments ?? []).map((c) => {
         const u = userOf(c.by);
         return (

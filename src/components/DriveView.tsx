@@ -1,7 +1,7 @@
 import { TopBar } from '../mobile/TopBar';
 import { useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { flushSync } from 'react-dom';
-import { ArrowDown, ArrowUp, Camera, Check, ChevronRight, Download, Eye, Folder, FolderInput, FolderPlus, HardDrive, Info, LayoutGrid, Link2, List, Mail, Menu, MoreHorizontal, PenLine, Play, Plus, RotateCcw, Search, Star, Trash2, Upload, X } from 'lucide-react';
+import { ArrowDown, ArrowUp, Camera, Check, ChevronRight, Download, Image as ImageIcon, Eye, Folder, FolderInput, FolderPlus, HardDrive, Info, LayoutGrid, Link2, List, Mail, Menu, MoreHorizontal, PenLine, Play, Plus, RotateCcw, Search, Star, Trash2, Upload, X } from 'lucide-react';
 import type { DriveItem, DriveSection } from '../types';
 import { fmtSize } from '../data/drive';
 import { relative } from '../utils';
@@ -579,13 +579,24 @@ function DrivePhone(props: Props & { live: DriveItem[]; q: string; query: string
     if (!list.length)
       return (
         <EmptyState
-          icon={section === 'trash' ? <Trash2 size={24} /> : q ? <Search size={24} /> : section === 'starred' ? <Star size={24} /> : <Folder size={24} />}
-          title={q ? t('No files found') : section === 'trash' ? t('Trash is empty') : section === 'my' ? t('This folder is empty') : section === 'starred' ? t('No starred files') : t('Nothing here yet')}
+          icon={section === 'trash' ? <Trash2 size={24} /> : q ? <Search size={24} /> : section === 'starred' ? <Star size={24} /> : section === 'media' ? <ImageIcon size={24} /> : <Folder size={24} />}
+          title={q ? t('No files found') : section === 'trash' ? t('Trash is empty') : section === 'my' ? t('This folder is empty') : section === 'starred' ? t('No starred files') : section === 'media' ? t('No photos or videos yet') : t('Nothing here yet')}
+          action={
+            !q && section === 'my' && folder ? (
+              <button type="button" className="btn primary" onClick={props.onNew}>
+                <Upload size={16} /> {t('Upload')}
+              </button>
+            ) : undefined
+          }
           text={
             q
               ? t('Nothing matches “{q}”.', { q: props.query.trim() })
               : section === 'my'
-                ? t('Files you upload and folders you make live here. Files from chat and email stay in Home and Shared.')
+                ? folder
+                  ? t('Add files or folders here')
+                  : t('Files you upload and folders you make live here. Files from chat and email stay in Recent and Shared.')
+                : section === 'media'
+                  ? t('Photos and videos you upload or receive show here.')
                 : section === 'starred'
                   ? t('Star a file from its menu and it waits for you here.')
                   : section === 'trash'
@@ -601,7 +612,7 @@ function DrivePhone(props: Props & { live: DriveItem[]; q: string; query: string
         <div className="dp-sort">
           {sortable ? (
             <button type="button" className="dp-sort-btn" onClick={() => setSortOpen(true)}>
-              {t(SORTS.find((s) => s.by === sort.by)!.label)}
+              {t(SORTS.find((s) => s.by === (sort.by === 'size' && !files.length ? 'name' : sort.by))!.label)}
               {sort.dir === 1 ? <ArrowUp size={15} /> : <ArrowDown size={15} />}
             </button>
           ) : (
@@ -627,7 +638,7 @@ function DrivePhone(props: Props & { live: DriveItem[]; q: string; query: string
             ))}
           </div>
         ) : (
-          <div className={section === 'media' && !q ? 'media-grid' : 'dp-grid'} key="grid">
+          <div className={section === 'media' && !q ? 'media-grid' : 'dp-grid drv-grid'} key="grid">
             {list.map((i, n) => (
               <DriveItemCard key={i.id} className="file-card dp-tile" style={{ ['--i' as string]: Math.min(n, 16) }} label={i.name} header={<DriveMenuHead i={i} meta={props.meta(i)} />} actions={props.menuFor(i)} onOpen={() => props.open(i, files)}>
                 {i.thumb ? (
@@ -641,7 +652,6 @@ function DrivePhone(props: Props & { live: DriveItem[]; q: string; query: string
                 )}
                 {(section !== 'media' || q) && (
                   <span className="fc-text">
-                    <FileIcon kind={i.kind} size={16} />
                     <span className="d-name" title={i.name}>{i.name}</span>
                   </span>
                 )}
@@ -667,11 +677,7 @@ function DrivePhone(props: Props & { live: DriveItem[]; q: string; query: string
             </button>
           )}
         </label>
-        {section === 'email' && !q && (
-          <p className="drive-note">
-            <Mail size={14} /> {t('Attachments from your emails appear here automatically.')}
-          </p>
-        )}
+        {section === 'email' && !q && <p className="drive-note dp-caption">{t('Email attachments land here automatically.')}</p>}
         {body(null)}
       </div>
       {section === 'my' &&
@@ -753,6 +759,7 @@ export function NameSheet({ title, initial, done, onDone, onClose }: { title: st
       }
     >
       <form
+        className="dp-name-form"
         onSubmit={(e) => {
           e.preventDefault();
           if (ok) (onDone(name.trim()), onClose());
@@ -818,9 +825,7 @@ function DetailsScreen({ item, items, who, from, onBack }: { item: DriveItem; it
       <div className="dp-details-body">
         <DriveMenuHead i={item} meta={tn(items.filter((x) => x.parentId === item.id && !x.trashed).length, '{n} item', '{n} items')} />
         <Group>
-          <GRow label={t('Type')} value={t(TYPE_WORDS[item.kind])} />
-          {item.kind !== 'folder' && <GRow label={t('Size')} value={fmtSize(item.size)} />}
-          <GRow label={t('Location')} value={item.id.startsWith('att:') ? t('From email') : [t('My Drive'), ...where].join(' / ')} />
+          {!from && <GRow label={t('Location')} value={item.id.startsWith('att:') ? t('From email') : [t('My Drive'), ...where].join(' / ')} />}
           <GRow label={t('Modified')} value={fmtDay(item.modified)} />
           {who && <GRow label={t('Uploaded by')} value={item.uploadedBy ? <PersonName who={item.uploadedBy}>{who}</PersonName> : who} />}
           {from && <GRow label={t('Saved from an email by')} value={from} />}

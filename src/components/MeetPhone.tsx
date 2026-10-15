@@ -168,7 +168,7 @@ function ComingRow({ e, p, j }: { e: CalEvent; p: HomeProps; j: ReturnType<typeo
           className="mh-event"
           footer={
             p.onOpenEvent ? (
-              <button type="button" className="ghost-btn" onClick={() => (setOpen(false), p.onOpenEvent!(e.id))}>
+              <button type="button" className="primary-btn" onClick={() => (setOpen(false), p.onOpenEvent!(e.id))}>
                 {t('Open in Calendar')}
               </button>
             ) : undefined

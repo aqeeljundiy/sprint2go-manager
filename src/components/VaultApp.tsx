@@ -255,7 +255,7 @@ export function VaultView({
     );
     reload();
   };
-  if (!priv) return <VaultGate record={vaultKey} me={me} onUnlocked={(k, record) => (setVaultUnlocked(me, k), record && onVaultKey(record), setTick((n) => n + 1))} />;
+  if (!priv) return <VaultGate record={vaultKey} me={me} onUnlocked={(k, record) => (setVaultUnlocked(me, k), record && onVaultKey(record), setTick((n) => n + 1), reload())} />;
 
   const shown = items.filter((i) => (filter === '' ? true : filter === 'company' ? !i.meta.clientId : i.meta.clientId === filter));
   /** A secret of an end-to-end login, decrypted here; a server-locked (older) one comes back as is. */

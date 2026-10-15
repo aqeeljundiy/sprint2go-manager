@@ -61,7 +61,7 @@ export function MobileTop({
   unreadByWs?: Record<string, number>; // unread mail per company
   onWorkspace: (id: string) => void;
   onAddWorkspace?: () => void; // none for guests: they can't add a company from a shared space
-  onSearch: () => void;
+  onSearch?: () => void; // none: no search button (the locked Vault)
   back?: () => void;
   onBell?: () => void; // the guest portal keeps its bell here; the team app's notifications are on Home
   unread?: number;
@@ -133,7 +133,7 @@ export function MobileTop({
 
           <span className="spacer" />
           <span className="mt-slot" ref={actions} />
-          {claim?.search !== false && (
+          {onSearch && claim?.search !== false && (
             <button className="icon-btn mt-search" onClick={onSearch} aria-label={t('Search {title}', { title })}>
               <Search size={22} />
             </button>

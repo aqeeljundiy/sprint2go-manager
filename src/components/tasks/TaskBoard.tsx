@@ -292,7 +292,7 @@ function BoardCard({
 /** Phones: a column's "…" (Todoist's section menu): add a task in this stage, or change the stages. */
 function ColumnMenu({ name, onAdd, onEditStages }: { name: string; onAdd: () => void; onEditStages?: () => void }) {
   const btn = useRef<HTMLButtonElement>(null);
-  const m = useActionMenu(() => [{ label: t('Add task here'), icon: Plus, run: onAdd }, ...(onEditStages ? [{ label: t('Edit stages'), icon: Columns3, run: onEditStages }] : [])], { title: name, menu: true });
+  const m = useActionMenu(() => [{ label: t('Add task here'), icon: Plus, run: onAdd }, ...(onEditStages ? [{ label: t('Edit stages'), icon: Columns3, run: onEditStages }] : [])], { title: name });
   return (
     <>
       <button ref={btn} type="button" className="icon-btn tcol-more" onClick={() => m.openFrom(btn)} aria-label={t('More for {stage}', { stage: name })}>

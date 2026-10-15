@@ -123,7 +123,8 @@ import { needsYou } from './needsYou';
 import { plainTiles } from './mobile/BarDefaults';
 import { companyApps as companyAppOrder, launcherApps, migrateBar, normalize as normalizeApps, type AppOrder, type LauncherId } from './mobile/launcherApps';
 import { historySteps, parseRoute, routePath, startPath, RESUME_MS, SECTIONS as SECTIONS_OF, type Route } from './route';
-import { setVaultUnlocked } from './vaultCrypto';
+import { setVaultUnlocked, vaultUnlocked } from './vaultCrypto';
+import { KeyRound } from 'lucide-react';
 import { useEdgeSwipe } from './components/ui/SideDrawer';
 import { openCompanySheet, useAppSections, useSidebarDrawer, useChrome, useFocusedScreen, useTitleMenu, useTitleTucked, type AppSection, type AppSections } from './mobile/chrome';
 import { PHONE, TABLET, isPhone, useMedia } from './mobile/media';
@@ -4546,6 +4547,8 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
     ...wsNotes.map((n) => ({ id: 'no-' + n.id, group: 'Notes', title: n.title || t('Untitled note'), sub: wsClientsAll.find((c) => c.id === n.clientId)?.name, icon: FileText, keywords: htmlToText(n.html).slice(0, 2000), run: () => openNote(n.id) })),
     ...wsMeetings.map((m) => ({ id: 'mt-' + m.id, group: 'Meetings', title: m.title, icon: Video, keywords: [m.summary, ...(m.keyPoints ?? []), ...(m.decisions ?? []), ...(m.transcript ?? []).map((l) => l.text)].join(' ').slice(0, 6000), run: () => openMeeting(m.id) })),
     ...deepItems,
+    // Vault logins by name and site only (never a secret), and only while the Vault is unlocked.
+    ...(vaultUnlocked(user.id) ? vaultItems.map((v) => ({ id: 'v-' + v.id, group: 'Logins', title: v.meta.title, sub: v.meta.url?.replace(/^https?:\/\//, '').replace(/\/.*$/, ''), icon: KeyRound, app: 'vault' as const, run: () => (go('vault'), setVaultEditing(v)) })) : []),
     ...wsDrive.filter((i) => i.kind !== 'folder' && !i.trashed).map((i) => ({ id: 'f-' + i.id, group: 'Files', title: i.name, icon: FileText, run: () => { go('drive'); setPreview({ item: i, list: [i] }); } })),
   ];
 
@@ -5008,7 +5011,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
             portals={portalItems}
             onPortal={setPortalKey}
             onShared={myPortals.length > 1 ? () => setPortalKey('*') : undefined}
-            onSearch={searchHere}
+            onSearch={mode === 'vault' && !vaultUnlocked(user.id) ? undefined : searchHere}
             me={{ person: { ...ME, email: user.email } /* the sign-in address, as Settings > Account shows it */, onOpen: () => (setSettingsSection('account'), go('settings')) }}
             status={{ emoji: statuses[user.id]?.emoji, text: statuses[user.id] ? statusText(statuses[user.id]!) : t('Available'), run: () => setStatusOpen(true) }}
             onSettings={() => (openSettingsList(), go('settings'))}
@@ -5612,6 +5615,18 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
                 if (view.kind === 'todos') return { title: t('Nothing to do from email'), sub: t('Emails that ask you to do something show here until their to-dos are done.') };
                 if (view.kind === 'project') return { title: t('No email with {name} yet', { name: title }), sub: t('Email to and from {name}’s address shows here.', { name: title }) };
                 const tmp = myAccounts.find((a) => a.id === activeAccount && a.temp);
+                const folderEmpty: Partial<Record<FolderId, { title: string; sub: string }>> = {
+                  sent: { title: t('Nothing sent yet'), sub: t('Email you send shows here.') },
+                  drafts: { title: t('No drafts'), sub: t('Email you start and don’t send is kept here.') },
+                  snoozed: { title: t('Nothing snoozed'), sub: t('Snoozed email comes back to your inbox when it’s time.') },
+                  scheduled: { title: t('Nothing scheduled'), sub: t('Email you schedule waits here until it sends.') },
+                  assigned: { title: t('Nothing assigned to you'), sub: t('Email a teammate gives you shows here.') },
+                  starred: { title: t('No starred email'), sub: t('Star an email to find it here later.') },
+                  trash: { title: t('Trash is empty'), sub: t('Deleted email stays here for 30 days.') },
+                  spam: { title: t('No spam'), sub: t('Email that looks like spam lands here.') },
+                  archive: { title: t('Nothing archived'), sub: t('Archived email leaves your inbox and waits here.') },
+                };
+                if (!tmp && view.kind === 'folder' && folderEmpty[view.id]) return { ...folderEmpty[view.id]!, icon: 'none' as const };
                 return tmp
                   ? {
                       title: t('Nothing here yet'),

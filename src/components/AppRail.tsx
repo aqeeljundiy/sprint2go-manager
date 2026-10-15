@@ -1,4 +1,4 @@
-import { Fragment, useContext, useRef, useState, type ReactNode } from 'react';
+import { Fragment, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { useActionMenu } from './ui/ActionSheet';
 import { usePersisted } from '../settings';
 import { TabDefaultsCtx, arrange, type TabPrefs } from './ui/TabBar';
@@ -85,6 +85,11 @@ export function AppRail(p: Props) {
     ];
   });
   const moreBtn = useRef<HTMLButtonElement>(null);
+  const appsRef = useRef<HTMLDivElement>(null);
+  // A short screen scrolls the app list: keep the open app in view.
+  useEffect(() => {
+    appsRef.current?.querySelector<HTMLElement>('.rail-app.on')?.scrollIntoView({ block: 'nearest' });
+  }, [p.current]);
   const moreMenu = useActionMenu(showList, { title: t('Hidden apps') });
   const drop = () => {
     if (drag && over && drag !== over.id && pinned.length) {
@@ -104,7 +109,7 @@ export function AppRail(p: Props) {
   return (
     <nav className="rail" aria-label={t('Apps')}>
       <div className="rail-ws">{p.workspace}</div>
-      <div className="rail-apps">
+      <div className="rail-apps" ref={appsRef}>
         {apps.map(({ id, name, icon: Icon }, i) => (
           <Fragment key={id}>
           {i === pinned.length && i > 0 && <span className="rail-sep" aria-hidden="true" />}

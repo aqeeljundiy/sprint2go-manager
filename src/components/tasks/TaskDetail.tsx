@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { AlignLeft, ArrowUp, Bell, CalendarDays, CalendarPlus, Check, CheckCircle2, ChevronRight, Clock, Copy, Eye, EyeOff, Flag, Hash, Link2, ListChecks, MoreHorizontal, Pencil, Plus, Repeat as RepeatIcon, RotateCcw, Trash2, UserRound, Users, X, type LucideIcon } from 'lucide-react';
+import { AlignLeft, ArrowUp, Bell, CalendarDays, CalendarPlus, Check, CheckCircle2, ChevronRight, Clock, Copy, Eye, Flag, Globe, Hash, Link2, ListChecks, Lock, MoreHorizontal, Pencil, Plus, Repeat as RepeatIcon, RotateCcw, Trash2, UserRound, Users, X, type LucideIcon } from 'lucide-react';
 import { Sheet } from '../ui/Sheet';
 import { SwipeRow } from '../ui/SwipeRow';
 import { useLeaving } from '../ui/Smooth';
@@ -483,7 +483,7 @@ export function TaskDetail({
           ))}
           {guest && (
             <div className={`tdp-row tdp-guest${guest.visible ? ' on' : ''}`}>
-              {guest.visible ? <Eye size={20} className="tdp-icon" aria-hidden="true" /> : <EyeOff size={20} className="tdp-icon" aria-hidden="true" />}
+              {guest.visible ? <Globe size={20} className="tdp-icon" aria-hidden="true" /> : <Lock size={20} className="tdp-icon" aria-hidden="true" />}
               <button type="button" className="tdp-btn" role="switch" aria-checked={guest.visible} onClick={guest.toggle}>
                 {guest.visible ? t('Visible to {whos}', { whos: term.whos }) : t('Internal only')}
                 <span className={`switch ${guest.visible ? 'on' : ''}`} aria-hidden="true">

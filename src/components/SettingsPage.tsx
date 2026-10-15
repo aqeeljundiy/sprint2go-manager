@@ -939,7 +939,6 @@ export function SettingsPage({ email, settings: s, update, section, onSection, u
               <GRow label={t('Edit apps')} chevron onClick={myApps.onEdit} />
             </Group>
           )}
-          {section === 'myapps' && myApps && demo && demo.state !== 'on' && <DemoCompanyBlock d={demo} />}
           {section === 'myapps' && myApps && (
             <MyAppsSection
               edited={!!myApps.onEdit}
@@ -951,6 +950,11 @@ export function SettingsPage({ email, settings: s, update, section, onSection, u
               onAsk={myApps.onAsk}
               onCompanyApp={(id) => onWorkspace({ apps: [...(ws.apps ?? []), id] })}
             />
+          )}
+          {section === 'myapps' && myApps && demo && demo.state !== 'on' && (
+            <div className="set-block set-demo-after">
+              <DemoCompanyBlock d={demo} />
+            </div>
           )}
           {section === 'meetings' && <MeetingsSection ws={ws} canManage={canManage} onMeetings={admin.onMeetings} />}
           {!sections.some((x) => x.id === section) && (

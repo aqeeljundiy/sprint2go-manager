@@ -101,7 +101,7 @@
 
   /* ---------- Sheets: rows start at the 16 gutter (4 + the row's 12) ---------- */
   .sheet-body {
-    padding: 0 4px calc(env(safe-area-inset-bottom) + 16px);
+    padding: 0 4px calc(env(safe-area-inset-bottom) + 24px);
   }
 
   /* ---------- Rows in sheets and menus ---------- */

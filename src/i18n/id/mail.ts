@@ -662,6 +662,23 @@ const id: Record<string, string> = {
   "One line": "Satu baris",
   "Layout": "Tata letak",
   "Preview": "Pratinjau",
+  'This file’s contents aren’t available here, so it can’t be opened or downloaded.': 'Isi file ini tidak tersedia di sini, jadi tidak bisa dibuka atau diunduh.',
+  'Nothing sent yet':'Belum ada yang dikirim',
+  'Email you send shows here.': 'Email yang Anda kirim muncul di sini.',
+  'No drafts': 'Tidak ada draf',
+  'Email you start and don’t send is kept here.': 'Email yang Anda mulai tapi belum dikirim disimpan di sini.',
+  'Nothing snoozed': 'Tidak ada yang ditunda',
+  'Snoozed email comes back to your inbox when it’s time.': 'Email yang ditunda kembali ke kotak masuk saat waktunya tiba.',
+  'Nothing scheduled': 'Tidak ada yang dijadwalkan',
+  'Email you schedule waits here until it sends.': 'Email terjadwal menunggu di sini sampai terkirim.',
+  'Email a teammate gives you shows here.': 'Email yang diberikan rekan tim kepada Anda muncul di sini.',
+  'No starred email': 'Tidak ada email berbintang',
+  'Star an email to find it here later.': 'Beri bintang pada email untuk menemukannya di sini nanti.',
+  'Deleted email stays here for 30 days.': 'Email yang dihapus tetap di sini selama 30 hari.',
+  'No spam': 'Tidak ada spam',
+  'Email that looks like spam lands here.': 'Email yang tampak seperti spam masuk ke sini.',
+  'Nothing archived': 'Tidak ada yang diarsipkan',
+  'Archived email leaves your inbox and waits here.': 'Email yang diarsipkan keluar dari kotak masuk dan menunggu di sini.',
   // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
 };
 

@@ -175,6 +175,7 @@ const id: Record<string, string> = {
   "No notes in this view": "Tidak ada catatan di tampilan ini",
   "Show all notes": "Tampilkan semua catatan",
   "Tap the pen to write one.": "Ketuk pena untuk menulis catatan.",
+  'Notes others share with you show up here.': 'Catatan yang dibagikan orang lain muncul di sini.',
   "Background": "Latar",
   "Blocks": "Blok",
   "Brown": "Cokelat",

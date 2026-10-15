@@ -104,7 +104,7 @@
     background: var(--hover);
   }
   .tq-chips {
-    padding: 0 16px 8px;
+    padding: 8px 16px 8px;
   }
   .tq-filters {
     min-height: 32px;
@@ -784,7 +784,7 @@
     font-weight: 400;
   }
   .tdp-sheet .sheet-body {
-    padding: 0 0 16px;
+    padding: 0 0 calc(var(--tap) + 32px + env(safe-area-inset-bottom)); /* clear of the pinned comment field */
   }
   .tdp {
     gap: 0;
@@ -817,7 +817,7 @@
     field-sizing: content;
   }
   .tdp > .parent-brief,
-  .tdp > .review-banner,
+  .tdp .review-banner,
   .tdp > .smooth-height {
     margin: 0 16px 8px;
   }
@@ -1351,7 +1351,7 @@
     display: flex;
     align-items: center;
     min-height: 20px;
-    padding: 0 0 8px 16px;
+    padding: 0 16px 8px 16px;
   }
   .tbr-head h2 {
     flex: 1;
@@ -1362,7 +1362,7 @@
     text-overflow: ellipsis;
   }
   .tbr-add {
-    margin: -12px -8px -12px 0;
+    margin: -12px -16px -12px 0; /* centred on the chevron column below */
     color: var(--text-2);
   }
   .tbr-card {
@@ -1544,24 +1544,22 @@
     align-content: center;
     gap: 8px;
     padding: 8px 4px;
-    border: 2px solid var(--line);
+    border: 0;
     border-radius: var(--r-card);
     color: var(--text-2);
+    transition: background-color 0.15s ease, color 0.15s ease;
   }
   .ds-card .ds-pic span {
-    padding: 4px 12px;
-    border-radius: var(--r-pill);
     font-size: var(--fs-secondary);
     font-weight: 600;
     transition: background-color 0.15s ease, color 0.15s ease;
   }
   .ds-card .ds-pic.on {
-    border-color: var(--accent);
-    background: none;
+    background: var(--accent-soft);
+    color: var(--accent-text);
   }
   .ds-card .ds-pic.on span {
-    background: var(--accent);
-    color: #fff;
+    color: var(--accent-text);
   }
   .ds-prow {
     position: relative;
@@ -1808,14 +1806,17 @@
   .tdp-row :is(.due-today, .due-tomorrow, .due-week, .due-later) {
     color: var(--text);
   }
-  /* The place and the stage get their whole words (Indonesian runs longer); the pill and the round buttons share a row. */
+  /* The crumbs stay on one line (the project name ellipsizes) so the pill and the round buttons share a row. */
   .sheet-title .td-crumbs {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     min-width: 0;
   }
   .sheet-title .td-crumb-text {
     max-width: none;
-    white-space: normal;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
   }
   .sel.td-crumb {
     border-radius: var(--r-pill);
@@ -1866,5 +1867,62 @@
   }
   :root.phone-sidebar .sidebar .sb-panel .nav-item.active svg {
     color: var(--accent-text);
+  }
+}
+
+@media (max-width: 767px) {
+  /* The create button steps aside while a new-task sheet is open, so it never pokes out above it. */
+  :root:has(.qa-sheet) .fab.on {
+    opacity: 0;
+    transform: translateY(24px) scale(0.85);
+    pointer-events: none;
+  }
+}
+
+@media (max-width: 767px) {
+  /* Upcoming: the "next four weeks" expander is a full row with a chevron, not a floating label. */
+  .ucal-more {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-height: var(--tap);
+    margin: 8px 0 0;
+    padding: 0 16px;
+    border-radius: 0;
+    color: var(--accent-text);
+    font: var(--t-body);
+  }
+  .ucal-more svg {
+    color: var(--text-3);
+  }
+}
+
+@media (max-width: 767px) {
+  /* Brain dump as a bottom sheet: title in the accent, no resize grip under the mic, actions at the foot. */
+  .dump-sheet .dump-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--accent-text);
+    font: var(--t-title);
+  }
+  .dump-sheet .dump-input textarea {
+    resize: none;
+    font-size: 16px;
+  }
+  .dump-sheet .sheet-body .modal-body {
+    padding: 0 12px;
+  }
+  .dump-sheet-foot {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 8px 16px;
+  }
+  .dump-sheet-foot .primary-btn {
+    flex: 1;
+    justify-content: center;
+    min-height: var(--tap);
   }
 }

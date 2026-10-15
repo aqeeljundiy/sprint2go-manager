@@ -2,6 +2,8 @@ import { MEETING_LANGUAGES } from '../data/languages';
 import { useEffect, useRef, useState } from 'react';
 import { ProjectPicker } from './ProjectPicker';
 import { SmoothHeight } from './ui/Smooth';
+import { Sheet } from './ui/Sheet';
+import { usePhone } from '../mobile/media';
 import { term, brand as product } from '../terms';
 import { ArrowLeft, Bell, FileText, ListChecks, Loader2, Mail, MessagesSquare, Mic, MicOff, Plus, Sparkles, UserPlus, X } from 'lucide-react';
 import type { Client, Team, User } from '../types';
@@ -78,6 +80,7 @@ function useDictation(onText: (said: string) => void, lang?: string) {
 }
 
 export function BrainDump({ users, clients, teams, me, aliases, initialText, language, onCreate, onInvite, onClose }: Props) {
+  const phone = usePhone();
   const [text, setText] = useState(initialText ?? '');
   const [step, setStep] = useState<'write' | 'thinking' | 'review'>('write');
   const [rows, setRows] = useState<Row[]>([]);
@@ -165,18 +168,8 @@ export function BrainDump({ users, clients, teams, me, aliases, initialText, lan
     { value: '__invite', label: t('Invite {name} to the team', { name }), hint: t('Sends an invite by email'), icon: <UserPlus size={16} />, group: t('Someone else') },
   ];
 
-  return (
-    <div className="modal-scrim" onMouseDown={onClose}>
-      <div className="modal dump-modal" role="dialog" aria-label={t('Brain dump')} onMouseDown={(e) => e.stopPropagation()} onKeyDown={(e) => e.key === 'Escape' && !document.querySelector('.pop') && onClose()}>
-        <header className="modal-head">
-          <span className="dump-title">
-            <Sparkles size={15} /> {t('Brain dump')} {!aiLive() && <span className="demo-tag">{t('Demo AI')}</span>}
-          </span>
-          <button className="icon-btn sm" onClick={onClose} aria-label={t('Close')}>
-            <X size={15} />
-          </button>
-        </header>
-
+  const body = (
+    <>
         {step !== 'review' ? (
           <div className="modal-body">
             <SmoothHeight>
@@ -312,7 +305,10 @@ export function BrainDump({ users, clients, teams, me, aliases, initialText, lan
           </div>
         )}
 
-        <footer className="modal-foot">
+    </>
+  );
+  const actions = (
+    <>
           {step === 'review' ? (
             <>
               <button className="ghost-btn" onClick={() => setStep('write')}>
@@ -324,15 +320,39 @@ export function BrainDump({ users, clients, teams, me, aliases, initialText, lan
             </>
           ) : (
             <>
+              {!phone && (
               <button className="ghost-btn" onClick={onClose}>
                 {t('Cancel')}
               </button>
+              )}
               <button className="primary-btn" onClick={plan} disabled={!text.trim() || step === 'thinking'}>
                 {step === 'thinking' ? <Loader2 size={15} className="spin" /> : <Sparkles size={15} />} {step === 'thinking' ? t('Reading…') : t('Turn into tasks')}
               </button>
             </>
           )}
-        </footer>
+    </>
+  );
+  // Phones: a bottom sheet (grab handle, swipe down to close), so the only Cancel is the sheet itself.
+  if (phone)
+    return (
+      <Sheet onClose={onClose} size="tall" className="dump-sheet" label={t('Brain dump')} title={<span className="dump-title"><Sparkles size={16} /> {t('Brain dump')} {!aiLive() && <span className="demo-tag">{t('Demo AI')}</span>}</span>} footer={<div className="dump-sheet-foot">{actions}</div>}>
+        {body}
+      </Sheet>
+    );
+  return (
+    <div className="modal-scrim" onMouseDown={onClose}>
+      <div className="modal dump-modal" role="dialog" aria-label={t('Brain dump')} onMouseDown={(e) => e.stopPropagation()} onKeyDown={(e) => e.key === 'Escape' && !document.querySelector('.pop') && onClose()}>
+        <header className="modal-head">
+          <span className="dump-title">
+            <Sparkles size={15} /> {t('Brain dump')} {!aiLive() && <span className="demo-tag">{t('Demo AI')}</span>}
+          </span>
+          <button className="icon-btn sm" onClick={onClose} aria-label={t('Close')}>
+            <X size={15} />
+          </button>
+        </header>
+
+        {body}
+        <footer className="modal-foot">{actions}</footer>
       </div>
     </div>
   );

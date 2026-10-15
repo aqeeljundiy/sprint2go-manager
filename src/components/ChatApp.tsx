@@ -2,7 +2,7 @@ import { useMemo, useRef, useState, type ReactNode } from 'react';
 import { flushSync } from 'react-dom';
 import { SmoothHeight, TabPane } from './ui/Smooth';
 import { term } from '../terms';
-import { FolderPlus, ChevronUp, Handshake, ChevronDown, ChevronRight, Check, LayoutList, Pencil, Compass, Hash, Lock, MoreHorizontal, Plus, Settings, Star, Trash2, Users, X, Headphones, BellOff, Bell, Link2, LogOut, MailOpen, CheckCheck, Inbox, MessagesSquare, SendHorizontal, Bookmark, ArrowLeft, ArrowRight, EyeOff, SlidersHorizontal, PenLine, AtSign, MessageCircle, Folder, Briefcase, PartyPopper, ListFilter, Clock } from 'lucide-react';
+import { FolderPlus, ChevronUp, Handshake, ChevronDown, ChevronRight, Check, LayoutList, Pencil, Compass, Hash, Lock, MoreHorizontal, Plus, Settings, Star, Trash2, Users, X, Headphones, BellOff, Bell, Link2, LogOut, MailOpen, CheckCheck, Inbox, MessagesSquare, SendHorizontal, Bookmark, ArrowLeft, ArrowRight, EyeOff, GripVertical, Smile, LayoutGrid, PenLine, AtSign, MessageCircle, Folder, Briefcase, PartyPopper, ListFilter, Clock } from 'lucide-react';
 import type { Channel, ChannelCategory, ChatLayout, ChatMessage, ChatSection, ChatView as ChatViewDef, Notice, Status, Team, User } from '../types';
 import { usePersisted } from '../settings';
 import { Avatar } from './Avatar';
@@ -564,7 +564,10 @@ export function ChatSidebar(p: SidebarProps) {
                   <div className="as-list">
                     {p.settings.map((r) => (
                       <button key={r.id} type="button" className="as-item" onClick={r.run}>
-                        <Settings size={20} className="as-icon" />
+                        {(() => {
+                          const Icon = r.id.endsWith('status') ? Smile : r.id.endsWith('tiles') ? LayoutGrid : r.id === 'chat' ? MessagesSquare : Settings;
+                          return <Icon size={20} className="as-icon" />;
+                        })()}
                         <span className="as-label">
                           {r.label}
                           {r.hint && <small>{r.hint}</small>}
@@ -1149,20 +1152,42 @@ export function StatusPicker({ status, onStatus }: { status?: Status; onStatus: 
 function TilesEditor({ me }: { me: string }) {
   const chat = useChatState(me);
   const { order, hidden } = chat.tiles;
+  const now = useRef(chat);
+  now.current = chat;
+  // Drag a tile by its handle: as the finger passes over another row, the tile takes that row's place.
+  const drag = (id: TileId) => (e: React.PointerEvent) => {
+    e.preventDefault();
+    const move = (ev: PointerEvent) => {
+      const row = (document.elementFromPoint(ev.clientX, ev.clientY) as HTMLElement | null)?.closest<HTMLElement>('[data-tile-row]');
+      const to = row ? Number(row.dataset.tileRow) : -1;
+      const c = now.current;
+      const cur = c.tiles.order.indexOf(id);
+      if (to < 0 || to === cur) return;
+      const next = c.tiles.order.filter((x) => x !== id);
+      next.splice(to, 0, id);
+      c.setTiles({ order: next, hidden: c.tiles.hidden });
+    };
+    const up = () => (window.removeEventListener('pointermove', move), window.removeEventListener('pointerup', up), window.removeEventListener('pointercancel', up));
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', up);
+  };
   return (
     <div className="tiles-editor">
       <p className="muted small">{t('Tiles show what to act on in Chat. Hold a tile in the list to move or hide it there too.')}</p>
       {order.map((id, i) => (
-        <div key={id} className="te-tile">
-          <SlidersHorizontal size={16} className="muted" aria-hidden />
+        <div key={id} className="te-tile" data-tile-row={i}>
+          <span className="te-grab" onPointerDown={drag(id)} aria-hidden>
+            <GripVertical size={20} />
+          </span>
           <span className="te-name">
             {TILE_NAMES[id]}
             {id === 'live' && <small>{t('Only while a huddle is on')}</small>}
           </span>
-          <button type="button" className="icon-btn sm" disabled={i === 0} onClick={() => moveTile(chat, id, -1)} aria-label={t('Move {name} up', { name: TILE_NAMES[id] })}>
+          <button type="button" className="icon-btn sm te-move" disabled={i === 0} onClick={() => moveTile(chat, id, -1)} aria-label={t('Move {name} up', { name: TILE_NAMES[id] })}>
             <ChevronUp size={16} />
           </button>
-          <button type="button" className="icon-btn sm" disabled={i === order.length - 1} onClick={() => moveTile(chat, id, 1)} aria-label={t('Move {name} down', { name: TILE_NAMES[id] })}>
+          <button type="button" className="icon-btn sm te-move" disabled={i === order.length - 1} onClick={() => moveTile(chat, id, 1)} aria-label={t('Move {name} down', { name: TILE_NAMES[id] })}>
             <ChevronDown size={16} />
           </button>
           <button type="button" role="switch" aria-checked={!hidden.includes(id)} aria-label={t('Show {name}', { name: TILE_NAMES[id] })} className={`switch ${hidden.includes(id) ? '' : 'on'}`} onClick={() => chat.setTiles({ order, hidden: hidden.includes(id) ? hidden.filter((x) => x !== id) : [...hidden, id] })}>
@@ -1235,7 +1260,7 @@ function NewMessage(p: {
   const label = p.done ?? (!any ? t('Pick who to message') : picked.length + guestPicked.length === 1 ? t('Message {name}', { name: picked[0] ? firstOf(picked[0]) : guestPicked[0].name.split(' ')[0] }) : t('Start a group message'));
   const chip = (key: string, person: { name: string; email: string; color?: string; photo?: string }, remove: (() => void) | null) => (
     <button key={key} type="button" className={`nm-chip${remove ? '' : ' locked'}`} onClick={(e) => (e.stopPropagation(), remove?.())} disabled={!remove} aria-label={remove ? t('Remove {name}', { name: person.name }) : person.name}>
-      <Avatar person={person} size={20} />
+      <Avatar person={person} size={24} />
       <span>{person.name.split(' ')[0]}</span>
       {remove && <X size={14} aria-hidden />}
     </button>
@@ -1339,7 +1364,8 @@ function NewMessage(p: {
       {!people.length && !chans.length && !guests.length && <p className="sheet-empty">{t('Nobody here is called “{q}”', { q })}</p>}
     </div>
   );
-  const footer = p.single ? undefined : (
+  // Nothing picked yet: no disabled button sitting at the bottom of the phone screen.
+  const footer = p.single || (!any && p.variant === 'screen') ? undefined : (
     <div className="nm-foot">
       <button type="button" className="primary-btn nm-go" disabled={!any} onClick={go}>
         {label}
@@ -1421,10 +1447,10 @@ function ViewEditor({ view, channels, isNew, onSave, onDelete, onClose }: { view
                 </div>
               ))}
               <div className="ve-actions">
-                <button type="button" className="ghost-btn sm" onClick={() => setV({ ...v, sections: [...v.sections, { id: 's' + Date.now().toString(36), name: t('New section'), channelIds: [] }] })}>
+                <button type="button" className="ghost-btn sm ve-add" onClick={() => setV({ ...v, sections: [...v.sections, { id: 's' + Date.now().toString(36), name: t('New section'), channelIds: [] }] })}>
                   <Plus size={13} /> {t('Add section')}
                 </button>
-                <button type="button" className="link-btn" onClick={fromCategories}>
+                <button type="button" className="link-btn ve-from" onClick={fromCategories}>
                   {t('Start from the default groups')}
                 </button>
               </div>
@@ -1452,7 +1478,8 @@ function ViewEditor({ view, channels, isNew, onSave, onDelete, onClose }: { view
           <label className="set-row toggle-row">
             <span>
               <strong>{t('Show the rest under “Other channels”')}</strong>
-              <small>{t('Off: channels you didn’t place are hidden in this view (you can still find them with ⌘K)')}</small>
+              <small className="ve-k-hint">{t('Off: channels you didn’t place are hidden in this view (you can still find them with ⌘K)')}</small>
+              <small className="ve-k-phone">{t('Off: channels you didn’t place are hidden in this view (you can still find them in Search)')}</small>
             </span>
             <button type="button" role="switch" aria-checked={v.showRest} className={`switch ${v.showRest ? 'on' : ''}`} onClick={() => setV({ ...v, showRest: !v.showRest })}>
               <span />

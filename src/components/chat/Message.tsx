@@ -192,6 +192,16 @@ function ReactionPill({ m, emoji, who, ctx }: { m: ChatMessage; emoji: string; w
   );
 }
 
+/** "now", "31m", "3h", "2d": the compact age that fits beside a celebration pill on a phone. */
+function shortAgo(iso: string) {
+  const mins = Math.round((Date.now() - new Date(iso).getTime()) / 60_000);
+  if (mins < 1) return t('now');
+  if (mins < 60) return t('{n}m', { n: mins });
+  const hrs = Math.round(mins / 60);
+  if (hrs < 24) return t('{n}h', { n: hrs });
+  return t('{n}d', { n: Math.round(hrs / 24) });
+}
+
 /** One message in a conversation or thread. Tap opens its thread on phones; long-press (or right-click, or "…") shows what you can do with it. */
 export function Msg({ m, grouped, inThread = false, ctx }: { m: ChatMessage; grouped: boolean; inThread?: boolean; ctx: MsgCtx }) {
   const more = useRef<HTMLButtonElement>(null);
@@ -202,7 +212,7 @@ export function Msg({ m, grouped, inThread = false, ctx }: { m: ChatMessage; gro
     return (
       <div className="chat-celebration">
         <span>🎉 {msgText(m)}</span>
-        <time>{relative(m.at)}</time>
+        <time>{ctx.phone ? shortAgo(m.at) : relative(m.at)}</time>
       </div>
     );
   if (m.kind === 'summary')

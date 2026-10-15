@@ -1779,3 +1779,10 @@
   font-weight: 500;
   color: var(--text-3);
 }
+/* Short windows (an iPad on its side): tighter app rows so more of the list fits; it scrolls past that. */
+@media (min-width: 768px) and (max-height: 820px) {
+  .rail-app {
+    padding: 4px 0 3px;
+    gap: 2px;
+  }
+}

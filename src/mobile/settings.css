@@ -57,7 +57,7 @@
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 0;
   }
   .set-account-text strong {
     font-size: var(--fs-title);
@@ -80,6 +80,9 @@
   .settings-push .settings-content {
     overflow: visible;
     padding: 16px 16px 48px;
+  }
+  .settings-push .settings-content .g-card {
+    margin-inline: 0;
   }
   .settings-push .settings-content > h2:first-child {
     display: none;
@@ -812,7 +815,7 @@
   .settings-push .acct-row .ghost-btn.sm {
     min-height: 32px;
     padding: 0 12px;
-    gap: 4px;
+    gap: 0;
   }
   .settings-push .acct-add {
     min-height: var(--row-compact);
@@ -842,7 +845,7 @@
     box-shadow: none;
   }
   .settings-push .push-card .push-text {
-    gap: 4px;
+    gap: 0;
     padding: 0;
   }
   .settings-push .push-card .push-text strong {
@@ -874,8 +877,15 @@
   /* Account: the avatar colours as one row of swatches. */
   .set-swatches {
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 0;
     padding-block: 12px;
+  }
+  .set-swatches .swatch {
+    width: 42px;
+    height: 42px;
+    border: 8px solid var(--surface);
+    background-clip: padding-box;
+    box-shadow: none;
   }
   /* Mail & signature: the editor on its screen, a white card like the rows. */
   .g-edit .set-sig {

@@ -410,7 +410,7 @@ export function TeamsLink({ teams, users, onOpen }: { teams: Team[]; users: User
       <p className="set-intro">{t('Departments like Video editing or Finance. Teams have their own app in the sidebar: make teams, add people (someone can be in several), set who can join, and see each team’s work and workload.')}</p>
       {phone ? (
         <div className="set-rows">
-          <Group footer={t('Teams have their own app: make teams, add people, set who can join, and see each team’s work.')}>
+          <Group>
             {teams.map((tm) => {
               const lead = users.find((u) => u.id === tm.leadId);
               const size = tn(tm.members.length, '{n} person', '{n} people');

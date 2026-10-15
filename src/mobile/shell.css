@@ -1144,10 +1144,25 @@
     min-height: 44px;
     padding: 8px 16px;
   }
+  .palette-chips {
+    padding: 0 16px;
+    mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+  }
+  .palette-chips::after {
+    content: '';
+    flex: none;
+    width: 8px;
+  }
   .palette-chips button {
+    position: relative;
     min-height: 32px;
-    border-radius: var(--r-card);
+    margin-block: 6px;
     font-size: var(--fs-caption);
+  }
+  .palette-chips button::before {
+    content: '';
+    position: absolute;
+    inset: -6px 0;
   }
 }
 

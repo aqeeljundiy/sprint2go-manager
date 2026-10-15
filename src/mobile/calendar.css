@@ -466,10 +466,8 @@
     min-width: 0;
   }
   .er-cals {
-    margin-right: -16px;
-    padding: 8px 16px 8px 0;
-    overflow-x: auto;
-    scrollbar-width: none;
+    flex-wrap: wrap;
+    padding: 8px 0;
   }
   .er-cals::-webkit-scrollbar {
     display: none;

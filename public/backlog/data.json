@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-15T07:23:47.836Z",
+  "updated": "2026-10-15T08:56:32.302Z",
   "items": [
     {
       "id": "G1",
@@ -8577,6 +8577,2193 @@
       "detail": "From the domains build, 15 Oct.",
       "priority": "medium",
       "status": "todo"
+    },
+    {
+      "id": "M2-home-1",
+      "round": "Mobile audit 2",
+      "area": "home",
+      "title": "New message sheet rows run off the right edge (New channel subtitle and pick circles clipped)",
+      "detail": "Give .nm-list grid-template-columns:minmax(0,1fr) and min-width:0 on .nm-row so .nm-sub ellipsizes. (src/mobile/chat.css:656-659; src/components/ChatApp.tsx:1300 (.nm-sub nowrap)) Evidence: phone375__010: the subtitle is cut at x=375 and the radio circles are half off screen. .nm-list is display:grid with no column template.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2-home-2",
+      "round": "Mobile audit 2",
+      "area": "home",
+      "title": "'To:' in the New message sheet sits 4px from the edge, not on the 16px gutter",
+      "detail": "Scope the .newmsg-sheet .nm-to override to min-width:768px, or set margin:0 and padding-inline:16px under the phone query. (src/components/chat/chat.css:1122-1125 vs src/mobile/chat.css:624-631) Evidence: phone375__010/020: 'To:' starts at x≈4. The desktop rule .newmsg-sheet .nm-to {margin:0 -4px; padding:4px 4px 8px} overrides the phone rule (padding 4px 16px).",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-home-3",
+      "round": "Mobile audit 2",
+      "area": "home",
+      "title": "Search scope chips are 32px tall, the last chip is clipped with no scroll hint, and the radii don't match",
+      "detail": "Give the chips a 44px hit area, add trailing padding or an edge fade, and use one pill radius. (src/mobile/shell.css:1103-1151 (.palette-chips)) Evidence: phone375__001/005: the chips are 32px tall and 'Notes' is cut off at the right edge with no fade.",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-home-4",
+      "round": "Mobile audit 2",
+      "area": "home",
+      "title": "Files search scope is almost blank (one grey line)",
+      "detail": "Show recent files, or use the shared EmptyState with an icon and a line saying what can be searched. (src/components/CommandPalette.tsx:214) Evidence: phone375__006: only 'Type to search.' shows. The other scopes list items straight away.",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-home-5",
+      "round": "Mobile audit 2",
+      "area": "home",
+      "title": "Notifications filter is a grey segmented pill, not the phone tab pattern, and is not full width",
+      "detail": "Use the shared underline tab bar on phones (register it in slidingTabs BARS). (src/components/Notifications.tsx:107; src/mobile/shell.css:802) Evidence: phone375__003 and phone430__003: a 200px grey capsule whose selected bubble clips. Other phone tabs use colour plus an underline.",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-home-6",
+      "round": "Mobile audit 2",
+      "area": "home",
+      "title": "Brain dump sheet: native resize grip, text runs under the mic, X instead of a grab handle, grey footer band",
+      "detail": "On phones, set resize:none and padding-right to clear the mic, use Sheet, and give the footer the sheet background. (src/components/BrainDump.tsx:185) Evidence: phone375__008/014: a resize grip shows bottom-right, long text runs under the mic button, and there is no grab handle (the other New sheets have one).",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-home-7",
+      "round": "Mobile audit 2",
+      "area": "home",
+      "title": "New channel dialog on phone: full-height modal with no handle, boxed category cards, 16px native checkbox",
+      "detail": "On phones, use a Sheet or PushScreen, show categories as a radio list, and replace the checkbox with a 44px switch row. (src/components/ChannelDialog.tsx:210 and its category grid) Evidence: phone375__019",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-home-8",
+      "round": "Mobile audit 2",
+      "area": "home",
+      "title": "Compose attach menu is a popover covering From/To on phones; the From address is truncated",
+      "detail": "Use ActionSheet for the attach menu on phones, and show the sender name or a 2-line value in From. (src/components/Compose.tsx:498) Evidence: phone375__017: the popover covers the fields. phone375__009: 'james@rimbagroup.ex…'.",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-home-9",
+      "round": "Mobile audit 2",
+      "area": "home",
+      "title": "New note sheet: 'Private' chip off the 16px gutter and a mostly empty sheet",
+      "detail": "Align the chip to 16px, and make the textarea taller with autofocus. (src/components/notes/QuickNote.tsx:91) Evidence: phone375__011: the chip is at x≈20 while the title is at 16, and about 140px is blank above a disabled Save button.",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-home-10",
+      "round": "Mobile audit 2",
+      "area": "home",
+      "title": "People in search results show a generic user glyph instead of avatars",
+      "detail": "Render people with the shared Avatar or PersonCell. (src/components/CommandPalette.tsx:3,59) Evidence: phone430__001: Ethan Brooks and Thomas Reyes show an outline person icon.",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-home-11",
+      "round": "Mobile audit 2",
+      "area": "home",
+      "title": "New sheet shows 'Note' highlighted with nothing tapped",
+      "detail": "Wrap :hover in @media (hover:hover), use focus-visible only, and don't auto-focus a row. (src/components/ui/ActionSheet.tsx and the mobile css) Evidence: phone430__004: the Note row has a grey selected background.",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-home-12",
+      "round": "Mobile audit 2",
+      "area": "home",
+      "title": "Notification avatar kind badge overlaps the avatar edge with no ring",
+      "detail": "Add a 2px ring in the surface colour and size the badge to 16px. (src/components/Notifications.tsx (ns-list avatar badge), src/mobile/shell.css) Evidence: phone430__003",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-home-13",
+      "round": "Mobile audit 2",
+      "area": "home",
+      "title": "Customise controls wrap to two rows and the resize grip overlaps the card edge (768)",
+      "detail": "Put the controls on one row (container query) or in a popover, and move the grip inside the padding. (src/components/HomeView.tsx:1111-1134) Evidence: ipad768__001",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2F-home-1",
+      "round": "Mobile audit 2",
+      "area": "home",
+      "title": "Fixed: New message sheet rows run off the right edge",
+      "detail": "Proof: Added grid-template-columns:minmax(0,1fr) to .nm-list and min-width:0 to .nm-list .nm-row under the phone query, so .nm-sub can now ellipsize. tsc reports no errors. I have not confirmed this on screen: my script did not get the sheet open. Files: C:/Users/Komputer/OneDrive/Desktop/Claude/sprint2go-manager/src/mobile/chat.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-home-2",
+      "round": "Mobile audit 2",
+      "area": "home",
+      "title": "Fixed: 'To:' off the 16px gutter in the New message sheet",
+      "detail": "Proof: Added a phone-scoped '.newmsg-sheet .nm-to {margin:0; padding:4px 16px}' that overrides the desktop margin of -4px. Not confirmed on screen. Files: C:/Users/Komputer/OneDrive/Desktop/Claude/sprint2go-manager/src/mobile/chat.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-home-3",
+      "round": "Mobile audit 2",
+      "area": "home",
+      "title": "Fixed: Search scope chips: 44px hit area, edge fade, one radius",
+      "detail": "Proof: On phones the chips now keep the pill radius (the r-card override is removed). Each chip has a ::before that extends the hit area to 44px. The row ends with a mask fade and an 8px trailing spacer. Not confirmed on screen: my script did not open the search palette from the home screen (screenshot audit/agents/r2-home-search.png shows home only). Files: C:/Users/Komputer/OneDrive/Desktop/Claude/sprint2go-manager/src/mobile/shell.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2-mail-1",
+      "round": "Mobile audit 2",
+      "area": "mail",
+      "title": "Empty folders (Sent, Drafts, Snoozed, Assigned, Trash, Starred) all show the Inbox copy 'All caught up'",
+      "detail": "Pass per-folder empty {title, sub, icon}: 'Nothing sent yet', 'No drafts', 'Nothing snoozed', 'Trash is empty', 'Nothing assigned to you', 'No starred email'; keep the tick for Inbox only (src/App.tsx ~5549/5611 (no per-folder empty prop); src/components/MessageList.tsx:428,440 fallback) Evidence: phone375__013/014/016/020/021 and deep 109 (Starred) show the green tick with 'New mail lands in your inbox'",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "M2-mail-2",
+      "round": "Mobile audit 2",
+      "area": "mail",
+      "title": "Phone menus open as anchored popovers instead of bottom sheets (select-mode more, Contacts import/export, Compose attach)",
+      "detail": "Pass menu: !phone (and drop anchor on phones) so ActionSheet renders as a bottom sheet (src/components/MessageList.tsx:329 menu:true; src/components/mail/Contacts.tsx:138 menu:true; src/components/Compose.tsx:491-500) Evidence: phone375__052 (36px rows covering Select all), deep 091, deep 098",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "M2-mail-3",
+      "round": "Mobile audit 2",
+      "area": "mail",
+      "title": "Attachment viewer says 'download it' but offers no Download; PDF falls to NoPreview",
+      "detail": "Fetch by attachment id when url missing so Download always shows (or hide the copy), route .pdf to PdfView, give seed attachments a url (src/components/mail/AttachmentViewer.tsx:120,258-272 (Download only when a.url)) Evidence: phone375__058 (board-pack PDF), deep 089 (invite.ics)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "M2-mail-4",
+      "round": "Mobile audit 2",
+      "area": "mail",
+      "title": "'to me' chevron rotates to point left when details open",
+      "detail": "Use ChevronRight, or add .rot-chev.down.open { rotate(180deg) } (src/components/Reader.tsx:978 ChevronDown with rot-chev open; src/polish.css:2230 rotates 90deg) Evidence: phone375__048, 064, 073",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-mail-5",
+      "round": "Mobile audit 2",
+      "area": "mail",
+      "title": "Smart reply chips clipped at the right edge with no end padding",
+      "detail": "Wrap the 2-3 chips (flex-wrap, gap 8) or add 16px end padding plus fade (src/mobile/mail.css:1348-1358 (.gm-smart nowrap scroll); Reader.tsx:1215) Evidence: phone375__004/006/007/035, deep 104/106, phone430__004",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-mail-6",
+      "round": "Mobile audit 2",
+      "area": "mail",
+      "title": "Compose FAB covers the last inbox row; icon touches label",
+      "detail": "List padding-bottom = FAB + 16 + tab bar; gap 8px in extended FAB; collapse to icon on scroll (src/mobile/AppBar.tsx:94; mail list padding in src/mobile/mail.css) Evidence: phone375__024/045/051 ShopMart row hidden; report 0px icon-label gap",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-mail-7",
+      "round": "Mobile audit 2",
+      "area": "mail",
+      "title": "Contacts: chip tabs instead of underline tabs, double selected state, FAB plus per-row add duplicate and covers last row",
+      "detail": "Use underline sliding tabs on phones with TabPane; one add affordance; bottom padding for FAB; 44px row targets (src/components/mail/Contacts.tsx:141,168) Evidence: phone375__010, deep 114 (two chips selected), deep 090",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-mail-8",
+      "round": "Mobile audit 2",
+      "area": "mail",
+      "title": "Invite/event cards nest bordered controls inside the bordered card",
+      "detail": "Plain text buttons for Join Meet / Add to calendar, no inner borders; segmented RSVP without filled track (src/components/InviteCard.tsx:185,196-197; src/mobile/mail.css:1338,1761) Evidence: phone375__035/037, deep 104/127/130",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-mail-9",
+      "round": "Mobile audit 2",
+      "area": "mail",
+      "title": "Reply composer: no body placeholder; quoted-text toggle is a 44x24 pill far below",
+      "detail": "Add 'Write your reply' placeholder, put toggle under signature with 44x44 hit area (src/mobile/mail.css:2742-2749; src/components/mail/QuickReply.tsx:139) Evidence: phone375__044/060/079, 011",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-mail-10",
+      "round": "Mobile audit 2",
+      "area": "mail",
+      "title": "Recipient chip remove X is 18x18 and avatar initials 8px",
+      "detail": "44px ::after hit area for X; drop chip avatar or 24px with 12px initials (QuickReply.tsx To row; .recip-chips in src/mobile/mail.css) Evidence: phone375__043/059/070/079",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-mail-11",
+      "round": "Mobile audit 2",
+      "area": "mail",
+      "title": "Send is not the primary action on phone Compose",
+      "detail": "Company-colour primary Send, disabled until valid (src/components/Compose.tsx phone top bar) Evidence: deep 095/110: Send grey outline like paperclip",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-mail-12",
+      "round": "Mobile audit 2",
+      "area": "mail",
+      "title": "Reader dock: bordered strip with left-packed equal outline pills, no primary",
+      "detail": "Reply filled primary, others plain, spread full width, no border-top (src/mobile/mail.css:1398-1430) Evidence: phone375__004/006/007/035",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-mail-13",
+      "round": "Mobile audit 2",
+      "area": "mail",
+      "title": "Mailbox/folder sheet: search inset at 8px and To-do row has no icon",
+      "detail": "16px gutter for search/title/rows; icon ListTodo for To-do; PersonCell rows in Files From (src/App.tsx:3883 todos option no icon; sheet search styling; FilesView.tsx:186-209) Evidence: phone375__001/034, deep 101/111/125, deep 086",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-mail-14",
+      "round": "Mobile audit 2",
+      "area": "mail",
+      "title": "Thread header: Summarize and project tag each on their own chip row",
+      "detail": "One chip row under the title holding tag, Assign, Summarize (src/components/Reader.tsx:1127-1160; mail.css:889-918) Evidence: phone375__004/054/057/064",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-mail-15",
+      "round": "Mobile audit 2",
+      "area": "mail",
+      "title": "Tracker-blocked note wraps to two lines, misaligned, too tight",
+      "detail": "'Blocked N trackers' one line, muted, aligned to text column, 8px top margin (Reader.tsx:1054; src/shell.css:1969,2132) Evidence: phone375__008, deep 140",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-mail-16",
+      "round": "Mobile audit 2",
+      "area": "mail",
+      "title": "Sender name truncates while time sits inline",
+      "detail": "Move time to the 'to me' line; name flex:1 min-width:0 (Reader.tsx phone message header ~1030-1050) Evidence: deep 107, 140, 150",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-mail-17",
+      "round": "Mobile audit 2",
+      "area": "mail",
+      "title": "Search and Files filter chip rows clipped at right edge; mixed chip styles",
+      "detail": "16px end padding + fade; single chip style, kind as one Type dropdown (MailSearch.tsx:180; FilesView.tsx:20-30) Evidence: phone375__003/026/009",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-mail-18",
+      "round": "Mobile audit 2",
+      "area": "mail",
+      "title": "Trash retention notice is a full-bleed grey band above search",
+      "detail": "Muted one-line caption below search, no fill (src/components/mail/Sorting.tsx:396-399; mail.css:2402) Evidence: phone375__020",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-mail-19",
+      "round": "Mobile audit 2",
+      "area": "mail",
+      "title": "Compose From picker shows raw 'Name <email>' and field truncates; To chip off baseline; dividers lack right gutter",
+      "detail": "Name label with email hint; align-items center, 48px row; inset dividers both sides (src/components/Compose.tsx account options and recipient row) Evidence: deep 097, 093, 095/099",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-mail-20",
+      "round": "Mobile audit 2",
+      "area": "mail",
+      "title": "Read tracking panel box-in-box with duplicate status line",
+      "detail": "Plain muted note, remove duplicate 'Opened' line (src/components/TrackingPanel.tsx:155; src/shell.css:2122) Evidence: deep 115",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-mail-21",
+      "round": "Mobile audit 2",
+      "area": "mail",
+      "title": "New contact screen uses Cancel/Save text bar; Phone has no field",
+      "detail": "TopBarBack + primary Save; empty Phone field (src/components/mail/Contacts.tsx:360,429-436) Evidence: deep 094",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-mail-22",
+      "round": "Mobile audit 2",
+      "area": "mail",
+      "title": "Assignee avatar initials in list rows 9px",
+      "detail": "24px avatar with 12px initials, or icon (MessageList.tsx row meta avatar) Evidence: phone375__045/051",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-mail-23",
+      "round": "Mobile audit 2",
+      "area": "mail",
+      "title": "iPad 1024 reader card squeezes sender name to two lines",
+      "detail": "Container query: drop card border/padding under ~420px, name ellipsis on one line (Reader.tsx message card; reader pane padding) Evidence: ipad1024__013",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-mail-24",
+      "round": "Mobile audit 2",
+      "area": "mail",
+      "title": "iPad advanced search is a dense form in a popover; Mail settings popover covers rail",
+      "detail": "Advanced search as dialog/sheet with plain-text hint; collision-aware anchoring (src/components/mail/Sorting.tsx:143; mail sidebar settings popover) Evidence: ipad1024__010, __001",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2F-mail-1",
+      "round": "Mobile audit 2",
+      "area": "mail",
+      "title": "Fixed: Empty folders show their own copy instead of Inbox 'All caught up'",
+      "detail": "Proof: audit/agents/r2-mail-sent.png: Snoozed shows mail icon with 'Tidak ada yang ditunda' / own sub; tick kept for Inbox only Files: src/App.tsx (folderEmpty map in MessageList empty prop), src/components/MessageList.tsx (empty.icon), src/i18n/id/mail.ts",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-mail-2",
+      "round": "Mobile audit 2",
+      "area": "mail",
+      "title": "Fixed: Phone menus open as bottom sheets (select-mode more, Contacts import/export, Compose attach)",
+      "detail": "Proof: menu: !phone and no anchor on phones in MessageList.tsx:329 and Contacts.tsx:138; Compose phone attach ActionSheet dropped anchor+menu; tsc clean for these files (not screenshotted) Files: src/components/MessageList.tsx, src/components/mail/Contacts.tsx, src/components/Compose.tsx",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-mail-3",
+      "round": "Mobile audit 2",
+      "area": "mail",
+      "title": "Fixed: Attachment viewer no longer tells you to download a file it can't offer",
+      "detail": "Proof: NoPreview text for attachments without url now says the contents aren't available (Indonesian added); Download copy only when a url exists. Not screenshotted Files: src/components/mail/AttachmentViewer.tsx, src/i18n/id/mail.ts",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-mail-4",
+      "round": "Mobile audit 2",
+      "area": "mail",
+      "title": "Fixed: 'to me' chevron flips up instead of pointing sideways",
+      "detail": "Proof: audit/agents/r2-mail-chev.png: details open, chevron points up Files: src/components/Reader.tsx (rot-chev down), src/polish.css (.rot-chev.down.open 180deg)",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-mail-5",
+      "round": "Mobile audit 2",
+      "area": "mail",
+      "title": "Fixed: Smart reply chips wrap instead of clipping",
+      "detail": "Proof: audit/agents/r2-mail-reader.png: three chips plus Saran balasan wrap within gutter Files: src/mobile/mail.css (appended phone block)",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-mail-6",
+      "round": "Mobile audit 2",
+      "area": "mail",
+      "title": "Fixed: Reader dock: Reply is the filled primary, others plain, no border-top",
+      "detail": "Proof: audit/agents/r2-mail-reader.png: green Balas pill, Teruskan/Komentar plain, spread full width Files: src/mobile/mail.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2-chat-1",
+      "round": "Mobile audit 2",
+      "area": "chat",
+      "title": "Celebration pills touch the screen edge and the time wraps onto two lines",
+      "detail": "On phones, add padding-inline 16px. Give the span flex:0 1 auto and the time flex:none, white-space:nowrap and 12px, using the short form '31m'. Also dedupe identical celebration events that appear one after another. (src/round2.css:1328-1350; src/components/chat/Message.tsx:203; src/mobile/shell.css:117) Evidence: phone375__080/117/121/049: the pill starts at x=0 and its text wraps. '31 min ago' wraps onto two lines at 11px. .chat-celebration has margin 8px 0 and no side padding, and its time is 11px with no nowrap.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2-chat-2",
+      "round": "Mobile audit 2",
+      "area": "chat",
+      "title": "The Your status screen reuses the desktop popover: 35px rows, no 16px gutter, and a framed input",
+      "detail": "Add phone rules: 48px rows with a 16px gutter, a standard 16px input field on the gutter, and the hint on the gutter. (src/round2.css:1173-1191; src/components/ChatApp.tsx:1127-1145) Evidence: phone375__042/126: the rows are 35px tall and start at x=10. The input has 10px padding and the hint sits at x=8. There is no phone override.",
+      "priority": "medium",
+      "status": "done"
+    },
+    {
+      "id": "M2-chat-3",
+      "round": "Mobile audit 2",
+      "area": "chat",
+      "title": "Tiles on top rows have three controls each, a sliders glyph and 40x24 switches",
+      "detail": "Use a GripVertical handle with long-press drag and drop the up/down arrows on phones. Give the switch a 44px hit area. (src/components/ChatApp.tsx:1156-1170; src/components/chat/chat.css:569) Evidence: phone375__043: each row has a SlidersHorizontal icon, up and down buttons and a switch. The switch measures 40x24.",
+      "priority": "medium",
+      "status": "done"
+    },
+    {
+      "id": "M2-chat-4",
+      "round": "Mobile audit 2",
+      "area": "chat",
+      "title": "Drafts and sent uses grey segmented tabs and a bare empty state",
+      "detail": "Use the underline tab bar on phones, and the full EmptyState with a PenLine icon and the title 'No drafts'. (src/components/chat/Pages.tsx:423 and 455) Evidence: phone375__041: the tabs are a grey segmented box, and the empty state is one line of grey text, unlike Saved.",
+      "priority": "medium",
+      "status": "done"
+    },
+    {
+      "id": "M2-chat-5",
+      "round": "Mobile audit 2",
+      "area": "chat",
+      "title": "Sheet paragraphs and the profile sheet sit at x=20 while the title is at 16",
+      "detail": "Inside .sheet-body on phones, use a 12px inline margin so text lands on the 16px gutter. Stack the profile facts with the label above the value. (src/components/chat/chat.css:389,466-473; src/components/ui/personCard.css:99,171-172; src/mobile/system.css:103) Evidence: phone375__051/054/066/076: the body text and the email sit at x=20. The email is cut off because of the 88px label column.",
+      "priority": "medium",
+      "status": "done"
+    },
+    {
+      "id": "M2-chat-6",
+      "round": "Mobile audit 2",
+      "area": "chat",
+      "title": "Composer grab handle shows between the mention list and the field, with a 64x16 target",
+      "detail": "Hide .cmp-grab while the mention pop or any composer panel is open, and give it a 44px hit area. (src/components/chat/Composer.tsx:285; src/mobile/chat.css:1060-1092) Evidence: phone375__059/070/080: a grey pill floats between the mention rows and the field",
+      "priority": "medium",
+      "status": "done"
+    },
+    {
+      "id": "M2-chat-7",
+      "round": "Mobile audit 2",
+      "area": "chat",
+      "title": "Create a view sheet: 'Add section' wraps to two lines, and the action pair and switch are cramped",
+      "detail": "On phones, stack .ve-actions as full-width 44px rows with nowrap labels, give the switch a 44px hit area, and hide the ⌘K hint. (src/components/ChatApp.tsx:1405-1430; src/round2.css:3921-3940) Evidence: phone375__012/112: 'Add section' wraps next to a two-line link, and the switch is 40x24",
+      "priority": "medium",
+      "status": "done"
+    },
+    {
+      "id": "M2-chat-8",
+      "round": "Mobile audit 2",
+      "area": "chat",
+      "title": "New channel dialog on phones: framed people list and a narrow AI summary select",
+      "detail": "On phones, give the Select width 100%, remove the .people-pick border, make the search a plain field, and give the dialog tabs a min-height of var(--tap). (src/components/ChannelDialog.tsx:194-198; src/round2.css:1849,1854; src/system.css:348) Evidence: phone375__085/087: the people list sits in a bordered box with a boxed search above it. The summary Select is about 150px wide. The dialog tabs are 32px tall.",
+      "priority": "medium",
+      "status": "done"
+    },
+    {
+      "id": "M2-chat-9",
+      "round": "Mobile audit 2",
+      "area": "chat",
+      "title": "Search People results use a generic glyph instead of avatars, and the Files scope is blank",
+      "detail": "Render people with Avatar or PersonCell, and show recent items or a compact EmptyState for each scope. (src/components/CommandPalette.tsx:214 and the people rows) Evidence: phone375__120: the people rows show an outline icon. phone375__124: the Files scope shows only 'Type to search.'",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-chat-10",
+      "round": "Mobile audit 2",
+      "area": "chat",
+      "title": "The disabled 'Pick who to message' button is a washed-out green bar",
+      "detail": "Hide the footer until someone is picked, or show the hint as muted text. (src/components/ChatApp.tsx:1343-1345; src/mobile/chat.css:723-731) Evidence: phone375__010/045: a faded green pill sits at the bottom of the screen",
+      "priority": "low",
+      "status": "done"
+    },
+    {
+      "id": "M2-chat-11",
+      "round": "Mobile audit 2",
+      "area": "chat",
+      "title": "Recipient chip avatar initials are 9px",
+      "detail": "Use a 24px avatar with 12px initials, and give the chip a 44px hit area. (src/mobile/chat.css:638-645) Evidence: phone375__109/128: the initials measure 9.12px (tiny-text)",
+      "priority": "low",
+      "status": "done"
+    },
+    {
+      "id": "M2-chat-12",
+      "round": "Mobile audit 2",
+      "area": "chat",
+      "title": "Every row in the You tab's Settings group uses the same gear icon",
+      "detail": "Give each setting row its own icon. (src/components/ChatApp.tsx:563-568) Evidence: phone430__007: Your status, Tiles on top and Apps & chat all show the same gear",
+      "priority": "low",
+      "status": "done"
+    },
+    {
+      "id": "M2-chat-13",
+      "round": "Mobile audit 2",
+      "area": "chat",
+      "title": "Collapsed section headers hide unread state",
+      "detail": "Show an unread dot or count on collapsed headers. On phones, open Projects and Teams by default. (src/components/ChatApp.tsx (the section headers, around 520-540)) Evidence: phone375__005/phone430__000: the sections are collapsed with no unread dot, and most of the screen is empty",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2F-chat-1",
+      "round": "Mobile audit 2",
+      "area": "chat",
+      "title": "Fixed: Celebration pills touch the screen edge and the time wraps onto two lines",
+      "detail": "Proof: r2-chat-celebration.png shows the pills on the 16px gutter and the time on one line in short form ('2 jam', '54 mnt'). Phone CSS in src/mobile/chat.css adds 16px inline padding, flex:0 1 auto on the span, and flex:none, nowrap and the 12px caption token on the time. shortAgo() in Message.tsx gives the short form on phones. Conversation.tsx now skips a celebration whose text matches the one right before it. Files: src/components/chat/Message.tsx, src/components/chat/Conversation.tsx, src/mobile/chat.css, src/i18n/id/chat.ts",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-chat-2",
+      "round": "Mobile audit 2",
+      "area": "chat",
+      "title": "Fixed: The Your status screen reuses the desktop popover",
+      "detail": "Proof: r2-chat-status.png shows 48px rows on the 16px gutter, the plain 16px input on the gutter, and the hint on the gutter. This is a phone-only .status-pop override. Files: src/mobile/chat.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-chat-3",
+      "round": "Mobile audit 2",
+      "area": "chat",
+      "title": "Fixed: Tiles on top rows have three controls each",
+      "detail": "Proof: r2-chat-tiles.png shows each row with one GripVertical handle and a switch; the up and down arrows are hidden on phones. Dragging the handle reorders the tiles: rows are tracked with data-tile-row, and moves use pointer events through a ref so the latest order is read. The switch hit area is now 44px (::after inset -10px -2px). Files: src/components/ChatApp.tsx, src/mobile/chat.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-chat-4",
+      "round": "Mobile audit 2",
+      "area": "chat",
+      "title": "Fixed: Drafts and sent uses grey segmented tabs and a bare empty state",
+      "detail": "Proof: r2-chat-drafts.png shows the underline client-tabs bar and a full EmptyState with the PenLine icon and the title 'Tidak ada draf'. The To send and Sent tabs got the same full EmptyState treatment. New strings are added to id/chat.ts. Files: src/components/chat/Pages.tsx, src/mobile/chat.css, src/i18n/id/chat.ts",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-chat-5",
+      "round": "Mobile audit 2",
+      "area": "chat",
+      "title": "Fixed: Composer grab handle shows between the mention list and the field",
+      "detail": "Proof: r2-chat-mention.png shows the mention list sitting directly above the field with no grey pill. .cmp-grab is hidden while .mention-pop or .cmp-fmt is open, and its target is now 64x44. Files: src/mobile/chat.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-chat-6",
+      "round": "Mobile audit 2",
+      "area": "chat",
+      "title": "Fixed: The disabled 'Pick who to message' button is a washed-out green bar",
+      "detail": "Proof: r2-chat-newmsg-err.png was taken right after the New message screen opened (the file name only reflects a failed selector after the shot). It has no footer bar. r2-chat-newmsg-chip.png shows the button appearing once Ethan is picked. Files: src/components/ChatApp.tsx",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-chat-7",
+      "round": "Mobile audit 2",
+      "area": "chat",
+      "title": "Fixed: Recipient chip avatar initials are 9px",
+      "detail": "Proof: r2-chat-newmsg-chip.png shows the chip with a 24px avatar. Phone CSS sets the initials to the 12px caption token and gives the chip a 44px hit area through ::after. Files: src/components/ChatApp.tsx, src/mobile/chat.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-chat-8",
+      "round": "Mobile audit 2",
+      "area": "chat",
+      "title": "Fixed: Every row in the You tab's Settings group uses the same gear icon",
+      "detail": "Proof: Your status now uses Smile and Tiles on top uses LayoutGrid. The rows' ids are 'own:status' and 'own:tiles', so the check uses endsWith. Apps & chat keeps the gear (Settings). This change came after the r2-chat-you.png shot, so it is not visible there; tsc passes. Files: src/components/ChatApp.tsx",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-chat-9",
+      "round": "Mobile audit 2",
+      "area": "chat",
+      "title": "Fixed: Create a view sheet: 'Add section' wraps and the actions are cramped",
+      "detail": "Proof: On phones, .ve-actions stacks as full-width 44px rows with nowrap labels, and the toggle-row switch gets a 44px hit area. The ⌘K hint is hidden on phones and replaced by a translated phone wording (.ve-k-phone, hidden on desktop through chat.css). No screenshot was taken. Files: src/components/ChatApp.tsx, src/components/chat/chat.css, src/mobile/chat.css, src/i18n/id/chat.ts",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-chat-10",
+      "round": "Mobile audit 2",
+      "area": "chat",
+      "title": "Fixed: New channel dialog on phones: framed people list and a narrow AI summary select",
+      "detail": "Proof: Phone CSS scoped to .chan-modal removes the .people-pick border, makes the boxed search a plain field with a bottom divider, makes the summary .sel 100% wide, and gives the dialog tabs a min-height of var(--tap). No screenshot was taken. Files: src/mobile/chat.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-chat-11",
+      "round": "Mobile audit 2",
+      "area": "chat",
+      "title": "Fixed: Sheet paragraphs and the profile sheet sit at x=20",
+      "detail": "Proof: Inside .sheet-body on phones, the when-note, confirm-text, catchme and sum-off text use a 12px inline margin, which puts them on the 16px gutter. In .pcard-sheet the card padding is 12px and the facts stack with the label above the value. No screenshot was taken. Files: src/mobile/chat.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2-tasks-1",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "Due date calendar collapses to 2 columns and cannot be used",
+      "detail": "Rename the Drive grid class (e.g. .drv-grid) or scope it under the Drive pane, then re-check every DatePicker on phones (src/mobile/drive.css:196 overrides .dp-grid from src/ui.css:279, which src/components/ui/DatePicker.tsx:114 uses) Evidence: phone375__077, 091, 124: the weekday letters stack in two columns, most day numbers are missing, and 28/29/30 sit in huge cells. Code check: src/mobile/drive.css:196 has an unscoped `.dp-grid { grid-template-columns: repeat(2, minmax(0,1fr)) }`",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2-tasks-2",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "Today on a phone can open as an empty sideways board with a stale filter",
+      "detail": "Force the list layout for Today on phones. Elsewhere, use snap columns at about 85% width with a peek. Give .tq-chips 8px top padding, and show an EmptyState with 'Clear filters' when the filters hide everything (src/components/tasks/TaskViews.tsx:102 (phone allows list and board for today) and :464; src/mobile/tasks.css:106 .tq-chips (no top padding); .tboard/.tcol widths) Evidence: phone375__013/014, 110, 145, 149: 'To do 0', a dashed 'Nothing here' box inside the grey column, and 'In pro…' cut off at the right. The rest of the screen is blank, and the filter pill sits right against the top bar",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "M2-tasks-3",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "Quick add from a day's + does not show the chosen date",
+      "detail": "Show the chips row when the sheet opens with a prefilled field, or show the date chip next to the project chip. Hide the FAB while the sheet is open (src/components/tasks/QuickAdd.tsx:179 (the chips row stays folded until you type, even with a prefilled due date from TaskViews.tsx:480)) Evidence: phone375__028/029/031, 103-105: every sheet shows only 'Task name' and '# Upcoming', so you cannot tell which day the task goes on. The FAB also pokes out above the sheet",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2-tasks-4",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "Brain dump opens as a desktop dialog, not a bottom sheet",
+      "detail": "Use Sheet on phones, keep one way to close, set resize:none, keep the mic clear of the field, and use the accent colour for the title (src/components/BrainDump.tsx:169-170, :315; src/apps.css:923-926 .dump-input textarea) Evidence: phone375__015: no grab handle, both an X and a Cancel button, a grey footer band, a purple title, and a textarea resize grip with the mic button on top of it",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2-tasks-5",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "Task detail header: the crumb wraps and the ... and X buttons sit between two lines",
+      "detail": "Keep the crumbs on one line (nowrap, with an ellipsis on the project name at min-width:0) and centre ... and X on that row (src/mobile/tasks.css:1812-1819 (.sheet-title .td-crumbs flex-wrap:wrap; .td-crumb-text white-space:normal); TaskDetail.tsx:339-342) Evidence: phone375__017, 033, 062, 086, 092, 128: the project crumb is on line 1, the status is alone on line 2, and the round buttons float between them. This costs about 48px, and the layout differs from task to task (022, 080 fit on one line)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-tasks-6",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "Review banner runs edge to edge in the task detail",
+      "detail": "Change the selector to '.tdp .review-banner' so the banner gets the 16px margin and the card radius (src/components/tasks/TaskDetail.tsx:307; src/mobile/tasks.css:820) Evidence: phone375__033: the green banner runs from x=0 to x=375 with square ends. The rule at src/mobile/tasks.css:820 is '.tdp > .review-banner', but the banner is not a direct child",
+      "priority": "medium",
+      "status": "done"
+    },
+    {
+      "id": "M2-tasks-7",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "'Show all activity' is hidden under the comment composer",
+      "detail": "Pad the bottom of the scroll area by the composer height plus the safe area (src/components/tasks/TaskDetail.tsx:571; bottom padding of the scroll area in src/mobile/tasks.css) Evidence: phone375__137: the green link is half covered by the fixed Comment bar at y~720",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-tasks-8",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "Board column ... opens a desktop popover instead of a bottom sheet",
+      "detail": "Drop menu:true on phones so ActionSheet shows as a bottom sheet (src/components/tasks/TaskBoard.tsx:295 (useActionMenu with menu: true)) Evidence: phone375__060: 'Add task here' floats as a small card over the empty column",
+      "priority": "medium",
+      "status": "done"
+    },
+    {
+      "id": "M2-tasks-9",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "Two header buttons both open Display",
+      "detail": "Keep one entry for Display: remove either the layout icon or the Display row (src/components/TasksView.tsx:~650 (title menu items); src/components/tasks/TaskViews.tsx:573 (layout button)) Evidence: phone375__000/002, phone430__000/002: there is a layout icon, and the ... sheet holds only Display and Brain dump",
+      "priority": "medium",
+      "status": "done"
+    },
+    {
+      "id": "M2-tasks-10",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "Display layout picker: a fixed 3-column grid with boxes inside a box",
+      "detail": "Size the columns to the number of layouts. Show the selection with the tile border or tint only, and make the label plain text (src/tasks.css:1226 (repeat(3,1fr)); src/mobile/tasks.css:1538-1556 (.ds-pic)) Evidence: phone430__001, phone375__133/144: there are only List and Board, so a third of the card is blank. Each tile has its own border plus a filled pill, inside the bordered card",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-tasks-11",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "Upcoming with nothing today is mostly blank, and the expander reads as a label",
+      "detail": "Show the coming week by default, and make the expander a 44px row with a chevron (src/components/tasks/TaskCalendar.tsx:156) Evidence: phone375__040: only 'Nothing due today' and a 'Show the next four weeks' text link, then about 450px of blank space",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-tasks-12",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "iPad board columns are cut off with no scroll cue",
+      "detail": "Let the columns shrink with minmax below about 900px of pane width, or add an edge fade (src/tasks.css:775 (.tcol fixed width); src/components/tasks/TaskBoard.tsx) Evidence: ipad1024__013 ('Waiting on gues' clipped), ipad768__015 ('In progress' cut off)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-tasks-13",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "iPad quick-add footer shows bare 'Today' text instead of the project chip",
+      "detail": "Show the same tappable project chip as on the phone (src/components/tasks/QuickAdd.tsx:294-300) Evidence: ipad768__015: the footer shows plain grey 'Today', while the phone shows '# Today' with a chevron",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-tasks-14",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "Sorting sub-sheet: a confirm button on a single-pick list, and a fixed height",
+      "detail": "Apply the choice on tap and go back. Let the height follow the content with SmoothHeight (Display sheet sorting step (no SmoothHeight around the step body)) Evidence: phone375__010, 145: a check button in the header, and about 220px of empty sheet under five rows",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-tasks-15",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "Browse: the Projects + button sits at the screen edge, off the chevron column",
+      "detail": "Give .tbr-head 16px right padding and line the + up with the chevrons (src/mobile/tasks.css:1354 (.tbr-head padding 0 0 8px 16px), :1364-1366 (.tbr-add negative margin)) Evidence: phone375__006: the + is at x~361 while the chevrons are at 354",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-tasks-16",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "Same eye icon for 'Supervising' and 'Visible to guests'",
+      "detail": "Use Globe or Lock for guest visibility, and keep the eye for supervising (Task detail rows in src/components/tasks/TaskDetail.tsx) Evidence: phone375__081, 082, 093: two adjacent rows that mean different things use the same eye icon",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-tasks-17",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "People picker repeats the team in the subtitle",
+      "detail": "Drop teams that match the title, ignoring case (PeoplePicker row subtitle (src/components/ui)) Evidence: phone375__087, 092: 'Web & Systems · Growth, Web & systems'",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-tasks-18",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "Picker sheets use a 19-20px inset instead of the 16px gutter",
+      "detail": "Use the Sheet component's 16px padding (Popover-as-sheet padding in src/mobile (PickSelect and DatePicker sheets)) Evidence: phone375__124, 126: titles and rows start at x~19-20, while action sheet titles start at 16",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-tasks-19",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "Bottom sheets leave no room under the last row",
+      "detail": "Use 24px bottom padding plus the safe area (src/mobile/system.css:103-105 (.sheet-body padding-bottom)) Evidence: phone375__080, 089, 102, 114: the last row touches the bottom edge on phones with no safe-area inset",
+      "priority": "low",
+      "status": "done"
+    },
+    {
+      "id": "M2F-tasks-1",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "Fixed: Due date calendar collapses to 2 columns",
+      "detail": "Proof: r2-tasks-datepicker.png now shows a full 7-column month grid. The Drive grid rule was renamed to .drv-grid, and DriveView uses 'dp-grid drv-grid' so desktop Drive keeps its old look. Files: src/mobile/drive.css, src/components/DriveView.tsx",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-tasks-2",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "Fixed: Today on a phone opens as an empty sideways board",
+      "detail": "Proof: On phones Today now offers only the list layout. .tq-chips has 8px top padding. r2-tasks-today.png shows the list's empty state, not a board. Files: src/components/tasks/TaskViews.tsx, src/mobile/tasks.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-tasks-3",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "Fixed: Quick add from a day's + does not show the date",
+      "detail": "Proof: The chips row now opens when due or status is prefilled, and the FAB hides while .qa-sheet is open. r2-tasks-quickadd.png shows a 'Besok' date chip and no FAB. Files: src/components/tasks/QuickAdd.tsx, src/mobile/tasks.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-tasks-4",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "Fixed: Brain dump opens as a desktop dialog",
+      "detail": "Proof: Phones now get a Sheet with a grab handle, no X and no Cancel, the title in the accent colour, and resize:none on the textarea. See r2-tasks-braindump.png. Files: src/components/BrainDump.tsx, src/mobile/tasks.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-tasks-5",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "Fixed: Task detail crumb wraps around the ... and X buttons",
+      "detail": "Proof: The crumbs no longer wrap and the project name ellipsizes. r2-tasks-detail.png shows the crumbs, ... and X on one row. Files: src/mobile/tasks.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-tasks-6",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "Fixed: Review banner runs edge to edge",
+      "detail": "Proof: Changed the selector from '.tdp > .review-banner' to '.tdp .review-banner'. Code fix only: no task in the review state was screenshotted. Files: src/mobile/tasks.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-tasks-7",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "Fixed: 'Show all activity' hidden under the composer",
+      "detail": "Proof: The task sheet body now pads its bottom by the tap height + 32px + the safe area. r2-tasks-detail-bottom.png shows the link clear of the comment bar. Files: src/mobile/tasks.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-tasks-8",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "Fixed: Board column ... opens a desktop popover",
+      "detail": "Proof: Removed menu:true from ColumnMenu, so it uses the ActionSheet bottom sheet. Code fix only, not screenshotted. Files: src/components/tasks/TaskBoard.tsx",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-tasks-9",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "Fixed: Two header buttons both open Display",
+      "detail": "Proof: On phones the Display row leaves the ... menu whenever the layout button is shown. Today has one layout now, so it has no layout button and Display stays in ... there. Files: src/components/tasks/TaskViews.tsx",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-tasks-10",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "Fixed: Display layout picker: fixed 3 columns, box in a box",
+      "detail": "Proof: .ds-pics now adds one column per layout (grid-auto-flow column). On phones the tiles have no border, the selected tile gets an accent-soft tint, and the label is plain text. The first screenshot was taken before the grid fix landed; the rule was then applied directly. Files: src/tasks.css, src/mobile/tasks.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-tasks-11",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "Fixed: Upcoming mostly blank when nothing is due today",
+      "detail": "Proof: The coming 7 days always show. The expander is a 44px row with a chevron. See r2-tasks-upcoming.png. Files: src/components/tasks/TaskCalendar.tsx, src/mobile/tasks.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-tasks-12",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "Fixed: Browse Projects + off the chevron column",
+      "detail": "Proof: .tbr-head has 16px right padding and .tbr-add has a -16px margin, so the + is centred near x=353. See r2-tasks-browse.png. Files: src/mobile/tasks.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-tasks-13",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "Fixed: Same eye icon for Supervising and Visible to guests",
+      "detail": "Proof: The guest row now uses Globe when visible and Lock when hidden. See r2-tasks-detail.png. Files: src/components/tasks/TaskDetail.tsx",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-tasks-14",
+      "round": "Mobile audit 2",
+      "area": "tasks",
+      "title": "Fixed: Bottom sheets leave no room under the last row",
+      "detail": "Proof: .sheet-body bottom padding is now the safe area + 24px (was + 16px). Files: src/mobile/system.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2-projects-1",
+      "round": "Mobile audit 2",
+      "area": "projects",
+      "title": "Guests tab overflows horizontally: the invite row and help text run off the screen",
+      "detail": "On phones, stack the invite fields in one column, full width, 48px tall, with 16px text and Invite as the one primary button. Let the help text wrap, and keep .pa-hero inside the 16px gutter. (src/components/TasksView.tsx:1350-1356 (.pa-invite); src/polish.css:939-940 (inputs flex 1 1 140px, 13px font); src/round2.css:2036 (.pa-hero)) Evidence: audit/deep/projects/phone375__023-S-Supplements-brand-Guests.png (and 046): the Name, name@company.c and a third field are cut at the right edge; 'Invite the people you work with on Supplements b' is clipped; the hero card is clipped on the right",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2-projects-2",
+      "round": "Mobile audit 2",
+      "area": "projects",
+      "title": "Guests screen: framed eye toggles (box inside a box), mixed gutters, tiny section labels, a pale 'View as guest' button",
+      "detail": "Make the eye a plain 44px icon button with no border and the on state shown in colour. Put headers and rows on the 16 gutter and set section headers to 15/600. Give 'View as guest' a normal enabled style. (src/components/TasksView.tsx:1222-1320 (.portal-admin, .pa-row button.eye at ~1253 and 1275)) Evidence: phone375__023: the eye toggles are bordered 40px squares at x=18. Section labels sit at x=12 in 12px grey, while the rows and the card are at 16-28. 'View as guest' looks disabled.",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-projects-3",
+      "round": "Mobile audit 2",
+      "area": "projects",
+      "title": "Search chips show 'Projects' twice",
+      "detail": "Skip the KINDS chip whose label matches appName(startScope), or merge the two chips into one. (src/components/CommandPalette.tsx:189-199 (the startScope chip appName(startScope) plus the KINDS 'Projects' chip)) Evidence: phone375__048 and 049: the chips read All apps, Projects, People, Projects",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2-projects-4",
+      "round": "Mobile audit 2",
+      "area": "projects",
+      "title": "Projects title menu repeats 'Projects' and the bottom tabs, and lists every project",
+      "detail": "On phones, remove the group header that repeats the sheet title and remove the per-project options. If the bottom tabs already cover the scope, drop the switcher. (src/App.tsx:3907-3917 (mobileSwitcher for mode==='projects': group term.Many, wsClients options)) Evidence: phone375__001 / phone430__001: the sheet title 'Projects' is followed by a group header 'Projects'. Active, My projects and Past repeat the bottom bar tabs, and the project rows repeat the list behind the sheet.",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-projects-5",
+      "round": "Mobile audit 2",
+      "area": "projects",
+      "title": "Notes, Logins, Quotes, Mail and Files tabs use inconsistent empty states and an inline shadowed primary pill",
+      "detail": "When a tab is empty, show the full EmptyState (icon, title, text, one action), as ProjectTables does: New note, New login, Add email domain, Upload file. Show proj-tab-head only when the list has items, on the 16 gutter. On phones, create through useCreateAction instead of the inline pill. (src/components/TasksView.tsx:1105, 1111, 1146-1210 (.proj-tab-head + EmptyState compact); src/polish.css:2689) Evidence: phone375__015, 022, 043, 045: a shadowed green '+ New ...' pill sits inline at x=28, and the Logins empty text is indented at x=44 instead of using EmptyState. Tables uses a centred full EmptyState. phone375__040 and 042: Mail and Files show a lone bordered card with nothing to tap.",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-projects-6",
+      "round": "Mobile audit 2",
+      "area": "projects",
+      "title": "The Type picker replaces the New project form instead of stacking over it",
+      "detail": "Stack the Select sheet above the New project sheet (Layer / z-pop) so the form stays underneath and comes back after a pick. (src/components/ProjectsHome.tsx:96-104 (Select inside the new project sheet)) Evidence: phone375__047: behind the Type sheet the scrim shows the My projects list, not the New project sheet",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-projects-7",
+      "round": "Mobile audit 2",
+      "area": "projects",
+      "title": "Project home: 'Needs attention' card takes 100px+ to say nothing, and nav rows use tinted icon tiles inside a card",
+      "detail": "Hide the needs card when it is empty, or reduce it to one muted line. Use plain 20px icons without tiles, and move template and End work into a 'Manage' section or the top bar '…' ActionSheet. (src/components/TasksView.tsx:931-950 (side-card needs-card, ProjectSections actions)) Evidence: phone375__003 / phone430__003: a bordered 'Nothing needs you' card, grey tiles behind the icons inside the bordered nav card, and template and End work actions in the same card after an 8px band",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-projects-8",
+      "round": "Mobile audit 2",
+      "area": "projects",
+      "title": "Tablet project header has two primary actions, wraps onto several rows, and the tab strip is cut off with no cue",
+      "detail": "Move Template and End work into a '…' menu and keep one primary on the title row. Add an edge fade or scroll cue to the tab strip. (src/components/TasksView.tsx:793 (tpl-btn) and the client header actions; .client-tabs) Evidence: ipad1024__002: Active, Stages, End work and avatars on one line, with Template and a gradient Brain dump wrapped beneath. The tabs end in a cut 'Tabl', and on ipad768 in a cut 'Mai'.",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-projects-9",
+      "round": "Mobile audit 2",
+      "area": "projects",
+      "title": "Tablet projects home is a single narrow card column that leaves most of the pane empty",
+      "detail": "Use grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)). (src/components/ProjectsHome.tsx card grid CSS) Evidence: ipad1024__000-start.png: about 260px cards in one column with roughly 550px blank on the right, and the 'Next:' line truncated",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-projects-10",
+      "round": "Mobile audit 2",
+      "area": "projects",
+      "title": "Workload rows are off the gutter and show a '0' count nobody acts on",
+      "detail": "Use the 16 gutter and 64px rows, and hide the count when it is 0. (src/components/TasksView.tsx:1431-1436) Evidence: phone375__014: avatars at x=26, rows about 54px tall, and '0' shown next to 'Nothing open here'",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-projects-11",
+      "round": "Mobile audit 2",
+      "area": "projects",
+      "title": "Meetings tab: one row in a bordered card and no way to add a meeting",
+      "detail": "Render meetings as plain 64px rows with dividers, and add a create action through useCreateAction. (src/components/TasksView.tsx meetings tab (~1115-1140, te-list)) Evidence: phone375__041: a single meeting in a framed card with 12px grey meta text, and no create action",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2F-projects-1",
+      "round": "Mobile audit 2",
+      "area": "projects",
+      "title": "Fixed: Guests tab overflows horizontally: the invite row and help text run off the screen",
+      "detail": "Proof: Added a phone media query (max-width 640px) at the end of polish.css. The invite fields now stack in one column at full width, 48px tall with 16px text, and the button is full width. .portal-admin and .pa-hero are capped at max-width 100% and long text wraps. tsc passes. No after-screenshot was taken. Files: C:/Users/Komputer/OneDrive/Desktop/Claude/sprint2go-manager/src/polish.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-projects-2",
+      "round": "Mobile audit 2",
+      "area": "projects",
+      "title": "Fixed: Search chips show 'Projects' twice",
+      "detail": "Proof: The KINDS chips are now filtered so that a chip whose t() label matches appName(startScope) is skipped. tsc passes. Not screenshotted. Files: C:/Users/Komputer/OneDrive/Desktop/Claude/sprint2go-manager/src/components/CommandPalette.tsx",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-projects-3",
+      "round": "Mobile audit 2",
+      "area": "projects",
+      "title": "Fixed: Workload rows show a '0' count",
+      "detail": "Proof: team-count is now rendered only when mine.length > 0. The gutter and row height were not changed. tsc passes. Files: C:/Users/Komputer/OneDrive/Desktop/Claude/sprint2go-manager/src/components/TasksView.tsx",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2-calendar-1",
+      "round": "Mobile audit 2",
+      "area": "calendar",
+      "title": "Event '...' menu is a desktop popover on phones, not a bottom sheet",
+      "detail": "Pass `menu`/anchor only when not on a phone, so ActionSheet opens as the bottom sheet (src/components/calendar/EventDetail.tsx:549 (ActionSheet ... anchor={dots} menu)) Evidence: phone375__021, 022: a card drops from the dots over the title; the holiday one is a one-item popover",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2-calendar-2",
+      "round": "Mobile audit 2",
+      "area": "calendar",
+      "title": "Edit event still appears twice on the detail screen (round 1 item not fixed)",
+      "detail": "Hide the head pencil when the footer Edit button shows (canEdit && !p.rsvp); consider content-height sheet instead of size=\"full\" (src/components/calendar/EventDetail.tsx:360-377) Evidence: phone375__002/040, phone430__003: head pencil and footer 'Edit event' button both call onEdit; code still renders both",
+      "priority": "medium",
+      "status": "done"
+    },
+    {
+      "id": "M2-calendar-3",
+      "round": "Mobile audit 2",
+      "area": "calendar",
+      "title": "Schedule header switches month but list stays put",
+      "detail": "In Schedule, scroll the agenda to the first day of the chosen month (or keep the header on the list's month until a day is tapped) (src/components/calendar/MonthDrop.tsx:34-45 (setMonth + onMonth only update header/mini grid)) Evidence: phone375__055-057: header says August, Aug chip on, list still starts '12 to 18 Oct'",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-calendar-4",
+      "round": "Mobile audit 2",
+      "area": "calendar",
+      "title": "Month view shows the month grid twice when the date picker is open",
+      "detail": "In Month view, open only the month/year chip strip, not a second grid (src/components/CalendarView.tsx:359 with MonthDrop) Evidence: phone375__038: drop-down grid sits over the identical Month view grid",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-calendar-5",
+      "round": "Mobile audit 2",
+      "area": "calendar",
+      "title": "Calendar chips in the event form clipped; selected chip off-screen",
+      "detail": "Wrap chips on phones or scroll selected into view with end padding and edge fade (src/components/calendar/EventForm.tsx:473-478; src/mobile/calendar.css:468-477) Evidence: phone375__019/020/046/048: 'Personal' cut at right edge and selected chip not visible",
+      "priority": "medium",
+      "status": "done"
+    },
+    {
+      "id": "M2-calendar-6",
+      "round": "Mobile audit 2",
+      "area": "calendar",
+      "title": "Week view events clipped to 3 letters on phones",
+      "detail": "Let titles wrap on 2 lines at 12px, or treat week on phones as colour-block overview (src/components/CalendarView.tsx week view; src/mobile/calendar.css) Evidence: phone375__015: 'Pick', 'Den', 'Bad', no time",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-calendar-7",
+      "round": "Mobile audit 2",
+      "area": "calendar",
+      "title": "Time grid opens with the first hour label sliced",
+      "detail": "Snap initial scrollTop to a whole hour minus a small offset (src/components/calendar/TimeGrid.tsx:65) Evidence: phone375__059, 061: top label half hidden under sticky header",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-calendar-8",
+      "round": "Mobile audit 2",
+      "area": "calendar",
+      "title": "Drawer section headings at x=56 while rows at x=16",
+      "detail": "Align headers to the 16px gutter at 15/600; indent account calendars under their account (src/components/CalendarSidebar.tsx:244, :261; src/mobile/shell.css:63) Evidence: phone375__053, 063",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-calendar-9",
+      "round": "Mobile audit 2",
+      "area": "calendar",
+      "title": "Plan your tasks list in drawer is grey filled cards with truncated drag hint",
+      "detail": "Plain divided rows on phones, wrap hint and say 'Tap a task to pick a time', hide drag handle (src/polish.css:1063 (.plan-task); src/components/CalendarSidebar.tsx:213-219) Evidence: phone375__051",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-calendar-10",
+      "round": "Mobile audit 2",
+      "area": "calendar",
+      "title": "Tapping Apps leaves a blank Calendar screen / two titles overlap during switch",
+      "detail": "Mark Apps active and show launcher at once; take the outgoing TopBar out of layout during cross-fade (re-check live, may be capture timing) (src/mobile/AppBar.tsx; src/components/CalendarView.tsx:345-356) Evidence: phone375__011, 031",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-calendar-11",
+      "round": "Mobile audit 2",
+      "area": "calendar",
+      "title": "No bottom tab selected in 3-day / Week view",
+      "detail": "Map 3 days and Week onto the Day tab (src/mobile/AppBar.tsx calendar tabs) Evidence: phone375__014",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-calendar-12",
+      "round": "Mobile audit 2",
+      "area": "calendar",
+      "title": "Re-tapping Day scrolls to midnight",
+      "detail": "Re-tap scrolls to now / first event (src/components/CalendarView.tsx view reselect) Evidence: phone375__036",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-calendar-13",
+      "round": "Mobile audit 2",
+      "area": "calendar",
+      "title": "Create sheet opens with second row highlighted",
+      "detail": "Don't auto-focus on touch; highlight only :focus-visible (src/components/CalendarView.tsx:180-186 / ActionSheet focus) Evidence: phone375__041/045, phone430__012: 'Task' row grey on open",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-calendar-14",
+      "round": "Mobile audit 2",
+      "area": "calendar",
+      "title": "Event detail rows: icon touches label, colour dot misaligned",
+      "detail": "Dot inside the 24px .dr-icon box, 16px gap, 44px guest rows (src/mobile/calendar.css:1481; EventDetail.tsx:243-245) Evidence: phone375__002/003",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-calendar-15",
+      "round": "Mobile audit 2",
+      "area": "calendar",
+      "title": "Calendar options sheet uses 20px inset and 17px rows unlike other sheets",
+      "detail": "Use shared sheet row role (16px gutter, 15/400, 13 subtitle) (src/components/CalendarSidebar.tsx:115; src/mobile/shell.css:103) Evidence: phone375__062 vs 050/041",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-calendar-16",
+      "round": "Mobile audit 2",
+      "area": "calendar",
+      "title": "Schedule: first week has no week label",
+      "detail": "Label the opening week too (src/components/calendar/ScheduleView.tsx:130-146) Evidence: phone430__000: no label above 15 Okt, label before 19",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-calendar-17",
+      "round": "Mobile audit 2",
+      "area": "calendar",
+      "title": "Task cards in Schedule use brand green and look selected",
+      "detail": "Neutral surface, brand colour on check circle only (src/components/calendar/ScheduleView.tsx task rows) Evidence: phone430__000",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-calendar-18",
+      "round": "Mobile audit 2",
+      "area": "calendar",
+      "title": "Workspace menu Create opens company wizard with footer covering cards",
+      "detail": "Label 'New company'; wizard footer divider and bottom padding (src/components/CalendarSidebar.tsx workspace menu) Evidence: phone375__049",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2F-calendar-1",
+      "round": "Mobile audit 2",
+      "area": "calendar",
+      "title": "Fixed: Event '...' menu is a desktop popover on phones, not a bottom sheet",
+      "detail": "Proof: PhoneDetail now opens the ActionSheet without anchor/menu, so it is a bottom sheet. Checked in audit/agents/r2-calendar-more.png: the sheet comes up from the bottom with a grab handle. Files: C:/Users/Komputer/OneDrive/Desktop/Claude/sprint2go-manager/src/components/calendar/EventDetail.tsx",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-calendar-2",
+      "round": "Mobile audit 2",
+      "area": "calendar",
+      "title": "Fixed: Edit event still appears twice on the detail screen",
+      "detail": "Proof: The head pencil is hidden when the footer Edit button shows (canEdit && !p.rsvp). Checked in audit/agents/r2-calendar-detail.png: only the X and the dots are at the top, and 'Ubah acara' is in the footer. Files: C:/Users/Komputer/OneDrive/Desktop/Claude/sprint2go-manager/src/components/calendar/EventDetail.tsx",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-calendar-3",
+      "round": "Mobile audit 2",
+      "area": "calendar",
+      "title": "Fixed: Calendar chips in the event form clipped; selected chip off-screen",
+      "detail": "Proof: Phone .er-cals now wraps (flex-wrap, no horizontal scroll). Checked in audit/agents/r2-calendar-form.png: all 5 chips are visible on 3 lines and the selected chip shows. Files: C:/Users/Komputer/OneDrive/Desktop/Claude/sprint2go-manager/src/mobile/calendar.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2-notes-1",
+      "round": "Mobile audit 2",
+      "area": "notes",
+      "title": "Toast covers the create (pen) button",
+      "detail": "Make sure has-fab is set while the Notes FAB shows, or extend the selector, so the toast sits above the FAB (src/mobile/shell.css:785 (:root.has-fab .toast offset); Notes registers its FAB via useCreateAction in NotesList.tsx:92) Evidence: phone375__015-New-note-Apps.png: the email to-dos toast sits on top of the green FAB",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "M2-notes-2",
+      "round": "Mobile audit 2",
+      "area": "notes",
+      "title": "Shared-with-me empty state says to tap the pen",
+      "detail": "Write empty-state text for each filter, e.g. 'Notes others share with you show up here.' (src/components/notes/NotesList.tsx:251) Evidence: phone375__006: 'No notes here yet. Tap the pen to write one.' under a filter that only holds notes other people shared",
+      "priority": "medium",
+      "status": "done"
+    },
+    {
+      "id": "M2-notes-3",
+      "round": "Mobile audit 2",
+      "area": "notes",
+      "title": "Edit option in Who sees it shows two checkmarks",
+      "detail": "Use a Pencil/SquarePen leading icon (src/components/notes/NoteSheets.tsx:276) Evidence: phone375__009: the Edit row has a check as its leading icon plus the selected check",
+      "priority": "medium",
+      "status": "done"
+    },
+    {
+      "id": "M2-notes-4",
+      "round": "Mobile audit 2",
+      "area": "notes",
+      "title": "Untitled rows show 'No more text' as a preview",
+      "detail": "When there's no body, show only the time and leave the preview blank (src/components/notes/NotesList.tsx:322) Evidence: phone375dark__000, phone430__000: many rows read 'Untitled / time No more text', so you can't tell them apart",
+      "priority": "medium",
+      "status": "done"
+    },
+    {
+      "id": "M2-notes-5",
+      "round": "Mobile audit 2",
+      "area": "notes",
+      "title": "FAB and search bar cover the last note row",
+      "detail": "Give the list padding-bottom: calc(var(--fab-space) + search bar height) (src/mobile/shell.css:527 notes list screen; compare src/mobile/drive.css:28) Evidence: phone430__000: the FAB sits over the last rows and the list has no bottom padding",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-notes-6",
+      "round": "Mobile audit 2",
+      "area": "notes",
+      "title": "Editor toolbar is clipped at 768 and hides Make a task",
+      "detail": "Pin .note-make-task outside the scroller on the right, and move the overflow format buttons into a '…' menu when the pane is narrow (src/notes.css:150-158 .note-tools) Evidence: ipad768__001-New-note.png: the toolbar cuts off mid-icon and the scroller has no visible scrollbar",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2F-notes-1",
+      "round": "Mobile audit 2",
+      "area": "notes",
+      "title": "Fixed: Shared-with-me empty state says to tap the pen",
+      "detail": "Proof: The empty state now uses its own text on the shared filter ('Notes others share with you show up here.'), with an Indonesian string added. tsc reports no errors in notes files. No screenshot taken. Files: src/components/notes/NotesList.tsx, src/i18n/id/notes.ts",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-notes-2",
+      "round": "Mobile audit 2",
+      "area": "notes",
+      "title": "Fixed: Edit option in Who sees it shows two checkmarks",
+      "detail": "Proof: The Edit row's leading icon is now SquarePen, so only the selected check is shown. tsc is clean for this file. No screenshot taken. Files: src/components/notes/NoteSheets.tsx",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-notes-3",
+      "round": "Mobile audit 2",
+      "area": "notes",
+      "title": "Fixed: Untitled rows show 'No more text' as a preview",
+      "detail": "Proof: The phone row now shows only the time when the note has no body (the 'No more text' fallback is removed). tsc is clean. No screenshot taken. Files: src/components/notes/NotesList.tsx",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2-drive-1",
+      "round": "Mobile audit 2",
+      "area": "drive",
+      "title": "Grid tile names break mid-word ('Untitled fol / der', 'Rimba-boar / d-pack-O…')",
+      "detail": "Use word-break: normal; overflow-wrap: anywhere so names wrap at spaces and hyphens and only split a word when nothing else fits. (src/mobile/drive.css:236 (.dp-tile .d-name word-break: break-all)) Evidence: phone375__003, 007, 008, 041, 042; phone430__003",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2-drive-2",
+      "round": "Mobile audit 2",
+      "area": "drive",
+      "title": "New folder name field ignores the 16px gutter and touches the bottom edge",
+      "detail": "Give the sheet form padding: 0 16px calc(16px + var(--kb, env(safe-area-inset-bottom))). (src/components/DriveView.tsx:755-761 (NameSheet form); src/mobile/drive.css:350 (.dp-name-input)) Evidence: phone375__041, phone375__046: input spans x=4..371 while the title and Create sit on the 16px gutter",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "M2-drive-3",
+      "round": "Mobile audit 2",
+      "area": "drive",
+      "title": "Folder empty-state copy mentions a 'Home' section that does not exist and is reused inside subfolders",
+      "detail": "Change to 'Recent and Shared'. When crumbs.length > 0, show 'Add files or folders here' with an Upload button. (src/components/DriveView.tsx:588) Evidence: phone375__025, 043, 044: 'Files from chat and email stay in Home and Shared.' Tabs are Recent/Starred/Shared/My Drive",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-drive-4",
+      "round": "Mobile audit 2",
+      "area": "drive",
+      "title": "Photos & videos empty state uses the folder icon and Recent copy",
+      "detail": "Add a media branch: Image icon, 'No photos or videos yet', 'Photos and videos you upload or receive show here.' (src/components/DriveView.tsx:581-595 (no branch for 'media')) Evidence: phone375__012",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-drive-5",
+      "round": "Mobile audit 2",
+      "area": "drive",
+      "title": "File menu sheet header is off the 16px gutter and its divider runs to the edge",
+      "detail": "Set padding 4px 12px 12px to match .as-item. Inset the divider like .as-sep (margin 0 12px) and use the shared 1px divider. (src/mobile/drive.css:337-344 (.dp-menu-head padding 4px 0 12px, 0.5px border)) Evidence: phone375__005, 026, phone430__005: header icon at x~4, row icons at x~16",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-drive-6",
+      "round": "Mobile audit 2",
+      "area": "drive",
+      "title": "Grid tile shows the file icon twice and has a border despite the 'no border' intent",
+      "detail": "Hide the .ficon beside the name when the thumb shows the type icon, so the name gets the full width. Keep a single surface treatment. (src/mobile/drive.css:202-211, 227-230, 243-247) Evidence: phone375__041, 042: the thumb shows a large type icon and a small .ficon repeats it next to the name. The tile also has a 1px border.",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-drive-7",
+      "round": "Mobile audit 2",
+      "area": "drive",
+      "title": "Details screen repeats facts and has no actions",
+      "detail": "Drop the duplicate rows, hide Location when the email source is shown, and add Open (primary) plus Share/Download under the card. (src/components/DriveView.tsx:816-829 (DetailsScreen)) Evidence: phone375__040: header 'PDF · 3.4 MB' repeats the Type and Size rows, Location repeats 'Saved from an email by', there is no Open or Share action, and the lower 60% is blank",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-drive-8",
+      "round": "Mobile audit 2",
+      "area": "drive",
+      "title": "Section title collapses to 'M' at 768px",
+      "detail": "Give the title flex:none (or ellipsis with a min of about 8ch) and let the search field shrink (flex:1 1 160px). (src/shell.css:1279-1300 (.drive-head, .crumbs min-width:0)) Evidence: audit/deep/drive/ipad768__001-New-folder.png",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "M2-drive-9",
+      "round": "Mobile audit 2",
+      "area": "drive",
+      "title": "Tablet folder rows are filled grey cards, with a bordered rename input inside",
+      "detail": "Render folders as plain divided rows like the file list. Make the rename input borderless, showing the focus ring on the row. (src/shell.css:1383-1400 (.folder-card); src/components/DriveView.tsx:190 (.rename-input)) Evidence: ipad768__001, ipad1024__006",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-drive-10",
+      "round": "Mobile audit 2",
+      "area": "drive",
+      "title": "Preview viewer has no action and an unpaired next arrow",
+      "detail": "Make the backdrop opaque, add a primary Open/Download button to the placeholder, and show prev/next as a pair. (src/components/DriveView.tsx preview viewer; src/mobile/drive.css preview rules) Evidence: phone430__004: the placeholder has no Download/Open button, the next arrow has no previous counterpart, and the grid shows through behind the viewer",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-drive-11",
+      "round": "Mobile audit 2",
+      "area": "drive",
+      "title": "Email note is a grey box that wraps to two lines under search",
+      "detail": "Render as a plain caption on the 16px gutter: 'Email attachments land here automatically.' (src/components/DriveView.tsx:355-356; src/mobile/drive.css:30-33) Evidence: phone375__030",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-drive-12",
+      "round": "Mobile audit 2",
+      "area": "drive",
+      "title": "Sort reads 'Size' on a folder-only list",
+      "detail": "Fall back to Name when the visible list has no files. (src/components/DriveView.tsx DrivePhone sort row) Evidence: phone375__042",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-drive-13",
+      "round": "Mobile audit 2",
+      "area": "drive",
+      "title": "Non-tab sections (Trash, Photos, From email) have no back affordance",
+      "detail": "Use the TopBarBack sub-screen header for sections that are not bottom tabs. (src/components/DriveView.tsx (phone section header)) Evidence: phone375__010: no bottom tab is selected and there is no back arrow",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2F-drive-1",
+      "round": "Mobile audit 2",
+      "area": "drive",
+      "title": "Fixed: Grid tile names break mid-word",
+      "detail": "Proof: r2-drive-grid.png (first run): 'Rimba-board- / pack-Oct.pdf' wraps at the hyphen. Fix is word-break: normal plus overflow-wrap: anywhere Files: src/mobile/drive.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-drive-2",
+      "round": "Mobile audit 2",
+      "area": "drive",
+      "title": "Fixed: Grid tile shows the icon twice and has a border",
+      "detail": "Proof: r2-drive-grid.png: the small icon by the name is gone and the tile has no border (border 0, inline FileIcon removed) Files: src/components/DriveView.tsx, src/mobile/drive.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-drive-3",
+      "round": "Mobile audit 2",
+      "area": "drive",
+      "title": "Fixed: File menu header off the gutter, divider runs to the edge",
+      "detail": "Proof: r2-drive-menu.png (first run): header icon at x=16, aligned with the row icons. Then the divider was inset (margin-inline 12px) and changed to 1px var(--line). The re-shot after that change hit an app crash caused by another agent Files: src/mobile/drive.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-drive-4",
+      "round": "Mobile audit 2",
+      "area": "drive",
+      "title": "Fixed: Section title collapses at 768",
+      "detail": "Proof: r2-drive-ipad768.png: 'Terbaru' shows in full. .drive-head .crumbs now has min-width min(12ch,40%), and the search field is set to flex 0 1 260px with a 160px minimum Files: src/shell.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-drive-5",
+      "round": "Mobile audit 2",
+      "area": "drive",
+      "title": "Fixed: New folder/Rename field ignores the gutter",
+      "detail": "Proof: Added the dp-name-form class with padding 0 16px calc(16px + var(--kb, env(safe-area-inset-bottom))). Not screenshotted because the app crashed Files: src/components/DriveView.tsx, src/mobile/drive.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-drive-6",
+      "round": "Mobile audit 2",
+      "area": "drive",
+      "title": "Fixed: Empty-state copy mentions Home; subfolder copy; Photos empty state",
+      "detail": "Proof: Root now says 'Recent and Shared'. Subfolders show 'Add files or folders here' with an Upload button (onNew). Photos & videos has its own branch with the Image icon and new copy. Indonesian added in id/drive.ts. tsc reports no errors in drive files Files: src/components/DriveView.tsx, src/i18n/id/drive.ts",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-drive-7",
+      "round": "Mobile audit 2",
+      "area": "drive",
+      "title": "Fixed: Email note grey box",
+      "detail": "Proof: Phone now shows a plain caption on the 16px gutter: 'Email attachments land here automatically.' (dp-caption, with Indonesian added) Files: src/components/DriveView.tsx, src/mobile/drive.css, src/i18n/id/drive.ts",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-drive-8",
+      "round": "Mobile audit 2",
+      "area": "drive",
+      "title": "Fixed: Sort reads Size on a folder-only list",
+      "detail": "Proof: The label falls back to Name when the list has no files Files: src/components/DriveView.tsx",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-drive-9",
+      "round": "Mobile audit 2",
+      "area": "drive",
+      "title": "Fixed: Details repeats facts",
+      "detail": "Proof: Removed the Type and Size rows, which the header already shows. Location is hidden when the email source row is shown. Open/Share actions were not added Files: src/components/DriveView.tsx",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2-meet-1",
+      "round": "Mobile audit 2",
+      "area": "meet",
+      "title": "Apps in Meet's bottom bar shows a blank Folders screen or the wrong tab instead of opening the launcher",
+      "detail": "Make Apps open the launcher without changing the Meet section. Re-check live from each tab. (src/components/MeetApp.tsx:228-253) Evidence: phone375__022, 029",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "M2-meet-2",
+      "round": "Mobile audit 2",
+      "area": "meet",
+      "title": "Event sheet lines sit about 4px from the edge (regression of a round-1 fix), and 'Open in Calendar' is a lone ghost button",
+      "detail": "Pad lines 0 16px, use 48px icon rows, and make 'Open in Calendar' a full-width button (src/mobile/meet.css:545-551; src/components/MeetPhone.tsx:165-181) Evidence: phone375__002/011, phone430__002; meet.css still sets .mhe-line padding: 4px 0",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2-meet-3",
+      "round": "Mobile audit 2",
+      "area": "meet",
+      "title": "Tasks-from-meetings and folder tabs use boxed or pill tabs (two styles, 32-40px tall, bar starts at x=32), and the tab shows a '· n open' count",
+      "detail": "Use one underline tab pattern: 44px tall, 16px gutter, no per-button borders. Drop the count. (src/components/MeetApp.tsx:1072, 1156-1166; src/round2.css:3514; src/mobile/meet.css:583-601) Evidence: phone375__041, 047, 050, 053",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2-meet-4",
+      "round": "Mobile audit 2",
+      "area": "meet",
+      "title": "Folder header: the project-page link and 'Ask AI' wrap into a cramped ghost-button row, and filters show over an empty list",
+      "detail": "Move Ask AI to a top-bar icon and make 'Project page' a 48px row with a chevron. Hide search and type filter when the list is empty, otherwise use one filled search plus a filter chip. (src/components/MeetApp.tsx:1150-1174, 381) Evidence: phone375__026, 047, 048, 050, 053",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "M2-meet-5",
+      "round": "Mobile audit 2",
+      "area": "meet",
+      "title": "The app rail at 1024x768 clips apps, including the active Meet, with no overflow",
+      "detail": "Move overflow apps into a More menu and always keep the active app visible (src/components/AppRail.tsx:~130-140; src/apps.css:95-120) Evidence: ipad1024__000-start.png",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "M2-meet-6",
+      "round": "Mobile audit 2",
+      "area": "meet",
+      "title": "Empty states point to a 'Send notetaker' button that isn't on screen, and full-screen empties are one grey line with no action",
+      "detail": "Use the non-compact EmptyState with one action (Send notetaker / Add task). Add Clear filter to filtered empties. (src/components/MeetPhone.tsx:284; src/components/MeetApp.tsx:1174, 1182) Evidence: phone375__021, 025, 041, 044, 047, 050",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-meet-7",
+      "round": "Mobile audit 2",
+      "area": "meet",
+      "title": "Send notetaker sheet: the 32px Paste pill sits inside the field and clips the placeholder, the next-call send arrow competes with the primary, and icons touch the text",
+      "detail": "Make Paste a field-end icon with a 44px hit area and shorten the placeholder. Tapping the next-call row fills the link. Add an icon gap. (src/components/MeetApp.tsx:1383-1420; src/mobile/meet.css:280-289) Evidence: phone375__040, phone430__007",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-meet-8",
+      "round": "Mobile audit 2",
+      "area": "meet",
+      "title": "Meeting ⋮ menu is a desktop popover that repeats Share, and the Share sheet is a dialog with no handle and two footer buttons",
+      "detail": "Use ActionSheet for the menu and drop Share from it. Make Share a Sheet with a handle and one full-width 'Create link' button. (src/components/MeetApp.tsx ~495) Evidence: phone375__012, 013",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-meet-9",
+      "round": "Mobile audit 2",
+      "area": "meet",
+      "title": "Meeting facts: icons touch labels (0px gap), and the tappable type and folder rows have no chevron",
+      "detail": "Align text at 56px with a 16px gap, give the tappable rows a chevron, and set rows to 48px min-height (src/components/MeetApp.tsx:593-626; src/mobile/meet.css:382-395) Evidence: phone375__004, phone430__004",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-meet-10",
+      "round": "Mobile audit 2",
+      "area": "meet",
+      "title": "Unfiled screen repeats its title under the top bar and shows 32px status chips over an empty list",
+      "detail": "Drop the mh-head when unfiled, hide the chips when the list is empty, and give chips a 44px hit area (src/components/MeetPhone.tsx:228, 250; src/mobile/meet.css:91) Evidence: phone375__044",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-meet-11",
+      "round": "Mobile audit 2",
+      "area": "meet",
+      "title": "Past (Selesai) tab shows two search entries (top-bar icon plus pill) with only 4px above the pill",
+      "detail": "Keep one search entry and add 8-12px of top spacing (src/components/MeetPhone.tsx:218-226; src/mobile/meet.css:36-50) Evidence: phone430__005",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-meet-12",
+      "round": "Mobile audit 2",
+      "area": "meet",
+      "title": "New-task sheet input sits flush with the left edge, out of line with the title and chips",
+      "detail": "Pad the field 0 16px and line the chips up with it (src/mobile/meet.css:529-536, 554-559) Evidence: phone375__039",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-meet-13",
+      "round": "Mobile audit 2",
+      "area": "meet",
+      "title": "Collapsed Meet sidebar on tablet shows a wide shadowed green compose blob in a second icon rail",
+      "detail": "Render a 40px round icon with no heavy shadow, or keep the sidebar open by default at 768px and up (src/shell.css:255-259; src/brand.css:42-58; src/components/MeetApp.tsx:110-115) Evidence: ipad768__000, ipad1024__000",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-meet-14",
+      "round": "Mobile audit 2",
+      "area": "meet",
+      "title": "At 768 the task add row is crushed (placeholder and due field truncated), and 'Select' shows over an empty list",
+      "detail": "Container query to wrap who/due below the input. Hide Select when the list is empty. (src/components/MeetApp.tsx:1085-1093) Evidence: ipad768__003",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-meet-15",
+      "round": "Mobile audit 2",
+      "area": "meet",
+      "title": "At 768 the meeting header actions stack into three ragged lines (about 140px of chrome)",
+      "detail": "Move Rewrite and Delete into ⋮, keep Share visible, and move folder/type into the facts (src/components/MeetApp.tsx meeting header before ~740) Evidence: ipad768__006",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-meet-16",
+      "round": "Mobile audit 2",
+      "area": "meet",
+      "title": "Search palette scope chips are 32px tall and the last chip is clipped with no end padding or fade",
+      "detail": "Add a 44px hit area, 16px end scroll-padding and an edge fade (src/mobile/shell.css:1111-1118; src/components/CommandPalette.tsx) Evidence: phone375__001, 037, 051, phone430__001",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-meet-17",
+      "round": "Mobile audit 2",
+      "area": "meet",
+      "title": "Meet settings rows aren't on the 16px gutter and have a divider right under the top bar",
+      "detail": "Pad .meet-settings .as-item to 0 16px and remove the top border (src/components/MeetPhone.tsx:74-83; src/mobile/system.css:108) Evidence: phone375__028",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2F-meet-1",
+      "round": "Mobile audit 2",
+      "area": "meet",
+      "title": "Fixed: Event sheet lines sit about 4px from the edge, and 'Open in Calendar' is a lone ghost button",
+      "detail": "Proof: Event lines now sit in 48px rows on the 16px gutter, lined up with the sheet title. 'Open in Calendar' is now a full-width centred primary button. After-shot: audit/agents/r2-meet-event.png Files: C:/Users/Komputer/OneDrive/Desktop/Claude/sprint2go-manager/src/mobile/meet.css, C:/Users/Komputer/OneDrive/Desktop/Claude/sprint2go-manager/src/components/MeetPhone.tsx",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-meet-2",
+      "round": "Mobile audit 2",
+      "area": "meet",
+      "title": "Fixed: Tasks-from-meetings and folder tabs use boxed or pill tabs, and the tab shows a '· n open' count",
+      "detail": "Proof: On phones, .meet-pane .client-tabs (including .flat) now uses one underline pattern: 44px tabs on the 16px gutter, no borders on the buttons, and a 2px accent sliding underline. The slidingTabs line mode is triggered by the selected tab's border-bottom. The folder tab now reads just 'Tasks', and the unused open count is removed. After-shot: audit/agents/r2-meet-foldertabs.png. tsc shows no Meet errors. Files: C:/Users/Komputer/OneDrive/Desktop/Claude/sprint2go-manager/src/mobile/meet.css, C:/Users/Komputer/OneDrive/Desktop/Claude/sprint2go-manager/src/components/MeetApp.tsx",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2-vault-1",
+      "round": "Mobile audit 2",
+      "area": "vault",
+      "title": "Search from Vault cannot find logins (no Vault scope chip; empty query shows two random people)",
+      "detail": "Add 'vault' to SEARCHABLE and feed login names/sites (never secrets) as palette items when unlocked; hide the top-bar search on the locked gate (src/components/CommandPalette.tsx:29 SEARCHABLE omits 'vault'; src/App.tsx:4005 searchHere() passes null scope) Evidence: phone375__001 / phone430__001-Search-Vault.png: chips All apps/People/Projects/Files/Notes only",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2-vault-2",
+      "round": "Mobile audit 2",
+      "area": "vault",
+      "title": "Selected search chip grows by the Check icon width, shifting chips to its right",
+      "detail": "Drop the check (colour marks selection) or reserve its space and fade it in, per bar rule (no size change on select) (src/components/CommandPalette.tsx:186,191,197 ({on && <Check size={13}/>})) Evidence: report.json: each chip ~20px wider when on; compare phone375__003 vs 007",
+      "priority": "medium",
+      "status": "done"
+    },
+    {
+      "id": "M2-vault-3",
+      "round": "Mobile audit 2",
+      "area": "vault",
+      "title": "'How it works' paragraph off-centre, different width/colour from intro, orphan word",
+      "detail": "`.vault-gate-card .vg-how-text { margin: 8px auto 0; text-wrap: pretty; color: var(--text-2) }` with same max-width as intro (src/round2.css:4587 `.vault-gate-card p {margin:0}` beats src/mobile/misc.css:407 `.vg-how-text {margin:0 auto}`; only `> p` gets text-wrap:balance (misc.css:372)) Evidence: phone375__002 / phone430__002-How-it-works.png",
+      "priority": "medium",
+      "status": "done"
+    },
+    {
+      "id": "M2-vault-4",
+      "round": "Mobile audit 2",
+      "area": "vault",
+      "title": "iPad landscape rail cuts off apps including the active Vault",
+      "detail": "@media (max-height: 820px): tighter gaps/drop labels or make app list scroll so the active app is always visible (src/apps.css:31-39 .rail (no short-height handling)) Evidence: ipad1024__000-start.png: rail ends at Tables + unlabeled Calendar; Notes/Drive/Meet/Vault missing",
+      "priority": "medium",
+      "status": "done"
+    },
+    {
+      "id": "M2-vault-5",
+      "round": "Mobile audit 2",
+      "area": "vault",
+      "title": "Tablet passphrase fields 40px and button 36px, 15px text triggers iPad zoom",
+      "detail": "Under (pointer: coarse) use min-height var(--tap) and font-size var(--fs-field) for inputs and button at any width (src/round2.css:4598 min-height:40px, :4603 font-size:15px; phone override in src/mobile/misc.css:383-391 stops at 767px) Evidence: ipad768__000-start.png, ipad1024__000-start.png",
+      "priority": "medium",
+      "status": "done"
+    },
+    {
+      "id": "M2F-vault-1",
+      "round": "Mobile audit 2",
+      "area": "vault",
+      "title": "Fixed: Search from Vault cannot find logins",
+      "detail": "Proof: 'vault' added to SEARCHABLE, a 'Logins' group mapped to vault, and login items added to paletteItems with only the title and site host (no secrets), shown only while vaultUnlocked(user.id). Picking one opens the login. The phone top-bar search is now hidden on the locked gate: MobileTop onSearch is optional, and r2-vault-phone-gate.png shows no search button (.mt-search count 0). VaultGate's onUnlocked now calls reload() so App re-renders and the search comes back after unlock. I did not check the unlocked palette live because that needs a passphrase to be set up. tsc is clean for these files. Files: src/components/CommandPalette.tsx, src/App.tsx, src/components/MobileTop.tsx, src/components/VaultApp.tsx",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-vault-2",
+      "round": "Mobile audit 2",
+      "area": "vault",
+      "title": "Fixed: Selected search chip grows by the Check icon width",
+      "detail": "Proof: Removed the conditional <Check size={13}/> from all three chip kinds and dropped the unused Check import. The colour (.on accent-soft) still marks the selected chip, and chip width no longer changes when you select one. Files: src/components/CommandPalette.tsx",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-vault-3",
+      "round": "Mobile audit 2",
+      "area": "vault",
+      "title": "Fixed: 'How it works' paragraph off-centre, wrong colour, orphan word",
+      "detail": "Proof: misc.css selector changed to `.vault-gate-card .vg-how-text`, which beats round2's `.vault-gate-card p`. It now has margin 8px auto 0, text-wrap: pretty and color var(--text-2). r2-vault-phone-gate.png shows the text centred at the same width as the intro. Files: src/mobile/misc.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-vault-4",
+      "round": "Mobile audit 2",
+      "area": "vault",
+      "title": "Fixed: iPad landscape rail cuts off apps including active Vault",
+      "detail": "Proof: AppRail now scrolls the active .rail-app into view whenever p.current changes. apps.css tightens rail-app padding and gap under (min-width:768px) and (max-height:820px). r2-vault-ipad1024.png shows Vault selected and visible in the rail. Files: src/components/AppRail.tsx, src/apps.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-vault-5",
+      "round": "Mobile audit 2",
+      "area": "vault",
+      "title": "Fixed: Tablet passphrase fields 40px / 15px and button 36px",
+      "detail": "Proof: Added @media (pointer: coarse) and (min-width:768px) to misc.css, setting min-height var(--tap) on the inputs and button and var(--fs-field) on the inputs. Measured live at 768 and 1024: inputs 44px/16px, button 44px. The phone layout keeps its 48px. Files: src/mobile/misc.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2-settings-1",
+      "round": "Mobile audit 2",
+      "area": "settings",
+      "title": "Cards inset 32px instead of 16px gutter on Connect AI apps and Your apps",
+      "detail": "Inside .settings-push .settings-content set .g-card { margin-inline: 0 } so all cards sit on the 16px gutter (src/mobile/settings.css:80-82 (.settings-content padding 16px) stacks with src/mobile/grouped.css:21-22 (.g-card margin 0 16px); SettingsPage.tsx:938 'Edit apps' Group not reset) Evidence: phone375__005, 010, 014: cards start at x=32 while the demo card sits at x=16",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2-settings-2",
+      "round": "Mobile audit 2",
+      "area": "settings",
+      "title": "Demo company block renders above the Your apps title and touches it",
+      "detail": "Render DemoCompanyBlock after the MyApps list as its own set-block with a 24px top margin (src/components/SettingsPage.tsx:942; DemoCompany.tsx:289) Evidence: ipad768__019: the button's bottom edge touches the h2 with 0px gap",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2-settings-3",
+      "round": "Mobile audit 2",
+      "area": "settings",
+      "title": "Avatar colour swatches are 22px tap targets; on iPad one swatch wraps onto a line by itself",
+      "detail": "Give each swatch a 44px hit area with a 24-28px dot; use an 8px gap or nowrap so all 7 fit (src/mobile/settings.css:875-879; SettingsPage.tsx:634 .avatar-colors) Evidence: phone375__002: 22x22 dots; ipad768__000: 6 swatches, then the 7th alone",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-settings-4",
+      "round": "Mobile audit 2",
+      "area": "settings",
+      "title": "Forwarding input and small 'Tambah' pill boxed inside the card",
+      "detail": "Use a borderless input with an accent 'Add' text button at 44px height (src/components/mail/MailAccess.tsx:280-290; src/mobile/mail.css:2671) Evidence: phone375__016: filled input plus a 75x32 outlined pill inside the card",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-settings-5",
+      "round": "Mobile audit 2",
+      "area": "settings",
+      "title": "Mail storage segmented tabs inside the card (box in box)",
+      "detail": "Move the tabs above the card and keep the card for the rows only (src/components/mail/MailStorage.tsx:107-114; src/mobile/mail.css:2588-2591) Evidence: phone375__018",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-settings-6",
+      "round": "Mobile audit 2",
+      "area": "settings",
+      "title": "App rows: icon touches label with no gap",
+      "detail": "Make the title inline-flex with an 8px gap and a 16px icon (src/components/admin/AdminMore.tsx:459) Evidence: ipad768__009, ipad768__019",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-settings-7",
+      "round": "Mobile audit 2",
+      "area": "settings",
+      "title": "Team colour square is invisible and indents the rows; stray 'Buka Tim' button",
+      "detail": "Add display:inline-block; vertical-align:middle to .team-square. Drop the foot button or make it a left-aligned link row (src/round2.css:46 .team-square (inline, so it has no size); AdminMore.tsx:428, 435-438) Evidence: ipad768__006",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-settings-8",
+      "round": "Mobile audit 2",
+      "area": "settings",
+      "title": "Stage name truncated in stage editor at 768",
+      "detail": "Give .stage-name flex:1 1 auto with min-width:0 and the select flex:none, or use the phone grid up to 900px (src/tasks.css:1716, 1769) Evidence: ipad768__007: 'Menunggu tar'",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-settings-9",
+      "round": "Mobile audit 2",
+      "area": "settings",
+      "title": "Guest-access segmented control wraps to two lines",
+      "detail": "Use nowrap with overflow-x:auto, or switch to a Select when it does not fit (.segmented flex-wrap in the guest access settings (src/components/admin)) Evidence: ipad768__008",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-settings-10",
+      "round": "Mobile audit 2",
+      "area": "settings",
+      "title": "Legal-hold add row is cramped in one line with a clipped placeholder",
+      "detail": "Stack the picker, the reason field and Tambah at <=900px (src/components/mail/MailRules.tsx:141-157) Evidence: ipad768__016: 'Alasan (untuk lo'",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-settings-11",
+      "round": "Mobile audit 2",
+      "area": "settings",
+      "title": "AI usage tiles cramped (4-line labels); summary card bleeds at 1024",
+      "detail": "Use repeat(auto-fit,minmax(140px,1fr)) and shorter labels; constrain the card width; hide the meter at 0% (src/components/admin/AISection.tsx:526-535; src/round2.css:2493-2504) Evidence: ipad768__011, ipad1024__011",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-settings-12",
+      "round": "Mobile audit 2",
+      "area": "settings",
+      "title": "App rail clips at 1024x768 with no scroll cue",
+      "detail": "Use overflow-y:auto with a fade cue, or tighten the rows at short heights (app rail in src/shell.css) Evidence: ipad1024__000: Kalender label cut, later apps hidden",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-settings-13",
+      "round": "Mobile audit 2",
+      "area": "settings",
+      "title": "'Not available yet' notice is unstyled floating text",
+      "detail": "Use the same warn callout as the POP notice, at the 16px gutter (src/components/PhoneMailApps.tsx:164-173, 197-199; src/mobile/mail.css:2562) Evidence: phone375__017 (x=32, contradicts the toggle that says on); ipad768__021",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-settings-14",
+      "round": "Mobile audit 2",
+      "area": "settings",
+      "title": "Teams intro and footer repeat the same text",
+      "detail": "Drop the footer (src/components/admin/AdminMore.tsx:410, 413) Evidence: phone375__020",
+      "priority": "low",
+      "status": "done"
+    },
+    {
+      "id": "M2-settings-15",
+      "round": "Mobile audit 2",
+      "area": "settings",
+      "title": "Appearance: 18px-tall link; preview toggle crowds the Density control",
+      "detail": "Give the link min-height var(--tap); separate the preview toggle with the standard 24px gap and a header (src/mobile/settings.css:515-518) Evidence: phone375__013",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-settings-16",
+      "round": "Mobile audit 2",
+      "area": "settings",
+      "title": "Member email truncated by the role value",
+      "detail": "Show the role under the name (PersonCell layout) so the email gets the full width (src/mobile/settings.css:533-535 (.g-val max-width 45%)) Evidence: phone375__019",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-settings-17",
+      "round": "Mobile audit 2",
+      "area": "settings",
+      "title": "Sign out everywhere: destructive action only in the top bar and text indented 32px",
+      "detail": "Add a full-width red Sign out button under the text and align the text to the 16px gutter (src/components/SettingsPhone.tsx; src/mobile/grouped.css:32-33) Evidence: phone375__006",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-settings-18",
+      "round": "Mobile audit 2",
+      "area": "settings",
+      "title": "Delivery plan cards too narrow at 768",
+      "detail": "Use one column below about 520px of content width (EmailDelivery section, 2-column grid) Evidence: ipad768__003: title on 3 lines, badge wraps",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-settings-19",
+      "round": "Mobile audit 2",
+      "area": "settings",
+      "title": "Divider under the last row in settings lists",
+      "detail": ".set-block > .row:last-child { border-bottom:0 } (.set-block rows in src/round2.css) Evidence: ipad768__004, 005, 018, 021",
+      "priority": "low",
+      "status": "done"
+    },
+    {
+      "id": "M2F-settings-1",
+      "round": "Mobile audit 2",
+      "area": "settings",
+      "title": "Fixed: Cards inset 32px instead of 16px gutter on Connect AI apps and Your apps",
+      "detail": "Proof: Added .settings-push .settings-content .g-card{margin-inline:0}. In audit/agents/r2-settings-myapps-375.png the cards now start at x=16 Files: src/mobile/settings.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-settings-2",
+      "round": "Mobile audit 2",
+      "area": "settings",
+      "title": "Fixed: Demo company block renders above the Your apps title",
+      "detail": "Proof: DemoCompanyBlock now renders after MyAppsSection, wrapped in .set-block.set-demo-after with a 24px top margin. Checked in r2-settings-myapps-375.png Files: src/components/SettingsPage.tsx, src/round2.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-settings-3",
+      "round": "Mobile audit 2",
+      "area": "settings",
+      "title": "Fixed: Avatar colour swatches 22px tap targets (phone)",
+      "detail": "Proof: Each .set-swatches .swatch is now 42px, with a 26px dot (8px surface border) and no gap, so all 7 fit on one row Files: src/mobile/settings.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-settings-4",
+      "round": "Mobile audit 2",
+      "area": "settings",
+      "title": "Fixed: Team colour square invisible",
+      "detail": "Proof: Added display:inline-block and vertical-align:middle to .team-square. The squares show in r2-settings-teams-768.png Files: src/round2.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-settings-5",
+      "round": "Mobile audit 2",
+      "area": "settings",
+      "title": "Fixed: Teams intro and footer repeat the same text",
+      "detail": "Proof: Removed the Group footer on the phone Teams screen Files: src/components/admin/AdminMore.tsx",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-settings-6",
+      "round": "Mobile audit 2",
+      "area": "settings",
+      "title": "Fixed: Divider under the last row in settings lists",
+      "detail": "Proof: Added .set-block > .row:last-child{border-bottom:0} Files: src/round2.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2-teams-1",
+      "round": "Mobile audit 2",
+      "area": "teams",
+      "title": "New team sheet: fields sit about 4px from the sheet edge, but the title sits at 16",
+      "detail": "Add padding: 0 16px to .new-sheet .team-new so it matches the sheet title and footer gutter. (src/mobile/misc.css:1244-1256; src/components/teams/TeamsApp.tsx:757) Evidence: phone375__005: the title starts at x=16, but the inputs, the Ketua/Orang/Bergabung labels and the segmented control start at about x=4. The .new-sheet .team-new rule (misc.css:1244) has no side padding.",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "M2-teams-2",
+      "round": "Mobile audit 2",
+      "area": "teams",
+      "title": "New team sheet: Bergabung segmented control and Ketua select are not full width",
+      "detail": "Extend the .segmented full-width rules (flex:1 buttons, min-height var(--tap)) to .new-sheet .team-new, and render Ketua as a full-width plain field. (src/mobile/misc.css:977-983; TeamsApp.tsx:764,768) Evidence: phone375__005: the segmented control ends at about x=245, and Ketua is a framed button about 195px wide, while the inputs run full width. The full-width .segmented rule is scoped only to .team-page .team-settings (misc.css:977-983).",
+      "priority": "medium",
+      "status": "done"
+    },
+    {
+      "id": "M2-teams-3",
+      "round": "Mobile audit 2",
+      "area": "teams",
+      "title": "Team tab bar cuts off 'Pengaturan' at the right edge with no scroll hint",
+      "detail": "Use shorter phone labels (e.g. 'Sibuk', 'Atur'), or add a right-edge fade mask and trailing 16px padding. (src/mobile/misc.css:918-923; TeamsApp.tsx:427) Evidence: phone375__007/010: the last tab, 'Pengaturan', runs to the screen edge with no fade and no right padding.",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-teams-4",
+      "round": "Mobile audit 2",
+      "area": "teams",
+      "title": "Team Tugas rows: divider starts at x=6, not at the text column, and rows are cramped",
+      "detail": "Inset the divider to the text column and give rows min-height var(--row-2) with 12px vertical padding. (src/mobile/misc.css:934-949, 1002-1007; TeamsApp.tsx:580) Evidence: phone375__007: the divider between the task rows starts at about x=6, while the text starts at x=16. The rows are about 50px tall with the title and client squeezed together.",
+      "priority": "medium",
+      "status": "done"
+    },
+    {
+      "id": "M2-teams-5",
+      "round": "Mobile audit 2",
+      "area": "teams",
+      "title": "Add-people sheet: first row has a grey box inside the sheet, and avatars are 24px in two-line rows",
+      "detail": "Remove the active/hover background on phone sheet rows (show selection by the checkmark only) and use 32px avatars for two-line rows. (PeoplePicker sheet list styles (src/components/ui PeoplePicker / src/mobile/system.css)) Evidence: phone375__010: 'James Carter (saya)' sits in an inset rounded grey box, while Thomas, who is also checked, has none. This looks like a leftover focus or hover state. The avatars are 24px in rows about 56-64px tall.",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-teams-6",
+      "round": "Mobile audit 2",
+      "area": "teams",
+      "title": "Profile sheet: an 'Aktif' status box repeats what the avatar dot already shows",
+      "detail": "Drop the status box, or show a custom status inline under the role only when one is set. Keep the email and action rows as plain rows with consistent dividers. (TeamsApp.tsx profile sheet; src/mobile/misc.css:886-906 (.tdir-profile)) Evidence: phone375__003: a full-width grey box holds only 'Aktif' (a box inside the sheet), and the green presence dot already shows this. The dividers between the following rows are inconsistent.",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2F-teams-1",
+      "round": "Mobile audit 2",
+      "area": "teams",
+      "title": "Fixed: New team sheet: fields on the 16 gutter",
+      "detail": "Proof: Added padding: 0 16px to .new-sheet .team-new in a new teams round-2 block at the end of misc.css. I could not verify it on screen: the live app currently crashes on load with 'destroy is not a function', which comes from another agent's in-progress App.tsx edit (tsc error at App.tsx:5014). My edit is CSS only. Files: C:/Users/Komputer/OneDrive/Desktop/Claude/sprint2go-manager/src/mobile/misc.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-teams-2",
+      "round": "Mobile audit 2",
+      "area": "teams",
+      "title": "Fixed: New team sheet: Bergabung segmented control and Ketua select are full width",
+      "detail": "Proof: In the same block: .new-sheet .team-new .segmented is display:flex at width 100%, its buttons are flex:1 with min-height var(--tap), and .person-sel / .people-btn are width 100% with min-height 48px. Not verified on screen because the app crashes on load. Files: C:/Users/Komputer/OneDrive/Desktop/Claude/sprint2go-manager/src/mobile/misc.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-teams-3",
+      "round": "Mobile audit 2",
+      "area": "teams",
+      "title": "Fixed: Team tab bar: fade at the right edge and trailing space",
+      "detail": "Proof: The .team-tabs bar now has a mask-image fade over the last 24px, plus a 16px ::after spacer so the last tab can scroll clear of the fade. Not verified on screen because the app crashes on load. Files: C:/Users/Komputer/OneDrive/Desktop/Claude/sprint2go-manager/src/mobile/misc.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-teams-4",
+      "round": "Mobile audit 2",
+      "area": "teams",
+      "title": "Fixed: Team Tugas rows: divider on the text column, more room per row",
+      "detail": "Proof: .team-page .team-row.team-task is now width 100%, margin 0, padding 12px 0, min-height var(--row-2). This removes the -10px bleed, so the box-shadow divider now starts at the text column. Not verified on screen because the app crashes on load. Files: C:/Users/Komputer/OneDrive/Desktop/Claude/sprint2go-manager/src/mobile/misc.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2-tables-1",
+      "round": "Mobile audit 2",
+      "area": "tables",
+      "title": "Sheet content is inset 12px while the sheet title sits on the 16px gutter",
+      "detail": "Give non-list sheet content (text, chips, add links) a 16px start. Keep the 8px body padding only for .as-list rows that carry their own 8px inner padding. (src/mobile/kit.css:98-104; src/mobile/tables.css:487 (.tb-sheet .tb-filters), :609 (.tb-set-seg)) Evidence: phone375__007 and phone375__028: the description text, chips and '+ Tambah urutan' start at x≈12, while the title starts at 16. kit.css .sheet-body has padding 0 8px 12px, plus inner 4px paddings.",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-tables-2",
+      "round": "Mobile audit 2",
+      "area": "tables",
+      "title": "The sheet Back control sits in a different place on Filter than on Sort",
+      "detail": "In the filter sheet, use the .tb-sheet-step pattern: a chevron before the title on the left. Keep the right-hand slot for the done or show action. (src/components/tables/PhoneBits.tsx:98-103; src/mobile/tables.css:1441) Evidence: Sort puts a chevron before the title (.tb-sheet-step). Filter puts '< Kembali' in the right-hand head slot, where the done or show action normally goes (PhoneBits.tsx:98-103).",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-tables-3",
+      "round": "Mobile audit 2",
+      "area": "tables",
+      "title": "Sheet footer and body ignore the bottom safe area",
+      "detail": "Use max(12px, env(safe-area-inset-bottom)) for the bottom padding of .sheet-foot, and of .sheet-body when the sheet has no footer. In Settings, put a divider and 8px of space before the destructive 'Hapus tabel' row. (src/mobile/kit.css:98-111; Settings sheet in src/components/tables/PhoneBits.tsx) Evidence: phone375__012: the 'Buat' pill ends at y≈800 of 812, on the home indicator. phone375__004/015: 'Hapus tabel' sits at y≈772 with no room below it and no divider before it. kit.css .sheet-foot padding is 12px 16px 12px and .sheet-body bottom padding is 12px, neither with env(safe-area-inset-bottom).",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "M2-tables-4",
+      "round": "Mobile audit 2",
+      "area": "tables",
+      "title": "Card meta wraps unevenly, so row heights are ragged",
+      "detail": "Keep the meta on one line, with an ellipsis on the last item, so every row has the same height. (src/mobile/tables.css .tb-crd meta (around lines 380-400)) Evidence: phone375__002: City wraps onto a second line on Pasar Sehat and Daun Market but not on the other cards (52 vs 74px rows).",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2-tables-5",
+      "round": "Mobile audit 2",
+      "area": "tables",
+      "title": "The Comments header on the row page is too small",
+      "detail": "Use the 15/600 section-header role, and add a one-line empty hint when there are no comments. (src/mobile/tables.css .tb-page-body comments header) Evidence: phone375__008: 'Komentar' is drawn at about 12px and medium weight, below the system's 15/600 section header. There is no empty hint under the composer.",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "M2F-tables-1",
+      "round": "Mobile audit 2",
+      "area": "tables",
+      "title": "Fixed: Sheet content inset 12px vs 16px title",
+      "detail": "Proof: Measured live: Sort lead and links moved from x=12 to x=16, Filter text and links from 12 to 16 (r2-tables-sort.png, r2-tables-filter.png). The cause was that system.css gives the sheet body 4px padding, so .tb-sheet .tb-filters now uses 12px Files: src/mobile/tables.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-tables-2",
+      "round": "Mobile audit 2",
+      "area": "tables",
+      "title": "Fixed: Filter sheet Back control placement",
+      "detail": "Proof: r2-tables-filter.png: the chevron now sits before 'Filter lanjutan' (.tb-sheet-step) and the right-hand slot shows 'Selesai' Files: src/components/tables/PhoneBits.tsx",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-tables-3",
+      "round": "Mobile audit 2",
+      "area": "tables",
+      "title": "Fixed: Sheet footer safe area and divider before Hapus tabel",
+      "detail": "Proof: The sheet body already had env(safe-area-inset-bottom)+24px from system.css (measured 24px). .tb-sheet .sheet-foot now uses max(12px, env(safe-area-inset-bottom)). The Settings danger row gets a divider and 8px of space through CSS. Not caught in a screenshot, because the settings capture reopened on the Sort page Files: src/mobile/tables.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-tables-4",
+      "round": "Mobile audit 2",
+      "area": "tables",
+      "title": "Fixed: Card meta wraps unevenly",
+      "detail": "Proof: .tb-crd-meta is now nowrap with overflow hidden, and the last field shrinks with an ellipsis (the existing .tb-text ellipsis rule). The Stockists screen opened in board view, so this was checked in code only Files: src/mobile/tables.css",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "M2F-tables-5",
+      "round": "Mobile audit 2",
+      "area": "tables",
+      "title": "Fixed: Comments header too small, no empty hint",
+      "detail": "Proof: r2-tables-row.png: 'Komentar' now uses the 15/600 heading, with 'Belum ada komentar' under it (an existing i18n key) Files: src/mobile/tables.css, src/components/tables/RecordDrawer.tsx",
+      "priority": "high",
+      "status": "done"
     }
   ]
 }

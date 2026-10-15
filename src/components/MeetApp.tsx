@@ -1132,7 +1132,6 @@ function FolderPage(p: MeetProps & { clientId: string }) {
   const list = p.meetings.filter((m) => m.clientId === p.clientId).sort((a, b) => b.at.localeCompare(a.at));
   const { shown, bar, filtering } = useFilter(list);
   const tasks = p.tasks.filter((tk) => tk.meetingId && list.some((m) => m.id === tk.meetingId));
-  const open = tasks.filter((tk) => !tk.done).length;
   if (!c) return null;
   return (
     <section className="meet-pane view-enter">
@@ -1157,7 +1156,7 @@ function FolderPage(p: MeetProps & { clientId: string }) {
         {(
           [
             ['meetings', t('Meetings')],
-            ['tasks', open ? t('Tasks · {n} open', { n: open }) : t('Tasks')],
+            ['tasks', t('Tasks')],
           ] as const
         ).map(([k, l]) => (
           <button key={k} className={tab === k ? 'on' : ''} onClick={() => setTab(k)}>

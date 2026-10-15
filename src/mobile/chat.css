@@ -655,7 +655,15 @@
   }
   .nm-list {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     padding-bottom: 24px;
+  }
+  .nm-list .nm-row {
+    min-width: 0;
+  }
+  .newmsg-sheet .nm-to {
+    margin: 0;
+    padding: 4px 16px;
   }
   .nm-group {
     padding: 16px 16px 4px;
@@ -1833,5 +1841,169 @@
     margin: 0;
     padding: 24px 16px 8px;
     font: var(--t-heading);
+  }
+}
+
+/* ---------- Round 2 phone fixes (chat) ---------- */
+@media (max-width: 767px) {
+  /* Celebration pills: on the 16 gutter, the time on one line in its short form ("31m"). */
+  .chat-celebration {
+    padding-inline: 16px;
+  }
+  .chat-celebration span {
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+  .chat-celebration time {
+    flex: none;
+    white-space: nowrap;
+    font: var(--t-caption);
+  }
+
+  /* Your status: 48 px rows on the gutter, a standard field, the hint on the gutter. */
+  .status-pop {
+    gap: 0;
+    padding: 8px 0 16px;
+  }
+  .status-pop .sel-opt {
+    min-height: 48px;
+    padding: 0 16px;
+    gap: 12px;
+    border-radius: 0;
+    font: var(--t-body);
+  }
+  .status-custom {
+    padding: 8px 16px;
+  }
+  .status-custom {
+    padding: 0 16px;
+  }
+  .status-custom input {
+    margin: 0;
+    min-height: 48px;
+    padding: 0;
+    border: 0;
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+    background: none;
+    font-size: var(--fs-field);
+  }
+  .status-pop p {
+    margin: 8px 16px 0;
+  }
+
+  /* Tiles on top: one grip to drag, a switch with a 44 px target. */
+  .te-move {
+    display: none;
+  }
+  .te-tile {
+    gap: 12px;
+    min-height: 48px;
+  }
+  .te-tile:last-child {
+    border-bottom: 0;
+  }
+  .te-grab {
+    display: grid;
+    place-items: center;
+    width: var(--tap);
+    height: var(--tap);
+    margin-left: -12px;
+    color: var(--text-3);
+    touch-action: none;
+    cursor: grab;
+  }
+  .te-tile .switch::after,
+  .view-modal .toggle-row .switch::after {
+    inset: -10px -2px;
+  }
+
+  /* Drafts and sent: the underline tab bar on the gutter. */
+  .chat-page-push .drafts-page .page-tabs {
+    margin: 0 8px 8px;
+  }
+  .chat-page-push .drafts-page .page-tabs button {
+    min-height: var(--tap);
+  }
+
+  /* Sheet text and the profile card land on the 16 gutter (sheet-body already gives 4). */
+  .sheet-body .when-note,
+  .sheet-body .confirm-text,
+  .sheet-body .catchme-text,
+  .sheet-body .catchme-wait,
+  .sheet-body .sum-off-text,
+  .sheet-body .catchme-sheet .link-btn {
+    margin-inline: 12px;
+  }
+  .pcard-sheet .pcard {
+    padding-inline: 12px;
+  }
+  .pcard-sheet .pcard-fact {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    padding: 8px 0;
+  }
+
+  /* The composer's grab handle: a 44 px target, and gone while a list or panel sits above the field. */
+  .cmp-grab {
+    width: 64px;
+    height: var(--tap);
+    top: -14px;
+  }
+  .cmp-grab::after {
+    top: 20px;
+  }
+  .composer.is-phone:has(> .mention-pop, > .cmp-fmt) .cmp-grab {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Create a view: the two actions stack as full rows, and the phone hint replaces the ⌘K one. */
+  .ve-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+  .ve-actions > button {
+    min-height: var(--tap);
+    justify-content: flex-start;
+    white-space: nowrap;
+  }
+  .ve-k-hint {
+    display: none;
+  }
+  .ve-k-phone {
+    display: block;
+  }
+
+  /* New channel: a plain search field over an unframed people list, a full-width summary picker, 44 px tabs. */
+  .chan-modal .people-pick {
+    border: 0;
+    border-radius: 0;
+  }
+  .chan-modal .sel-search.boxed {
+    border: 0;
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+    min-height: var(--tap);
+  }
+  .chan-modal .summary-pick .sel {
+    width: 100%;
+  }
+  .chan-modal .dialog-tabs > button {
+    min-height: var(--tap);
+  }
+
+  /* Recipient chips: 12 px initials and a 44 px target. */
+  .nm-chip {
+    position: relative;
+  }
+  .nm-chip .avatar {
+    font-size: var(--fs-caption);
+  }
+  .nm-chip::after {
+    content: '';
+    position: absolute;
+    inset: -6px 0;
   }
 }

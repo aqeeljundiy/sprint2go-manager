@@ -99,7 +99,7 @@ export function TaskViews({
   const dkind = kind === 'client' && phone ? 'project' : kind;
   const [d, setD, resetD] = useDisplay(dkind);
   // Phones keep the week strip for Upcoming only: every other list (Assigned by me, Supervising, a team) is plain rows.
-  const layouts: Layout[] = kind === 'upcoming' ? ['calendar'] : kind === 'today' || phone ? ['list', 'board'] : ['list', 'board', 'calendar'];
+  const layouts: Layout[] = kind === 'upcoming' ? ['calendar'] : kind === 'today' && phone ? ['list'] : kind === 'today' || phone ? ['list', 'board'] : ['list', 'board', 'calendar'];
   const layout: Layout = layouts.includes(d.layout) ? d.layout : layouts[0];
   const [fieldsPref, setFieldsPref] = usePersisted<{ list: string[]; board: string[] }>('s2g-task-fields', { list: LIST_FIELDS, board: BOARD_FIELDS });
   const fields = (layout === 'board' ? fieldsPref.board : fieldsPref.list) ?? (layout === 'board' ? BOARD_FIELDS : LIST_FIELDS);
@@ -389,7 +389,8 @@ export function TaskViews({
   const LayoutIcon = layout === 'list' ? LayoutList : layout === 'board' ? Columns3 : CalendarRange;
   const dots = useActionMenu(
     () => [
-      { label: t('Display'), icon: SlidersHorizontal, hint: words.length ? words.join(', ') : undefined, run: () => setDisplayOpen(true) },
+      // One way to Display: the layout button in the top bar when there is one, otherwise this row.
+      ...(phone && layouts.length > 1 ? [] : [{ label: t('Display'), icon: SlidersHorizontal, hint: words.length ? words.join(', ') : undefined, run: () => setDisplayOpen(true) }]),
       ...(layout !== 'board' && open.length ? [{ label: t('Select tasks'), icon: CheckSquare, run: () => setSelecting(true) }] : []),
       ...(canPlan ? [{ label: t('Plan my day'), icon: Wand2, run: () => setPlanning(true) }] : []),
       ...(onBrainDump && (kind === 'mine' || kind === 'today' || kind === 'upcoming') ? [{ label: t('Brain dump'), icon: Sparkles, run: onBrainDump }] : []),

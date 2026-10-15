@@ -305,7 +305,8 @@
 }
 .tb-crd-meta {
   display: flex;
-  flex-wrap: wrap; /* every field readable: a second line rather than one cut off at the edge */
+  flex-wrap: nowrap; /* one line on every card so rows match; the last field ends in an ellipsis */
+  overflow: hidden;
   align-items: center;
   gap: 4px 12px;
   margin-top: 4px;
@@ -321,6 +322,10 @@
   min-width: 0;
   max-width: 70%;
   white-space: nowrap;
+}
+.tb-crd-f:last-child {
+  flex: 0 1 auto;
+  overflow: hidden;
 }
 .tb-crd-ficon {
   flex: none;
@@ -485,7 +490,7 @@
 /* ---------- sheets: views, filter, settings, quick create, cell editors ---------- */
 
 .tb-sheet .tb-filters {
-  padding: 4px 8px 12px;
+  padding: 4px 12px 12px; /* 4 of the sheet body + 12: text, chips and links start on the 16 gutter */
 }
 @media (max-width: 767px) {
   .tb-qchip {
@@ -704,6 +709,22 @@
 .tb-quick-sheet .sheet-foot {
   justify-content: space-between;
 }
+.tb-sheet .sheet-foot {
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+}
+/* The destructive row stands apart: a divider and 8px before it. */
+.tb-set-sheet .as-item.danger {
+  margin-top: 9px;
+  position: relative;
+}
+.tb-set-sheet .as-item.danger::before {
+  content: '';
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: -5px;
+  border-top: 1px solid var(--line);
+}
 
 /* ---------- a row on a phone: its own page (Notion's: label left, value right, one layout for every field) ---------- */
 
@@ -856,6 +877,16 @@ button.tb-page-title:active {
   justify-content: center;
   font-size: var(--fs-body);
   border-radius: var(--r-tile);
+}
+.tb-page .tb-rd-sec > h4 {
+  margin: 0 0 8px;
+  font: var(--t-heading);
+  color: var(--text);
+}
+.tb-page .tb-rd-empty {
+  margin: 0 0 8px;
+  font: var(--t-secondary);
+  color: var(--text-3);
 }
 .tb-page .tb-comment-new input {
   font-size: var(--fs-field);

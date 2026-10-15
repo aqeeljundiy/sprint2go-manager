@@ -47,6 +47,7 @@ export function TaskCalendar({
     return out;
   }, [today, end]);
   const later = tasks.filter((t) => t.due && t.due > end).length;
+  const weekEnd = addDays(today, 6);
   const listRef = useRef<HTMLDivElement>(null);
   const userJump = useRef(0);
 
@@ -134,10 +135,10 @@ export function TaskCalendar({
       </div>
       {head}
       <div className="ucal-list" ref={listRef}>
-        {/* Only days that have something, plus today; each day's own + sits on its heading (no add row under every day). */}
+        {/* The coming week always shows (so an empty today is not a blank screen), then only days that have something; each day's own + sits on its heading. */}
         {days.map((d) => {
           const items = byDay.get(d) ?? [];
-          if (!items.length && d !== today && d !== selected) return null;
+          if (!items.length && d > weekEnd && d !== selected) return null;
           const heading = phone ? dayHeadingDateFirst(d, today) : dayHeading(d, today);
           return (
             <section key={d} id={`ucal-${d}`} data-day={d} className={`ucal-day${items.length ? '' : ' no-tasks'}`}>
@@ -148,12 +149,13 @@ export function TaskCalendar({
                 </button>
               </div>
               {items.map(row)}
-              {!items.length && <p className="ucal-none">{d === today ? t('Nothing due today.') : t('Nothing due this day.')}</p>}
+              {!items.length && (d === today || d === selected) && <p className="ucal-none">{d === today ? t('Nothing due today.') : t('Nothing due this day.')}</p>}
             </section>
           );
         })}
         <button type="button" className="ghost-btn ucal-more" onClick={() => setEnd(addDays(end, 28))}>
-          {later ? tn(later, 'Show the next four weeks ({n} task later)', 'Show the next four weeks ({n} tasks later)') : t('Show the next four weeks')}
+          <span>{later ? tn(later, 'Show the next four weeks ({n} task later)', 'Show the next four weeks ({n} tasks later)') : t('Show the next four weeks')}</span>
+          <ChevronDown size={16} />
         </button>
       </div>
       {undated}
