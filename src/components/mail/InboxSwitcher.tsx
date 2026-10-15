@@ -43,7 +43,7 @@ export function InboxSwitcher(p: {
       ...(p.onAddAccount ? [{ label: t('Add an email address'), icon: Plus, group: 'add', run: p.onAddAccount }] : []),
     ],
     // A menu by the button on computers; a sheet from the bottom on phones.
-    { menu: !phone, className: 'inbox-switch-menu', title: t('Inboxes') },
+    { menu: !phone, className: 'inbox-switch-menu', title: t('Inboxes'), width: 320 /* a whole address fits */ },
   );
   const cur = p.accounts.find((a) => a.id === p.active);
   const Icon = cur ? iconOf(cur) : Layers;

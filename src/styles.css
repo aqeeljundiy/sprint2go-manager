@@ -460,14 +460,14 @@ kbd {
   top: 8px;
   display: flex;
   gap: 2px;
-  padding: 0 0 0 12px;
-  background: linear-gradient(to right, transparent, var(--hover) 12px);
+  padding: 0 0 0 16px;
+  /* The row's own colour (hover, selected, unread, any tint), fading in on the left: never a grey box over a tinted row. */
+  background: inherit;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 16px);
+  mask-image: linear-gradient(to right, transparent, #000 16px);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.16s;
-}
-.row.selected .row-actions {
-  background: linear-gradient(to right, transparent, var(--accent-soft) 12px);
 }
 .row:hover .row-actions,
 .row:focus-within .row-actions {

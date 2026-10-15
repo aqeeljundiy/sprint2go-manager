@@ -1005,3 +1005,14 @@ h4,
   font-weight: 700;
   line-height: 1;
 }
+
+/* Menus never scroll sideways: a long label (an email address) wraps inside the menu instead. */
+.as-list {
+  overflow-x: hidden;
+}
+.as-item {
+  min-width: 0;
+}
+.as-item :is(span, small, b, strong) {
+  overflow-wrap: anywhere;
+}
