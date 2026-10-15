@@ -81,6 +81,7 @@ export interface AppSection {
   label: string;
   icon: LucideIcon;
   badge?: number; // a count for you (99+ cap); nothing else
+  dot?: boolean; // something new, no count (the Apps tab)
   /** A section that does something instead of showing a list (Search opens the app's search). */
   run?: () => void;
 }

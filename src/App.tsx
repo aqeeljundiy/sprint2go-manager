@@ -15,7 +15,7 @@ import { ProjectsCtx } from './components/ProjectPicker';
 import { ProjectsSidebar } from './components/ProjectsSidebar';
 import { ProjectsHome } from './components/ProjectsHome';
 import { Popover } from './components/ui/Popover';
-import { Brain, Briefcase, Building2, CalendarPlus, Copy, FileText, Hash, ListChecks, Mail, PenLine, Send, Sparkles, Timer, Trash2, Undo2, Upload, User as UserIcon, Video, Table2, MessagesSquare, AlertTriangle, Menu, Inbox, Search as Paperclip, Contact, Clock, History, MessageCircle, Bell, Sun, CalendarRange, CircleCheck, Layers, List, CalendarDays, Users, Star, Folder, UserRound, Archive, NotebookText } from 'lucide-react';
+import { Brain, Briefcase, Building2, CalendarPlus, Copy, FileText, Hash, ListChecks, Mail, PenLine, Send, Sparkles, Timer, Trash2, Undo2, Upload, User as UserIcon, Video, Table2, MessagesSquare, AlertTriangle, Menu, Inbox, Search as Paperclip, Contact, Clock, History, MessageCircle, Bell, Sun, CalendarRange, CircleCheck, Layers, List, CalendarDays, Users, Star, Folder, UserRound, Archive, NotebookText, LayoutGrid } from 'lucide-react';
 import { DEFAULT_PERMISSIONS } from './types';
 import type { Quote, Team, Note, Account, AppId, Attachment, BlockRule, CalEvent, Channel, ChannelCategory, Client, ClientPerson, ChatFile, ChatMessage, CommentFile, Meeting, Message, Notice, RsvpStatus, TaskEvent, TaskStatus, Todo, DriveItem, DriveSection, Location, Person, Thread, User, View, Workspace, FolderId } from './types';
 import { useMailOrganize } from './components/mail/Organize';
@@ -124,7 +124,7 @@ import { companyApps as companyAppOrder, launcherApps, migrateBar, normalize as 
 import { historySteps, parseRoute, routePath, startPath, RESUME_MS, SECTIONS as SECTIONS_OF, type Route } from './route';
 import { setVaultUnlocked } from './vaultCrypto';
 import { useEdgeSwipe } from './components/ui/SideDrawer';
-import { openCompanySheet, useAppSections, useChrome, useFocusedScreen, useTitleMenu, useTitleTucked, type AppSection, type AppSections } from './mobile/chrome';
+import { openCompanySheet, useAppSections, useSidebarDrawer, useChrome, useFocusedScreen, useTitleMenu, useTitleTucked, type AppSection, type AppSections } from './mobile/chrome';
 import { PHONE, TABLET, isPhone, useMedia } from './mobile/media';
 import { usePullToSearch } from './mobile/usePullToSearch';
 import { useKeyboard } from './mobile/keyboard';
@@ -4376,6 +4376,10 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
   })();
   useAppSections(mode === 'settings' ? 'home' : mode, mobile && mode !== 'settings' && appBar);
   const showAppBar = mobile && !launcher && !!chrome.sections && mode !== 'settings' && !guestView;
+  // Phones with an app bar: the app's menu (its sidebar as a left drawer) sits top left behind the lines icon, and the
+  // app grid is the bar's last tab, bottom right in thumb reach (Gmail's menu, Gojek's bottom More).
+  const appDrawer = showAppBar && mode !== 'home';
+  useSidebarDrawer(appDrawer);
   useEffect(() => {
     const root = document.documentElement;
     const off = mobile && !showAppBar;
@@ -4971,8 +4975,9 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
             menu={chrome.title ?? mobileSwitcher}
             settings={mode === 'chat' || mode === 'tasks' ? [] : settingsRows}
             back={chrome.back /* Home is a main screen: the launcher button, never a back arrow */}
-            onLauncher={toLauncher}
+            onLauncher={showAppBar ? undefined : toLauncher}
             launcherDot={launcherDot}
+            onMenu={appDrawer ? () => setSidebarOpen(true) : undefined}
             workspaces={workspaces}
             current={ws}
             unreadByWs={wsUnread}
@@ -6046,7 +6051,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
 
       {/* Phones (src/mobile/, research/launcher/plan.md): the app's own bar of sections and its create button, and the
           launcher over the app when it's open. */}
-      {showAppBar && <AppBar bar={chrome.sections!} label={APPS.find((a) => a.id === mode)?.name ?? ''} />}
+      {showAppBar && <AppBar bar={{ ...chrome.sections!, sections: [...chrome.sections!.sections, { id: 'apps', label: t('Apps'), icon: LayoutGrid, dot: launcherDot, run: toLauncher }] }} label={APPS.find((a) => a.id === mode)?.name ?? ''} />}
       {mobile && <CreateFab create={mode === 'settings' || launcher ? null : chrome.create} off={newOpen} />}
       {editingApps && (
         <EditApps

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { Bell, Check, ChevronDown, ChevronLeft, ChevronRight, FlaskConical, LayoutGrid, Loader2, Plus, Search, Settings } from 'lucide-react';
+import { Bell, Check, ChevronDown, ChevronLeft, ChevronRight, FlaskConical, LayoutGrid, Loader2, Menu, Plus, Search, Settings } from 'lucide-react';
 import type { Client, Person, Workspace } from '../types';
 import { Avatar } from './Avatar';
 import { WorkspaceLogo } from './WorkspaceLogo';
@@ -50,6 +50,7 @@ export function MobileTop({
   large,
   onLauncher,
   launcherDot,
+  onMenu,
 }: {
   title: string;
   menu?: TitleMenu | null;
@@ -75,6 +76,7 @@ export function MobileTop({
   claim?: TopBarClaim | null; // what the app on screen took over (<TopBar>)
   large?: { large: boolean; tucked: boolean }; // a large title in the page (<LargeTitle>)
   onLauncher?: () => void; // phones with the launcher: the left button goes back to it (research/launcher/plan.md)
+  onMenu?: () => void; // phones: the app's own menu (its sidebar as a left drawer), top left
   launcherDot?: boolean; // another app has something new since you left the launcher
 }) {
   const [wsOpen, setWsOpen] = useState(false);
@@ -103,6 +105,10 @@ export function MobileTop({
           {claim?.lead ? null : back ? (
             <button className="mt-back" onClick={back} aria-label={t('Back')}>
               <ChevronLeft size={24} />
+            </button>
+          ) : onMenu ? (
+            <button type="button" className="icon-btn mt-launch" onClick={onMenu} aria-label={t('Open menu')} title={t('Menu')}>
+              <Menu size={24} />
             </button>
           ) : onLauncher ? (
             <LauncherButton onClick={onLauncher} dot={launcherDot} />
