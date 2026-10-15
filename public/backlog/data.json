@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-15T06:27:52.209Z",
+  "updated": "2026-10-15T06:46:06.385Z",
   "items": [
     {
       "id": "G1",
@@ -2465,6 +2465,42 @@
       "title": "View tabs overflow uses hard-coded widths",
       "detail": "The tab fitter reserves fixed 48px and 92px for '+' and 'N more'. Longer translations (Indonesian 'N lainnya') can overlap or clip, and tabs then jump as they move into 'more'. Fix: Measure the real widths of the more button and the add button (refs) instead of constants, and animate tabs moving into 'more' with a fade. (src/components/tables/ViewTabs.tsx:37 and :42)",
       "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "R-M1",
+      "round": "Inbox (raw)",
+      "area": "Projects",
+      "title": "Phone project list: avatar square touches the name, no gap",
+      "detail": "From the user, 15 Oct.",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "R-M2",
+      "round": "Inbox (raw)",
+      "area": "Projects",
+      "title": "\"Work with them again\" pill: icon and text cramped, pill looks off next to the name",
+      "detail": "From the user, 15 Oct.",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "R-M3",
+      "round": "Inbox (raw)",
+      "area": "Home",
+      "title": "AI on Home cannot be used on phones",
+      "detail": "From the user, 15 Oct.",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "R-M4",
+      "round": "Inbox (raw)",
+      "area": "Process",
+      "title": "Mobile audit was not thorough enough: run a foolproof one (every screen, state, overlay)",
+      "detail": "From the user, 15 Oct.",
+      "priority": "high",
       "status": "todo"
     }
   ]
