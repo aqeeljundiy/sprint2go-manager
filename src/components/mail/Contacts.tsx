@@ -138,7 +138,7 @@ export function ContactsView({ ws, users, me, onCompose, onMenu, toast }: { ws: 
     { title: t('Import and export'), menu: !phone },
   );
   // Phones: the create button makes a contact while Contacts is open (Gmail's Compose comes back after).
-  useCreateAction('mail', phone && server.on ? { label: t('New contact'), icon: UserPlus, run: () => setOpen({ draft: blank(), editing: true }) } : null);
+  useCreateAction('mail', phone && server.on && tab === 'contacts' ? { label: t('New contact'), icon: UserPlus, run: () => setOpen({ draft: blank(), editing: true }) } : null);
   const fromFrequent = (f: Frequent) => setOpen({ draft: blank({ name: f.name, emails: [f.email] }), editing: true });
 
   const tools = (
@@ -165,7 +165,7 @@ export function ContactsView({ ws, users, me, onCompose, onMenu, toast }: { ws: 
             </button>
           )}
         </label>
-        <div className={phone ? 'ct-tabs ct-chips' : 'segmented ct-tabs'} role="tablist" aria-label={t('Contacts')}>
+        <div className={phone ? 'ct-tabs ct-line' : 'segmented ct-tabs'} role="tablist" aria-label={t('Contacts')}>
           {(['contacts', 'other', 'team'] as Tab[]).map((x) => (
             <button key={x} type="button" role="tab" aria-selected={tab === x} className={tab === x ? 'on' : ''} onClick={() => setTab(x)}>
               {x === 'contacts' ? t('Contacts') : x === 'other' ? t('Other contacts') : t('Team')}
@@ -388,17 +388,22 @@ function ContactPanel({ phone, draft, editing, labels, onEdit, onView, onClose, 
       </div>
       <div className="field">
         <label>{t('Phone')}</label>
-        {d.phones.map((ph, i) => (
+        {/* No number yet: one empty field to type it in, like Name and Email. */}
+        {(d.phones.length ? d.phones : ['']).map((ph, i, all) => (
           <span key={i} className="ct-multi">
-            <input type="tel" inputMode="tel" value={ph} aria-label={t('Phone')} onChange={(e) => set({ phones: d.phones.map((x, j) => (j === i ? e.target.value : x)) })} />
-            <button type="button" className="icon-btn sm" aria-label={t('Remove')} onClick={() => set({ phones: d.phones.filter((_, j) => j !== i) })}>
-              <X size={14} />
-            </button>
+            <input type="tel" inputMode="tel" value={ph} aria-label={t('Phone')} onChange={(e) => set({ phones: all.map((x, j) => (j === i ? e.target.value : x)) })} />
+            {d.phones.length > 1 && (
+              <button type="button" className="icon-btn sm" aria-label={t('Remove')} onClick={() => set({ phones: d.phones.filter((_, j) => j !== i) })}>
+                <X size={14} />
+              </button>
+            )}
           </span>
         ))}
-        <button type="button" className="link-btn small ct-more" onClick={() => set({ phones: [...d.phones, ''] })}>
-          {t('Add a phone number')}
-        </button>
+        {d.phones.some((x) => x.trim()) && (
+          <button type="button" className="link-btn small ct-more" onClick={() => set({ phones: [...d.phones, ''] })}>
+            {t('Add a phone number')}
+          </button>
+        )}
       </div>
       <div className="ct-two">
         <div className="field">
@@ -489,13 +494,12 @@ function ContactPanel({ phone, draft, editing, labels, onEdit, onView, onClose, 
       <PushScreen
         title={title}
         onBack={editing && draft.id ? () => (setD(draft), onView()) : onClose}
-        cancel={editing}
         className="ct-push"
         actions={
           editing ? (
-            <button type="button" className="g-save" disabled={!ok || busy} onClick={() => void submit()}>
+            <BusyButton type="button" busy={busy} className="primary-btn ct-save" disabled={!ok} onClick={() => void submit()}>
               {t('Save')}
-            </button>
+            </BusyButton>
           ) : (
             <button type="button" className="g-save" onClick={onEdit}>
               {t('Edit')}

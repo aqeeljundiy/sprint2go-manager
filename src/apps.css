@@ -381,6 +381,11 @@
   flex: none;
   color: var(--text-3);
 }
+.palette li button .pi-avatar {
+  flex: none;
+  display: inline-flex;
+  margin-block: -6px;
+}
 .palette li button.hi {
   background: var(--accent-soft);
   color: var(--text);

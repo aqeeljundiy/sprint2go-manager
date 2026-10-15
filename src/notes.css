@@ -164,6 +164,12 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  /* Pinned at the right end: when a narrow pane scrolls the format buttons, Make a task never scrolls off. */
+  position: sticky;
+  right: 0;
+  z-index: 1;
+  background: var(--surface);
+  box-shadow: -12px 0 12px -4px var(--surface);
 }
 /* The text, and "Linked from" at the side when the pane is wide enough. */
 .note-wrap {

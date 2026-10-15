@@ -2,7 +2,7 @@ import { Fragment, useContext, useEffect, useRef, useState, type ReactNode } fro
 import { useActionMenu } from './ui/ActionSheet';
 import { usePersisted } from '../settings';
 import { TabDefaultsCtx, arrange, type TabPrefs } from './ui/TabBar';
-import { Briefcase, UsersRound, KeyRound, Table2, NotebookPen, Bell, CalendarDays, EyeOff, HardDrive, House, ListChecks, Mail, MessagesSquare, Plus, Search, Sparkles, Video, type LucideIcon } from 'lucide-react';
+import { Briefcase, UsersRound, KeyRound, Table2, NotebookPen, Bell, CalendarDays, EyeOff, HardDrive, House, ListChecks, Mail, MessagesSquare, MoreHorizontal, Plus, Search, Sparkles, Video, type LucideIcon } from 'lucide-react';
 import { term } from '../terms';
 import { t } from '../i18n';
 import type { AppId } from '../types';
@@ -91,6 +91,31 @@ export function AppRail(p: Props) {
     appsRef.current?.querySelector<HTMLElement>('.rail-app.on')?.scrollIntoView({ block: 'nearest' });
   }, [p.current]);
   const moreMenu = useActionMenu(showList, { title: t('Hidden apps') });
+  // A short window: the apps that fit, then More with the rest. The open app always keeps its place on the rail.
+  const [fit, setFit] = useState(0);
+  useEffect(() => {
+    const el = appsRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const measure = () => {
+      const row = el.querySelector<HTMLElement>('.rail-app:not(.rail-more)')?.offsetHeight ?? 0;
+      const n = row ? Math.floor((el.clientHeight - 16) / (row + 2)) : 0;
+      setFit((x) => (x === n ? x : n));
+    };
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  const slots = fit - (hiddenApps.length ? 1 : 0);
+  let shown = apps;
+  if (fit > 0 && apps.length > slots) {
+    const keep = Math.max(1, slots - 1);
+    shown = apps.slice(0, keep);
+    const cur = apps.find((a) => a.id === p.current);
+    if (cur && !shown.includes(cur)) shown = [...shown.slice(0, keep - 1), cur];
+  }
+  const rest = apps.filter((a) => !shown.includes(a));
+  const overBtn = useRef<HTMLButtonElement>(null);
+  const overMenu = useActionMenu(() => rest.map((a) => ({ label: a.name, icon: a.icon, run: () => p.onApp(a.id) })), { title: t('More apps') });
   const drop = () => {
     if (drag && over && drag !== over.id && pinned.length) {
       // Tablets: whatever ends up above the line is the bar (the same four as on the phone).
@@ -110,7 +135,7 @@ export function AppRail(p: Props) {
     <nav className="rail" aria-label={t('Apps')}>
       <div className="rail-ws">{p.workspace}</div>
       <div className="rail-apps" ref={appsRef}>
-        {apps.map(({ id, name, icon: Icon }, i) => (
+        {shown.map(({ id, name, icon: Icon }, i) => (
           <Fragment key={id}>
           {i === pinned.length && i > 0 && <span className="rail-sep" aria-hidden="true" />}
           <button
@@ -139,6 +164,14 @@ export function AppRail(p: Props) {
           </button>
           </Fragment>
         ))}
+        {rest.length > 0 && (
+          <button ref={overBtn} type="button" className="rail-app rail-more" onClick={() => overMenu.openFrom(overBtn)} title={t('More apps')} aria-label={t('More apps')}>
+            <span className="rail-icon">
+              <MoreHorizontal size={18} />
+            </span>
+            <span className="rail-label">{t('More')}</span>
+          </button>
+        )}
         {hiddenApps.length > 0 && (
           <button ref={moreBtn} type="button" className="rail-app rail-more" onClick={() => moreMenu.openFrom(moreBtn)} title={t('Show a hidden app')} aria-label={t('Show a hidden app')}>
             <span className="rail-icon">
@@ -149,6 +182,7 @@ export function AppRail(p: Props) {
         )}
         {appMenu.menu}
         {moreMenu.menu}
+        {overMenu.menu}
       </div>
       <div className="rail-foot">
         <button className="rail-tool" onClick={p.onSearch} title={t('Search everything (⌘K)')}>

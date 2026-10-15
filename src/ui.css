@@ -38,7 +38,7 @@
   width: 100%;
   max-height: 80vh;
   border-radius: 20px 20px 0 0;
-  padding: 6px 10px calc(14px + env(safe-area-inset-bottom));
+  padding: 6px 8px calc(14px + env(safe-area-inset-bottom)); /* 8 + the rows' own 8 = the 16 gutter */
   animation: sheet-up 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 @keyframes sheet-up {
@@ -197,7 +197,7 @@
   font-size: 13px;
 }
 .pop-sheet .sel-opt {
-  padding: 11px 10px;
+  padding: 11px 8px;
   font-size: 15px;
 }
 

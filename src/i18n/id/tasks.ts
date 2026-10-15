@@ -766,6 +766,15 @@ const id: Record<string, string> = {
   // Added 15-16 Oct 2026 (mailbox status, sorting rules, access levels, backup email, brief, Home layout, brands)
   "Normal priority": "Prioritas normal",
   '{name}’s tasks': 'Tugas {name}',
+  'Add email domain': 'Tambah domain email',
+  'Email domain': 'Domain email',
+  'Emails with @{domain} show up here as soon as someone there writes.': 'Email dengan @{domain} muncul di sini begitu seseorang di sana menulis.',
+  'Files shared in {name}’s channel and saved in its Drive folder show here.': 'File yang dibagikan di channel {name} dan disimpan di folder Drive-nya muncul di sini.',
+  'New meeting': 'Rapat baru',
+  'No emails yet': 'Belum ada email',
+  'Send the notetaker to your next call with {name} and its notes land here.': 'Kirim pencatat ke panggilan berikutnya dengan {name}, dan notulennya masuk ke sini.',
+  'Share in the channel': 'Bagikan di channel',
+  'company.com': 'perusahaan.com',
 };
 
 export default id;

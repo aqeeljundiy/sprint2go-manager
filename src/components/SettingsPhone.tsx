@@ -116,15 +116,20 @@ export function MembersPhone({ ws, users, me, canManage, onRole, onRemove, onInv
           return (
             <GRow
               key={mm.userId}
-              className={leaving ? 'row-leaving' : ''}
               pic={<Avatar person={p} size={40} />}
               label={
                 <>
                   {p.name} {mm.userId === me && <Badge tone="accent">{t('You')}</Badge>}
                 </>
               }
-              sub={p.email}
-              value={roleName(mm.role)}
+              // The role under the name, so the email gets the row's whole width.
+              className={`set-member${leaving ? ' row-leaving' : ''}`}
+              sub={
+                <>
+                  <span className="set-member-role">{roleName(mm.role)}</span>
+                  <span className="set-member-mail">{p.email}</span>
+                </>
+              }
               onClick={() => setOpen(mm.userId)}
             />
           );

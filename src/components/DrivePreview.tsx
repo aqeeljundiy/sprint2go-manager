@@ -110,19 +110,29 @@ export function DrivePreview({ item, list, onNav, onClose, onStar, onTrash, onOp
             <strong>{item.name}</strong>
             <span>{fmtSize(item.size)}</span>
             <small>{t('Previews for documents arrive with the real file server.')}</small>
+            {item.url ? (
+              <a className="primary-btn lb-action" href={item.url} download={item.name} rel="noreferrer">
+                <Download size={16} /> {t('Download')}
+              </a>
+            ) : item.threadId ? (
+              <button type="button" className="primary-btn lb-action" onClick={() => onOpenThread(item.threadId!)}>
+                <Mail size={16} /> {t('Open the email')}
+              </button>
+            ) : null}
           </div>
         )}
       </div>
 
-      {prev && (
-        <button className="lb-nav left" onClick={(e) => (e.stopPropagation(), onNav(prev))} aria-label={t('Previous file')}>
-          <ChevronLeft size={24} />
-        </button>
-      )}
-      {next && (
-        <button className="lb-nav right" onClick={(e) => (e.stopPropagation(), onNav(next))} aria-label={t('Next file')}>
-          <ChevronRight size={24} />
-        </button>
+      {/* Previous and next come as a pair: the one with nowhere to go stays, dimmed. */}
+      {list.length > 1 && (
+        <>
+          <button className="lb-nav left" disabled={!prev} onClick={(e) => (e.stopPropagation(), prev && onNav(prev))} aria-label={t('Previous file')}>
+            <ChevronLeft size={24} />
+          </button>
+          <button className="lb-nav right" disabled={!next} onClick={(e) => (e.stopPropagation(), next && onNav(next))} aria-label={t('Next file')}>
+            <ChevronRight size={24} />
+          </button>
+        </>
       )}
       {list.length > 1 && idx >= 0 && (
         <div className="lb-count">

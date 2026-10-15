@@ -73,7 +73,7 @@
     content: '';
     position: absolute;
     top: 0;
-    left: 60px;
+    left: 48px; /* 16 + 20 icon + 12 */
     right: 0;
     height: 1px;
     background: var(--line);
@@ -81,14 +81,13 @@
   .proj-sec-row:active {
     background: var(--hover);
   }
+  /* Plain 20 px icons: no tinted tile inside the card (no box inside a box). */
   .proj-sec-icon {
     flex: none;
     display: grid;
     place-items: center;
-    width: 32px;
-    height: 32px;
-    border-radius: var(--r-tile);
-    background: var(--surface-2);
+    width: 20px;
+    height: 20px;
     color: var(--text-2);
   }
   .proj-sec-name {
@@ -123,24 +122,112 @@
   }
   .proj-sec-row.danger .proj-sec-icon {
     color: var(--danger);
-    background: color-mix(in srgb, var(--danger) 10%, transparent);
+  }
+  /* Manage: its own section under the parts, with a 15/600 header on the gutter. */
+  .project-pane .proj-sec-manage {
+    margin: 24px 4px 0;
+  }
+  .project-pane .proj-sec-manage > .proj-sections {
+    margin: 0 !important;
+  }
+  .proj-sec-h {
+    margin: 0 0 8px;
+    font-size: var(--fs-heading);
+    font-weight: 600;
+    color: var(--text);
+  }
+  /* Nothing needs you: one muted line on the gutter instead of a card. */
+  .project-pane .needs-none {
+    margin: 0 4px 16px;
   }
 }
 
 @media (max-width: 767px) {
   /* Guests part: each shared item is a full-height row; the eye that shares it is a real tap target. */
+  /* Everything on the 16 px gutter (the pane pads 12): the intro, section headers at 15/600 and the rows. */
+  .project-pane .pa-hero {
+    margin-inline: 4px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+  }
+  .project-pane .pa-hero h3 {
+    font: var(--t-title);
+  }
+  .project-pane .pa-hero p {
+    font-size: var(--fs-secondary);
+    color: var(--text-2);
+  }
+  .project-pane .pa-preview,
+  .project-pane .pa-preview > .primary-btn {
+    width: 100%;
+  }
+  .project-pane .pa-preview > .primary-btn {
+    min-height: var(--tap);
+    justify-content: center;
+    border-radius: var(--r-pill);
+  }
+  .project-pane .pa-grid > section {
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .project-pane .pa-grid h4,
+  .project-pane .pa-grid h4:first-child {
+    margin: 24px 4px 8px;
+    font: var(--t-heading);
+    letter-spacing: 0;
+    color: var(--text);
+  }
+  .project-pane .pa-grid h4:first-child {
+    margin-top: 8px;
+  }
+  .project-pane .pa-grid > section > p.muted.small,
+  .project-pane .portal-admin > .pa-grid .pa-invite {
+    margin-inline: 4px;
+  }
+  .project-pane .pa-grid > section > p.muted.small {
+    margin-block: 0 8px;
+    font-size: var(--fs-secondary);
+  }
+  .project-pane .portal-admin .ca-form {
+    margin-inline: 4px;
+  }
+  .project-pane .portal-admin .ca-form > .g-row {
+    padding-inline: 0;
+  }
   .project-pane .pa-row {
     min-height: 48px;
     gap: 12px;
+    padding: 0 4px;
+    border-radius: 0;
   }
   .project-pane .pa-title {
     align-self: stretch;
     font-size: var(--fs-body);
   }
-  .project-pane .eye {
-    width: 40px;
-    height: 40px;
-    border-radius: var(--r-tile);
+  /* The eye is a plain 44 px icon button: no frame, on shown in the company colour. Its icon sits on the gutter. */
+  .project-pane .eye,
+  .project-pane .eye.on {
+    width: var(--tap);
+    height: var(--tap);
+    margin-left: -12px;
+    margin-right: -8px;
+    border: 0;
+    border-radius: var(--r-pill);
+    background: none;
+    color: var(--text-3);
+    transition: color 0.2s, background 0.2s;
+  }
+  .project-pane .eye.on {
+    color: var(--accent);
+  }
+  .project-pane .eye svg {
+    width: 20px;
+    height: 20px;
+  }
+  .project-pane .eye:active:not(:disabled) {
+    background: var(--hover);
   }
   .project-pane .proj-photo-btn {
     flex: none;
@@ -214,5 +301,139 @@
     flex: 1;
     min-height: var(--tap);
     border-radius: var(--r-pill);
+  }
+}
+
+/* Notes, Logins, Quotes and Meetings: their create is the floating button (useCreateAction), so it shows on these focused
+   screens too, the way a project's tasks keep theirs (tasks.css). The inline pill is for desktop. */
+@media (max-width: 767px) {
+  :root.bar-away:not(.kb-open):has(.project-pane:is(.tab-notes, .tab-logins, .tab-quotes, .tab-meetings)) .fab.on {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+  :root.bar-away.has-fab:not(.kb-open):has(.project-pane:is(.tab-notes, .tab-logins, .tab-quotes, .tab-meetings)) .toast {
+    bottom: calc(var(--bar-space) + 88px);
+  }
+  .project-pane .proj-tab-head,
+  .project-pane .qt-head {
+    margin-inline: 4px;
+  }
+  .project-pane .proj-tab-head > .primary-btn,
+  .project-pane .qt-head > .primary-btn {
+    display: none;
+  }
+
+  /* Meetings: plain 64 px rows with a divider from the text, no card. */
+  .project-pane .te-list.proj-meetings {
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    padding: 0;
+  }
+  .project-pane .proj-meetings > .te-row {
+    position: relative;
+    min-height: 64px;
+    padding: 8px 4px;
+    gap: 12px;
+    border: 0;
+    border-radius: 0;
+    background: none;
+  }
+  .project-pane .proj-meetings > .te-row + .te-row::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 56px; /* 4 + 40 icon + 12 */
+    right: 0;
+    height: 1px;
+    background: var(--line);
+  }
+  .project-pane .proj-meetings .kpi-icon {
+    width: 40px;
+    height: 40px;
+  }
+  .project-pane .proj-meetings .te-main strong {
+    font-size: var(--fs-body);
+    font-weight: 400;
+  }
+  .project-pane .proj-meetings .te-main small {
+    font-size: var(--fs-secondary);
+    color: var(--text-2);
+  }
+
+  /* Workload: rows on the 16 px gutter, 64 px tall. */
+  .project-pane .proj-workload .team-row {
+    min-height: 64px;
+    padding-inline: 0;
+  }
+}
+
+/* New project sheet: the type as chips inside the sheet, not a second sheet over it. */
+@media (max-width: 767px) {
+  .proj-new-sheet .pns-types {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 16px 8px;
+  }
+  .proj-new-sheet .pns-type {
+    position: relative;
+    min-height: 32px;
+    padding: 0 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-pill);
+    background: none;
+    color: var(--text-2);
+    font-size: var(--fs-secondary);
+    font-weight: 600;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+  }
+  /* 44 px to tap, 32 px to see. */
+  .proj-new-sheet .pns-type::after {
+    content: '';
+    position: absolute;
+    inset: -6px -2px;
+  }
+  .proj-new-sheet .pns-type.on {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+}
+@media (max-width: 767px) and (prefers-reduced-motion: reduce) {
+  .proj-new-sheet .pns-type {
+    transition: none;
+  }
+}
+
+@media (max-width: 767px) {
+  /* Phones manage the project from its home's Manage section. */
+  .project-pane .tasks-head .proj-head-more {
+    display: none;
+  }
+}
+
+/* Tablet and desktop: when a project's tabs run past the edge, the last one fades out so it reads as "scroll for more".
+   A scroll-driven animation drops the fade once the strip is scrolled to its end. */
+@media (min-width: 768px) {
+  .project-pane .project-tabs {
+    mask-image: linear-gradient(to right, #000 calc(100% - 48px), transparent);
+  }
+  @supports (animation-timeline: scroll()) {
+    .project-pane .project-tabs {
+      animation: proj-tabs-edge linear both;
+      animation-timeline: scroll(self inline);
+    }
+  }
+}
+@keyframes proj-tabs-edge {
+  0%,
+  96% {
+    mask-image: linear-gradient(to right, #000 calc(100% - 48px), transparent);
+  }
+  100% {
+    mask-image: none;
   }
 }

@@ -30,6 +30,8 @@ import {
   Plus,
   RefreshCw,
   Send,
+  Check,
+  ClipboardPaste,
   Share2,
   Sparkles,
   Square,
@@ -231,6 +233,9 @@ export function MeetView(p: MeetProps & { part?: 'meetings' | 'notes'; embedded?
     <TopBar
       app="meet"
       lead={sub ? <TopBarBack onClick={() => p.onPage({ kind: 'folders' })} /> : undefined}
+      // Past and Unfiled have their own search pill: one search entry per screen.
+      search={!(pg.kind === 'unfiled' || ((pg.kind === 'list' || pg.kind === 'upcoming') && p.part === 'notes'))}
+      actions={pg.kind === 'folder' ? <TopBarButton icon={Sparkles} label={t('Ask AI')} onClick={() => p.onAsk({ kind: 'client', id: pg.clientId })} /> : undefined}
       title={
         <h1 className={`mt-title plain${sub ? ' small' : ''}`}>
           <span className="mt-title-text">{pg.kind === 'folder' ? (p.clients.find((c) => c.id === pg.clientId)?.name ?? t('Folder')) : pg.kind === 'unfiled' ? t('Unfiled') : pg.kind === 'tasks' ? t('Tasks from meetings') : t('Meet')}</span>
@@ -381,7 +386,7 @@ function useFilter(list: Meeting[]) {
       <Select value={type} onChange={setType} label={t('Type')} options={[{ value: '', label: t('All types') }, ...Object.entries(TYPE_LABEL).map(([v, l]) => ({ value: v, label: l }))]} />
     </div>
   );
-  return { shown, bar, filtering: !!(q || type) };
+  return { shown, bar, filtering: !!(q || type), clear: () => (setQ(''), setType('')) };
 }
 
 function MeetingList(p: MeetProps & { unfiled: boolean }) {
@@ -488,7 +493,7 @@ function MeetingPage(p: MeetProps & { m: Meeting }) {
   const remove = () => confirm(t('Delete this meeting, its recording, transcript and tasks?')) && p.onDelete(m.id);
   const more = useActionMenu(
     () => [
-      { label: m.share ? t('Shared') : t('Share'), hint: m.share ? t('A read-only link is on') : t('A read-only link'), icon: Share2, run: () => p.onShare(m.id) },
+      // Share isn't here: it's always its own button next to ⋮.
       { label: t('Ask about this meeting'), icon: Sparkles, run: () => p.onAsk({ kind: 'meeting', id: m.id }) },
       ...(live && status !== 'stopping' && status !== 'processing' ? [{ label: t('Make bot leave'), icon: Square, run: () => p.onStop(m.id) }] : []),
       ...(!live && (m.transcript?.length ?? 0) > 0 ? [{ label: t('Regenerate notes'), hint: t('From the transcript'), icon: RefreshCw, run: regenerate }] : []),
@@ -496,7 +501,7 @@ function MeetingPage(p: MeetProps & { m: Meeting }) {
       { label: t('Bot log'), hint: t('What the notetaker did, step by step'), icon: FileText, run: () => setTab('log') },
       { label: t('Delete'), icon: Trash2, danger: true, group: 'end', run: remove },
     ],
-    { title: m.title, menu: phone },
+    { title: m.title },
   );
   // Phones: Google's details page: Back, then Share and ⋮ at the top right.
   const phoneBar = phone && (
@@ -533,23 +538,16 @@ function MeetingPage(p: MeetProps & { m: Meeting }) {
             p.onFolder(m.id, v || null, false);
           }} projects={p.clients} none={t('Unfiled')} label={t('Folder')} className="sel-flat" />
         <Select value={m.type ?? null} onChange={(v) => p.onPatch(m.id, { type: v as MeetingType })} placeholder={t('Type…')} label={t('Type')} className="sel-flat" options={Object.entries(TYPE_LABEL).map(([v, l]) => ({ value: v, label: l }))} />
-        {m.filedBy && m.filedBy !== 'user' && <span className="muted small">{m.filedBy === 'ai' ? t('auto-filed') : t('filed by rule')}</span>}
+        {m.filedBy && m.filedBy !== 'user' && <span className="muted small m-filed">{m.filedBy === 'ai' ? t('auto-filed') : t('filed by rule')}</span>}
         <span className="spacer" />
         {live && status !== 'stopping' && status !== 'processing' && (
           <button className="ghost-btn sm" onClick={() => p.onStop(m.id)}>
             <Square size={13} /> {t('Make bot leave')}
           </button>
         )}
-        {!live && (m.transcript?.length ?? 0) > 0 && (
-          <button className="ghost-btn sm" title={t('Write the summary and tasks again from the transcript')} onClick={regenerate}>
-            <RefreshCw size={13} /> {t('Regenerate notes')}
-          </button>
-        )}
+        {/* Regenerate and Delete live in ⋮, so the header stays one row on tablets. */}
         <button className="ghost-btn sm" onClick={() => p.onShare(m.id)}>
           <Share2 size={13} /> {m.share ? t('Shared') : t('Share')}
-        </button>
-        <button className="icon-btn sm m-delete" title={t('Delete')} onClick={remove}>
-          <Trash2 size={15} />
         </button>
         {!phone && (
           <button ref={moreBtn} className="icon-btn m-more" aria-label={t('More for this meeting')} onClick={() => more.openFrom(moreBtn)}>
@@ -607,12 +605,14 @@ function MeetingPage(p: MeetProps & { m: Meeting }) {
                 label={t('Folder')}
                 className="er-sel"
               />
+              <ChevronRight size={20} className="m-fact-chev" aria-hidden="true" />
             </div>
             <div className="dr-row">
               <span className="dr-icon">
                 <Tag size={20} />
               </span>
               <Select value={m.type ?? null} onChange={(v) => p.onPatch(m.id, { type: v as MeetingType })} placeholder={t('Meeting type')} label={t('Meeting type')} className={`er-sel${m.type ? '' : ' er-empty'}`} options={Object.entries(TYPE_LABEL).map(([v, l]) => ({ value: v, label: t('{type} meeting', { type: l }) }))} />
+              <ChevronRight size={20} className="m-fact-chev" aria-hidden="true" />
             </div>
             {(m.attendees.length > 0 || speakers.length > 0) && (
               <div className="dr-row">
@@ -627,6 +627,7 @@ function MeetingPage(p: MeetProps & { m: Meeting }) {
                 <CircleCheck size={20} />
               </span>
               <span className="dr-text">{t('{done} of {total} done', { done: doneN, total: mTasks.length })}</span>
+              <ChevronRight size={20} className="m-fact-chev" aria-hidden="true" />
             </button>
           </div>
         )}
@@ -950,6 +951,8 @@ function TaskList(p: MeetProps & { list: Todo[]; meetingFor: (t: Todo) => Meetin
     : [['', p.list]];
   return (
     <div className="m-tasks">
+      {/* Nothing to select over an empty list. */}
+      {(selecting || p.list.length > 0 || !!p.extra) && (
       <div className="bulk-bar">
         {selecting ? (
           <>
@@ -980,6 +983,7 @@ function TaskList(p: MeetProps & { list: Todo[]; meetingFor: (t: Todo) => Meetin
         <span className="spacer" />
         {p.extra}
       </div>
+      )}
       {p.list.length === 0 && p.empty}
       {groups.map(([mid, list]) => {
         const mt = mid ? p.meetings.find((x) => x.id === mid) : undefined;
@@ -1082,14 +1086,16 @@ function MeetTasks(p: MeetProps) {
             {t('Add a task')}
           </button>
         ) : (
-          <div className="todo-add task-add">
-            <Plus size={16} />
-            <input value={title} onChange={(e) => setTitle(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && title.trim() && add()} placeholder={t('Add a task…')} />
-            {whoField}
-            {dueField}
-            <button className="primary-btn sm" disabled={!title.trim()} onClick={add}>
-              {t('Add')}
-            </button>
+          <div className="mt-add-wrap">
+            <div className="todo-add task-add">
+              <Plus size={16} />
+              <input value={title} onChange={(e) => setTitle(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && title.trim() && add()} placeholder={t('Add a task…')} />
+              {whoField}
+              {dueField}
+              <button className="primary-btn sm" disabled={!title.trim()} onClick={add}>
+                {t('Add')}
+              </button>
+            </div>
           </div>
         )}
         {adding && (
@@ -1117,7 +1123,21 @@ function MeetTasks(p: MeetProps) {
           meetingFor={(tk) => p.meetings.find((m) => m.id === tk.meetingId)}
           ownerName={(tk) => p.meetings.find((m) => m.id === tk.meetingId)?.actions.find((a) => a.taskId === tk.id)?.owner}
           nameFor={(tk) => p.users.find((u) => u.id === tk.userId)}
-          empty={<EmptyState compact text={tab === 'done' ? t('Nothing finished yet.') : t('No open tasks. Nice.')} />}
+          empty={
+          <EmptyState
+            compact={!phone}
+            icon={phone ? <ListChecks size={28} /> : undefined}
+            title={phone ? (tab === 'done' ? t('Nothing finished yet') : t('No open tasks')) : undefined}
+            text={tab === 'done' ? t('Tasks you tick off show up here.') : t('Action items from your meetings land here.')}
+            action={
+              phone && tab !== 'done' ? (
+                <button type="button" className="ghost-btn" onClick={() => setAdding(true)}>
+                  <Plus size={18} /> {t('Add task')}
+                </button>
+              ) : undefined
+            }
+          />
+        }
         />
       </div>
     </section>
@@ -1130,9 +1150,18 @@ function FolderPage(p: MeetProps & { clientId: string }) {
   const c = p.clients.find((x) => x.id === p.clientId);
   const [tab, setTab] = useState<'meetings' | 'tasks'>('meetings');
   const list = p.meetings.filter((m) => m.clientId === p.clientId).sort((a, b) => b.at.localeCompare(a.at));
-  const { shown, bar, filtering } = useFilter(list);
+  const { shown, bar, filtering, clear } = useFilter(list);
   const tasks = p.tasks.filter((tk) => tk.meetingId && list.some((m) => m.id === tk.meetingId));
+  const phone = usePhone();
+  const [adding, setAdding] = useState(false);
+  const [title, setTitle] = useState('');
   if (!c) return null;
+  const addTask = () => (p.onAddTask({ title: title.trim(), userId: p.me, clientId: c.id }), setTitle(''), setAdding(false));
+  const clearBtn = (
+    <button type="button" className="ghost-btn" onClick={clear}>
+      {t('Clear filters')}
+    </button>
+  );
   return (
     <section className="meet-pane view-enter">
       <Head
@@ -1145,13 +1174,27 @@ function FolderPage(p: MeetProps & { clientId: string }) {
         sub={t('{Project} folder', { project: term.one })}
         onMenu={p.onMenu}
       >
-        <button className="ghost-btn sm" onClick={() => p.onOpenClient(c.id)}>
-          {t('{Project} page: overview, mail, files', { project: term.one })}
-        </button>
-        <button className="ghost-btn sm" onClick={() => p.onAsk({ kind: 'client', id: c.id })}>
-          <Sparkles size={13} /> {t('Ask AI')}
-        </button>
+        {/* Phones: Ask AI is in the top bar and the project page is a row below. */}
+        {!phone && (
+          <>
+            <button className="ghost-btn sm" onClick={() => p.onOpenClient(c.id)}>
+              {t('{Project} page: overview, mail, files', { project: term.one })}
+            </button>
+            <button className="ghost-btn sm" onClick={() => p.onAsk({ kind: 'client', id: c.id })}>
+              <Sparkles size={13} /> {t('Ask AI')}
+            </button>
+          </>
+        )}
       </Head>
+      {phone && (
+        <button type="button" className="mf-page" onClick={() => p.onOpenClient(c.id)}>
+          <span className="mf-page-text">
+            <strong>{t('{Project} page', { project: term.one })}</strong>
+            <small>{t('Overview, mail and files')}</small>
+          </span>
+          <ChevronRight size={20} className="mf-page-chev" />
+        </button>
+      )}
       <div className="client-tabs">
         {(
           [
@@ -1168,9 +1211,26 @@ function FolderPage(p: MeetProps & { clientId: string }) {
         <TabPane key={tab}>
         {tab === 'meetings' && (
           <>
-            {bar(t('Search this {project}’s meetings', { project: term.one }))}
+            {list.length > 0 && bar(t('Search this {project}’s meetings', { project: term.one }))}
             <MeetingRows list={shown} clients={p.clients} tasks={p.tasks} onOpen={(id) => p.onPage({ kind: 'meeting', id })} />
-            {!shown.length && <EmptyState compact text={filtering ? t('Nothing matches.') : t('No meetings yet.')} />}
+            {!shown.length &&
+              (filtering ? (
+                <EmptyState compact={!phone} title={t('Nothing matches')} text={t('Try another word or show all meetings.')} action={clearBtn} />
+              ) : (
+                <EmptyState
+                  compact={!phone}
+                  icon={<Video size={28} />}
+                  title={t('No meetings yet')}
+                  text={t('Meetings filed under {project} show up here.', { project: c.name })}
+                  action={
+                    p.canSendBot !== false ? (
+                      <button type="button" className="primary-btn" onClick={p.onSend}>
+                        <Bot size={18} /> {t('Send notetaker')}
+                      </button>
+                    ) : undefined
+                  }
+                />
+              ))}
           </>
         )}
         {tab === 'tasks' && (
@@ -1180,11 +1240,37 @@ function FolderPage(p: MeetProps & { clientId: string }) {
             grouped
             meetingFor={(tk) => p.meetings.find((m) => m.id === tk.meetingId)}
             nameFor={(tk) => p.users.find((u) => u.id === tk.userId)}
-            empty={<EmptyState compact text={t('No tasks from these meetings yet. Promises made in a meeting become tasks here.')} />}
+            empty={
+              <EmptyState
+                compact={!phone}
+                icon={<ListChecks size={28} />}
+                title={t('No tasks yet')}
+                text={t('Promises made in a meeting become tasks here.')}
+                action={
+                  <button type="button" className="ghost-btn" onClick={() => setAdding(true)}>
+                    <Plus size={18} /> {t('Add task')}
+                  </button>
+                }
+              />
+            }
           />
         )}
         </TabPane>
       </div>
+      {adding && (
+        <Sheet
+          title={t('New task')}
+          onClose={() => setAdding(false)}
+          className="mt-quick"
+          footer={
+            <button type="button" className="primary-btn" disabled={!title.trim()} onClick={addTask}>
+              {t('Add task')}
+            </button>
+          }
+        >
+          <input className="mt-quick-title" autoFocus value={title} onChange={(e) => setTitle(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && title.trim() && addTask()} placeholder={t('What needs doing?')} aria-label={t('Task')} />
+        </Sheet>
+      )}
     </section>
   );
 }
@@ -1335,7 +1421,10 @@ export function SendBotDialog({ clients, botName, languages, real, workspaceId, 
   const [name, setName] = useState('');
   const [clientId, setClientId] = useState('');
   const [err, setErr] = useState('');
+  // Phones: one of the next calls, picked by tapping its row (Send at the top sends it).
+  const [picked, setPicked] = useState<CalEvent | null>(null);
   const send = () => {
+    if (picked && !url.trim() && onSendEvent) return onSendEvent(picked);
     if (!/^https?:\/\/(meet\.google\.com|[\w.-]*zoom\.us)\//i.test(url.trim())) return setErr(t('Paste a Google Meet or Zoom link'));
     onSend({ url: url.trim(), title: title.trim(), botName: name.trim() || botName, clientId, language: language || undefined });
   };
@@ -1361,7 +1450,7 @@ export function SendBotDialog({ clients, botName, languages, real, workspaceId, 
     const paste = async () => {
       try {
         const v = (await navigator.clipboard.readText()).trim();
-        if (v) (setUrl(v), setErr(''));
+        if (v) (setUrl(v), setErr(''), setPicked(null));
       } catch {
         setErr(t('Couldn’t read what you copied. Paste it into the field instead.'));
       }
@@ -1379,7 +1468,7 @@ export function SendBotDialog({ clients, botName, languages, real, workspaceId, 
             </button>
             <h2 className="sheet-title tn-title">{t('Send notetaker')}</h2>
             <span className="spacer" />
-            <button type="button" className="primary-btn qc-save" onClick={send} disabled={usedUp || !url.trim()}>
+            <button type="button" className="primary-btn qc-save" onClick={send} disabled={usedUp || (!url.trim() && !picked)}>
               {t('Send')}
             </button>
           </>
@@ -1391,7 +1480,7 @@ export function SendBotDialog({ clients, botName, languages, real, workspaceId, 
             <>
               <div className="ad-heading">{t('Your next calls')}</div>
               {next.map((e) => (
-                <button key={e.id} type="button" className="tn-call" onClick={() => onSendEvent(e)}>
+                <button key={e.id} type="button" className={`tn-call${picked?.id === e.id ? ' on' : ''}`} aria-pressed={picked?.id === e.id} onClick={() => (setPicked(picked?.id === e.id ? null : e), setUrl(''), setErr(''))}>
                   <CallMark kind={callOf(e, demo)} />
                   <span className="mh-text">
                     <strong>{e.title}</strong>
@@ -1399,7 +1488,7 @@ export function SendBotDialog({ clients, botName, languages, real, workspaceId, 
                       {fmtTime(e.start)} · {MEETING_NAME[callOf(e, demo)!]}
                     </small>
                   </span>
-                  <Send size={18} className="tn-send" />
+                  <span className="tn-pick" aria-hidden="true">{picked?.id === e.id && <Check size={20} />}</span>
                 </button>
               ))}
               <div className="ad-heading">{t('Or paste a link')}</div>
@@ -1411,10 +1500,10 @@ export function SendBotDialog({ clients, botName, languages, real, workspaceId, 
             </span>
             <span className="er-body">
               <span className="er-field">
-                <input className="er-input" value={url} onChange={(e) => (setUrl(e.target.value), setErr(''))} placeholder={t('Google Meet or Zoom link')} inputMode="url" aria-label={t('Meeting link')} onKeyDown={(e) => e.key === 'Enter' && send()} />
+                <input className="er-input" value={url} onChange={(e) => (setUrl(e.target.value), setErr(''), setPicked(null))} placeholder={t('Meet or Zoom link')} inputMode="url" aria-label={t('Meeting link')} onKeyDown={(e) => e.key === 'Enter' && send()} />
                 {!url && (
-                  <button type="button" className="tn-paste" onClick={() => void paste()}>
-                    {t('Paste')}
+                  <button type="button" className="icon-btn tn-paste" onClick={() => void paste()} aria-label={t('Paste')} title={t('Paste')}>
+                    <ClipboardPaste size={20} />
                   </button>
                 )}
               </span>
@@ -1529,10 +1618,67 @@ export function SendBotDialog({ clients, botName, languages, real, workspaceId, 
 /* ---------------- Share ---------------- */
 
 export function ShareDialog({ m, onSave, onOff, onPreview, onClose, toast }: { m: Meeting; onSave: (opts: { transcript: boolean; video: boolean }) => void; onOff: () => void; onPreview: () => void; onClose: () => void; toast: (t: string) => void }) {
+  const phone = usePhone();
   const hasVideo = m.recording?.keep === 'video' || m.recording?.keep === 'audio';
   const [transcript, setTranscript] = useState(m.share?.transcript ?? true);
   const [video, setVideo] = useState(m.share?.video ?? hasVideo);
   const link = m.share ? `https://meet.sprint2go.com/s/${m.share.token}` : '';
+  const save = () => onSave({ transcript, video: video && hasVideo });
+  const body = (
+    <>
+      <p className="modal-intro">{t('Anyone with the link can view a read-only page: summary and tasks, plus the parts you allow below. No login needed.')}</p>
+      <label className="set-row toggle-row">
+        <span>
+          <strong>{t('Include transcript')}</strong>
+          <small>{t('The full conversation, line by line')}</small>
+        </span>
+        <button type="button" role="switch" aria-checked={transcript} className={`switch ${transcript ? 'on' : ''}`} onClick={() => setTranscript(!transcript)}>
+          <span />
+        </button>
+      </label>
+      <label className="set-row toggle-row">
+        <span>
+          <strong>{t('Include recording')}</strong>
+          <small>{hasVideo ? t('The meeting recording') : t('This meeting has no recording')}</small>
+        </span>
+        <button type="button" role="switch" disabled={!hasVideo} aria-checked={video && hasVideo} className={`switch ${video && hasVideo ? 'on' : ''}`} onClick={() => setVideo(!video)}>
+          <span />
+        </button>
+      </label>
+      {link && (
+        <div className="share-link">
+          <input readOnly value={link} onFocus={(e) => e.target.select()} />
+          <button className="ghost-btn sm" onClick={() => navigator.clipboard?.writeText(link).then(() => toast(t('Link copied')), () => toast(t('Copying isn’t allowed here')))}>
+            {t('Copy link')}
+          </button>
+          <button className="link-btn" onClick={onPreview}>
+            <Eye size={13} /> {t('Preview')}
+          </button>
+        </div>
+      )}
+    </>
+  );
+  // Phones: a sheet with its grab handle and one full-width button; turning the link off is a quiet line in it.
+  if (phone)
+    return (
+      <Sheet
+        title={t('Share this meeting')}
+        onClose={onClose}
+        className="m-share-sheet"
+        footer={
+          <button type="button" className="primary-btn" onClick={save}>
+            {link ? t('Save') : t('Create link')}
+          </button>
+        }
+      >
+        {body}
+        {link && (
+          <button type="button" className="link-btn danger-text m-share-off" onClick={() => confirm(t('Turn off this link? People who have it will no longer see the meeting.')) && onOff()}>
+            {t('Turn off link')}
+          </button>
+        )}
+      </Sheet>
+    );
   return (
     <div className="modal-scrim" onMouseDown={onClose}>
       <div className="modal" role="dialog" aria-label={t('Share this meeting')} onMouseDown={(e) => e.stopPropagation()} onKeyDown={(e) => e.key === 'Escape' && onClose()}>
@@ -1546,36 +1692,7 @@ export function ShareDialog({ m, onSave, onOff, onPreview, onClose, toast }: { m
         </header>
         <div className="modal-body">
           <SmoothHeight>
-          <p className="modal-intro">{t('Anyone with the link can view a read-only page: summary and tasks, plus the parts you allow below. No login needed.')}</p>
-          <label className="set-row toggle-row">
-            <span>
-              <strong>{t('Include transcript')}</strong>
-              <small>{t('The full conversation, line by line')}</small>
-            </span>
-            <button type="button" role="switch" aria-checked={transcript} className={`switch ${transcript ? 'on' : ''}`} onClick={() => setTranscript(!transcript)}>
-              <span />
-            </button>
-          </label>
-          <label className="set-row toggle-row">
-            <span>
-              <strong>{t('Include recording')}</strong>
-              <small>{hasVideo ? t('The meeting recording') : t('This meeting has no recording')}</small>
-            </span>
-            <button type="button" role="switch" disabled={!hasVideo} aria-checked={video && hasVideo} className={`switch ${video && hasVideo ? 'on' : ''}`} onClick={() => setVideo(!video)}>
-              <span />
-            </button>
-          </label>
-          {link && (
-            <div className="share-link">
-              <input readOnly value={link} onFocus={(e) => e.target.select()} />
-              <button className="ghost-btn sm" onClick={() => navigator.clipboard?.writeText(link).then(() => toast(t('Link copied')), () => toast(t('Copying isn’t allowed here')))}>
-                {t('Copy link')}
-              </button>
-              <button className="link-btn" onClick={onPreview}>
-                <Eye size={13} /> {t('Preview')}
-              </button>
-            </div>
-          )}
+          {body}
           </SmoothHeight>
         </div>
         <footer className="modal-foot">
@@ -1588,7 +1705,7 @@ export function ShareDialog({ m, onSave, onOff, onPreview, onClose, toast }: { m
           <button className="ghost-btn" onClick={onClose}>
             {t('Close')}
           </button>
-          <button className="primary-btn" onClick={() => onSave({ transcript, video: video && hasVideo })}>
+          <button className="primary-btn" onClick={save}>
             {link ? t('Save') : t('Create link')}
           </button>
         </footer>

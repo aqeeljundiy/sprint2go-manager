@@ -280,7 +280,7 @@ export function QuickAdd({ ops, defaults, mode, onClose, where, inputRef }: { op
             assignees.length > 0 && !(assignees.length === 1 && assignees[0] === ops.me),
             !!tokenOf('person') && !picks.assignees,
           )}
-          {!todo && chip('project', proj ? <span className="dot" style={{ background: proj.color }} /> : <Hash size={15} />, proj ? proj.name : term.One, !!proj, !!tokenOf('project') && !has('clientId'))}
+          {mode !== 'sheet' && chip('project', proj ? <span className="dot" style={{ background: proj.color }} /> : <Hash size={15} />, proj ? proj.name : term.One, !!proj, !!tokenOf('project') && !has('clientId'))}
           <button type="button" className={`qa-chip${priority === 'high' ? ' on p-high' : ''}${tokenOf('priority') && !picks.priority ? ' from-text' : ''}`} onClick={() => pick({ priority: priority === 'high' ? 'normal' : 'high' }, 'priority', false)} aria-pressed={priority === 'high'}>
             <Flag size={15} />
             <span>{priority === 'high' ? t('High priority') : t('Priority')}</span>
@@ -292,7 +292,7 @@ export function QuickAdd({ ops, defaults, mode, onClose, where, inputRef }: { op
         </div>
       </div>
       <div className="qa-foot">
-        {todo ? (
+        {mode === 'sheet' ? (
           <button type="button" ref={(el) => void (chipRefs.current.project = el)} className={`qa-proj${tokenOf('project') && !has('clientId') ? ' from-text' : ''}`} onClick={() => setPicker(picker === 'project' ? null : 'project')} aria-expanded={picker === 'project'} aria-label={t('{project}: {name}', { project: term.One, name: proj ? proj.name : where })}>
             <span className="qa-hash" style={{ color: proj?.color ?? 'var(--text-3)' }}>
               #

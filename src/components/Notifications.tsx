@@ -104,7 +104,7 @@ export function NoticesScreen({ notices, users, needs, onOpen, onRead, onReadAll
         ) : undefined
       }
     >
-      <div className="segmented ns-chips" role="tablist" aria-label={t('Show')}>
+      <div className="client-tabs ns-tabs" role="tablist" aria-label={t('Show')}>
         {(
           [
             ['all', t('All')],

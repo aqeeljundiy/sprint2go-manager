@@ -5,7 +5,7 @@
  * tab's shape; every bar has the same look (system.css: a 32px round pill tinted with the accent), so tabs and
  * segmented controls read as one family. Screens don't need to do anything: any container matching BARS gets it.
  */
-const BARS = '.segmented, .client-tabs, .chan-tabs, .cs-tabs';
+const BARS = '.segmented, .client-tabs, .chan-tabs, .cs-tabs, .ct-line';
 
 type Ink = HTMLSpanElement & { _kind?: 'pill' | 'line' };
 

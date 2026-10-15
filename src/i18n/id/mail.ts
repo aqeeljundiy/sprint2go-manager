@@ -139,6 +139,8 @@ const id: Record<string, string> = {
   'Could not be delivered: {why}': 'Tidak bisa dikirim: {why}',
   'the receiving server refused it': 'server penerima menolaknya',
   'Blocked {n} trackers, so the sender can’t see when you read this': '{n} pelacak diblokir, jadi pengirim tidak tahu kapan Anda membaca email ini',
+  'Blocked {n} trackers': '{n} pelacak diblokir',
+  'Write your reply': 'Tulis balasan Anda',
   'Saved to Drive': 'Tersimpan di Drive',
   'Save to Drive': 'Simpan ke Drive',
   'Save {name} to Drive': 'Simpan {name} ke Drive',

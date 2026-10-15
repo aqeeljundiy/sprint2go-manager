@@ -607,6 +607,44 @@
   padding: 8px 10px 8px 14px;
   border-top: 1px solid var(--line);
 }
+/* The sheet (tablet and phone): the project is a tappable "# Project" chip in the footer. */
+.qa-proj {
+  flex: 1;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: max-content;
+  min-height: var(--tap);
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--r-tile);
+  background: none;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+.qa-proj:hover,
+.qa-proj[aria-expanded='true'] {
+  background: var(--hover);
+}
+.qa-proj .qa-hash {
+  font-weight: 600;
+}
+.qa-proj .qa-proj-name {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.qa-proj svg {
+  flex: none;
+  color: var(--text-3);
+}
+.qa-proj ~ .qa-send {
+  margin-left: auto;
+}
 .qa-where {
   flex: 1;
   min-width: 0;
@@ -766,11 +804,26 @@
 /* ---------- Board ---------- */
 .tboard {
   display: grid;
-  grid-template-columns: repeat(var(--cols), minmax(240px, 1fr));
+  grid-template-columns: repeat(var(--cols), minmax(min(240px, max(176px, calc((100% - 12px * (var(--cols) - 1)) / var(--cols)))), 1fr)); /* columns shrink to fit a tablet pane */
   align-items: start;
   gap: 12px;
   overflow-x: auto;
   padding-bottom: 8px;
+}
+/* When the columns overflow (a tablet pane), the right edge fades so the cut-off column reads as "scroll for more"; the fade leaves at the end. */
+@supports (animation-timeline: scroll()) {
+  .tboard {
+    animation: tboard-edge linear both;
+    animation-timeline: scroll(self inline);
+  }
+}
+@keyframes tboard-edge {
+  from {
+    mask-image: linear-gradient(to right, #000 calc(100% - 48px), transparent);
+  }
+  to {
+    mask-image: linear-gradient(to right, #000 100%, transparent);
+  }
 }
 .tcol {
   display: flex;

@@ -130,8 +130,8 @@ export function QuickReply({
             <span>{t('Subject')}</span>
             <input value={re} onChange={(e) => setRe(e.target.value)} />
           </label>
-          <div className="compose-body" onClick={(e) => startAtTop(e, typed)}>
-            <RichEditor ref={editor} autoFocus initialHtml={initialHtml} placeholder={t('Compose email')} onChange={(html, text) => setBody({ html, text })} onSubmit={send} spellLang={spellLang} suggest={suggest} onImages={inlineImages} />
+          <div className="compose-body" onClick={(e) => startAtTop(e, typed)} style={{ ['--qr-ph' as string]: JSON.stringify(t('Write your reply')) }}>
+            <RichEditor ref={editor} autoFocus initialHtml={initialHtml} placeholder={t('Write your reply')} onChange={(html, text) => setBody({ html, text })} onSubmit={send} spellLang={spellLang} suggest={suggest} onImages={inlineImages} />
           </div>
           <DraftFilesList state={files} />
           {quoted && (
@@ -166,8 +166,7 @@ export function QuickReply({
       <ActionSheet
         open={more}
         onClose={() => setMore(false)}
-        anchor={moreBtn}
-        menu
+        title={t('More options')}
         actions={[
           { label: t('Templates'), icon: FileText, run: () => setTpl(true) },
           ...(track ? [{ label: t('Read tracking'), icon: track.on ? Eye : EyeOff, checked: track.on, run: () => track.set(!track.on) }] : []),

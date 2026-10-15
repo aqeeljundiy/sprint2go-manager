@@ -93,7 +93,14 @@ export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu,
         }
       >
         <input className="pns-name" autoFocus value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && save()} placeholder={t('{Project} name', { project: term.one })} aria-label={t('{Project} name', { project: term.one })} />
-        <Select<string> value={type} onChange={setType} label={t('Type')} className="sel-flat" options={[{ value: '', label: t('No type') }, ...PROJECT_TYPES.map((ty) => ({ value: ty, label: t(ty) }))]} />
+        {/* The type is picked right in the sheet (chips), so no second sheet covers the form. */}
+        <div className="pns-types" role="radiogroup" aria-label={t('Type')}>
+          {[{ value: '', label: t('No type') }, ...PROJECT_TYPES.map((ty) => ({ value: ty, label: t(ty) }))].map((o) => (
+            <button key={o.value || 'none'} type="button" role="radio" aria-checked={type === o.value} className={`pns-type${type === o.value ? ' on' : ''}`} onClick={() => setType(o.value)}>
+              {o.label}
+            </button>
+          ))}
+        </div>
       </Sheet>
     )
   ) : (

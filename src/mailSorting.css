@@ -488,3 +488,12 @@
     animation: none;
   }
 }
+
+/* Search options as a dialog: a comfortable width, and the query hint as plain muted text (no grey box). */
+.sheet.so-sheet {
+  width: min(520px, 100%);
+}
+.so-sheet .so-query {
+  padding: 0;
+  background: none;
+}

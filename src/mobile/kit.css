@@ -166,7 +166,11 @@
   text-align: left;
   transition: background 0.15s, color 0.15s;
 }
-.as-item:hover:not(:disabled),
+@media (hover: hover) {
+  .as-item:hover:not(:disabled) {
+    background: var(--hover);
+  }
+}
 .as-item:focus-visible {
   background: var(--hover);
 }

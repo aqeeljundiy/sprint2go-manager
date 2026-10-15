@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { TabPane } from './ui/Smooth';
 import { PROJECT_TYPES, term } from '../terms';
-import { Archive, RotateCcw, Inbox, X, Brain, CheckCircle2, Clock, Columns3, Eye, EyeOff, FileText, Hash, LayoutGrid, LayoutTemplate, Mail, Menu, MessagesSquare, Plus, Sparkles, Users, Video, type LucideIcon, FolderInput, ChevronRight, MessageCircle, CalendarCheck2, CalendarRange, ListTodo, Send, Layers, SlidersHorizontal, Settings2, BarChart3, LayoutDashboard } from 'lucide-react';
+import { Archive, RotateCcw, Inbox, X, Brain, CheckCircle2, Clock, Columns3, Eye, EyeOff, FileText, Hash, LayoutGrid, LayoutTemplate, Mail, Menu, MessagesSquare, Plus, Sparkles, Users, Video, type LucideIcon, FolderInput, ChevronRight, MessageCircle, CalendarCheck2, CalendarRange, ListTodo, Send, Layers, SlidersHorizontal, Settings2, BarChart3, LayoutDashboard, NotebookPen, KeyRound, AtSign, MoreHorizontal } from 'lucide-react';
 import type { Channel, ChatMessage, Client, DriveItem, Meeting, TaskStatus, Team, Thread, Todo, User, ClientPerson, Workspace, Note, DataTable, TableRow } from '../types';
 import { kindOf, stageOf, stagesFor, stagesForScope, toneOf } from '../stages';
 import { OwnStages } from './admin/TaskStages';
@@ -27,7 +27,7 @@ import { useCreateAction } from '../mobile/chrome';
 import { TopBar, TopBarBack } from '../mobile/TopBar';
 import { usePhone } from '../mobile/media';
 import { Sheet } from './ui/Sheet';
-import type { SheetAction } from './ui/ActionSheet';
+import { useActionMenu, type SheetAction } from './ui/ActionSheet';
 import type { TopSettingsRow } from './MobileTop';
 import { TaskViews, type SavedTaskView, type PhoneBar } from './tasks/TaskViews';
 import { TasksBrowse, type BrowseGroup } from './tasks/TasksBrowse';
@@ -164,6 +164,8 @@ interface Props {
   logins?: { id: string; title: string; url?: string; username?: string; clientId?: string; hasTotp?: boolean }[];
   onOpenLogins?: (clientId: string) => void;
   onNewLogin?: (clientId: string) => void;
+  /** A new calendar event (a meeting with this project). */
+  onNewMeeting?: () => void;
   /** Tables that belong to this project (leads, pipelines…); open one, or make one for it. */
   tables?: DataTable[];
   tableRows?: TableRow[];
@@ -634,6 +636,21 @@ export function TasksView(p: Props) {
 
   // Admins, the owner and the project's Leads manage a project: its status, people, guests and their access.
   const projectManage = !!client && (p.canManage || client.ownerId === p.me || (client.members ?? []).some((m) => m.userId === p.me && m.role === 'lead'));
+  // Phones: a part's create is the floating button, not a pill inline with the intro (Notes, Logins, Meetings). An
+  // empty part has its action in its EmptyState instead, so there is one create at a time.
+  const partCreate =
+    phone && client
+      ? clientTab === 'notes' && p.notes.some((n) => n.clientId === client.id)
+        ? { label: t('New note'), icon: Plus, run: () => p.onNewNote(client.id) }
+        : clientTab === 'logins' && p.onNewLogin && (p.logins ?? []).some((l) => l.clientId === client.id)
+          ? { label: t('New login'), icon: Plus, run: () => p.onNewLogin!(client.id) }
+          : clientTab === 'meetings' && p.onNewMeeting && p.meetings.some((m) => m.clientId === client.id)
+            ? { label: t('New meeting'), icon: Plus, run: p.onNewMeeting }
+            : null
+      : null;
+  useCreateAction(app, partCreate);
+  const [domainOpen, setDomainOpen] = useState(false);
+  const [domainDraft, setDomainDraft] = useState('');
 
   /* ---------- Phones: the top bar (Todoist: "‹ Tasks", the view's name, one "…"; a project's people and layout) ---------- */
   const proj = client ?? project;
@@ -651,6 +668,9 @@ export function TasksView(p: Props) {
         ...(client && projectManage && client.status !== 'ended' ? [{ label: t('End work'), icon: Archive, danger: true, group: 'end', run: () => p.onEndClient(client.id) }] : []),
       ]
     : [];
+  // Desktop and tablet: Stages, Template and End work sit behind one "…" on the title row (the project's manage actions).
+  const headMore = useRef<HTMLButtonElement>(null);
+  const headMenu = useActionMenu(() => projectMenu.filter((a) => a.group === 'manage' || a.group === 'end'), { title: client?.name, menu: true });
   const teamMenu: SheetAction[] = team
     ? [
         { label: t('Workload'), icon: BarChart3, run: () => setWorkloadOpen(true) },
@@ -741,12 +761,10 @@ export function TasksView(p: Props) {
                     { value: 'paused', label: t('Paused'), hint: t('On hold for now') },
                   ]}
                 />
-                <button className="ghost-btn sm" onClick={() => setStagesOpen(true)} title={t('This {project}’s task stages: the company’s, or its own', { project: term.one })}>
-                  <Columns3 size={13} /> {t('Stages')}
+                <button ref={headMore} type="button" className="icon-btn proj-head-more" onClick={() => headMenu.openFrom(headMore)} aria-label={t('More actions')} title={t('More actions')}>
+                  <MoreHorizontal size={18} />
                 </button>
-                <button className="ghost-btn sm" onClick={() => p.onEndClient(client.id)}>
-                  {t('End work')}
-                </button>
+                {headMenu.menu}
               </span>
             )
           ))}
@@ -790,11 +808,13 @@ export function TasksView(p: Props) {
         {client && <ProjectPeople client={client} users={p.users} me={p.me} canEdit={projectManage} canInvite={projectManage || !!p.canInviteGuests} onPatch={(x) => p.onPatchClient(client.id, x)} onGuests={() => setClientTab('portal')} />}
         {/* The task list's own actions (layout, Display, New task) sit here, on the title's row (TaskViews). */}
         <span className="tq-head-slot" id="tq-head-slot" />
-        <button className="ghost-btn sm tpl-btn" onClick={p.onTemplate} title={t('Start from a template')}>
-          <LayoutTemplate size={14} /> <span>{t('Template')}</span>
-        </button>
+        {!(client && projectManage && client.status !== 'ended') && (
+          <button className="ghost-btn sm tpl-btn" onClick={p.onTemplate} title={t('Start from a template')}>
+            <LayoutTemplate size={14} /> <span>{t('Template')}</span>
+          </button>
+        )}
         {!p.dumpInSidebar && (
-          <button className={`${showTaskList ? 'ghost-btn' : 'primary-btn'} sm brain-btn`} onClick={p.onBrainDump}>
+          <button className={`${showTaskList || client ? 'ghost-btn' : 'primary-btn'} sm brain-btn`} onClick={p.onBrainDump}>
             <Sparkles size={14} /> {t('Brain dump')}
           </button>
         )}
@@ -927,6 +947,8 @@ export function TasksView(p: Props) {
                 ...open.filter((x) => !x.userId).map((x) => ({ key: 'u' + x.id, text: x.title, sub: t('Nobody on it yet'), run: () => p.onOpenTask(x.id) })),
                 ...clientThreads.filter((th) => th.unread).map((th) => ({ key: 'm' + th.id, text: th.subject, sub: t('Unread email'), run: () => p.onOpenThread(th.id) })),
               ];
+              // Phones: nothing to do is one muted line, not a card that says so.
+              if (!items.length && phone) return <p className="needs-none muted small">{t('Nothing needs you for {name}.', { name: client.name })}</p>;
               return (
                 <div className="side-card needs-card">
                   <h3>{t('Needs attention')}</h3>
@@ -1091,7 +1113,59 @@ export function TasksView(p: Props) {
           </div>
         )}
 
-        {client && clientTab === 'files' && (
+        {client && clientTab === 'files' && !clientFiles.length && (
+          <EmptyState
+            icon={<FileText size={20} />}
+            title={t('No files yet')}
+            text={t('Files shared in {name}’s channel and saved in its Drive folder show here.', { name: client.name })}
+            action={
+              clientChannel && (
+                <button className="primary-btn sm" onClick={() => p.onOpenChannel(clientChannel.id)}>
+                  <Hash size={14} /> {t('Share in the channel')}
+                </button>
+              )
+            }
+          />
+        )}
+        {client && clientTab === 'emails' && !clientThreads.length && (
+          <EmptyState
+            icon={<Mail size={20} />}
+            title={t('No emails yet')}
+            text={client.domain ? t('Emails with @{domain} show up here as soon as someone there writes.', { domain: client.domain }) : t('Add {name}’s email domain to see their emails here.', { name: client.name })}
+            action={
+              !client.domain &&
+              projectManage && (
+                <button className="primary-btn sm" onClick={() => (setDomainDraft(''), setDomainOpen(true))}>
+                  <AtSign size={14} /> {t('Add email domain')}
+                </button>
+              )
+            }
+          />
+        )}
+        {client && (
+          <Sheet open={domainOpen} className="proj-new-sheet" onClose={() => setDomainOpen(false)} title={t('Email domain')} footer={
+            <button type="button" className="primary-btn" disabled={!/^[a-z0-9.-]+\.[a-z]{2,}$/i.test(domainDraft.trim().replace(/^@/, ''))} onClick={() => (p.onPatchClient(client.id, { domain: domainDraft.trim().replace(/^@/, '').toLowerCase() }), setDomainOpen(false))}>
+              {t('Save')}
+            </button>
+          }>
+            <input className="pns-name" autoFocus value={domainDraft} onChange={(e) => setDomainDraft(e.target.value)} placeholder={t('company.com')} aria-label={t('Email domain')} />
+          </Sheet>
+        )}
+        {client && clientTab === 'meetings' && !clientMeetings.length && (
+          <EmptyState
+            icon={<Video size={20} />}
+            title={t('No meetings yet')}
+            text={t('Send the notetaker to your next call with {name} and its notes land here.', { name: client.name })}
+            action={
+              p.onNewMeeting && (
+                <button className="primary-btn sm" onClick={p.onNewMeeting}>
+                  <Plus size={14} /> {t('New meeting')}
+                </button>
+              )
+            }
+          />
+        )}
+        {client && clientTab === 'files' && clientFiles.length > 0 && (
           <div className="te-list">
             {clientFiles.map((f) => (
               <div key={f.id} className="chat-file flat">
@@ -1102,13 +1176,11 @@ export function TasksView(p: Props) {
                 </span>
               </div>
             ))}
-            {!clientFiles.length && <EmptyState compact text={t('No files for {name} yet. Files shared in its channel and saved in its Drive folder show here.', { name: client.name })} />}
           </div>
         )}
 
-        {client && clientTab === 'emails' && (
+        {client && clientTab === 'emails' && clientThreads.length > 0 && (
           <div className="te-list">
-            {clientThreads.length === 0 && <EmptyState compact text={client.domain ? t('No emails with @{domain} yet. They show up here as soon as someone there writes.', { domain: client.domain }) : t('Add {name}’s email domain to see their emails here.', { name: client.name })} />}
             {clientThreads.map((th) => {
               const last = th.messages[th.messages.length - 1];
               return (
@@ -1127,9 +1199,8 @@ export function TasksView(p: Props) {
           </div>
         )}
 
-        {client && clientTab === 'meetings' && (
-          <div className="te-list">
-            {clientMeetings.length === 0 && <EmptyState compact text={t('No recorded meetings with {name} yet. Send the notetaker to your next call with them (Meet, Send notetaker).', { name: client.name })} />}
+        {client && clientTab === 'meetings' && clientMeetings.length > 0 && (
+          <div className="te-list proj-meetings">
             {clientMeetings.map((m) => (
               <button key={m.id} className="te-row simple" onClick={() => p.onOpenMeeting(m.id)}>
                 <span className="kpi-icon">
@@ -1145,13 +1216,14 @@ export function TasksView(p: Props) {
         )}
         {client && clientTab === 'notes' && (
           <div className="tracking-scroll proj-tab">
-            <div className="proj-tab-head">
-              <p className="muted small">{t('Prep, preferences, who’s who: notes linked to {name}. Private notes stay yours.', { name: client.name })}</p>
-              <button className="primary-btn sm" onClick={() => p.onNewNote(client.id)}>
-                <Plus size={14} /> {t('New note')}
-              </button>
-            </div>
             {p.notes.filter((n) => n.clientId === client.id).length ? (
+              <>
+              <div className="proj-tab-head">
+                <p className="muted small">{t('Prep, preferences, who’s who: notes linked to {name}. Private notes stay yours.', { name: client.name })}</p>
+                <button className="primary-btn sm" onClick={() => p.onNewNote(client.id)}>
+                  <Plus size={14} /> {t('New note')}
+                </button>
+              </div>
               <ul className="proj-list">
                 {p.notes
                   .filter((n) => n.clientId === client.id)
@@ -1165,8 +1237,18 @@ export function TasksView(p: Props) {
                     </li>
                   ))}
               </ul>
+              </>
             ) : (
-              <EmptyState compact text={t('No notes for {name} yet.', { name: client.name })} />
+              <EmptyState
+                icon={<NotebookPen size={20} />}
+                title={t('No notes yet')}
+                text={t('Prep, preferences, who’s who: notes linked to {name}. Private notes stay yours.', { name: client.name })}
+                action={
+                  <button className="primary-btn sm" onClick={() => p.onNewNote(client.id)}>
+                    <Plus size={14} /> {t('New note')}
+                  </button>
+                }
+              />
             )}
           </div>
         )}
@@ -1182,13 +1264,14 @@ export function TasksView(p: Props) {
         )}
         {client && clientTab === 'logins' && (
           <div className="tracking-scroll proj-tab">
-            <div className="proj-tab-head">
-              <p className="muted small">{t('Shared passwords and 2FA codes for {name}. You only see the ones you were given; every reveal is logged.', { name: client.name })}</p>
-              <button className="primary-btn sm" onClick={() => p.onNewLogin?.(client.id)}>
-                <Plus size={14} /> {t('New login')}
-              </button>
-            </div>
             {(p.logins ?? []).filter((l) => l.clientId === client.id).length ? (
+              <>
+              <div className="proj-tab-head">
+                <p className="muted small">{t('Shared passwords and 2FA codes for {name}. You only see the ones you were given; every reveal is logged.', { name: client.name })}</p>
+                <button className="primary-btn sm" onClick={() => p.onNewLogin?.(client.id)}>
+                  <Plus size={14} /> {t('New login')}
+                </button>
+              </div>
               <ul className="proj-list">
                 {(p.logins ?? [])
                   .filter((l) => l.clientId === client.id)
@@ -1203,8 +1286,20 @@ export function TasksView(p: Props) {
                     </li>
                   ))}
               </ul>
+              </>
             ) : (
-              <EmptyState compact text={t('No logins for {name} yet. Add the ad accounts, social logins and tools you share with the team.', { name: client.name })} />
+              <EmptyState
+                icon={<KeyRound size={20} />}
+                title={t('No logins yet')}
+                text={t('No logins for {name} yet. Add the ad accounts, social logins and tools you share with the team.', { name: client.name })}
+                action={
+                  p.onNewLogin && (
+                    <button className="primary-btn sm" onClick={() => p.onNewLogin!(client.id)}>
+                      <Plus size={14} /> {t('New login')}
+                    </button>
+                  )
+                }
+              />
             )}
           </div>
         )}
@@ -1238,7 +1333,8 @@ export function TasksView(p: Props) {
                       options={people.filter((x) => x.status !== 'pending').map((g) => ({ value: g.email, label: g.name, hint: ROLE_NAME[g.role] }))}
                     />
                   )}
-                  <button className="primary-btn sm" disabled={!viewAs} onClick={() => viewAs && p.onViewAs(client.id, viewAs)}>
+                  {/* Nobody to view as yet: the button takes you to the invite instead of sitting there disabled. */}
+                  <button className="primary-btn sm" onClick={() => (viewAs ? p.onViewAs(client.id, viewAs) : document.querySelector<HTMLInputElement>('.pa-invite input')?.focus())}>
                     <Eye size={14} /> {t('View as {who}', { who: term.who })}
                   </button>
                 </div>

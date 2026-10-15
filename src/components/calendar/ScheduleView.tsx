@@ -32,6 +32,7 @@ export function ScheduleView({
   onOpenTask,
   onEmptyDay,
   onTopDay,
+  peek,
 }: {
   events: CalEvent[];
   cursor: Date;
@@ -41,6 +42,7 @@ export function ScheduleView({
   onOpenTask?: (id: string) => void;
   onEmptyDay?: (d: Date) => void; // "Nothing planned": tap to add something
   onTopDay?: (d: Date) => void; // the day at the top as the list scrolls (the bar's month follows it)
+  peek?: Date | null; // phones: the month browsed in the open date picker, so the list follows the bar's title
 }) {
   const scroll = useRef<HTMLDivElement>(null);
   const frame = useRef(0);
@@ -54,14 +56,18 @@ export function ScheduleView({
 
   // A new date picked (the month title, Today): start from its week and scroll to it.
   const target = useRef<Date>(cursor);
-  useEffect(() => {
-    target.current = cursor;
-    const inRange = cursor >= from && cursor < addDays(from, weeks * 7);
+  const goTo = (d: Date) => {
+    target.current = d;
+    const inRange = d >= from && d < addDays(from, weeks * 7);
     if (!inRange) {
-      setFrom(startOfWeek(cursor));
+      setFrom(startOfWeek(d));
       setWeeks(WEEKS);
-    } else jump(cursor);
-  }, [cursor.toDateString()]); // eslint-disable-line react-hooks/exhaustive-deps
+    } else jump(d);
+  };
+  useEffect(() => goTo(cursor), [cursor.toDateString()]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (peek) goTo(peek);
+  }, [peek?.getTime()]); // eslint-disable-line react-hooks/exhaustive-deps
   useLayoutEffect(() => jump(target.current, true), [from]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /** Scrolls so `d` (or the first day after it with something on it) is at the top. */

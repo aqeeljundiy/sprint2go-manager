@@ -1,4 +1,4 @@
-import { TopBar } from '../mobile/TopBar';
+import { TopBar, TopBarBack } from '../mobile/TopBar';
 import { useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { flushSync } from 'react-dom';
 import { ArrowDown, ArrowUp, Camera, Check, ChevronRight, Download, Image as ImageIcon, Eye, Folder, FolderInput, FolderPlus, HardDrive, Info, LayoutGrid, Link2, List, Mail, Menu, MoreHorizontal, PenLine, Play, Plus, RotateCcw, Search, Star, Trash2, Upload, X } from 'lucide-react';
@@ -257,7 +257,7 @@ export function DriveView(props: Props) {
           />
         )}
         {moving && <MoveSheet item={moving} items={items} onMove={(parentId) => props.onMove?.(moving.id, parentId)} onClose={() => setMoving(null)} />}
-        {details && <DetailsScreen item={details} items={items} who={who(details)} from={details.threadId ? props.senderOf(details.threadId) : undefined} onBack={() => setDetails(null)} />}
+        {details && <DetailsScreen item={details} items={items} who={who(details)} from={details.threadId ? props.senderOf(details.threadId) : undefined} onBack={() => setDetails(null)} onOpen={() => (setDetails(null), props.onOpen(details, [details]))} onShare={details.url && !details.url.startsWith('data:') ? () => shareLink(details) : undefined} onDownload={details.url ? () => download(details) : undefined} />}
         <input
           ref={photo}
           type="file"
@@ -583,7 +583,7 @@ function DrivePhone(props: Props & { live: DriveItem[]; q: string; query: string
           title={q ? t('No files found') : section === 'trash' ? t('Trash is empty') : section === 'my' ? t('This folder is empty') : section === 'starred' ? t('No starred files') : section === 'media' ? t('No photos or videos yet') : t('Nothing here yet')}
           action={
             !q && section === 'my' && folder ? (
-              <button type="button" className="btn primary" onClick={props.onNew}>
+              <button type="button" className="primary-btn" onClick={props.onNew}>
                 <Upload size={16} /> {t('Upload')}
               </button>
             ) : undefined
@@ -666,7 +666,7 @@ function DrivePhone(props: Props & { live: DriveItem[]; q: string; query: string
   return (
     <section className="drive-pane drive-phone view-enter">
       {/* One search: the field under the bar (Google Drive). No magnifier on top of it. */}
-      <TopBar app="drive" search={false} />
+      <TopBar app="drive" search={false} lead={!q && (section === 'media' || section === 'email' || section === 'trash') ? <TopBarBack onClick={() => props.onSection('recent')} /> : undefined} />
       <div className="drive-scroll" key={`${section}:${layout}`}>
         <label className="dp-search">
           <Search size={20} />
@@ -812,7 +812,7 @@ function MoveSheet({ item, items, onMove, onClose }: { item: DriveItem; items: D
 }
 
 /** Details & activity: what it is, how big, where it lives, who put it there and when. */
-function DetailsScreen({ item, items, who, from, onBack }: { item: DriveItem; items: DriveItem[]; who: string; from?: string; onBack: () => void }) {
+function DetailsScreen({ item, items, who, from, onBack, onOpen, onShare, onDownload }: { item: DriveItem; items: DriveItem[]; who: string; from?: string; onBack: () => void; onOpen: () => void; onShare?: () => void; onDownload?: () => void }) {
   const where: string[] = [];
   for (let x = item.parentId; x; ) {
     const p = items.find((i) => i.id === x);
@@ -831,6 +831,25 @@ function DetailsScreen({ item, items, who, from, onBack }: { item: DriveItem; it
           {from && <GRow label={t('Saved from an email by')} value={from} />}
           {item.starred && <GRow label={t('Starred')} value={t('Yes')} />}
         </Group>
+        <div className="dp-details-actions">
+          <button type="button" className="primary-btn" onClick={onOpen}>
+            <Eye size={16} /> {t('Open')}
+          </button>
+          {(onShare || onDownload) && (
+            <div className="dp-details-more">
+              {onShare && (
+                <button type="button" className="ghost-btn" onClick={onShare}>
+                  <Link2 size={16} /> {t('Share link')}
+                </button>
+              )}
+              {onDownload && (
+                <button type="button" className="ghost-btn" onClick={onDownload}>
+                  <Download size={16} /> {t('Download')}
+                </button>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </PushScreen>
   );

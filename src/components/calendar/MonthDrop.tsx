@@ -18,6 +18,7 @@ export function MonthDrop({
   busyOf,
   months,
   bare,
+  chipsOnly,
   onMonth,
   onPick,
 }: {
@@ -26,6 +27,7 @@ export function MonthDrop({
   busyOf: (month: Date) => Set<string>;
   months?: boolean;
   bare?: boolean;
+  chipsOnly?: boolean; // phones' Month view: the grid is already on screen, so only the month chips fold down
   onMonth?: (month: Date | null) => void;
   onPick: (d: Date) => void;
 }) {
@@ -52,6 +54,11 @@ export function MonthDrop({
   const pickMonth = (i: number) => {
     const last = new Date(month.getFullYear(), i + 1, 0).getDate();
     onPick(new Date(month.getFullYear(), i, Math.min(cursor.getDate(), last)));
+  };
+
+  const pickMonthOf = (m: Date) => {
+    const last = new Date(m.getFullYear(), m.getMonth() + 1, 0).getDate();
+    onPick(new Date(m.getFullYear(), m.getMonth(), Math.min(cursor.getDate(), last)));
   };
 
   // Phones: the month chips, a year either side of today, with the year as its own chip where it turns.
@@ -106,12 +113,12 @@ export function MonthDrop({
     return (
       <div className={`fold month-drop bare${open ? ' open' : ''}`} aria-hidden={!open}>
         <div className="fold-in">
-          <div className="md-wrap">
-            {days}
+          <div className={`md-wrap${chipsOnly ? ' chips-only' : ''}`}>
+            {!chipsOnly && days}
             <div className="md-chips" ref={chipRow}>
               {chips.map((c) =>
                 c.month ? (
-                  <button key={c.key} type="button" tabIndex={open ? 0 : -1} className={`md-chip${c.month.getTime() === month.getTime() ? ' on' : ''}`} onClick={() => setMonth(c.month!)} aria-label={fmtMonth(c.month)}>
+                  <button key={c.key} type="button" tabIndex={open ? 0 : -1} className={`md-chip${c.month.getTime() === month.getTime() ? ' on' : ''}`} onClick={() => (chipsOnly ? pickMonthOf(c.month!) : setMonth(c.month!))} aria-label={fmtMonth(c.month)}>
                     {c.label}
                   </button>
                 ) : (

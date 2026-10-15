@@ -755,7 +755,7 @@ button.cell:hover {
   position: absolute;
   top: 12px;
   bottom: 12px;
-  right: -7px;
+  right: 0;
   width: 14px;
   cursor: ew-resize;
   touch-action: none;
@@ -785,9 +785,19 @@ button.cell:hover {
 }
 .card-size {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
-  padding: 4px 16px 8px;
+  padding: 4px 24px 8px 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  /* A narrow card scrolls the picks sideways: the right edge fades so the cut-off one reads as more. */
+  mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+}
+.card-size::-webkit-scrollbar {
+  display: none;
+}
+.seg-mini {
+  flex: none;
 }
 .seg-mini {
   display: inline-flex;
@@ -803,9 +813,10 @@ button.cell:hover {
   font: inherit;
   font-size: 12px;
   font-weight: 600;
-  min-width: 30px;
+  min-width: 26px;
   height: 26px;
-  padding: 0 8px;
+  padding: 0 6px;
+  white-space: nowrap;
   border-radius: 999px;
   cursor: pointer;
   transition: background 0.18s var(--ease), color 0.18s var(--ease);
@@ -1843,6 +1854,17 @@ button.chat-members:hover {
   font-size: 11.5px;
   color: var(--text-3);
   line-height: 1.3;
+}
+.cat-pick .cat-dot {
+  display: none;
+}
+.chan-post-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 13px;
 }
 .cat-pick button.on {
   border-color: var(--accent);

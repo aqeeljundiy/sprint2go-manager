@@ -661,9 +661,10 @@
   .nm-list .nm-row {
     min-width: 0;
   }
+  /* The sheet body already gives 4: "To:" lands on the 16 gutter. */
   .newmsg-sheet .nm-to {
     margin: 0;
-    padding: 4px 16px;
+    padding: 4px 12px;
   }
   .nm-group {
     padding: 16px 16px 4px;
@@ -1992,6 +1993,79 @@
   }
   .chan-modal .dialog-tabs > button {
     min-height: var(--tap);
+  }
+  /* New channel as a sheet: categories as a radio list, the summary option a 44 px switch row. */
+  .chan-sheet .cat-pick {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+  .chan-sheet .cat-pick button {
+    grid-template-columns: 20px minmax(0, 1fr);
+    column-gap: 12px;
+    row-gap: 0;
+    align-items: center;
+    min-height: var(--row-2);
+    padding: 8px 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+  }
+  .chan-sheet .cat-pick button + button {
+    box-shadow: inset 32px 0 0 var(--surface), inset 0 1px 0 var(--line);
+  }
+  .chan-sheet .cat-pick button > :not(.cat-dot) {
+    grid-column: 2;
+  }
+  .chan-sheet .cat-pick strong {
+    font: var(--t-body);
+    font-weight: 600;
+  }
+  .chan-sheet .cat-pick small {
+    font: var(--t-secondary);
+  }
+  .chan-sheet .cat-dot {
+    display: block;
+    grid-row: 1 / span 2;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 2px var(--border);
+    transition: box-shadow 0.18s ease;
+  }
+  .chan-sheet .cat-pick button.on .cat-dot {
+    box-shadow: inset 0 0 0 6px var(--accent);
+  }
+  .chan-sheet .chan-post-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: var(--tap);
+    font: var(--t-body);
+  }
+  .chan-sheet-foot {
+    display: flex;
+    gap: 8px;
+    padding: 8px 16px;
+  }
+  .chan-sheet-foot > .spacer {
+    display: none;
+  }
+  .chan-sheet-foot > button {
+    flex: 1;
+    justify-content: center;
+    min-height: var(--tap);
+    white-space: nowrap;
+  }
+  .chan-sheet .dump-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text);
+    font: var(--t-title);
+  }
+  .chan-sheet .chan-body {
+    padding-inline: 12px;
   }
 
   /* Recipient chips: 12 px initials and a 44 px target. */

@@ -41,8 +41,10 @@ export function AppBar({ bar, label }: { bar: AppSections; label: string }) {
 
 /** The selected section tapped again: to the top of its list first; already there, back to the section's root. */
 function reselect(bar: AppSections, id: string) {
-  const list = [...document.querySelectorAll<HTMLElement>('.main *')].find((el) => el.scrollTop > 0 && el.scrollHeight > el.clientHeight && getComputedStyle(el).overflowY !== 'visible');
-  if (list) return list.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  // A list can name its own resting place (`data-home`, Calendar's time grid: the current hour, not midnight).
+  const home = (el: HTMLElement) => Number(el.dataset.home ?? 0);
+  const list = [...document.querySelectorAll<HTMLElement>('.main *')].find((el) => Math.abs(el.scrollTop - home(el)) > 4 && el.scrollHeight > el.clientHeight && getComputedStyle(el).overflowY !== 'visible');
+  if (list) return list.scrollTo({ top: home(list), behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
   bar.onReselect?.(id);
 }
 

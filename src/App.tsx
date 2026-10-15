@@ -15,7 +15,7 @@ import { ProjectsCtx } from './components/ProjectPicker';
 import { ProjectsSidebar } from './components/ProjectsSidebar';
 import { ProjectsHome } from './components/ProjectsHome';
 import { Popover } from './components/ui/Popover';
-import { Brain, SlidersHorizontal, Briefcase, Building2, CalendarPlus, Copy, FileText, Hash, ListChecks, Mail, PenLine, Send, Sparkles, Timer, Trash2, Undo2, Upload, User as UserIcon, Video, Table2, MessagesSquare, AlertTriangle, Menu, Inbox, Search as Paperclip, Contact, Clock, History, MessageCircle, Bell, Sun, CalendarRange, CircleCheck, Layers, List, CalendarDays, Users, Star, Folder, UserRound, Archive, NotebookText, LayoutGrid, type LucideIcon, type LucideProps } from 'lucide-react';
+import { Brain, SlidersHorizontal, Briefcase, Building2, CalendarPlus, Copy, FileText, Hash, ListChecks, ListTodo, Mail, PenLine, Send, Sparkles, Timer, Trash2, Undo2, Upload, User as UserIcon, Video, Table2, MessagesSquare, AlertTriangle, Menu, Inbox, Search as Paperclip, Contact, Clock, History, MessageCircle, Bell, Sun, CalendarRange, CircleCheck, Layers, List, CalendarDays, Users, Star, Folder, UserRound, Archive, NotebookText, LayoutGrid, type LucideIcon, type LucideProps } from 'lucide-react';
 import { DEFAULT_PERMISSIONS } from './types';
 import type { Quote, Team, Note, Account, AppId, Attachment, BlockRule, CalEvent, Channel, ChannelCategory, Client, ClientPerson, ChatFile, ChatMessage, CommentFile, Meeting, Message, Notice, RsvpStatus, TaskEvent, TaskStatus, Todo, DriveItem, DriveSection, Location, Person, Thread, User, View, Workspace, FolderId } from './types';
 import { useMailOrganize } from './components/mail/Organize';
@@ -3881,7 +3881,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
         const I = FOLDERS.find((f) => f.id === id)?.icon;
         return { value: id, label: folderName(id), group: t('Mail'), icon: I ? <I size={20} /> : undefined, hint: (counts as Record<string, number>)[id] ? fmtNumber((counts as Record<string, number>)[id]) : undefined };
       }),
-      { value: 'todos', label: t('To-do'), group: t('Mail') },
+      { value: 'todos', label: t('To-do'), group: t('Mail'), icon: <ListTodo size={20} /> },
       ...organize.chipLabels.map((l) => ({ value: `label/${l.id}`, label: l.name, group: t('Labels') })),
       ...wsClients.filter((c) => c.domain).map((c) => ({ value: `project/${c.id}`, label: c.name, group: term.Many })),
     ],
@@ -3905,7 +3905,8 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
     // Tasks registers its own switcher (TasksView, useTitleMenu).
     // Meet has its own drawer on phones (MeetView, Google Meet's).
     // Projects: the open project's name, and a quick way to another one (the sidebar isn't there on phones).
-    if (mode === 'projects')
+    // Phones: the bottom tabs (Active, Mine, Past) and the list already cover this, so no title menu there.
+    if (mode === 'projects' && !mobile)
       return {
         label: term.Many,
         value: projScope.kind === 'client' ? projScope.id : projScope.kind === 'past' ? 'past' : mobile && projMine ? 'mine' : 'all',
@@ -4148,7 +4149,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
       case 'tasks':
         return taskBrowse || !['today', 'upcoming', 'mine'].includes(taskScope.kind) ? 'browse' : taskScope.kind;
       case 'calendar':
-        return calMeetings ? 'meetings' : calView === 'month' || calView === 'day' || calView === 'schedule' ? calView : '';
+        return calMeetings ? 'meetings' : calView === 'month' || calView === 'schedule' ? calView : 'day'; // 3 days and Week are Day's tab
       case 'notes':
         return notesFilter === 'shared' ? 'shared' : 'notes';
       case 'drive':
@@ -4541,7 +4542,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
     ...settingsEntries().map((e) => ({ id: 'set-' + e.key, group: 'Settings', title: e.option ?? e.page, sub: e.option ? e.page : undefined, icon: SlidersHorizontal, run: () => { setSettingsSection(e.id as SettingsSection); go('settings'); if (e.option) flashOption(e.option); } })),
     ...wsClientsAll.map((c) => ({ id: 'c-' + c.id, group: `${term.Many}`, title: c.name, sub: c.status === 'ended' ? t('Past {project}', { project: term.one }) : c.domain, icon: Building2, run: () => openClient(c.id) })),
     ...wsTasks.filter((task) => !task.done).map((task) => ({ id: 't-' + task.id, group: 'Tasks', title: task.title, sub: [wsClients.find((c) => c.id === task.clientId)?.name, task.userId ? firstOf(task.userId) : t('nobody yet')].filter(Boolean).join(' · '), icon: ListChecks, keywords: [task.notes, task.context].filter(Boolean).join(' ').slice(0, 1500), run: () => openTask(task.id) })),
-    ...members.filter((u) => u.id !== user.id).map((u) => ({ id: 'p-' + u.id, group: 'People', title: u.name, sub: u.title || u.email, icon: UserIcon, run: () => openChannel(dmWith(u.id)) })),
+    ...members.filter((u) => u.id !== user.id).map((u) => ({ id: 'p-' + u.id, group: 'People', title: u.name, sub: u.title || u.email, icon: UserIcon, avatar: <Avatar person={u} size={32} />, run: () => openChannel(dmWith(u.id)) })),
     ...wsChannels.filter((c) => c.kind === 'channel').map((c) => ({ id: 'ch-' + c.id, group: 'Channels', title: '#' + c.name, icon: Hash, run: () => openChannel(c.id) })),
     ...wsThreads.slice(0, 200).map((th) => ({ id: 'm-' + th.id, group: 'Emails', title: th.subject, sub: th.messages[th.messages.length - 1].from.name, icon: Mail, keywords: th.messages.slice(-2).map((m) => m.body).join(' ').slice(0, 1500), run: () => openThread(th.id) })),
     ...wsNotes.map((n) => ({ id: 'no-' + n.id, group: 'Notes', title: n.title || t('Untitled note'), sub: wsClientsAll.find((c) => c.id === n.clientId)?.name, icon: FileText, keywords: htmlToText(n.html).slice(0, 2000), run: () => openNote(n.id) })),
@@ -5297,6 +5298,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
             logins={vaultItems.map((v) => ({ id: v.id, title: v.meta.title, url: v.meta.url, username: v.meta.username, clientId: v.meta.clientId, hasTotp: v.hasTotp }))}
             onOpenLogins={(clientId) => (setVaultFilter(clientId), go('vault'))}
             onNewLogin={(clientId) => (setVaultFilter(clientId), setVaultEditing('new'), go('vault'))}
+            onNewMeeting={enabled.has('calendar') ? () => openNewEvent() : undefined}
             tables={enabled.has('tables') ? wsTables : undefined}
             tableRows={wsTableRows}
             onOpenTable={enabled.has('tables') ? (id) => openTable(id) : undefined}

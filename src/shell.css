@@ -257,6 +257,17 @@ body.resizing-x .pane-resize::after {
   margin: 0 2px 12px;
   padding: 11px 0;
 }
+/* Collapsed: a 40 px round icon, no glow (a wide shadowed blob read as a second rail). */
+.sidebar.collapsed .compose-btn,
+.sidebar.collapsed .compose-btn:hover,
+aside.sidebar.collapsed .sb-panel .compose-btn {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 12px;
+  padding: 0;
+  box-shadow: none;
+  transform: none;
+}
 .sidebar.collapsed .nav-item {
   position: relative;
   justify-content: center;

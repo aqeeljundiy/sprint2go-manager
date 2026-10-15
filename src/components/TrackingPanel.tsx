@@ -60,16 +60,19 @@ export function TrackingPanel({ thread, message }: { thread: Thread; message: Me
           ...(r.docs ?? []).map((d) => ({ kind: 'doc' as const, at: d.at, d })),
           ...(replied ? [{ kind: 'reply' as const, at: replied }] : []),
         ].sort((a, b) => b.at.localeCompare(a.at));
-        const isOpen = open.has(email);
+        // One plain open says the same as the line under the name: no timeline to fold open, its time joins that line.
+        const one = events.length === 1 && (events[0].kind === 'auto' || (events[0].kind === 'open' && !events[0].o.via && !events[0].o.device)) ? events[0] : null;
+        const isOpen = open.has(email) && !one;
 
         return (
           <div key={email} className={`tp-person ${isOpen ? 'open' : ''}`}>
-            <button className="tp-row" onClick={() => events.length && toggle(email)} disabled={!events.length}>
+            <button className="tp-row" onClick={() => events.length && !one && toggle(email)} disabled={!events.length || !!one}>
               <Avatar person={person} size={28} />
               <span className="tp-who">
                 <strong>{person.name}</strong>
                 <small className={replied || real.length || clicks.length ? 'ok' : r.opens.length ? 'auto' : ''} title={!replied && !real.length && !clicks.length && r.opens.length ? autoWhy(r.opens[r.opens.length - 1]) : undefined}>
                   {replied ? t('Replied {when}', { when: relative(replied) }) : recipientLine(r)}
+                  {one && ` · ${relative(one.at)}`}
                 </small>
               </span>
               {forwarded && (
@@ -87,7 +90,7 @@ export function TrackingPanel({ thread, message }: { thread: Thread; message: Me
                   <MousePointerClick size={12} /> {clicks.length}
                 </span>
               )}
-              {events.length > 0 && <ChevronDown size={16} className="tp-chev" />}
+              {events.length > 0 && !one && <ChevronDown size={16} className="tp-chev" />}
             </button>
 
             {isOpen && (

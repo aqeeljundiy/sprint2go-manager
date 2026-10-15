@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Bookmark, ChevronRight, Inbox, Info, ListFilter, MessagesSquare, Plus, Search, SlidersHorizontal, Tag, Trash2, Users, X, type LucideIcon } from 'lucide-react';
 import type { Thread } from '../../types';
 import { CATEGORIES, EMPTY_FORM, formToQuery, hasTerm, queryToForm, toggleTerm, type Category, type SearchForm } from '../../mailQuery';
-import { Popover } from '../ui/Popover';
+import { Sheet } from '../ui/Sheet';
 import { useActionMenu } from '../ui/ActionSheet';
 import { Select } from '../ui/Select';
 import { PushScreen } from '../ui/PushScreen';
@@ -97,7 +97,8 @@ export function SearchOptions({ query, onQuery }: { query: string; onQuery: (q: 
       >
         <SlidersHorizontal size={15} />
       </button>
-      <Popover anchor={btn} open={open} onClose={() => setOpen(false)} width={460} align="end" title={t('Search options')}>
+      {/* A form with many fields: a centred dialog on wider screens, a bottom sheet on phones, never a popover over the rail. */}
+      <Sheet open={open} onClose={() => setOpen(false)} title={t('Search options')} className="so-sheet">
         <form className="so-form" onSubmit={(e) => (e.preventDefault(), run())}>
           {text('from', t('From'))}
           {text('to', t('To'))}
@@ -156,7 +157,7 @@ export function SearchOptions({ query, onQuery }: { query: string; onQuery: (q: 
             </span>
           </footer>
         </form>
-      </Popover>
+      </Sheet>
     </>
   );
 }

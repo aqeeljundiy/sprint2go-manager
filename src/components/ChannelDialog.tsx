@@ -7,6 +7,8 @@ import type { Channel, ChannelCategory, Client, Guest, Policy, Team, User } from
 import { Badge, PersonCell } from './ui/Person';
 import { Dot, Select } from './ui/Select';
 import { mark, t, tx } from '../i18n';
+import { Sheet } from './ui/Sheet';
+import { usePhone } from '../mobile/media';
 import { tj } from '../i18n/tj';
 import { fmtMoney } from '../i18n/format';
 
@@ -121,18 +123,15 @@ export function ChannelDialog({ channel, users, clients, teams, me, canManage, g
 
   const shownUsers = users.filter((u) => u.name.toLowerCase().includes(q.toLowerCase()));
   const readOnly = editing && !canManage;
+  const phone = usePhone();
+  const heading = (
+    <span className="dump-title">
+      {priv ? <Lock size={15} /> : <Hash size={15} />} {editing ? `#${channel!.name}` : t('New channel')}
+    </span>
+  );
 
-  return (
-    <div className="modal-scrim" onMouseDown={onClose}>
-      <div className="modal chan-modal" role="dialog" aria-label={editing ? t('Channel settings') : t('New channel')} onMouseDown={(e) => e.stopPropagation()} onKeyDown={(e) => e.key === 'Escape' && !document.querySelector('.pop') && onClose()}>
-        <header className="modal-head">
-          <span className="dump-title">
-            {priv ? <Lock size={15} /> : <Hash size={15} />} {editing ? `#${channel!.name}` : t('New channel')}
-          </span>
-          <button className="icon-btn sm" onClick={onClose} aria-label={t('Close')}>
-            <X size={15} />
-          </button>
-        </header>
+  const content = (
+    <>
         <div className="client-tabs dialog-tabs" role="tablist">
           {(
             [
@@ -167,9 +166,10 @@ export function ChannelDialog({ channel, users, clients, teams, me, canManage, g
               </label>
               <div className="field">
                 <span>{t('Category')}</span>
-                <div className="cat-pick">
+                <div className="cat-pick" role="radiogroup" aria-label={t('Category')}>
                   {(Object.keys(CATEGORY_NAME) as ChannelCategory[]).map((c) => (
-                    <button key={c} type="button" className={category === c ? 'on' : ''} onClick={() => pickCategory(c)}>
+                    <button key={c} type="button" role="radio" aria-checked={category === c} className={category === c ? 'on' : ''} onClick={() => pickCategory(c)}>
+                      <span className="cat-dot" aria-hidden="true" />
                       <strong>{categoryText(CATEGORY_ONE[c])}</strong>
                       <small>{categoryHint(c)}</small>
                     </button>
@@ -206,9 +206,12 @@ export function ChannelDialog({ channel, users, clients, teams, me, canManage, g
                   <small className="muted">{schedule === 'off' ? t('No automatic summaries.') : t('Each update uses {cost}. Skipped when nothing happened.', { cost: summaryCost })}</small>
                 </div>
                 {schedule !== 'off' && (
-                  <label className="check-row small">
-                    <input type="checkbox" checked={postSummary} onChange={(e) => setPostSummary(e.target.checked)} /> {t('Also post each summary in the channel')}
-                  </label>
+                  <div className="toggle-row chan-post-row">
+                    <span>{t('Also post each summary in the channel')}</span>
+                    <button type="button" role="switch" aria-checked={postSummary} aria-label={t('Also post each summary in the channel')} className={`switch ${postSummary ? 'on' : ''}`} onClick={() => setPostSummary(!postSummary)}>
+                      <span />
+                    </button>
+                  </div>
                 )}
               </div>
               <div className="field">
@@ -331,8 +334,10 @@ export function ChannelDialog({ channel, users, clients, teams, me, canManage, g
           </TabPane>
           </SmoothHeight>
         </div>
-
-        <footer className="modal-foot">
+    </>
+  );
+  const actions = (
+    <>
           {editing && onArchive && canManage && (
             <button className="ghost-btn danger-text" onClick={onArchive}>
               <Archive size={14} /> {t('Archive channel')}
@@ -347,7 +352,27 @@ export function ChannelDialog({ channel, users, clients, teams, me, canManage, g
               {editing ? t('Save') : t('Create channel')}
             </button>
           )}
-        </footer>
+    </>
+  );
+
+  // Phones: a full-height bottom sheet (grab handle, swipe down to close).
+  if (phone)
+    return (
+      <Sheet onClose={onClose} size="full" className="chan-modal chan-sheet" label={editing ? t('Channel settings') : t('New channel')} title={heading} footer={<div className="chan-sheet-foot">{actions}</div>}>
+        {content}
+      </Sheet>
+    );
+  return (
+    <div className="modal-scrim" onMouseDown={onClose}>
+      <div className="modal chan-modal" role="dialog" aria-label={editing ? t('Channel settings') : t('New channel')} onMouseDown={(e) => e.stopPropagation()} onKeyDown={(e) => e.key === 'Escape' && !document.querySelector('.pop') && onClose()}>
+        <header className="modal-head">
+          {heading}
+          <button className="icon-btn sm" onClick={onClose} aria-label={t('Close')}>
+            <X size={15} />
+          </button>
+        </header>
+        {content}
+        <footer className="modal-foot">{actions}</footer>
       </div>
     </div>
   );

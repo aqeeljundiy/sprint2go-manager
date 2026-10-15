@@ -218,7 +218,7 @@ function CardBody({
       <div className="pcard-head">
         <span className="pcard-face">
           <Avatar person={{ name: p.name, email: p.email, color: p.color, photo: p.photo }} size={72} />
-          {p.presence && <span className={`pcard-dot is-${p.presence}`} aria-hidden="true" />}
+          {p.presence && <span className={`pcard-dot is-${p.presence}`} role="img" aria-label={presence} title={presence} />}
         </span>
         <div className="pcard-who">
           <div className="pcard-name">{p.name}</div>
@@ -227,15 +227,10 @@ function CardBody({
         </div>
       </div>
 
-      {(presence || p.status) && (
+      {/* Presence is the dot on the avatar; only a status someone set gets a line of its own. */}
+      {p.status && (
         <div className="pcard-status">
-          {p.status ? (
-            <>
-              <span aria-hidden="true">{p.status.emoji}</span> {p.status.text}
-            </>
-          ) : (
-            presence
-          )}
+          <span aria-hidden="true">{p.status.emoji}</span> {p.status.text}
         </div>
       )}
 

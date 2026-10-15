@@ -396,7 +396,7 @@ export const MessageList = forwardRef<HTMLInputElement, Props>(function MessageL
         </div>
       </header>
       {props.notice}
-      {props.top}
+      {!phone && props.top}
       {props.offline && <div className={`list-offline${props.offline === 'device' ? ' device' : ''}`}>{props.offline === 'device' ? t('You’re offline. Recent mail kept on this device is here, and what you send goes out once you’re back online.') : t('Connection lost. Pull down to check for mail.')}</div>}
       {props.onRefresh && (
         <div className={`pull-mark ${pull ? 'on' : ''} ${dragging ? 'dragging' : ''} ${refreshing ? 'busy' : ''} ${pull >= PULL_AT ? 'ready' : ''}`} style={{ ['--pull' as string]: `${pull}px` }} aria-hidden>
@@ -421,6 +421,8 @@ export const MessageList = forwardRef<HTMLInputElement, Props>(function MessageL
             <span>{t('Search in mail')}</span>
           </button>
         ))}
+      {/* On phones a folder's notes (Trash's 30 days, the inbox tabs) sit under the search pill. */}
+      {phone && props.top}
       {threads.length === 0 ? (
         <div className={`empty ${pull ? 'pulled' : ''} ${dragging ? 'dragging' : ''}`} ref={(el) => void (bodyRef.current = el)} style={pull ? { transform: `translateY(${pull}px)` } : undefined}>
           {/* The tick only means "all caught up": a search or a filter that finds nothing says so with its own icon. */}
@@ -606,6 +608,7 @@ export function MailRow(p: {
   hl?: string; // search words to bold
 }) {
   const th = p.t;
+  const phone = usePhone();
   const last = lastMessage(th);
   const hasFiles = threadHasAttachment(th); // not pictures inside the words (src/mailAttachments.ts)
   const tracked = lastTracked(th, p.me);
@@ -647,7 +650,7 @@ export function MailRow(p: {
             </span>
             {p.shared && who && (
               <span className="row-assignee" title={who.id === p.meId ? t('You handle this one') : t('{name} handles this one', { name: who.name.split(' ')[0] })}>
-                <Avatar person={who} size={18} />
+                <Avatar person={who} size={phone ? 24 : 18} />
               </span>
             )}
             {files.length > 0 && <Paperclip size={16} className="row-clip" aria-hidden="true" />}

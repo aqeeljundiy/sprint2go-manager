@@ -138,6 +138,8 @@ export function Compose({ contacts, signature: baseSignature, signatureFor, work
       // A domain with its own sender name (Settings, Domains) shows it next to the address, so nobody writes as the wrong one.
       const brand = workspace ? lookOf(workspace, address) : undefined;
       const kind = i ? t('Alias') : a.kind === 'shared' ? t('Shared inbox') : undefined;
+      // Phones: the name as the label and the address as its hint, so the narrow field never cuts an address in half.
+      if (phone) return { value: `${a.id}|${address}`, label: a.name, hint: [address, brand?.name, kind].filter(Boolean).join(' · '), group: all.length > 1 ? a.email : undefined };
       return { value: `${a.id}|${address}`, label: i === 0 ? `${a.name} <${a.email}>` : `${a.name} <${address}>`, hint: brand?.name ? [brand.name, kind].filter(Boolean).join(' · ') : kind, group: all.length > 1 ? a.email : undefined };
     });
   });
@@ -476,8 +478,7 @@ export function Compose({ contacts, signature: baseSignature, signatureFor, work
         <ActionSheet
           open={phoneMore}
           onClose={() => setPhoneMore(false)}
-          anchor={moreBtn}
-          menu
+          title={t('More options')}
           actions={[
             { label: t('Send later'), icon: Clock, disabled: !valid, run: () => setLaterOpen(true) },
             { label: t('Templates'), icon: FileText, run: () => setTplOpen(true) },

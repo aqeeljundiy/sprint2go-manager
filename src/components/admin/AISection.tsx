@@ -528,9 +528,12 @@ export function AISection({ ws, people, users, me, canManage, onAI, onBilling, t
             <h3>{t('Left this month')}</h3>
             {allowance?.unlimited || !showUsage ? null : (
               <div className="allow-meter">
-                <span className="bar wide">
-                  <span style={{ width: `${Math.min(1, usedShare) * 100}%` }} className={usedShare > 0.8 ? 'warn' : ''} />
-                </span>
+                {/* An empty bar says nothing: it shows once something has been used. */}
+                {usedShare > 0 && (
+                  <span className="bar wide">
+                    <span style={{ width: `${Math.min(1, usedShare) * 100}%` }} className={usedShare > 0.8 ? 'warn' : ''} />
+                  </span>
+                )}
                 {usedUp ? (
                   <p>
                     <b>{t('Used up for this month.')}</b>{' '}
@@ -585,7 +588,9 @@ export function AISection({ ws, people, users, me, canManage, onAI, onBilling, t
                   <div key={k}>
                     <b>{allowance ? allowance.uses[k] ?? 0 : n}</b>
                     <span>
-                      {allowance ? (k === 'meeting' ? t('Meetings with notes') : l) : l} {allowance ? <em>{t('this month')}</em> : <em>{t('of {total}', { total: fmtNumber(pool[k]) })}</em>}
+                      {allowance ? (k === 'meeting' ? t('Meetings with notes') : l) : l}
+                      {/* The section's heading already says "this month"; the tiles keep to the name. */}
+                      {allowance ? null : <> <em>{t('of {total}', { total: fmtNumber(pool[k]) })}</em></>}
                     </span>
                   </div>
                 ))}

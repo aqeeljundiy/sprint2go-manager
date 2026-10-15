@@ -369,8 +369,11 @@
   }
 
   /* Quick capture */
+  .quick-note .qn {
+    margin-inline: -4px;
+  }
   .qn textarea {
-    min-height: 144px;
+    min-height: 240px;
   }
   .sel.qn-dest {
     min-height: var(--tap);

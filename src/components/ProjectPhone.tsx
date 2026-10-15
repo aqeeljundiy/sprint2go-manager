@@ -92,6 +92,7 @@ export function ProjectSections({ items, onTab, actions = [] }: { items: TabItem
   const { shown } = useArranged(items);
   if (!phone) return null;
   return (
+    <>
     <nav className="proj-sections" aria-label={t('This {project}', { project: term.one })}>
       {shown
         .filter((tab) => tab.id !== 'overview')
@@ -101,7 +102,7 @@ export function ProjectSections({ items, onTab, actions = [] }: { items: TabItem
           return (
             <button key={tab.id} type="button" className="proj-sec-row" onClick={() => onTab(tab.id as ProjectTab)}>
               <span className="proj-sec-icon">
-                <Icon size={17} />
+                <Icon size={20} />
               </span>
               <span className="proj-sec-name">{tab.name}</span>
               {note && <span className="proj-sec-note warn">{note}</span>}
@@ -109,16 +110,21 @@ export function ProjectSections({ items, onTab, actions = [] }: { items: TabItem
             </button>
           );
         })}
-      {actions.length > 0 && (
-        <div className="proj-sec-actions">
+    </nav>
+    {/* Managing the project is its own section under the parts, not more rows in the same card. */}
+    {actions.length > 0 && (
+      <section className="proj-sec-manage" aria-label={t('Manage')}>
+        <h3 className="proj-sec-h">{t('Manage')}</h3>
+        <div className="proj-sections">
           {actions.map((a) => (
             <button key={a.id} type="button" className={`proj-sec-row${a.danger ? ' danger' : ''}`} onClick={a.run}>
-              <span className="proj-sec-icon">{a.danger ? <Archive size={17} /> : <LayoutTemplate size={17} />}</span>
+              <span className="proj-sec-icon">{a.danger ? <Archive size={20} /> : <LayoutTemplate size={20} />}</span>
               <span className="proj-sec-name">{a.label}</span>
             </button>
           ))}
         </div>
-      )}
-    </nav>
+      </section>
+    )}
+    </>
   );
 }

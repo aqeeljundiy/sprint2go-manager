@@ -1,5 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react';
-import { ChevronRight, Folder, Home, Inbox, ListChecks, Mic, MicOff, Search, Settings, Video, X } from 'lucide-react';
+import { Bot, ChevronRight, Folder, Home, Inbox, ListChecks, Mic, MicOff, Search, Settings, Video, X } from 'lucide-react';
 import type { CalEvent, Client, Meeting, MeetingSettings, Role, Todo, Workspace } from '../types';
 import { JOIN_MODES, MEETING_NAME, joinsByRule, meetingLinkOf, notetakerJoins, type MeetingKind } from '../meetingLinks';
 import { isMine } from '../identity';
@@ -114,6 +114,9 @@ interface HomeProps {
   onFolder: (id: string, clientId: string | null, remember: boolean) => void;
   onOverride: (eventId: string, join: boolean | null) => void;
   onOpenEvent?: (id: string) => void;
+  /** The empty list's one action: send the notetaker (when it works here). */
+  onSend?: () => void;
+  canSendBot?: boolean;
 }
 
 /** Whether the notetaker joins this event (its own switch, else the company's rule). */
@@ -205,17 +208,20 @@ export function MeetHome(p: HomeProps) {
     () => p.events.filter((e) => !e.allDay && isMeeting(e, p.demo) && new Date(e.end).getTime() > now && new Date(e.start).getTime() < now + 86_400_000).sort((a, b) => a.start.localeCompare(b.start)),
     [p.events, p.demo, now],
   );
+  const base = useMemo(() => p.meetings.filter((m) => !p.unfiled || !m.clientId), [p.meetings, p.unfiled]);
   const past = useMemo(() => {
     const s = q.trim().toLowerCase();
-    return [...p.meetings]
-      .filter((m) => !p.unfiled || !m.clientId)
+    return [...base]
       .filter((m) => filter === 'all' || (filter === 'recording' ? LIVE.has(m.status ?? 'done') : filter === 'failed' ? m.status === 'failed' : p.tasks.some((tk) => tk.meetingId === m.id)))
       .filter((m) => !s || m.title.toLowerCase().includes(s) || m.summary.toLowerCase().includes(s) || (m.transcript ?? []).some((l) => l.text.toLowerCase().includes(s)))
       .sort((a, b) => b.at.localeCompare(a.at));
-  }, [p.meetings, p.tasks, p.unfiled, q, filter]);
+  }, [base, p.tasks, q, filter]);
+  const filtering = !!q || filter !== 'all';
+  // Nothing to search or filter yet: no search pill or chips over an empty list.
   return (
     <section className="meet-pane meet-home view-enter">
       <div className="tracking-scroll meet-list">
+        {(base.length > 0 || filtering) && (
         <label className="mh-search">
           <Search size={20} />
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('Search meetings, notes and transcripts')} aria-label={t('Search meetings')} enterKeyHint="search" />
@@ -225,6 +231,8 @@ export function MeetHome(p: HomeProps) {
             </button>
           )}
         </label>
+        )}
+        {(base.length > 0 || filtering) && (
         <div className="mh-chips" role="radiogroup" aria-label={t('Show')}>
           {FILTERS.map(([v, l]) => (
             <button key={v} type="button" role="radio" aria-checked={filter === v} className={`mh-chip${filter === v ? ' on' : ''}`} onClick={() => setFilter(v)}>
@@ -232,6 +240,7 @@ export function MeetHome(p: HomeProps) {
             </button>
           ))}
         </div>
+        )}
 
         {!p.unfiled && !p.notesOnly && !q && filter === 'all' && coming.length > 0 && (
           <>
@@ -247,7 +256,8 @@ export function MeetHome(p: HomeProps) {
           </>
         )}
 
-        <h2 className="mh-head">{p.unfiled ? t('Unfiled') : t('Past meetings')}</h2>
+        {/* Unfiled: the top bar already says so. */}
+        {!p.unfiled && past.length > 0 && <h2 className="mh-head">{t('Past meetings')}</h2>}
         {past.length > 0 ? (
           <div className="mh-card">
             {past.map((m) => {
@@ -281,7 +291,22 @@ export function MeetHome(p: HomeProps) {
             })}
           </div>
         ) : (
-          <EmptyState compact text={q || filter !== 'all' ? t('Nothing matches.') : t('No meetings here yet. Tap “{send}” to send the notetaker to one.', { send: t('Send notetaker') })} />
+          <EmptyState
+            icon={filtering ? <Search size={28} /> : p.unfiled ? <Inbox size={28} /> : <Video size={28} />}
+            title={filtering ? t('Nothing matches') : p.unfiled ? t('Everything is filed') : t('No meetings yet')}
+            text={filtering ? t('Try another word or show all meetings.') : p.unfiled ? t('Meetings that don’t fit a {project} land here.', { project: term.one }) : t('Send the notetaker to a call and its notes show up here.')}
+            action={
+              filtering ? (
+                <button type="button" className="ghost-btn" onClick={() => (setQ(''), setFilter('all'))}>
+                  {t('Clear filters')}
+                </button>
+              ) : !p.unfiled && p.onSend && p.canSendBot !== false ? (
+                <button type="button" className="primary-btn" onClick={p.onSend}>
+                  <Bot size={18} /> {t('Send notetaker')}
+                </button>
+              ) : undefined
+            }
+          />
         )}
       </div>
       {filing && (

@@ -7,6 +7,8 @@ import { DatePicker } from './ui/DatePicker';
 import { Select } from './ui/Select';
 import { EmptyState } from './ui/EmptyState';
 import { t, tn, tx } from '../i18n';
+import { useCreateAction } from '../mobile/chrome';
+import { usePhone } from '../mobile/media';
 import { fmtDate } from '../i18n/format';
 
 export const money = (n: number, cur: Quote['currency']) => (cur === 'IDR' ? `Rp ${Math.round(n).toLocaleString('id-ID')}` : `$${n.toLocaleString('en-US', { maximumFractionDigits: 2 })}`);
@@ -54,21 +56,33 @@ export function QuotesTab({ client, quotes, users, me, canEdit, onSave, onDelete
   const [editing, setEditing] = useState<Quote | null>(null);
   const mine = quotes.filter((q) => q.clientId === client.id).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   const blank = (): Quote => ({ id: uid(), workspaceId: client.workspaceId, clientId: client.id, title: t('{name}: quote', { name: client.name }), items: [{ id: uid(), title: '', qty: 1, price: 0 }], currency: 'IDR', status: 'draft', createdBy: me, createdAt: new Date().toISOString() });
+  // Phones: New quote is the floating button; the intro and its pill show only once there are quotes.
+  const phone = usePhone();
+  useCreateAction('projects', phone && canEdit && !editing && mine.length > 0 && { label: t('New quote'), icon: Plus, run: () => setEditing(blank()) });
   return (
     <div className="qt-tab">
-      <div className="qt-head">
-        <p className="muted small">{t('A quote or contract the {who} accepts by typing their name. Once accepted, it becomes a brief with one task per line.', { who: term.who })}</p>
-        {canEdit && (
-          <button type="button" className="primary-btn sm" onClick={() => setEditing(blank())}>
-            <Plus size={14} /> {t('New quote')}
-          </button>
-        )}
-      </div>
+      {mine.length > 0 && (
+        <div className="qt-head">
+          <p className="muted small">{t('A quote or contract the {who} accepts by typing their name. Once accepted, it becomes a brief with one task per line.', { who: term.who })}</p>
+          {canEdit && (
+            <button type="button" className="primary-btn sm" onClick={() => setEditing(blank())}>
+              <Plus size={14} /> {t('New quote')}
+            </button>
+          )}
+        </div>
+      )}
       {!mine.length && (
         <EmptyState
           icon={<FileSignature size={20} />}
           title={t('No quotes yet')}
           text={t('Write what you’ll do and what it costs. The {who} sees it in their shared space and accepts with one click.', { who: term.who })}
+          action={
+            canEdit && (
+              <button type="button" className="primary-btn sm" onClick={() => setEditing(blank())}>
+                <Plus size={14} /> {t('New quote')}
+              </button>
+            )
+          }
         />
       )}
       <div className="qt-list">

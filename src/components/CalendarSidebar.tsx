@@ -361,7 +361,7 @@ function CalendarDrawerView(p: Props & { drawer: CalDrawer; calMenu: React.React
           {accounts.map((acc) => {
             const first = external.find((c) => groupOf(c) === acc)!;
             return (
-              <div key={acc} className="ad-group">
+              <div key={acc} className="ad-group ad-acc">
                 <DrawerHeading>
                   <SourceMark source={first.source ?? 'sprint2go'} size={16} />
                   <span>{acc === 'Public holidays' || acc === 'Calendar links' ? t(acc) : acc}</span>

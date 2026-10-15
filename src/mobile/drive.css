@@ -398,3 +398,52 @@
   .dp-name-form { padding: 0 16px calc(16px + var(--kb, env(safe-area-inset-bottom))); }
   .drive-phone .drive-note.dp-caption { margin: 4px 16px 8px; padding: 0; background: none; color: var(--text-2); font-size: var(--fs-secondary); }
 }
+
+/* Drive r3 fixes. */
+@media (max-width: 767px) {
+  /* The name field on the same 16px gutter as the title and Create (the sheet body adds 4px of its own). */
+  .dp-name-form { padding-inline: 12px; }
+  /* Details: Open, then Share and Download, under the card. */
+  .dp-details-actions { display: grid; gap: 8px; margin: 24px 16px 0; }
+  .dp-details-actions :is(.primary-btn, .ghost-btn) { justify-content: center; min-height: var(--tap); gap: 8px; }
+  .dp-details-more { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 8px; }
+  /* Preview: an opaque viewer (nothing of the list behind it) and one clear action on the placeholder. */
+  .lightbox { background: rgb(8 8 12); backdrop-filter: none; }
+  .lb-doc .lb-action { margin-top: 8px; min-height: var(--tap); gap: 8px; color: #fff; }
+}
+.lb-nav { transition: background 0.15s, opacity 0.15s; }
+.lb-nav:disabled { opacity: 0.35; pointer-events: none; }
+
+/* Tablets and up: folders are plain divided rows like the file list (not grey cards), renamed in place with no box. */
+@media (min-width: 768px) {
+  .drive-pane:not(.drive-phone) .folder-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .drive-pane:not(.drive-phone) .folder-card {
+    border: 0;
+    border-radius: 0;
+    background: var(--surface);
+    box-shadow: none;
+    transform: none;
+    transition: background 0.15s, box-shadow 0.15s;
+  }
+  .drive-pane:not(.drive-phone) .folder-card + .folder-card,
+  .drive-pane:not(.drive-phone) .folder-card ~ .folder-card { border-top: 1px solid var(--border); }
+  .drive-pane:not(.drive-phone) .folder-card:hover { background: var(--hover); transform: none; box-shadow: none; }
+  .drive-pane:not(.drive-phone) .folder-card:focus-within:has(.rename-input) { box-shadow: inset 0 0 0 2px var(--accent); }
+}
+.drive-pane .rename-input {
+  padding: 3px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  font: inherit;
+  color: var(--text);
+}
+.drive-pane .d-tr:focus-within:has(.rename-input),
+.drive-pane .file-card:focus-within:has(.rename-input) { box-shadow: inset 0 0 0 2px var(--accent); }

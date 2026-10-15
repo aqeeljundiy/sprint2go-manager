@@ -171,6 +171,7 @@ const id: Record<string, string> = {
   'Nothing matches “{q}”. Try a {who}, a person or a few words from a task.': 'Tidak ada yang cocok dengan “{q}”. Coba nama {who}, orang, atau beberapa kata dari tugas.',
   'Type to search {app}.': 'Ketik untuk mencari di {app}.',
   'Type to search.': 'Ketik untuk mencari.',
+  'Type a name or a few words to find it.': 'Ketik nama atau beberapa kata untuk menemukannya.',
   'Latest in {app}': 'Terbaru di {app}',
   'Needs you': 'Perlu Anda',
   Actions: 'Tindakan',
@@ -426,6 +427,7 @@ const id: Record<string, string> = {
   "{n} emails marked read": "{n} email ditandai sudah dibaca",
   "Archived": "Diarsipkan",
   'Profile of {name}': 'Profil {name}',
+  'More apps': 'Aplikasi lainnya',
 };
 
 export default id;

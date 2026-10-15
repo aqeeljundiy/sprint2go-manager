@@ -461,8 +461,11 @@ export function TaskViews({
     return <EmptyState icon="✓" title={t('Nothing open')} text={t('Add one, or use Brain dump to turn your thoughts into tasks.')} action={action} />;
   })();
 
+  const boardHidden = layout === 'board' && !open.length && !asleep.length && words.length > 0 && tasks.some((task) => !task.done);
   const listBody =
-    layout === 'board' ? (
+    boardHidden ? (
+      empty
+    ) : layout === 'board' ? (
       <TaskBoard
         ops={ops}
         tasks={[...open, ...(d.completed ? doneList : doneList.filter((task) => (task.doneAt ?? '') > new Date(Date.now() - 14 * 86_400_000).toISOString()))]}

@@ -416,6 +416,7 @@ export function CalendarView(props: Props) {
         busyOf={busyOf}
         months={view === 'month' && !phone}
         bare={phone}
+        chipsOnly={phone && view === 'month'}
         onMonth={setBrowsed}
         onPick={(d) => {
           setDrop(false);
@@ -426,7 +427,7 @@ export function CalendarView(props: Props) {
       {!phone && <UpNext events={events} color={color} onOpen={(id) => select(id)} botWill={props.botWillJoin} />}
 
       {view === 'schedule' ? (
-        <ScheduleView events={events} cursor={cursor} kit={kit} dueTasks={props.dueTasks} onToggleTask={props.onToggleTask} onOpenTask={props.onOpenTask} onEmptyDay={(d) => create(nextSlot(d))} onTopDay={phone ? (d) => setTopDay((was) => (was && was.getMonth() === d.getMonth() && was.getFullYear() === d.getFullYear() ? was : d)) : undefined} />
+        <ScheduleView events={events} cursor={cursor} kit={kit} dueTasks={props.dueTasks} onToggleTask={props.onToggleTask} onOpenTask={props.onOpenTask} onEmptyDay={(d) => create(nextSlot(d))} onTopDay={phone ? (d) => setTopDay((was) => (was && was.getMonth() === d.getMonth() && was.getFullYear() === d.getFullYear() ? was : d)) : undefined} peek={phone && drop && browsed ? (browsed.getMonth() === cursor.getMonth() && browsed.getFullYear() === cursor.getFullYear() ? cursor : browsed) : null} />
       ) : view === 'month' ? (
         <MonthView
           cursor={cursor}

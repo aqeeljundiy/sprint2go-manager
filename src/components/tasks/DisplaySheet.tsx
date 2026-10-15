@@ -2,7 +2,7 @@ import { useState, type RefObject } from 'react';
 import { Bookmark, Check, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { Popover } from '../ui/Popover';
 import { Sheet } from '../ui/Sheet';
-import { TabPane } from '../ui/Smooth';
+import { SmoothHeight, TabPane } from '../ui/Smooth';
 import { usePhone } from '../../mobile/media';
 import { Select } from '../ui/Select';
 import { Avatar } from '../Avatar';
@@ -128,7 +128,7 @@ export function DisplaySheet({
     );
     const subTitle = sub === 'group' ? t('Grouping') : sub === 'sort' ? t('Sorting') : sub === 'who' ? t('Assignee') : sub === 'rows' ? (d.layout === 'board' ? t('On each card') : t('On each row')) : '';
     return (
-      <Sheet onClose={close} label={t('Display')} size="tall" className="ds-sheet">
+      <Sheet onClose={close} label={t('Display')} className="ds-sheet">
         <header className="ds-phead">
           {sub ? (
             <button type="button" className="ds-pback" onClick={() => setSub('')} aria-label={t('Back to {screen}', { screen: t('Display') })}>
@@ -140,10 +140,16 @@ export function DisplaySheet({
             </button>
           )}
           <h2>{sub ? subTitle : t('Display')}</h2>
-          <button type="button" className="ds-pcircle accent" onClick={close} aria-label={t('Done')}>
-            <Check size={20} strokeWidth={2.5} />
-          </button>
+          {/* A single-pick list applies on tap and goes back, so it has no confirm button (the space keeps the title centred). */}
+          {sub === 'group' || sub === 'sort' ? (
+            <span className="ds-pcircle" style={{ visibility: 'hidden' }} aria-hidden="true" />
+          ) : (
+            <button type="button" className="ds-pcircle accent" onClick={close} aria-label={t('Done')}>
+              <Check size={20} strokeWidth={2.5} />
+            </button>
+          )}
         </header>
+        <SmoothHeight>
         <TabPane key={sub || 'main'}>
           {sub === '' && (
             <div className="ds-pbody">
@@ -226,6 +232,7 @@ export function DisplaySheet({
             </div>
           )}
         </TabPane>
+        </SmoothHeight>
       </Sheet>
     );
   }

@@ -57,12 +57,17 @@ export function TimeGrid(p: GridProps) {
 
   useSwipeNav(rootRef, (dir) => p.onStep?.(dir), !p.onStep);
 
-  // Open with "now" a third of the way down when today is on screen, else at 7:30.
+  // Open with "now" a third of the way down when today is on screen, else at 7:00, snapped to a whole hour with its
+  // label clear of the day header (labels sit centred on their line). `data-home` is where the bar's tab goes back to
+  // when tapped again (AppBar's reselect), not midnight.
   useLayoutEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
     const today = days.some((d) => sameDay(d, new Date()));
-    el.scrollTop = today ? Math.max(0, (minutesIntoDay(new Date()) / 60) * hour - el.clientHeight / 3) : hour * 7.5;
+    const raw = today ? (minutesIntoDay(new Date()) / 60) * hour - el.clientHeight / 3 : hour * 7;
+    const home = Math.max(0, Math.round(raw / hour) * hour - 12);
+    el.dataset.home = String(home);
+    el.scrollTop = home;
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // The block being made sits in the upper part of the screen, above the sheet.

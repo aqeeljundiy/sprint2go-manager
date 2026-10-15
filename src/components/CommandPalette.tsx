@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { EmptyState } from './ui/EmptyState';
 import { term } from '../terms';
 import { ArrowLeft, Brain, Building2, CalendarPlus, Clock, FileText, Hash, ListChecks, Mail, PenLine, Search, User, X, type LucideIcon } from 'lucide-react';
 import { isPhone } from '../mobile/media';
@@ -14,6 +15,8 @@ export interface PaletteItem {
   title: string;
   sub?: string;
   icon: LucideIcon;
+  /** A person's face, shown in place of the icon. */
+  avatar?: ReactNode;
   run: () => void;
   keywords?: string; // what's inside it (an email's text, a note, a transcript, a row's cells): searched, shown as a snippet when it's the match
   app?: AppId; // the app it belongs to (else worked out from its group): search scoped to an app shows only these
@@ -208,7 +211,15 @@ export function CommandPalette({ items: all, onClose, queryActions, recentKey = 
             ) : q.trim() ? (
               <li className="palette-empty">{t('Nothing matches “{q}”. Try a {who}, a person or a few words from a task.', { q, who: term.who })}</li>
             ) : (
-              <li className="palette-empty">{scope ? t('Type to search {app}.', { app: appName(scope) }) : t('Type to search.')}</li>
+              <li className="palette-empty">
+                {kind ? (
+                  <EmptyState icon={<Search size={28} />} title={t('Search {kind}', { kind: t(kind) })} text={t('Type a name or a few words to find it.')} />
+                ) : scope ? (
+                  t('Type to search {app}.', { app: appName(scope) })
+                ) : (
+                  t('Type to search.')
+                )}
+              </li>
             ))}
           {results.map((r, idx) => {
             const head = r.group !== lastGroup ? (lastGroup = r.group) : null;
@@ -216,7 +227,7 @@ export function CommandPalette({ items: all, onClose, queryActions, recentKey = 
               <li key={r.id}>
                 {head && <div className="palette-group">{t(head)}</div>}
                 <button className={idx === hi ? 'hi' : ''} onMouseEnter={() => setHi(idx)} onClick={() => run(r)}>
-                  <r.icon size={16} />
+                  {r.avatar ? <span className="pi-avatar">{r.avatar}</span> : <r.icon size={16} />}
                   <span className="pi-title">{r.title}</span>
                   {(r.sub || (phone && appOf(r))) && <span className="pi-sub">{r.sub ?? appName(appOf(r)!)}</span>}
                 </button>

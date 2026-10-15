@@ -678,7 +678,7 @@ export function Reader(props: Props) {
               <button className={`ai-sum${summary && summary !== 'loading' ? ' has' : ''}${summaryOpen ? ' open' : ''}`} onClick={summarize} aria-expanded={summary && summary !== 'loading' ? summaryOpen : undefined}>
                 {summary === 'loading' ? <Loader2 size={14} className="spin" /> : <Sparkles size={14} />}
                 <span>{summary === 'loading' ? t('Reading the conversation…') : summary ? firstLine(summary.summary) : t('Summarize in one line')}</span>
-                {summary && summary !== 'loading' && <ChevronDown size={15} className={`rot-chev${summaryOpen ? ' open' : ''}`} />}
+                {summary && summary !== 'loading' && <ChevronDown size={15} className={`rot-chev down${summaryOpen ? ' open' : ''}`} />}
               </button>
             )}
             {props.onMakeTask && (
@@ -971,9 +971,10 @@ export function Reader(props: Props) {
             </button>
             <button type="button" className="gm-msg-name" onClick={() => toggle(m.id)} aria-expanded>
               <strong>{who}</strong>
-              <time title={fullDate(m.date)}>{relative(m.date)}</time>
             </button>
+            {/* The time sits on the "to me" line, so a long name keeps the whole first line. */}
             <button type="button" className="gm-msg-to" onClick={() => setDetails((d) => (d.has(m.id) ? new Set([...d].filter((x) => x !== m.id)) : new Set([...d, m.id])))} aria-expanded={showDetails}>
+              <time title={fullDate(m.date)}>{relative(m.date)}</time>
               <span>{toWords(m)}</span>
               <ChevronDown size={14} className={`rot-chev down${showDetails ? ' open' : ''}`} />
             </button>
@@ -1050,8 +1051,8 @@ export function Reader(props: Props) {
             </div>
           )}
           {props.blockTrackers && m.trackersBlocked ? (
-            <div className="blocked-note">
-              <ShieldCheck size={14} /> {tn(m.trackersBlocked, 'Blocked {n} tracker, so the sender can’t see when you read this', 'Blocked {n} trackers, so the sender can’t see when you read this')}
+            <div className="blocked-note" title={tn(m.trackersBlocked, 'Blocked {n} tracker, so the sender can’t see when you read this', 'Blocked {n} trackers, so the sender can’t see when you read this')}>
+              <ShieldCheck size={14} /> {tn(m.trackersBlocked, 'Blocked {n} tracker', 'Blocked {n} trackers')}
             </div>
           ) : null}
           <div className="message-body">
@@ -1127,23 +1128,6 @@ export function Reader(props: Props) {
           <div className="gm-subject">
             <h2>
               <span>{thread.subject}</span>
-              {props.client && (
-                <button type="button" className="gm-tag gm-tag-btn" style={{ ['--c' as string]: props.client.color }} onClick={() => props.onClient?.(props.client!.id)} title={t('Open the {project} page', { project: term.one })}>
-                  {props.client.name}
-                </button>
-              )}
-              {props.shared && (
-                <button type="button" className={`gm-tag gm-tag-btn gm-who${assignee ? ' on' : ''}`} onClick={() => setAssignOpen(true)} aria-label={t('Who handles this')}>
-                  {assignee ? <Avatar person={assignee} size={16} /> : <UserPlus size={12} />}
-                  {assignee ? (assignee.id === props.meUser.id ? t('You') : assignee.name.split(' ')[0]) : t('Assign')}
-                </button>
-              )}
-              {snoozed && (
-                <span className="gm-tag gm-snoozed">
-                  <Clock size={12} /> {thread.snoozeIfNoReply ? t('Back {when} if nobody replies', { when: whenWords(new Date(thread.snoozedUntil!)) }) : t('Back {when}', { when: whenWords(new Date(thread.snoozedUntil!)) })}
-                </span>
-              )}
-              {props.labelChips}
             </h2>
             <button type="button" className={`gm-star${thread.starred ? ' on' : ''}`} onClick={() => props.onStar(thread.id)} aria-pressed={thread.starred} aria-label={thread.starred ? t('Unstar') : t('Star')}>
               <Star size={22} />
@@ -1151,15 +1135,33 @@ export function Reader(props: Props) {
           </div>
           {props.filedLine}
 
-          {props.aiOn && (
-            <div className="gm-chiprow">
+          {/* One chip row under the title: the project tag, Assign, labels and Summarize together. */}
+          <div className="gm-chiprow">
+            {props.client && (
+              <button type="button" className="gm-tag gm-tag-btn" style={{ ['--c' as string]: props.client.color }} onClick={() => props.onClient?.(props.client!.id)} title={t('Open the {project} page', { project: term.one })}>
+                {props.client.name}
+              </button>
+            )}
+            {props.shared && (
+              <button type="button" className={`gm-tag gm-tag-btn gm-who${assignee ? ' on' : ''}`} onClick={() => setAssignOpen(true)} aria-label={t('Who handles this')}>
+                {assignee ? <Avatar person={assignee} size={16} /> : <UserPlus size={12} />}
+                {assignee ? (assignee.id === props.meUser.id ? t('You') : assignee.name.split(' ')[0]) : t('Assign')}
+              </button>
+            )}
+            {snoozed && (
+              <span className="gm-tag gm-snoozed">
+                <Clock size={12} /> {thread.snoozeIfNoReply ? t('Back {when} if nobody replies', { when: whenWords(new Date(thread.snoozedUntil!)) }) : t('Back {when}', { when: whenWords(new Date(thread.snoozedUntil!)) })}
+              </span>
+            )}
+            {props.labelChips}
+            {props.aiOn && (
               <button type="button" className={`gm-ai${summary && summary !== 'loading' ? ' has' : ''}`} onClick={summarize} aria-expanded={summary && summary !== 'loading' ? summaryOpen : undefined}>
                 {summary === 'loading' ? <Loader2 size={16} className="spin" /> : <Sparkles size={16} />}
                 {summary === 'loading' ? t('Reading…') : summary ? t('Summary') : t('Summarize')}
-                {summary && summary !== 'loading' && <ChevronDown size={14} className={`rot-chev${summaryOpen ? ' open' : ''}`} />}
+                {summary && summary !== 'loading' && <ChevronDown size={14} className={`rot-chev down${summaryOpen ? ' open' : ''}`} />}
               </button>
-            </div>
-          )}
+            )}
+          </div>
           <SmoothHeight>
             {summary && summary !== 'loading' && summaryOpen && (
               <div className="ai-summary">

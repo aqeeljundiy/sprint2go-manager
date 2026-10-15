@@ -423,3 +423,37 @@ iframe.print-frame {
 .compose.narrow .compose-foot .track-toggle {
   padding-inline: 8px;
 }
+
+/* ---------- A narrow reader pane (an iPad with the sidebar open) ----------
+   The sender's name stays on one line, and under ~420px the message card drops its frame so the words get the room.
+   The container is the message stack (an inner element: popovers and the viewer render at page level). */
+.reader-in > .messages {
+  container-type: inline-size;
+}
+.message-from > strong {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+@container (max-width: 420px) {
+  .message.open:not(.gm-msg) {
+    border-color: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    background: none;
+  }
+  .message.open:not(.gm-msg) > .message-head {
+    padding-left: 0;
+  }
+  .message.open:not(.gm-msg) .message-from .email {
+    display: none;
+  }
+}
+@container (max-width: 420px) {
+  .message.open:not(.gm-msg) .message-body {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}

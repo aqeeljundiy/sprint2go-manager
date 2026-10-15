@@ -783,7 +783,7 @@
     z-index: var(--z-toast);
   }
   :root.has-fab:not(.bar-away) .toast {
-    bottom: calc(var(--bar-space) + 88px);
+    bottom: calc(max(var(--fab-bottom), calc(var(--bar-space) + 16px)) + 72px); /* the FAB's own spot (see .fab) + its 56 + 16 */
   }
   .ask-pill {
     bottom: calc(var(--bar-space) + 12px);
@@ -799,8 +799,15 @@
     text-decoration: none;
     white-space: nowrap;
   }
-  .ns-chips {
-    margin: 8px 16px 4px;
+  .ns-tabs {
+    padding-inline: 16px;
+  }
+  .client-tabs.ns-tabs > button {
+    flex: 1;
+    min-height: var(--tap);
+  }
+  .client-tabs.ns-tabs > .tab-ink {
+    background: var(--accent);
   }
   .ns-list {
     padding: 0 0 calc(24px + env(safe-area-inset-bottom));
@@ -851,6 +858,7 @@
     width: 16px;
     height: 16px;
     box-shadow: 0 0 0 2px var(--surface);
+    background: color-mix(in oklab, var(--accent) 18%, var(--surface));
   }
   .ns-text {
     flex: 1;
@@ -946,6 +954,12 @@
     align-items: center;
     min-height: var(--row-2);
     padding: 12px 16px;
+  }
+  .palette li button > .pi-avatar {
+    margin-block: 0;
+    grid-row: 1 / span 2;
+    justify-self: center;
+    display: inline-flex;
   }
   .palette li button > svg {
     grid-row: 1 / span 2;

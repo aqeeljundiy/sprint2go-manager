@@ -1166,3 +1166,218 @@
     padding: 0 16px;
   }
 }
+
+/* ---------- Round 3 (settings): tap targets, rows and callouts at phone and tablet widths ---------- */
+/* A row's title with its icon or colour square: one line, 8 px between them (Apps, Teams). */
+.set-row-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.set-row-title > svg {
+  flex: none;
+}
+/* Teams: Open Teams is a plain link row under the list, on the left like the names. */
+.set-link-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--tap);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.18s ease, opacity 0.18s ease;
+}
+.set-link-row:hover {
+  opacity: 0.8;
+}
+/* AI usage: tiles as wide as their words allow, the summary card solid and inside its column. */
+.settings-content .usage-grid {
+  grid-template-columns: repeat(auto-fit, minmax(116px, 1fr));
+}
+.settings-content .usage-grid span {
+  font-size: 12px;
+}
+.settings-content .allow-meter {
+  min-width: 0;
+  background: var(--surface-2);
+}
+
+@media (min-width: 768px) and (max-width: 900px) {
+  /* Task stages: the phone's grid, so a long stage name isn't cut by the type picker. */
+  .settings-content .stage-row {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr) auto auto;
+    grid-template-areas: 'swatch name order remove' '. kind kind kind';
+    gap: 4px 8px;
+  }
+  .settings-content .stage-swatch {
+    grid-area: swatch;
+  }
+  .settings-content .stage-name {
+    grid-area: name;
+    width: 100%;
+  }
+  .settings-content .stage-row .stage-kind,
+  .settings-content .stage-kind-fixed {
+    grid-area: kind;
+    justify-self: start;
+    max-width: 100%;
+  }
+  .settings-content .stage-order {
+    grid-area: order;
+  }
+  .settings-content .stage-row > .icon-btn {
+    grid-area: remove;
+  }
+  /* Legal hold: who, why and Add stacked, so the reason field shows its whole placeholder. */
+  .settings-content .mx-hold-add {
+    flex-wrap: wrap;
+  }
+  .settings-content .mx-hold-add > .person-sel,
+  .settings-content .mx-hold-add > .sel,
+  .settings-content .mx-hold-add > input {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+  /* Email delivery: one plan per line, so titles and badges keep to one line. */
+  .settings-content .ed-routes {
+    grid-template-columns: 1fr;
+  }
+}
+@media (min-width: 768px) {
+  /* Guest access: the "Settings for" choices stay on one line and scroll sideways when they don't fit. */
+  .access-types > .segmented {
+    flex-wrap: nowrap;
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .access-types > .segmented::-webkit-scrollbar {
+    display: none;
+  }
+  .access-types > .segmented > button {
+    flex: none;
+    white-space: nowrap;
+  }
+}
+@media (min-width: 768px) and (max-width: 1180px) and (pointer: coarse) {
+  /* Account on a tablet: the colours go under the photo, each a 44 px target around a 26 px dot, all on one line. */
+  .settings-content .profile-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .settings-content .avatar-colors div {
+    flex-wrap: nowrap;
+    gap: 4px;
+  }
+}
+@media (pointer: coarse) {
+  .settings-content .avatar-colors .swatch {
+    width: var(--tap);
+    height: var(--tap);
+    border: 9px solid transparent;
+    background-clip: padding-box !important; /* the inline background shorthand resets the clip */
+    box-shadow: none;
+  }
+  .settings-content .avatar-colors .swatch.on {
+    outline-offset: -7px;
+  }
+}
+
+@media (max-width: 767px) {
+  /* Account: each colour a 44 px target with a 26 px dot. */
+  .set-swatches .swatch {
+    width: var(--tap);
+    height: var(--tap);
+    border-width: 9px;
+  }
+  /* Mailbox access: the forwarding address is a plain field in the card, Add an accent word beside it. */
+  .settings-push .mx-add-address {
+    gap: 12px;
+  }
+  .settings-push .mx-add-address input {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 0;
+    background: none !important; /* system: beats the shared field-in-card tint (polish.css), which is stronger */
+    font-size: var(--fs-field);
+  }
+  .settings-push .mx-add-address .ghost-btn.outline {
+    flex: none;
+    min-height: var(--tap);
+    padding: 0 4px;
+    border: 0;
+    background: none;
+    box-shadow: none;
+    color: var(--accent);
+    font: var(--t-segment);
+  }
+  .settings-push .mx-add-address .ghost-btn.outline:disabled {
+    color: var(--text-3);
+  }
+  /* Mail storage: the tabs sit above the card on the grey; the card is the rows only. */
+  .settings-push .mx-sections .set-block > .segmented.mx-tabs.mx-tabs {
+    margin: 0 0 8px;
+    border: 0;
+    border-radius: var(--r-pill);
+    background: var(--hover);
+  }
+  .settings-push .mx-sections .set-block > .mx-tabs + .smooth-h {
+    border-top: 1px solid var(--border);
+    border-top-left-radius: var(--r-card);
+    border-top-right-radius: var(--r-card);
+  }
+  /* Phone mail apps / Mailbox access: "Not available yet" is a warn callout at the gutter, like POP's. */
+  .settings-push .pm-note,
+  .settings-push .mx-sections .set-block > .mx-note {
+    margin: 0 0 24px;
+    padding: 12px 16px;
+    border-radius: var(--r-card);
+    background: var(--warn-soft);
+    color: var(--text);
+    font: var(--t-secondary);
+  }
+  /* Appearance: Change in Workspace is a full tap target; the message preview is its own group under a gap. */
+  .settings-push .set-hint .link-btn {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+  }
+  /* Members: role then email under the name, each on its own line; the email gets the whole width. */
+  .g-row.set-member .g-sub > span {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .g-row.set-member .set-member-role {
+    color: var(--text-2);
+  }
+  /* Sign out everywhere: the text at the 16 px gutter, the red button under it. */
+  .so-all .g-note {
+    margin: 0 16px 12px;
+  }
+  .so-all .so-all-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(100% - 32px);
+    min-height: var(--tap);
+    margin: 12px 16px 0;
+    padding: 0 16px;
+    border: 0;
+    border-radius: var(--r-pill);
+    background: var(--danger);
+    color: var(--surface);
+    font: var(--t-segment);
+    transition: opacity 0.18s ease;
+  }
+  .so-all .so-all-btn:active {
+    opacity: 0.8;
+  }
+}

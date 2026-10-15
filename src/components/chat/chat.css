@@ -1119,9 +1119,11 @@
     transform: scale(0.85);
   }
 }
-.newmsg-sheet .nm-to {
-  margin: 0 -4px 4px;
-  padding: 4px 4px 8px;
+@media (min-width: 768px) {
+  .newmsg-sheet .nm-to {
+    margin: 0 -4px 4px;
+    padding: 4px 4px 8px;
+  }
 }
 .nm-list {
   display: grid;

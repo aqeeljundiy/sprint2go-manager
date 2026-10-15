@@ -425,18 +425,17 @@ export function TeamsLink({ teams, users, onOpen }: { teams: Team[]; users: User
           const lead = users.find((u) => u.id === tm.leadId);
           const size = tn(tm.members.length, '{n} person', '{n} people');
           return (
-            <Row key={tm.id} title={<><span className="team-square" style={{ background: tm.color }} /> {tm.name}</>} hint={lead ? t('{people} · led by {name}', { people: size, name: lead.name }) : size}>
+            <Row key={tm.id} title={<span className="set-row-title"><span className="team-square" style={{ background: tm.color }} />{tm.name}</span>} hint={lead ? t('{people} · led by {name}', { people: size, name: lead.name }) : size}>
               <button type="button" className="ghost-btn sm" onClick={() => onOpen(tm.id)}>
                 {t('Open')}
               </button>
             </Row>
           );
         })}
-        <div className="set-foot">
-          <button type="button" className="primary-btn sm" onClick={() => onOpen()}>
-            <Users size={14} /> {t('Open Teams')}
-          </button>
-        </div>
+        <button type="button" className="set-link-row" onClick={() => onOpen()}>
+          <Users size={16} aria-hidden />
+          {t('Open Teams')}
+        </button>
       </div>
       )}
     </>
@@ -456,7 +455,7 @@ export function AppsSection({ ws, canManage, onWorkspace, projects }: { ws: Work
       <fieldset className="plain" disabled={!canManage}>
         <div className="set-block">
           {APPS.filter((a) => a.id !== 'home').map((a) => (
-            <Row key={a.id} title={<><a.icon size={15} /> {a.name}</>}>
+            <Row key={a.id} title={<span className="set-row-title"><a.icon size={16} aria-hidden />{a.name}</span>}>
               <Switch on={apps.includes(a.id)} onChange={() => toggleApp(a.id)} />
             </Row>
           ))}
@@ -838,7 +837,7 @@ export function MyAppsSection({ ws, hidden, isAdmin, asked, onHidden, onCompanyA
       {!edited && <p className="set-intro">{t('Put your apps in the order you use them (or drag them in the left rail), and hide the ones you don’t. Your team still has them, and you can show them again any time.')}</p>}
       {!edited && (<div className="set-block">
         {on.map((a, i) => (
-          <Row key={a.id} title={<><a.icon size={15} /> {a.name}</>} hint={hidden.includes(a.id) ? t('Hidden for you') : undefined}>
+          <Row key={a.id} title={<span className="set-row-title"><a.icon size={16} aria-hidden />{a.name}</span>} hint={hidden.includes(a.id) ? t('Hidden for you') : undefined}>
             <span className="app-order">
               <button type="button" className="icon-btn sm" disabled={i === 0} onClick={() => move(a.id, -1)} aria-label={t('Move {app} up', { app: a.name })}>
                 <ArrowUp size={13} />
@@ -868,7 +867,7 @@ export function MyAppsSection({ ws, hidden, isAdmin, asked, onHidden, onCompanyA
           <h3>{t('Off for {company}', { company: ws.name || t('the company') })}</h3>
           <p className="muted small">{isAdmin ? t('Switch one on and it appears for everyone.') : t('An admin decides which apps the company uses. Ask, and they get a notification that takes them straight to the switch.')}</p>
           {off.map((a) => (
-            <Row key={a.id} title={<><a.icon size={15} /> {a.name}</>}>
+            <Row key={a.id} title={<span className="set-row-title"><a.icon size={16} aria-hidden />{a.name}</span>}>
               {isAdmin ? (
                 <button className="ghost-btn sm outline" onClick={() => onCompanyApp(a.id)}>
                   {t('Switch on for everyone')}

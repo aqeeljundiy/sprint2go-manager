@@ -744,6 +744,7 @@ export function SettingsPage({ email, settings: s, update, section, onSection, u
                   </button>
                 ))}
               </div>
+              <h3>{t('Email')}</h3>
               <Toggle on={s.showSnippets} onChange={(v) => update({ showSnippets: v })} label={t('Show message previews')} hint={t('A line of each email under the subject.')} />
             </>
           )}

@@ -6,9 +6,29 @@
    section 15). The drawer is Calendar's (AppDrawer, styled in calendar.css).
    ========================================================================== */
 
-/* The meeting's "…" menu: phones only (the desktop shows its buttons). */
-.m-more {
-  display: none;
+/* The meeting's header on tablets: Regenerate and Delete are in ⋮; "auto-filed" gives way so it stays one row. */
+@media (max-width: 1100px) {
+  .m-head .m-filed {
+    display: none;
+  }
+}
+
+/* Tasks from meetings: the add row wraps who and due under the title when its pane is narrow. */
+.mt-add-wrap {
+  container-type: inline-size;
+}
+@container (max-width: 640px) {
+  .mt-add-wrap .task-add {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+  .mt-add-wrap .task-add > input {
+    flex: 1 1 calc(100% - 32px);
+    min-width: 0;
+  }
+  .mt-add-wrap .task-add > .primary-btn {
+    margin-left: auto;
+  }
 }
 
 /* A call app's mark: Meet green, Zoom blue, Teams purple. */
@@ -37,7 +57,7 @@
   /* ---------- Home: search, filter chips, Coming up, Past meetings (Google Meet's) ---------- */
 
   .meet-home .tracking-scroll {
-    padding: 4px 0 var(--fab-space);
+    padding: 12px 0 var(--fab-space);
     background: var(--surface);
   }
   .meet-home .mh-search,
@@ -88,7 +108,9 @@
   .mh-chips::-webkit-scrollbar {
     display: none;
   }
+  /* A 32 px pill with a 44 px tap area (the ::before reaches 6 px above and below). */
   .mh-chip {
+    position: relative;
     flex: none;
     min-height: 32px;
     padding: 0 12px;
@@ -102,8 +124,13 @@
       border-color 0.15s,
       color 0.15s;
   }
+  .mh-chip::before {
+    content: '';
+    position: absolute;
+    inset: -6px 0;
+  }
   .mh-chip.on {
-    background: var(--accent-soft);
+    background-color: var(--accent-soft);
     border-color: transparent;
     color: var(--accent-text, var(--accent));
   }
@@ -226,6 +253,73 @@
     padding: 0;
   }
 
+  /* Meet settings (from the drawer): rows on the 16 px gutter, no divider under the top bar. */
+  .meet-settings .as-item {
+    padding-inline: 16px;
+    border-top: 0;
+    box-shadow: none;
+  }
+  .meet-settings .push-head {
+    border-bottom-color: transparent;
+  }
+
+  /* A folder: its project page as one row with a chevron; one filled search with the type as a chip. */
+  .mf-page {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: var(--row-2);
+    padding: 8px 16px;
+    text-align: left;
+    color: var(--text);
+    transition: background 0.15s;
+  }
+  .mf-page:active {
+    background: var(--hover);
+  }
+  .mf-page-text {
+    flex: 1;
+    min-width: 0;
+    display: grid;
+  }
+  .mf-page-text strong {
+    font: var(--t-body);
+  }
+  .mf-page-text small {
+    font: var(--t-secondary);
+    color: var(--text-3);
+  }
+  .mf-page-chev {
+    flex: none;
+    color: var(--text-3);
+  }
+  .meet-pane .m-filters {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 0 4px;
+  }
+  .meet-pane .m-filters input {
+    flex: 1;
+    min-height: var(--tap);
+    padding: 0 16px;
+    border: 0;
+    border-radius: var(--r-pill);
+    background: var(--surface-2);
+    font: var(--t-field);
+  }
+  .meet-pane .m-filters .sel {
+    flex: none;
+    width: auto;
+    min-height: var(--tap);
+    padding: 0 12px;
+    border: 0;
+    border-radius: var(--r-pill);
+    background: var(--surface-2);
+    font: var(--t-chip);
+  }
+
   /* Meet settings (from the drawer) */
   .ms-join {
     padding: 8px 0;
@@ -273,19 +367,35 @@
   .tn-call:active {
     background: var(--hover);
   }
-  .tn-send {
+  .tn-call {
+    transition: background 0.15s;
+  }
+  .tn-call.on {
+    background: var(--accent-soft);
+  }
+  .tn-pick {
     flex: none;
+    display: grid;
+    place-items: center;
+    width: 24px;
     color: var(--accent-text, var(--accent));
+  }
+  /* Paste: an icon at the field's end with a 44 px tap area. */
+  .tn-link .er-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .tn-link .er-input {
+    flex: 1;
+    min-width: 0;
   }
   .tn-paste {
     flex: none;
-    min-height: 32px;
-    padding: 0 12px;
-    border-radius: var(--r-card);
-    background: var(--accent-soft);
+    width: var(--tap);
+    height: var(--tap);
+    margin-right: -12px;
     color: var(--accent-text, var(--accent));
-    font-size: var(--fs-secondary);
-    font-weight: 600;
   }
   .tn-note {
     margin: 8px 16px 0;
@@ -381,7 +491,23 @@
   }
   .m-facts .dr-row {
     width: 100%;
+    min-height: 48px;
     padding-right: 16px;
+  }
+  .m-facts .dr-main {
+    display: flex;
+    align-items: center;
+    text-align: left;
+    color: var(--text);
+  }
+  .m-facts .dr-main .dr-text {
+    flex: 1;
+  }
+  .m-fact-chev {
+    flex: none;
+    margin-left: 8px;
+    color: var(--text-3);
+    pointer-events: none;
   }
   .m-facts .dr-icon {
     width: 56px;
@@ -526,10 +652,11 @@
     font: var(--t-secondary);
     color: var(--text-3);
   }
+  /* The sheet body adds 4 px: the field and its chips sit on the 16 px gutter with the title. */
   .mt-quick .mt-quick-title {
     width: 100%;
     min-height: 48px;
-    padding: 0;
+    padding: 0 12px;
     border: 0;
     background: none;
     font: var(--t-field);
@@ -538,7 +665,30 @@
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    padding: 8px 0;
+    padding: 8px 12px;
+  }
+  .mt-quick .mt-quick-chips .sel {
+    min-height: 36px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: var(--r-pill);
+    background: var(--surface-2);
+  }
+  /* Share on phones: the text on the 16 px gutter, one full-width button. */
+  .m-share-sheet .modal-intro,
+  .m-share-sheet .set-row,
+  .m-share-sheet .share-link,
+  .m-share-sheet .m-share-off {
+    margin-inline: 0;
+    padding-inline: 12px;
+  }
+  .m-share-sheet .m-share-off {
+    min-height: var(--tap);
+  }
+  .m-share-sheet .sheet-foot > button {
+    flex: 1;
+    width: 100%;
+    justify-content: center;
   }
 }
 

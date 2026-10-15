@@ -6,6 +6,7 @@ import { session, store } from '../../store';
 /** Teams in the workspace on screen. */
 const wsTeams = () => store.teams.filter((tm) => !session.wsId || tm.workspaceId === session.wsId);
 import { Avatar } from '../Avatar';
+import { isPhone } from '../../mobile/media';
 import { lsKey } from '../../settings';
 import { t } from '../../i18n';
 
@@ -29,7 +30,8 @@ export function noteRecent(id: string) {
 
 /** "Video editor · Video, Design": what helps tell two people apart. */
 export function personHint(u: User, teams: Team[] = wsTeams()) {
-  const theirs = teams.filter((tm) => tm.members.includes(u.id)).map((tm) => tm.name);
+  const same = (a: string) => a.trim().toLowerCase() === (u.title ?? '').trim().toLowerCase(); // a team named like their title says it twice
+  const theirs = teams.filter((tm) => tm.members.includes(u.id) && !same(tm.name)).map((tm) => tm.name);
   return [u.title, theirs.join(', ')].filter(Boolean).join(' · ');
 }
 
@@ -119,7 +121,7 @@ export function PeopleList({
           return (
             <li key={item.kind === 'person' ? item.u.id : 'x:' + item.o.value} role="presentation">
               <button type="button" role="option" aria-selected={on} className={`sel-opt${i === hi ? ' hi' : ''}`} onMouseEnter={() => setHi(i)} onClick={() => pick(i)}>
-                <span className="sel-icon">{item.kind === 'person' ? <Avatar person={item.u} size={22} /> : item.o.icon}</span>
+                <span className="sel-icon">{item.kind === 'person' ? <Avatar person={item.u} size={isPhone() && personHint(item.u, teams) ? 32 : 22} /> : item.o.icon}</span>
                 <span className="sel-label">
                   {item.kind === 'person' ? (item.u.id === me ? t('{name} (me)', { name: item.u.name }) : item.u.name) : item.o.label}
                   {(item.kind === 'person' ? personHint(item.u, teams) : item.o.hint) && <small>{item.kind === 'person' ? personHint(item.u, teams) : item.o.hint}</small>}

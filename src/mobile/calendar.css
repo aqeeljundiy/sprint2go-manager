@@ -190,14 +190,39 @@
     align-items: center;
     gap: 8px;
     min-height: 36px;
-    padding: 8px 16px 0 56px;
+    /* Section headers sit on the 16 px gutter like every other list's (15/600 from system.css), not at the text's 56. */
+    padding: 8px 16px 0;
     font-size: var(--fs-secondary);
     font-weight: 600;
     color: var(--text-3);
   }
   .ad-heading svg {
     flex: none;
-    margin-left: -24px;
+  }
+  /* A calendar's options as a sheet: the shared sheet rows (16 px gutter, 15/400 with a 13 px second line, 48 px tall);
+     the sheet itself is 8 px in and the menu 1 px more, so the rows add 7. */
+  .pop-sheet .cal-menu .sel-opt {
+    min-height: 48px;
+    padding: 8px 7px;
+    gap: 16px;
+    font: var(--t-body);
+  }
+  .pop-sheet .cal-menu .sel-label small {
+    font-size: var(--fs-secondary);
+  }
+  .pop-sheet .cal-menu .sel-group {
+    padding: 16px 7px 8px;
+    font: var(--t-heading);
+    color: var(--text);
+  }
+  .pop-sheet .cal-menu .cal-status {
+    padding-left: 7px;
+    padding-right: 7px;
+  }
+  /* An account's calendars step in under the account's name (its logo is 24 + 8 wide). */
+  .ad-acc .ad-row .ad-icon {
+    width: 88px;
+    padding-left: 48px;
   }
   .ad-divider {
     flex: none;
@@ -1428,7 +1453,8 @@
     flex: none;
     width: 16px;
     height: 16px;
-    margin: 8px 24px 0 16px;
+    /* Centred on the rows' 20 px icons below (x 16 to 36), the title on their 56 px text line. */
+    margin: 8px 22px 0 18px;
     border-radius: var(--r-tile);
     background: var(--c, var(--accent));
   }
@@ -1582,6 +1608,7 @@
     color: var(--text-2);
   }
   .dr-cal-dot {
+    margin-left: 4px; /* centred in the 20 px icon slot */
     width: 12px;
     height: 12px;
     border-radius: 50%;
@@ -1712,9 +1739,11 @@
 }
 
 @media (max-width: 767px) {
+  /* A task is a plain card (a hairline on the page's surface), never the brand tint that reads as selected: the
+     company colour is only on its check circle. */
   .is-phone .sch-task {
-    background: color-mix(in srgb, var(--accent) var(--tile-tint), var(--surface));
-    box-shadow: inset 4px 0 0 var(--accent);
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--border);
     color: var(--text);
   }
   .is-phone .sch-task .ev-check {
@@ -1842,5 +1871,33 @@
   }
   .tg-phone .block-event .be-time {
     color: var(--text-2);
+  }
+  /* Week on phones: seven ~44 px columns. The block uses the whole column and its title wraps (two lines at 12 px,
+     broken mid-word when it must), the start time under it when there's room, rather than "Pic" cut to three letters. */
+  .tg-week .tg-col {
+    padding-right: 2px;
+  }
+  .tg-phone.tg-week .block-event {
+    max-width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 2px 2px 2px 6px;
+    box-shadow: inset 3px 0 0 var(--c), 0 0 0 1px var(--surface);
+    line-height: 1.25;
+  }
+  .tg-phone.tg-week .block-event .be-title {
+    flex: none;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-overflow: clip;
+  }
+  .tg-phone.tg-week .block-event .be-time {
+    display: block;
+    overflow: hidden;
+    font-size: var(--fs-caption);
   }
 }

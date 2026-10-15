@@ -754,6 +754,7 @@ function SignOutEverywhereScreen({ hasDevices, onBack, onDone }: { hasDevices: b
       onBack={onBack}
       saveLabel={t('Sign out')}
       danger
+      className="so-all"
       onSave={() =>
         post('/api/2fa/signout-everywhere')
           .then(() => (onDone(t('Signed out everywhere else. You’re still signed in here.')), null))
@@ -762,6 +763,10 @@ function SignOutEverywhereScreen({ hasDevices, onBack, onDone }: { hasDevices: b
     >
       <p className="g-note">{t('Lost a phone, or signed in on a computer that isn’t yours? End every other session.')}</p>
       <p className="g-note">{hasDevices ? t('Every other phone, computer and browser signed in as you signs out, and remembered devices ask for the code again. You stay signed in here.') : t('Every other phone, computer and browser signed in as you signs out. You stay signed in here.')}</p>
+      {/* The same action as the top bar's red word, where a thumb reaches it: submitting the form runs it. */}
+      <button type="submit" className="so-all-btn">
+        {t('Sign out everywhere else')}
+      </button>
     </EditScreen>
   );
 }

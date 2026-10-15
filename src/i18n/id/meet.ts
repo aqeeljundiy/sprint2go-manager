@@ -325,6 +325,20 @@ const id: Record<string, string> = {
   "Action items {n}": "Tindak lanjut {n}",
   "File under {project}": "Simpan di {project}",
   "File…": "Simpan…",
+  // Empty states and the phone's folder, tasks and send sheet (round 3)
+  'Everything is filed': 'Semua sudah masuk folder',
+  'Meetings that don’t fit a {project} land here.': 'Rapat yang belum cocok dengan {project} mana pun muncul di sini.',
+  'Send the notetaker to a call and its notes show up here.': 'Kirim notulis ke panggilan dan notulennya muncul di sini.',
+  'Meetings filed under {project} show up here.': 'Rapat yang disimpan di {project} muncul di sini.',
+  'Try another word or show all meetings.': 'Coba kata lain atau tampilkan semua rapat.',
+  'Meet or Zoom link': 'Link Meet atau Zoom',
+  'No open tasks': 'Tidak ada tugas terbuka',
+  'Nothing finished yet': 'Belum ada yang selesai',
+  'Tasks you tick off show up here.': 'Tugas yang Anda centang muncul di sini.',
+  'Action items from your meetings land here.': 'Tindak lanjut dari rapat Anda muncul di sini.',
+  'Promises made in a meeting become tasks here.': 'Janji yang dibuat dalam rapat menjadi tugas di sini.',
+  'Overview, mail and files': 'Ringkasan, email, dan file',
+  '{Project} page': 'Halaman {project}',
 };
 
 export default id;

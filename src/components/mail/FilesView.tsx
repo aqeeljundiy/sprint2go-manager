@@ -5,6 +5,7 @@ import { mailFiles, type FileKind, type MailFile } from '../../mailAttachments';
 import { Popover } from '../ui/Popover';
 import { TopBar } from '../../mobile/TopBar';
 import { EmptyState } from '../ui/EmptyState';
+import { PersonCell } from '../ui/Person';
 import { FileIcon } from '../FileIcon';
 import { AttachmentViewer, driveKind, sizeOf, type ViewItem } from './AttachmentViewer';
 import { DriveFolderPicker } from './DriveFolderPicker';
@@ -53,6 +54,8 @@ export function FilesView({ threads, onOpenThread, onMenu }: { threads: Thread[]
   const [fromQ, setFromQ] = useState('');
   const fromBtn = useRef<HTMLButtonElement>(null);
   const whenBtn = useRef<HTMLButtonElement>(null);
+  const [kindOpen, setKindOpen] = useState(false);
+  const kindBtn = useRef<HTMLButtonElement>(null);
   const saveAnchor = useRef<HTMLElement | null>(null);
 
   const all = useMemo(() => mailFiles(threads).filter((f) => !f.att.blocked), [threads]);
@@ -108,12 +111,10 @@ export function FilesView({ threads, onOpenThread, onMenu }: { threads: Thread[]
           <button type="button" ref={whenBtn} className={`fv-chip${when !== 'any' ? ' on' : ''}`} onClick={() => setWhenOpen(true)} aria-haspopup="menu">
             <CalendarDays size={14} /> <span>{t(WHEN.find((w) => w.id === when)!.label)}</span> <ChevronDown size={14} />
           </button>
-          <span className="fv-sep" aria-hidden="true" />
-          {KINDS.map((k) => (
-            <button key={k.id} type="button" className={`fv-chip${kind === k.id ? ' on' : ''}`} aria-pressed={kind === k.id} onClick={() => (setKind(k.id), setShown(PAGE))}>
-              {t(k.label)}
-            </button>
-          ))}
+          {/* The kind is one Type dropdown like From and When: one chip style across the row. */}
+          <button type="button" ref={kindBtn} className={`fv-chip${kind !== 'all' ? ' on' : ''}`} onClick={() => setKindOpen(true)} aria-haspopup="menu">
+            <Paperclip size={14} /> <span>{kind === 'all' ? t('Type') : t(KINDS.find((k) => k.id === kind)!.label)}</span> <ChevronDown size={14} />
+          </button>
         </div>
       </div>
       <div className="fv-scroll">
@@ -200,11 +201,8 @@ export function FilesView({ threads, onOpenThread, onMenu }: { threads: Thread[]
               .filter((s) => !fromWords || s.name.toLowerCase().includes(fromWords) || s.email.includes(fromWords))
               .slice(0, 60)
               .map((s) => (
-                <button key={s.email} type="button" role="menuitemradio" aria-checked={from?.email === s.email} className="as-item" onClick={() => (setFrom(s), setFromOpen(false), setFromQ(''), setShown(PAGE))}>
-                  <span className="as-label">
-                    {s.name}
-                    <small>{s.email}</small>
-                  </span>
+                <button key={s.email} type="button" role="menuitemradio" aria-checked={from?.email === s.email} className="as-item fv-person" onClick={() => (setFrom(s), setFromOpen(false), setFromQ(''), setShown(PAGE))}>
+                  <PersonCell person={s} size={32} />
                   {from?.email === s.email && <Check size={16} className="as-icon" />}
                 </button>
               ))}
@@ -218,6 +216,18 @@ export function FilesView({ threads, onOpenThread, onMenu }: { threads: Thread[]
               <button key={w.id} type="button" role="menuitemradio" aria-checked={when === w.id} className="as-item" onClick={() => (setWhen(w.id), setWhenOpen(false), setShown(PAGE))}>
                 <span className="as-label">{t(w.label)}</span>
                 {when === w.id && <Check size={16} className="as-icon" />}
+              </button>
+            ))}
+          </div>
+        </div>
+      </Popover>
+      <Popover anchor={kindBtn} open={kindOpen} onClose={() => setKindOpen(false)} width={240} title={t('Type')}>
+        <div className="mail-pick in-pop">
+          <div className="as-list" role="menu">
+            {KINDS.map((k) => (
+              <button key={k.id} type="button" role="menuitemradio" aria-checked={kind === k.id} className="as-item" onClick={() => (setKind(k.id), setKindOpen(false), setShown(PAGE))}>
+                <span className="as-label">{t(k.label)}</span>
+                {kind === k.id && <Check size={16} className="as-icon" />}
               </button>
             ))}
           </div>
