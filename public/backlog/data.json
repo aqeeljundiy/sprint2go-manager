@@ -10764,6 +10764,15 @@
       "detail": "Proof: r2-tables-row.png: 'Komentar' now uses the 15/600 heading, with 'Belum ada komentar' under it (an existing i18n key) Files: src/mobile/tables.css, src/components/tables/RecordDrawer.tsx",
       "priority": "high",
       "status": "done"
+    },
+    {
+      "id": "R-OPS1",
+      "round": "Inbox (raw)",
+      "area": "Ops",
+      "title": "Autodeploy runs through a GitHub push webhook to Dokploy over plain HTTP :3000; move it to HTTPS once the Dokploy dashboard has a domain, and remove the hook if the GitHub App starts seeing the repo",
+      "detail": "Hook id 698456929 on aqeeljundiy/sprint2go-manager (push only). Pushes to other branches answer Branch Not Match, as intended.",
+      "priority": "medium",
+      "status": "todo"
     }
   ]
 }
