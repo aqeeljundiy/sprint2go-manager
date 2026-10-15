@@ -10,8 +10,6 @@ import {
   MailOpen,
   FileText,
   Inbox,
-  Layers,
-  Users,
   PanelLeftClose,
   PanelLeftOpen,
   PenLine,
@@ -19,7 +17,7 @@ import {
   ShieldAlert,
   Star,
   Trash2,
-  type LucideIcon, Clock, CalendarClock, UserCheck, Timer, Plus, ListChecks, Inbox as InboxIcon, Hourglass, ListTodo, File, Tag, Folder, Settings, HelpCircle, Paperclip, Contact as ContactIcon, UserRoundCheck } from 'lucide-react';
+  type LucideIcon, Clock, CalendarClock, UserCheck, Plus, ListChecks, Inbox as InboxIcon, Hourglass, ListTodo, File, Tag, Folder, Settings, HelpCircle, Paperclip, Contact as ContactIcon } from 'lucide-react';
 import type { Account, AppId, FolderId, Label, View, Workspace } from '../types';
 import { usePhone } from '../mobile/media';
 import { WorkspaceLogo } from './WorkspaceLogo';
@@ -334,11 +332,10 @@ function PhoneMailDrawer(props: Props & { pm: NonNullable<Props['phoneMail']>; i
       {count ? <span className="gm-nav-count">{count > 999 ? '999+' : count}</span> : null}
     </button>
   );
-  // Picking a folder looks across all your inboxes (as the title switcher did).
-  const pick = (v: View) => {
-    if (props.activeAccount !== 'all') props.onAccountFilter('all');
-    props.onSelect(v);
-  };
+  // Picking a folder keeps the inbox you chose (Gmail keeps the account); the switcher above says which one it is.
+  const pick = (v: View) => props.onSelect(v);
+  void boxes;
+  void temps;
   return (
     <div className="gm-drawer">
       <button type="button" className="gm-drawer-head" onClick={pm.onAccounts} aria-haspopup="dialog" aria-label={t('Your account and companies')}>
@@ -349,13 +346,24 @@ function PhoneMailDrawer(props: Props & { pm: NonNullable<Props['phoneMail']>; i
         </span>
       </button>
       <div className="gm-drawer-scroll">
+        {/* The same inbox picker as on computers (full addresses, problems and unread under each, temporary
+            addresses, New temporary address, Add an email address), as a sheet; then this inbox's folders. */}
+        <div className="gm-switch">
+          <InboxSwitcher
+            accounts={props.accounts}
+            active={props.activeAccount}
+            unread={props.accountUnread}
+            state={props.accountState}
+            delegated={props.delegated}
+            brandColor={props.brandColor}
+            onPick={(id) => (props.onAccountFilter(id), props.onSelect({ kind: 'folder', id: 'inbox' }))}
+            onNewTemp={props.onNewTemp}
+            onAddAccount={props.onAddAccount}
+            onTempMenu={props.onTempMenu}
+          />
+        </div>
         <nav className="gm-nav-group" aria-label={t('Inboxes')}>
-          {boxes.length > 1 && item('all', Layers, t('All inboxes'), inboxOn('all'), () => props.onAccountFilter('all'), props.accountUnread.all)}
-          {boxes.map((a) =>
-            item(a.id, a.kind === 'shared' ? Users : props.delegated?.has(a.id) ? UserRoundCheck : InboxIcon, a.kind === 'shared' || props.delegated?.has(a.id) ? a.name || a.email : boxes.length > 1 ? t('My inbox') : t('Inbox'), inboxOn(a.id), () => props.onAccountFilter(a.id), props.accountUnread[a.id]),
-          )}
-          {boxes.length === 0 && item('inbox', InboxIcon, t('Inbox'), inboxOn('all'), () => props.onAccountFilter('all'), counts.inbox)}
-          {temps.map((a) => item(a.id, Timer, a.email.split('@')[0] + '@', inboxOn(a.id), () => props.onAccountFilter(a.id), props.accountUnread[a.id]))}
+          {item('inbox', InboxIcon, t('Inbox'), inboxOn(props.activeAccount), () => props.onSelect({ kind: 'folder', id: 'inbox' }), props.accountUnread[props.activeAccount] ?? counts.inbox)}
           {props.tabNav}
           {shared && item('assigned', UserCheck, t('Assigned to me'), isActive({ kind: 'folder', id: 'assigned' }), () => pick({ kind: 'folder', id: 'assigned' }), counts.assigned)}
         </nav>
@@ -385,13 +393,12 @@ function PhoneMailDrawer(props: Props & { pm: NonNullable<Props['phoneMail']>; i
             </nav>
           </>
         )}
-        {(props.clients?.length || props.onNewTemp) && (
+        {!!props.clients?.length && (
           <>
             {pm.labels.length === 0 && !pm.labelNav && <div className="gm-sep" />}
-            {!!props.clients?.length && <div className="gm-head">{term.Many}</div>}
+            <div className="gm-head">{term.Many}</div>
             <nav className="gm-nav-group" aria-label={term.Many}>
               {props.clients?.map((c) => item(`project:${c.id}`, Folder, c.name, isActive({ kind: 'project', id: c.id }), () => pick({ kind: 'project', id: c.id }), pm.tagUnread[`project:${c.id}`], c.color))}
-              {props.onNewTemp && item('temp-add', Plus, t('Temporary address'), false, props.onNewTemp)}
             </nav>
           </>
         )}

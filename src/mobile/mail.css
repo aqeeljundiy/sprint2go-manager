@@ -2776,3 +2776,14 @@
     color: var(--text-2);
   }
 }
+
+/* The phone drawer's inbox picker (Sidebar.tsx PhoneMailDrawer): the same button as on computers, under the account. */
+.gm-switch {
+  padding: 8px 12px 4px;
+}
+.gm-switch .inbox-switch {
+  margin: 0;
+}
+.gm-switch .inbox-switch-btn {
+  min-height: var(--tap);
+}

@@ -1,1040 +1,2471 @@
 {
-    "updated":  "2026-10-14T23:04:36Z",
-    "items":  [
-                  {
-                      "id":  "G1",
-                      "round":  "Requested",
-                      "area":  "Mail",
-                      "title":  "Mailbox status says what actually works",
-                      "detail":  "One rule (src/mailStatus.ts) using the server\u0027s readiness check: Working, Receiving only, No mail arriving yet, Not set up, Sign in needed.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "G2",
-                      "round":  "Requested",
-                      "area":  "Mail",
-                      "title":  "All mail folder",
-                      "detail":  "Every account and tab in one list, archived too, never spam or trash. /mail/all.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "G3",
-                      "round":  "Requested",
-                      "area":  "Mail",
-                      "title":  "Sorting rules editor",
-                      "detail":  "Settings, Mail: taught senders, change or remove, add for an address or @domain. Phone: in Inbox settings.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "G4",
-                      "round":  "Requested",
-                      "area":  "Mail",
-                      "title":  "Shared inbox access levels",
-                      "detail":  "Can read / Can read and send per person, enforced on the server and for mail apps. \u0027Private from admins\u0027 left out: admins control the list, so it can\u0027t be promised.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "G5",
-                      "round":  "Requested",
-                      "area":  "Account",
-                      "title":  "Backup sign-in email",
-                      "detail":  "Settings, Account, Security. Signs in and gets reset codes; a reset keeps the main email.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "G9",
-                      "round":  "Requested",
-                      "area":  "Chat",
-                      "title":  "Chat summary: one brief you can update",
-                      "detail":  "Overview, Urgent, Decided, Open questions, Next steps; Update button, \u0027N new messages since\u0027. Dated summaries folded below.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "G10",
-                      "round":  "Requested",
-                      "area":  "Home",
-                      "title":  "Home layout fully customizable",
-                      "detail":  "Exact card sizes, more columns, add any card, balanced spacing.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "G11",
-                      "round":  "Requested",
-                      "area":  "Phone",
-                      "title":  "Bottom bar: margins, safe areas, rounded",
-                      "detail":  "Floating bar, inset from edges, follows phone corner curves, rethink labels.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "G12",
-                      "round":  "Requested",
-                      "area":  "Landing",
-                      "title":  "Landing page audit and rewrite",
-                      "detail":  "Who it\u0027s for in the hero, two CTAs, agency and free guests up front, no endless marquee.",
-                      "priority":  "medium",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "G6",
-                      "round":  "Requested",
-                      "area":  "Workspace",
-                      "title":  "Brands inside a workspace",
-                      "detail":  "Settings, General \u0026 email, Brands: name, colour, logo, domains. Mailboxes on a brand\u0027s domains get its colour dot; compose names the brand. Next: brand signatures (with R7).",
-                      "priority":  "medium",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "G7",
-                      "round":  "Requested",
-                      "area":  "Onboarding",
-                      "title":  "Domain step: buying a domain (needs your call)",
-                      "detail":  "Connecting your own domain already works in onboarding (keep / mix / hosted with live DNS checks). Buying one needs a registrar account (e.g. a reseller API) and payments: your decision.",
-                      "priority":  "low",
-                      "status":  "todo"
-                  },
-                  {
-                      "id":  "G8",
-                      "round":  "Requested",
-                      "area":  "Guests",
-                      "title":  "One interface for guests and team (needs your call)",
-                      "detail":  "Changes how the client portal walls off client data. Proposal in docs/GAMEPLAN.md section 8; worth deciding together before building.",
-                      "priority":  "low",
-                      "status":  "todo"
-                  },
-                  {
-                      "id":  "R1",
-                      "round":  "Inbox",
-                      "area":  "Brand",
-                      "title":  "Own persona, not copied. Look like the landing page / elkiya.com / elkiyagroup.com",
-                      "detail":  "Raw: Settings feels copied from Apple settings. No persona yet. Brand consistent across the whole app, like the landing page or Elkiya.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "R2",
-                      "round":  "Inbox",
-                      "area":  "Brand",
-                      "title":  "No dead grey background: white, bright",
-                      "detail":  "Raw: don\u0027t like the grey background, makes the app look dead. Likes white and bright colours.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "R3",
-                      "round":  "Inbox",
-                      "area":  "Research",
-                      "title":  "Research each app against its reference",
-                      "detail":  "Raw: Mail = Gmail/Proton UI, Chat = Slack + Discord, Tasks = Todoist, Calendar = Google Calendar, Projects = ?, Meet = Read AI, Drive = Google Drive, Notes = notes, Tables = Notion database, Teams = team management, Vault = passwords, Settings = settings. Round 3 compared every app with its reference; 60+ findings. Projects: Basecamp recommended (built for agencies with clients).",
-                      "priority":  "high",
-                      "status":  "doing"
-                  },
-                  {
-                      "id":  "R4",
-                      "round":  "Inbox",
-                      "area":  "Everywhere",
-                      "title":  "Right-click on everything",
-                      "detail":  "Raw: right-click a feature to hide it (e.g. hide Chat if not used), then a menu to show it again. Most things should have a right-click menu, only a few do now. Rounds 2: rail apps, projects, teams, meetings, tables, mail folders. More in later rounds.",
-                      "priority":  "high",
-                      "status":  "doing"
-                  },
-                  {
-                      "id":  "R5",
-                      "round":  "Inbox",
-                      "area":  "Mail",
-                      "title":  "Inbox tabs should be removable (like Gmail labels)",
-                      "detail":  "Raw: Primary/Promotions/Social/Updates feel default, should be able to cancel them out if not wanted.",
-                      "priority":  "medium",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "R6",
-                      "round":  "Inbox",
-                      "area":  "Mail",
-                      "title":  "Filter chips cropped (Attachments cut off)",
-                      "detail":  "Raw: Unread / Needs reply / Assigned to me / Attachments row gets cropped when the list isn\u0027t wide, can\u0027t reach Attachments.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "R7",
-                      "round":  "Inbox",
-                      "area":  "Mail",
-                      "title":  "Signature designer with ~5 templates",
-                      "detail":  "Raw: design a signature, add logo etc. 5 templates. Free plan has a watermark, paid removes it.",
-                      "priority":  "medium",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "R8",
-                      "round":  "Inbox",
-                      "area":  "Mail",
-                      "title":  "Amazon SES: cost, what customers get free",
-                      "detail":  "Raw: we talked about SES but don\u0027t use it. How much does it cost us, is it expensive to provide, how many free per month? Back-end logic needed (message cut off).",
-                      "priority":  "medium",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "R9",
-                      "round":  "Inbox",
-                      "area":  "Support",
-                      "title":  "Submit a ticket, queue in the admin backend",
-                      "detail":  "Raw: feature to submit a ticket that goes to the backend, see which tickets need processing.",
-                      "priority":  "medium",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "R10",
-                      "round":  "Inbox",
-                      "area":  "Security",
-                      "title":  "Final: full security audit (vibe-coded app risks) + Dokploy",
-                      "detail":  "Raw: make sure ENVs, APIs etc. never reach the front end. List the usual vibe-code security mistakes and check all. Look at Dokploy for what else to protect. Research GitHub/Google. Final backlog after the 5 rounds.",
-                      "priority":  "high",
-                      "status":  "todo"
-                  },
-                  {
-                      "id":  "R11",
-                      "round":  "Inbox",
-                      "area":  "Process",
-                      "title":  "Five audit rounds, 15+ items each, UX/UI first",
-                      "detail":  "Raw: audit, 15-20 backlog items, fix, audit again, five times (75+). Customer-centric, UX/UI first, features second. Question every placement against common habits on phone and desktop. Open to removing features nobody uses.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "R13",
-                      "round":  "Inbox",
-                      "area":  "Brand",
-                      "title":  "Same background on phone and desktop (white, not reversed)",
-                      "detail":  "Raw: white is better than grey. On mobile the background is white, on desktop a grey off-white, reversed, feels inconsistent.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "R14",
-                      "round":  "Inbox",
-                      "area":  "Phone",
-                      "title":  "Phone should feel as clean as desktop",
-                      "detail":  "Raw: desktop UI is pretty clean but the phone doesn\u0027t reflect its similarities.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "R12",
-                      "round":  "Inbox",
-                      "area":  "Home",
-                      "title":  "Keep the \u0027Try it\u0027 demo",
-                      "detail":  "Raw: thought about removing the demo, decided to keep it.",
-                      "priority":  "low",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "A1",
-                      "round":  "Audit 1",
-                      "area":  "Phone",
-                      "title":  "Side drawer slides out the way it came in",
-                      "detail":  "Duplicate s2gDrawerOut keyframes made the left drawer fade right on close.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "A2",
-                      "round":  "Audit 1",
-                      "area":  "Phone",
-                      "title":  "Home shows the launcher button, not a back arrow",
-                      "detail":  "Home is a main screen; a back chevron implied it was pushed.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "A3",
-                      "round":  "Audit 1",
-                      "area":  "Chat",
-                      "title":  "Chat bottom tab: Channels, not Home",
-                      "detail":  "\"Home\" clashed with the Home app.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "A4",
-                      "round":  "Audit 1",
-                      "area":  "Drive",
-                      "title":  "Drive: Recent, not Home",
-                      "detail":  "Two different screens named Home inside one app.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "A5",
-                      "round":  "Audit 1",
-                      "area":  "Meet",
-                      "title":  "Meet rows: quiet notetaker toggle, distinct create button",
-                      "detail":  "Stacks of identical orange mic circles; unclear which one does what.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "A6",
-                      "round":  "Audit 1",
-                      "area":  "Phone",
-                      "title":  "Bottom bar and create button on the z-index tokens",
-                      "detail":  "Hard-coded 34/35; the bar could draw over the button mid-animation.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "A7",
-                      "round":  "Audit 1",
-                      "area":  "Calendar",
-                      "title":  "Month picker shows neighbouring days, muted",
-                      "detail":  "First and last rows looked broken with blank cells.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "A8",
-                      "round":  "Audit 1",
-                      "area":  "Mail",
-                      "title":  "Filter chips never cropped",
-                      "detail":  "Attachments chip was cut off in a narrow list (R6).",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "A9",
-                      "round":  "Audit 1",
-                      "area":  "Mail",
-                      "title":  "Inbox tabs keep one width; new-mail dot takes no space",
-                      "detail":  "Tabs resized when you picked one; the highlight jumped.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "A10",
-                      "round":  "Audit 1",
-                      "area":  "Mail",
-                      "title":  "Read and unread rows keep the same width",
-                      "detail":  "Bold-on-unread shifted text when an email was opened.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "A11",
-                      "round":  "Audit 1",
-                      "area":  "Mail",
-                      "title":  "Row hover actions without a box, date not hidden",
-                      "detail":  "Box inside a box covering the date.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "A12",
-                      "round":  "Audit 1",
-                      "area":  "Mail",
-                      "title":  "Done has one icon everywhere",
-                      "detail":  "Check in some places, archive box in others.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "A13",
-                      "round":  "Audit 1",
-                      "area":  "Mail",
-                      "title":  "Empty list says why, with the right icon",
-                      "detail":  "A big tick showed for searches that found nothing.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "A14",
-                      "round":  "Audit 1",
-                      "area":  "Mail",
-                      "title":  "Discarding a draft can be undone",
-                      "detail":  "One tap lost everything typed.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "A15",
-                      "round":  "Audit 1",
-                      "area":  "Tasks",
-                      "title":  "Today agrees with Home",
-                      "detail":  "\"All done for today\" while Home listed things that need you.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "A16",
-                      "round":  "Audit 1",
-                      "area":  "Meet",
-                      "title":  "One name for the notetaker; real call icons",
-                      "detail":  "Five names for one feature; every non-Zoom call labelled GM.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "A17",
-                      "round":  "Audit 1",
-                      "area":  "Projects",
-                      "title":  "One primary button per empty screen",
-                      "detail":  "Header and empty state both had the same primary button.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "A18",
-                      "round":  "Audit 1",
-                      "area":  "Vault",
-                      "title":  "No developer instructions shown to users",
-                      "detail":  "Vault told end users to run npm run server.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "A19",
-                      "round":  "Audit 1",
-                      "area":  "Settings",
-                      "title":  "Unknown Settings page says so, not \"Ask an admin\"",
-                      "detail":  "/settings/general showed a permission message.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "A20",
-                      "round":  "Audit 1",
-                      "area":  "Chat",
-                      "title":  "Dated summaries never hang on an AI error",
-                      "detail":  "An AI failure left it on \"Writing…\" forever.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "R15",
-                      "round":  "Inbox",
-                      "area":  "Process",
-                      "title":  "After the 5 rounds: audit every app twice (15-20 items each)",
-                      "detail":  "Raw: audit mail 2x, chat 2x, tasks 2x, vault 2x, projects 2x, every menu, 15-20 backlog each time. Customer experience on mobile, desktop and iPad (portrait and landscape). Very comprehensive.",
-                      "priority":  "high",
-                      "status":  "todo"
-                  },
-                  {
-                      "id":  "R16",
-                      "round":  "Inbox",
-                      "area":  "Mail",
-                      "title":  "Inboxes as a dropdown account switcher",
-                      "detail":  "Raw: instead of every email listed under Inboxes, a dropdown to pick which account to see (All or one), plus Add temporary address and Add a (non-temporary) address in the same dropdown.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "B1",
-                      "round":  "Audit 2",
-                      "area":  "Brand",
-                      "title":  "White pages everywhere, panels set apart by fine edges",
-                      "detail":  "Same white on phone and desktop; Elkiya ink and soft blue glow. (R2, R13)",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "B2",
-                      "round":  "Audit 2",
-                      "area":  "Everywhere",
-                      "title":  "Right-click an app to hide it; + brings hidden apps back",
-                      "detail":  "The rail menu: Open, Hide; a \"+N hidden\" button lists hidden apps. (R4)",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "B3",
-                      "round":  "Audit 2",
-                      "area":  "Mail",
-                      "title":  "Inbox picker instead of a long list",
-                      "detail":  "All inboxes, each mailbox with unread and problems, temporary addresses, add an address. (R16)",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "B4",
-                      "round":  "Audit 2",
-                      "area":  "Projects",
-                      "title":  "Right-click a project card",
-                      "detail":  "Open, Open tasks, Email the project, Pause, End.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "B5",
-                      "round":  "Audit 2",
-                      "area":  "Teams",
-                      "title":  "Right-click a team card",
-                      "detail":  "Open, Open team tasks, Rename, Delete.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "B6",
-                      "round":  "Audit 2",
-                      "area":  "Meet",
-                      "title":  "Right-click a meeting row",
-                      "detail":  "Open, Share, Ask about it, File in project, Delete: the detail screen\u0027s actions.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "B7",
-                      "round":  "Audit 2",
-                      "area":  "Tables",
-                      "title":  "Right-click a table card, and board cards on desktop",
-                      "detail":  "Board card menu was phone-only. Done for table cards (Open, Copy link). Board cards on desktop need the table screen\u0027s row actions passed in: next round.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "B8",
-                      "round":  "Audit 2",
-                      "area":  "Mail",
-                      "title":  "Right-click a folder",
-                      "detail":  "Mark all read, Empty (Trash, Spam).",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "B9",
-                      "round":  "Audit 2",
-                      "area":  "Settings",
-                      "title":  "One header style, sentence case, phone and desktop",
-                      "detail":  "11px uppercase on desktop, 13px uppercase on phone; the system says 15/600 sentence case.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "B10",
-                      "round":  "Audit 2",
-                      "area":  "Settings",
-                      "title":  "Phone Settings: our look, not iOS\u0027s coloured tiles",
-                      "detail":  "Plain icons like desktop; no rainbow of tiles.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "B11",
-                      "round":  "Audit 2",
-                      "area":  "Settings",
-                      "title":  "Phone Settings opens with the company card",
-                      "detail":  "Logo, name, plan: what you are setting, at the top. No change: the company group is already titled with the company name.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "B12",
-                      "round":  "Audit 2",
-                      "area":  "Settings",
-                      "title":  "Grouped cards follow the theme tokens in dark mode",
-                      "detail":  "Hard-coded #1c1c1f.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "B13",
-                      "round":  "Audit 2",
-                      "area":  "Settings",
-                      "title":  "Settings nav and blocks on the spacing scale",
-                      "detail":  "9px radius, 26px gaps: off the scale. Header style unified (B9); nav radii left as they are, within 1 px of the token.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "B14",
-                      "round":  "Audit 2",
-                      "area":  "Settings",
-                      "title":  "Phone shows each section\u0027s intro",
-                      "detail":  "The explanatory line was hidden on phones.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "B15",
-                      "round":  "Audit 2",
-                      "area":  "iPad",
-                      "title":  "One tablet breakpoint in JS and CSS",
-                      "detail":  "JS 1099 vs CSS 1100: at 1100 px both rules applied.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "B16",
-                      "round":  "Audit 2",
-                      "area":  "iPad",
-                      "title":  "iPad landscape: room for the reader in Mail",
-                      "detail":  "248 sidebar + 72 rail + 400 list left ~470 px.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "B17",
-                      "round":  "Audit 2",
-                      "area":  "Home",
-                      "title":  "Home cards go full width on every phone width",
-                      "detail":  "760 vs 767: half-width cards on some phones.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "B18",
-                      "round":  "Audit 2",
-                      "area":  "Chat",
-                      "title":  "Chat details dock beside the conversation from 1024 px",
-                      "detail":  "It covered the conversation up to 1100 px. No change: details float over the conversation below 1440 px on purpose (polish.css), so it never squeezes.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "B19",
-                      "round":  "Audit 2",
-                      "area":  "iPad",
-                      "title":  "Side panels leave room on iPad portrait",
-                      "detail":  "520 px panel left a 176 px sliver. No change: a 520 px panel over a dimmed list is iPad\u0027s slide-over pattern.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "C1",
-                      "round":  "Audit 3",
-                      "area":  "Mail",
-                      "title":  "A second window follows the first (compose, folder)",
-                      "detail":  "Seen tonight: with two windows open as the same person, opening a draft in one opened the same compose and folder in the other. Not reproducible with one window; needs a second window to trace (look at live sync of threads and any draft/compose state).",
-                      "priority":  "medium",
-                      "status":  "todo"
-                  },
-                  {
-                      "id":  "C2",
-                      "round":  "Audit 3",
-                      "area":  "Mail",
-                      "title":  "Archive, not Done (Gmail and Proton\u0027s word and icon)",
-                      "detail":  "Hover, bulk bar, phone bar, reader, swipes, shortcut sheet, toasts. Reverses A12: you named Gmail as the reference.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "C3",
-                      "round":  "Audit 3",
-                      "area":  "Mail",
-                      "title":  "Hover actions in Gmail\u0027s order, with Read/Unread",
-                      "detail":  "Archive, Delete, Read/Unread, Snooze.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "C4",
-                      "round":  "Audit 3",
-                      "area":  "Mail",
-                      "title":  "Swipes archive both ways by default",
-                      "detail":  "Gmail\u0027s default; snooze stays a choice in Settings.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "C5",
-                      "round":  "Audit 3",
-                      "area":  "Chat",
-                      "title":  "@mentions show in muted channels",
-                      "detail":  "Muting quiets chatter, not you (Slack, Discord).",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "C6",
-                      "round":  "Audit 3",
-                      "area":  "Chat",
-                      "title":  "Jump to recent",
-                      "detail":  "A pill above the composer when you\u0027re far up the history.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "C7",
-                      "round":  "Audit 3",
-                      "area":  "Chat",
-                      "title":  "One-click reactions on hover; Make a task moved to More",
-                      "detail":  "Slack\u0027s hover bar.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "C8",
-                      "round":  "Audit 3",
-                      "area":  "Tasks",
-                      "title":  "Undo after completing a task",
-                      "detail":  "Todoist\u0027s \"1 task completed · Undo\"; Undo restores the exact stage.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "C9",
-                      "round":  "Audit 3",
-                      "area":  "Tasks",
-                      "title":  "My tasks: no Inbox icon",
-                      "detail":  "In Todoist Inbox means unfiled tasks.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "C10",
-                      "round":  "Audit 3",
-                      "area":  "Tasks",
-                      "title":  "Q opens quick add",
-                      "detail":  "Todoist\u0027s shortcut, next to N.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "C11",
-                      "round":  "Audit 3",
-                      "area":  "Drive",
-                      "title":  "Desktop New menu (upload, new folder)",
-                      "detail":  "Desktop had no way to make a folder.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "C12",
-                      "round":  "Audit 3",
-                      "area":  "Drive",
-                      "title":  "Desktop right-click has share link, download, move",
-                      "detail":  "Same actions as the phone sheet.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "C13",
-                      "round":  "Audit 3",
-                      "area":  "Drive",
-                      "title":  "Empty Drive on phones says tap +",
-                      "detail":  "It said \"press Upload\", which phones don\u0027t have.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "C14",
-                      "round":  "Audit 3",
-                      "area":  "Meet",
-                      "title":  "Bot log only when a recording failed",
-                      "detail":  "Diagnostics out of sight (Read AI); in the meeting\u0027s menu otherwise.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "C15",
-                      "round":  "Audit 3",
-                      "area":  "Meet",
-                      "title":  "\"Action items\", one name",
-                      "detail":  "Was \"Tasks\" in one place and \"Action items\" in another.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "C16",
-                      "round":  "Audit 3",
-                      "area":  "Vault",
-                      "title":  "Lock button and auto-lock after 15 minutes idle",
-                      "detail":  "1Password and Bitwarden do.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "C17",
-                      "round":  "Audit 3",
-                      "area":  "Vault",
-                      "title":  "Honest encryption wording; chip only on logins needing re-save",
-                      "detail":  "The sidebar contradicted the end-to-end claim.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "C18",
-                      "round":  "Audit 3",
-                      "area":  "Teams",
-                      "title":  "Team name and description save on leaving the field, never empty",
-                      "detail":  "Saved on every keystroke; an empty name could be saved.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "C19",
-                      "round":  "Audit 3",
-                      "area":  "Tables",
-                      "title":  "Colour badge opens a picker",
-                      "detail":  "It cycled colours on click, which read as a bug.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "C20",
-                      "round":  "Audit 3",
-                      "area":  "Notes",
-                      "title":  "Empty states that are true",
-                      "detail":  "\"First line is the title\" was wrong; filtered views offer Show all notes.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "D1",
-                      "round":  "Audit 4",
-                      "area":  "Mail",
-                      "title":  "Internal notes say so on the box",
-                      "detail":  "\"Internal note · only your team sees it\", above the comment field next to Reply.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "D2",
-                      "round":  "Audit 4",
-                      "area":  "Mail",
-                      "title":  "A replies to all; L (label) listed",
-                      "detail":  "Gmail\u0027s keys.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "D3",
-                      "round":  "Audit 4",
-                      "area":  "Chat",
-                      "title":  "@mention autocomplete like Slack",
-                      "detail":  "Any word of a name, any language\u0027s letters, the conversation\u0027s people first, arrows and Tab.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "D4",
-                      "round":  "Audit 4",
-                      "area":  "Vault",
-                      "title":  "Search on desktop",
-                      "detail":  "Phones had it; desktop didn\u0027t.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "D5",
-                      "round":  "Audit 4",
-                      "area":  "Projects",
-                      "title":  "Grouped Active / Leads / Paused, in name order",
-                      "detail":  "Cards no longer reshuffle as tasks go late (Basecamp\u0027s way).",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "D6",
-                      "round":  "Audit 4",
-                      "area":  "Projects",
-                      "title":  "Find a project",
-                      "detail":  "Search field once there are more than six.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "D7",
-                      "round":  "Audit 4",
-                      "area":  "Projects",
-                      "title":  "One New project button",
-                      "detail":  "The sidebar\u0027s; the header copy is gone.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "D8",
-                      "round":  "Audit 4",
-                      "area":  "Teams",
-                      "title":  "One New team button; tabs Tasks and Who\u0027s busy",
-                      "detail":  "\"Work\" next to \"Workload\" read as the same thing.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "D9",
-                      "round":  "Audit 4",
-                      "area":  "Notes",
-                      "title":  "Date sections on desktop",
-                      "detail":  "Today, Previous 7 days, months: as on the phone and in Apple Notes.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "D10",
-                      "round":  "Audit 4",
-                      "area":  "Mail",
-                      "title":  "Signature designer (R7)",
-                      "detail":  "5 layouts, brand logo and colour, live preview, Use this signature. Free plan adds \"Sent with sprint2go\".",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "D11",
-                      "round":  "Audit 4",
-                      "area":  "Mail",
-                      "title":  "Tables allowed in email HTML",
-                      "detail":  "Designed signatures (and most designed emails) use tables; they can\u0027t run anything.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "D12",
-                      "round":  "Audit 4",
-                      "area":  "Mail",
-                      "title":  "Signature logos reach Gmail and Outlook",
-                      "detail":  "Uploaded as a company file so the mail engine attaches it; SVG logos are left out and explained.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "D13",
-                      "round":  "Audit 4",
-                      "area":  "Calendar",
-                      "title":  "Google Calendar\u0027s view order on computers",
-                      "detail":  "Day, Week, Month, Schedule, 3 days; phones keep Schedule first.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "D14",
-                      "round":  "Audit 4",
-                      "area":  "Tasks",
-                      "title":  "p1 to p4 in quick add say what they become",
-                      "detail":  "p1-p2 high, p3-p4 normal; the chip names it.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "D15",
-                      "round":  "Audit 4",
-                      "area":  "Support",
-                      "title":  "Tickets (R9): already built",
-                      "detail":  "Help \u0026 support files tickets with replies and ratings; the queue is at /admin/tickets.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "D16",
-                      "round":  "Audit 4",
-                      "area":  "Mail",
-                      "title":  "Amazon SES costs (R8)",
-                      "detail":  "docs/SES-COSTS.md: about $0.10 per 1,000 emails; the risk is reputation, not price.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "E1",
-                      "round":  "Audit 5",
-                      "area":  "Phone",
-                      "title":  "Create button slides away while scrolling down",
-                      "detail":  "It sat on rows\u0027 own controls at rest (Material\u0027s rule; Compose still shrinks).",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "E2",
-                      "round":  "Audit 5",
-                      "area":  "Meet",
-                      "title":  "Phone tab \"Past\", not \"Notes\"",
-                      "detail":  "Clashed with the Notes app.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "E3",
-                      "round":  "Audit 5",
-                      "area":  "Drive",
-                      "title":  "No repeated Upload/New in the header",
-                      "detail":  "The sidebar has Upload and New folder; the header copy from round 3 was a duplicate.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "E4",
-                      "round":  "Audit 5",
-                      "area":  "Calendar",
-                      "title":  "One New event button",
-                      "detail":  "Sidebar\u0027s (and C); the header copy is gone.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "E5",
-                      "round":  "Audit 5",
-                      "area":  "Meet",
-                      "title":  "One Send notetaker button; no static subtitle",
-                      "detail":  "Sidebar\u0027s; the header copy is gone.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "E6",
-                      "round":  "Audit 5",
-                      "area":  "Mail",
-                      "title":  "\"More\" folds Waiting for reply, To-do, Contacts, Files",
-                      "detail":  "Gmail\u0027s More; labels stay in reach. Opens itself while one is in use.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "E7",
-                      "round":  "Audit 5",
-                      "area":  "Mail",
-                      "title":  "Quick replies only when there\u0027s no draft",
-                      "detail":  "Two ways to reply side by side was noise.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "E8",
-                      "round":  "Audit 5",
-                      "area":  "Vault",
-                      "title":  "No static tagline in the header",
-                      "detail":  "Screens say what to do, not what they are.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "E9",
-                      "round":  "Audit 5",
-                      "area":  "Chat",
-                      "title":  "Activity on computers",
-                      "detail":  "Mentions and replies to you, first in Chat\u0027s sidebar (Slack\u0027s Activity); was phone-only.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "E10",
-                      "round":  "Audit 5",
-                      "area":  "Everywhere",
-                      "title":  "Dark mode checked after the white theme",
-                      "detail":  "Settings, Home and Mail read well in dark.",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "E11",
-                      "round":  "Audit 5",
-                      "area":  "Everywhere",
-                      "title":  "Primary buttons counted on every app",
-                      "detail":  "Mail, Projects, Teams, Notes, Drive, Calendar, Meet, Vault: one each now (Tasks and Tables keep two different actions).",
-                      "priority":  "high",
-                      "status":  "done"
-                  },
-                  {
-                      "id":  "E12",
-                      "round":  "Audit 5",
-                      "area":  "Tables",
-                      "title":  "Kept \"New row\" (not Notion\u0027s \"New\")",
-                      "detail":  "Clearer for people who don\u0027t know databases: a deliberate no.",
-                      "priority":  "high",
-                      "status":  "done"
-                  }
-              ]
+  "updated": "2026-10-15T06:27:52.209Z",
+  "items": [
+    {
+      "id": "G1",
+      "round": "Requested",
+      "area": "Mail",
+      "title": "Mailbox status says what actually works",
+      "detail": "One rule (src/mailStatus.ts) using the server's readiness check: Working, Receiving only, No mail arriving yet, Not set up, Sign in needed.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "G2",
+      "round": "Requested",
+      "area": "Mail",
+      "title": "All mail folder",
+      "detail": "Every account and tab in one list, archived too, never spam or trash. /mail/all.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "G3",
+      "round": "Requested",
+      "area": "Mail",
+      "title": "Sorting rules editor",
+      "detail": "Settings, Mail: taught senders, change or remove, add for an address or @domain. Phone: in Inbox settings.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "G4",
+      "round": "Requested",
+      "area": "Mail",
+      "title": "Shared inbox access levels",
+      "detail": "Can read / Can read and send per person, enforced on the server and for mail apps. 'Private from admins' left out: admins control the list, so it can't be promised.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "G5",
+      "round": "Requested",
+      "area": "Account",
+      "title": "Backup sign-in email",
+      "detail": "Settings, Account, Security. Signs in and gets reset codes; a reset keeps the main email.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "G9",
+      "round": "Requested",
+      "area": "Chat",
+      "title": "Chat summary: one brief you can update",
+      "detail": "Overview, Urgent, Decided, Open questions, Next steps; Update button, 'N new messages since'. Dated summaries folded below.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "G10",
+      "round": "Requested",
+      "area": "Home",
+      "title": "Home layout fully customizable",
+      "detail": "Exact card sizes, more columns, add any card, balanced spacing.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "G11",
+      "round": "Requested",
+      "area": "Phone",
+      "title": "Bottom bar: margins, safe areas, rounded",
+      "detail": "Floating bar, inset from edges, follows phone corner curves, rethink labels.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "G12",
+      "round": "Requested",
+      "area": "Landing",
+      "title": "Landing page audit and rewrite",
+      "detail": "Who it's for in the hero, two CTAs, agency and free guests up front, no endless marquee.",
+      "priority": "medium",
+      "status": "done"
+    },
+    {
+      "id": "G6",
+      "round": "Requested",
+      "area": "Workspace",
+      "title": "Brands inside a workspace",
+      "detail": "Settings, General & email, Brands: name, colour, logo, domains. Mailboxes on a brand's domains get its colour dot; compose names the brand. Next: brand signatures (with R7).",
+      "priority": "medium",
+      "status": "done"
+    },
+    {
+      "id": "G7",
+      "round": "Requested",
+      "area": "Onboarding",
+      "title": "Domain step: buying a domain (needs your call)",
+      "detail": "Connecting your own domain already works in onboarding (keep / mix / hosted with live DNS checks). Buying one needs a registrar account (e.g. a reseller API) and payments: your decision.",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "G8",
+      "round": "Requested",
+      "area": "Guests",
+      "title": "One interface for guests and team (needs your call)",
+      "detail": "Changes how the client portal walls off client data. Proposal in docs/GAMEPLAN.md section 8; worth deciding together before building.",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "R1",
+      "round": "Inbox",
+      "area": "Brand",
+      "title": "Own persona, not copied. Look like the landing page / elkiya.com / elkiyagroup.com",
+      "detail": "Raw: Settings feels copied from Apple settings. No persona yet. Brand consistent across the whole app, like the landing page or Elkiya.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "R2",
+      "round": "Inbox",
+      "area": "Brand",
+      "title": "No dead grey background: white, bright",
+      "detail": "Raw: don't like the grey background, makes the app look dead. Likes white and bright colours.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "R3",
+      "round": "Inbox",
+      "area": "Research",
+      "title": "Research each app against its reference",
+      "detail": "Raw: Mail = Gmail/Proton UI, Chat = Slack + Discord, Tasks = Todoist, Calendar = Google Calendar, Projects = ?, Meet = Read AI, Drive = Google Drive, Notes = notes, Tables = Notion database, Teams = team management, Vault = passwords, Settings = settings. Round 3 compared every app with its reference; 60+ findings. Projects: Basecamp recommended (built for agencies with clients).",
+      "priority": "high",
+      "status": "doing"
+    },
+    {
+      "id": "R4",
+      "round": "Inbox",
+      "area": "Everywhere",
+      "title": "Right-click on everything",
+      "detail": "Raw: right-click a feature to hide it (e.g. hide Chat if not used), then a menu to show it again. Most things should have a right-click menu, only a few do now. Rounds 2: rail apps, projects, teams, meetings, tables, mail folders. More in later rounds.",
+      "priority": "high",
+      "status": "doing"
+    },
+    {
+      "id": "R5",
+      "round": "Inbox",
+      "area": "Mail",
+      "title": "Inbox tabs should be removable (like Gmail labels)",
+      "detail": "Raw: Primary/Promotions/Social/Updates feel default, should be able to cancel them out if not wanted.",
+      "priority": "medium",
+      "status": "done"
+    },
+    {
+      "id": "R6",
+      "round": "Inbox",
+      "area": "Mail",
+      "title": "Filter chips cropped (Attachments cut off)",
+      "detail": "Raw: Unread / Needs reply / Assigned to me / Attachments row gets cropped when the list isn't wide, can't reach Attachments.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "R7",
+      "round": "Inbox",
+      "area": "Mail",
+      "title": "Signature designer with ~5 templates",
+      "detail": "Raw: design a signature, add logo etc. 5 templates. Free plan has a watermark, paid removes it.",
+      "priority": "medium",
+      "status": "done"
+    },
+    {
+      "id": "R8",
+      "round": "Inbox",
+      "area": "Mail",
+      "title": "Amazon SES: cost, what customers get free",
+      "detail": "Raw: we talked about SES but don't use it. How much does it cost us, is it expensive to provide, how many free per month? Back-end logic needed (message cut off).",
+      "priority": "medium",
+      "status": "done"
+    },
+    {
+      "id": "R9",
+      "round": "Inbox",
+      "area": "Support",
+      "title": "Submit a ticket, queue in the admin backend",
+      "detail": "Raw: feature to submit a ticket that goes to the backend, see which tickets need processing.",
+      "priority": "medium",
+      "status": "done"
+    },
+    {
+      "id": "R10",
+      "round": "Inbox",
+      "area": "Security",
+      "title": "Final: full security audit (vibe-coded app risks) + Dokploy",
+      "detail": "Raw: make sure ENVs, APIs etc. never reach the front end. List the usual vibe-code security mistakes and check all. Look at Dokploy for what else to protect. Research GitHub/Google. Final backlog after the 5 rounds.",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "R11",
+      "round": "Inbox",
+      "area": "Process",
+      "title": "Five audit rounds, 15+ items each, UX/UI first",
+      "detail": "Raw: audit, 15-20 backlog items, fix, audit again, five times (75+). Customer-centric, UX/UI first, features second. Question every placement against common habits on phone and desktop. Open to removing features nobody uses.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "R13",
+      "round": "Inbox",
+      "area": "Brand",
+      "title": "Same background on phone and desktop (white, not reversed)",
+      "detail": "Raw: white is better than grey. On mobile the background is white, on desktop a grey off-white, reversed, feels inconsistent.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "R14",
+      "round": "Inbox",
+      "area": "Phone",
+      "title": "Phone should feel as clean as desktop",
+      "detail": "Raw: desktop UI is pretty clean but the phone doesn't reflect its similarities.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "R12",
+      "round": "Inbox",
+      "area": "Home",
+      "title": "Keep the 'Try it' demo",
+      "detail": "Raw: thought about removing the demo, decided to keep it.",
+      "priority": "low",
+      "status": "done"
+    },
+    {
+      "id": "A1",
+      "round": "Audit 1",
+      "area": "Phone",
+      "title": "Side drawer slides out the way it came in",
+      "detail": "Duplicate s2gDrawerOut keyframes made the left drawer fade right on close.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "A2",
+      "round": "Audit 1",
+      "area": "Phone",
+      "title": "Home shows the launcher button, not a back arrow",
+      "detail": "Home is a main screen; a back chevron implied it was pushed.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "A3",
+      "round": "Audit 1",
+      "area": "Chat",
+      "title": "Chat bottom tab: Channels, not Home",
+      "detail": "\"Home\" clashed with the Home app.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "A4",
+      "round": "Audit 1",
+      "area": "Drive",
+      "title": "Drive: Recent, not Home",
+      "detail": "Two different screens named Home inside one app.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "A5",
+      "round": "Audit 1",
+      "area": "Meet",
+      "title": "Meet rows: quiet notetaker toggle, distinct create button",
+      "detail": "Stacks of identical orange mic circles; unclear which one does what.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "A6",
+      "round": "Audit 1",
+      "area": "Phone",
+      "title": "Bottom bar and create button on the z-index tokens",
+      "detail": "Hard-coded 34/35; the bar could draw over the button mid-animation.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "A7",
+      "round": "Audit 1",
+      "area": "Calendar",
+      "title": "Month picker shows neighbouring days, muted",
+      "detail": "First and last rows looked broken with blank cells.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "A8",
+      "round": "Audit 1",
+      "area": "Mail",
+      "title": "Filter chips never cropped",
+      "detail": "Attachments chip was cut off in a narrow list (R6).",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "A9",
+      "round": "Audit 1",
+      "area": "Mail",
+      "title": "Inbox tabs keep one width; new-mail dot takes no space",
+      "detail": "Tabs resized when you picked one; the highlight jumped.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "A10",
+      "round": "Audit 1",
+      "area": "Mail",
+      "title": "Read and unread rows keep the same width",
+      "detail": "Bold-on-unread shifted text when an email was opened.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "A11",
+      "round": "Audit 1",
+      "area": "Mail",
+      "title": "Row hover actions without a box, date not hidden",
+      "detail": "Box inside a box covering the date.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "A12",
+      "round": "Audit 1",
+      "area": "Mail",
+      "title": "Done has one icon everywhere",
+      "detail": "Check in some places, archive box in others.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "A13",
+      "round": "Audit 1",
+      "area": "Mail",
+      "title": "Empty list says why, with the right icon",
+      "detail": "A big tick showed for searches that found nothing.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "A14",
+      "round": "Audit 1",
+      "area": "Mail",
+      "title": "Discarding a draft can be undone",
+      "detail": "One tap lost everything typed.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "A15",
+      "round": "Audit 1",
+      "area": "Tasks",
+      "title": "Today agrees with Home",
+      "detail": "\"All done for today\" while Home listed things that need you.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "A16",
+      "round": "Audit 1",
+      "area": "Meet",
+      "title": "One name for the notetaker; real call icons",
+      "detail": "Five names for one feature; every non-Zoom call labelled GM.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "A17",
+      "round": "Audit 1",
+      "area": "Projects",
+      "title": "One primary button per empty screen",
+      "detail": "Header and empty state both had the same primary button.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "A18",
+      "round": "Audit 1",
+      "area": "Vault",
+      "title": "No developer instructions shown to users",
+      "detail": "Vault told end users to run npm run server.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "A19",
+      "round": "Audit 1",
+      "area": "Settings",
+      "title": "Unknown Settings page says so, not \"Ask an admin\"",
+      "detail": "/settings/general showed a permission message.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "A20",
+      "round": "Audit 1",
+      "area": "Chat",
+      "title": "Dated summaries never hang on an AI error",
+      "detail": "An AI failure left it on \"Writing…\" forever.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "R15",
+      "round": "Inbox",
+      "area": "Process",
+      "title": "After the 5 rounds: audit every app twice (15-20 items each)",
+      "detail": "Raw: audit mail 2x, chat 2x, tasks 2x, vault 2x, projects 2x, every menu, 15-20 backlog each time. Customer experience on mobile, desktop and iPad (portrait and landscape). Very comprehensive.",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "R16",
+      "round": "Inbox",
+      "area": "Mail",
+      "title": "Inboxes as a dropdown account switcher",
+      "detail": "Raw: instead of every email listed under Inboxes, a dropdown to pick which account to see (All or one), plus Add temporary address and Add a (non-temporary) address in the same dropdown.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "B1",
+      "round": "Audit 2",
+      "area": "Brand",
+      "title": "White pages everywhere, panels set apart by fine edges",
+      "detail": "Same white on phone and desktop; Elkiya ink and soft blue glow. (R2, R13)",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "B2",
+      "round": "Audit 2",
+      "area": "Everywhere",
+      "title": "Right-click an app to hide it; + brings hidden apps back",
+      "detail": "The rail menu: Open, Hide; a \"+N hidden\" button lists hidden apps. (R4)",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "B3",
+      "round": "Audit 2",
+      "area": "Mail",
+      "title": "Inbox picker instead of a long list",
+      "detail": "All inboxes, each mailbox with unread and problems, temporary addresses, add an address. (R16)",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "B4",
+      "round": "Audit 2",
+      "area": "Projects",
+      "title": "Right-click a project card",
+      "detail": "Open, Open tasks, Email the project, Pause, End.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "B5",
+      "round": "Audit 2",
+      "area": "Teams",
+      "title": "Right-click a team card",
+      "detail": "Open, Open team tasks, Rename, Delete.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "B6",
+      "round": "Audit 2",
+      "area": "Meet",
+      "title": "Right-click a meeting row",
+      "detail": "Open, Share, Ask about it, File in project, Delete: the detail screen's actions.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "B7",
+      "round": "Audit 2",
+      "area": "Tables",
+      "title": "Right-click a table card, and board cards on desktop",
+      "detail": "Board card menu was phone-only. Done for table cards (Open, Copy link). Board cards on desktop need the table screen's row actions passed in: next round.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "B8",
+      "round": "Audit 2",
+      "area": "Mail",
+      "title": "Right-click a folder",
+      "detail": "Mark all read, Empty (Trash, Spam).",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "B9",
+      "round": "Audit 2",
+      "area": "Settings",
+      "title": "One header style, sentence case, phone and desktop",
+      "detail": "11px uppercase on desktop, 13px uppercase on phone; the system says 15/600 sentence case.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "B10",
+      "round": "Audit 2",
+      "area": "Settings",
+      "title": "Phone Settings: our look, not iOS's coloured tiles",
+      "detail": "Plain icons like desktop; no rainbow of tiles.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "B11",
+      "round": "Audit 2",
+      "area": "Settings",
+      "title": "Phone Settings opens with the company card",
+      "detail": "Logo, name, plan: what you are setting, at the top. No change: the company group is already titled with the company name.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "B12",
+      "round": "Audit 2",
+      "area": "Settings",
+      "title": "Grouped cards follow the theme tokens in dark mode",
+      "detail": "Hard-coded #1c1c1f.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "B13",
+      "round": "Audit 2",
+      "area": "Settings",
+      "title": "Settings nav and blocks on the spacing scale",
+      "detail": "9px radius, 26px gaps: off the scale. Header style unified (B9); nav radii left as they are, within 1 px of the token.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "B14",
+      "round": "Audit 2",
+      "area": "Settings",
+      "title": "Phone shows each section's intro",
+      "detail": "The explanatory line was hidden on phones.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "B15",
+      "round": "Audit 2",
+      "area": "iPad",
+      "title": "One tablet breakpoint in JS and CSS",
+      "detail": "JS 1099 vs CSS 1100: at 1100 px both rules applied.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "B16",
+      "round": "Audit 2",
+      "area": "iPad",
+      "title": "iPad landscape: room for the reader in Mail",
+      "detail": "248 sidebar + 72 rail + 400 list left ~470 px.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "B17",
+      "round": "Audit 2",
+      "area": "Home",
+      "title": "Home cards go full width on every phone width",
+      "detail": "760 vs 767: half-width cards on some phones.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "B18",
+      "round": "Audit 2",
+      "area": "Chat",
+      "title": "Chat details dock beside the conversation from 1024 px",
+      "detail": "It covered the conversation up to 1100 px. No change: details float over the conversation below 1440 px on purpose (polish.css), so it never squeezes.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "B19",
+      "round": "Audit 2",
+      "area": "iPad",
+      "title": "Side panels leave room on iPad portrait",
+      "detail": "520 px panel left a 176 px sliver. No change: a 520 px panel over a dimmed list is iPad's slide-over pattern.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "C1",
+      "round": "Audit 3",
+      "area": "Mail",
+      "title": "A second window follows the first (compose, folder)",
+      "detail": "Seen tonight: with two windows open as the same person, opening a draft in one opened the same compose and folder in the other. Not reproducible with one window; needs a second window to trace (look at live sync of threads and any draft/compose state).",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "C2",
+      "round": "Audit 3",
+      "area": "Mail",
+      "title": "Archive, not Done (Gmail and Proton's word and icon)",
+      "detail": "Hover, bulk bar, phone bar, reader, swipes, shortcut sheet, toasts. Reverses A12: you named Gmail as the reference.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "C3",
+      "round": "Audit 3",
+      "area": "Mail",
+      "title": "Hover actions in Gmail's order, with Read/Unread",
+      "detail": "Archive, Delete, Read/Unread, Snooze.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "C4",
+      "round": "Audit 3",
+      "area": "Mail",
+      "title": "Swipes archive both ways by default",
+      "detail": "Gmail's default; snooze stays a choice in Settings.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "C5",
+      "round": "Audit 3",
+      "area": "Chat",
+      "title": "@mentions show in muted channels",
+      "detail": "Muting quiets chatter, not you (Slack, Discord).",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "C6",
+      "round": "Audit 3",
+      "area": "Chat",
+      "title": "Jump to recent",
+      "detail": "A pill above the composer when you're far up the history.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "C7",
+      "round": "Audit 3",
+      "area": "Chat",
+      "title": "One-click reactions on hover; Make a task moved to More",
+      "detail": "Slack's hover bar.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "C8",
+      "round": "Audit 3",
+      "area": "Tasks",
+      "title": "Undo after completing a task",
+      "detail": "Todoist's \"1 task completed · Undo\"; Undo restores the exact stage.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "C9",
+      "round": "Audit 3",
+      "area": "Tasks",
+      "title": "My tasks: no Inbox icon",
+      "detail": "In Todoist Inbox means unfiled tasks.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "C10",
+      "round": "Audit 3",
+      "area": "Tasks",
+      "title": "Q opens quick add",
+      "detail": "Todoist's shortcut, next to N.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "C11",
+      "round": "Audit 3",
+      "area": "Drive",
+      "title": "Desktop New menu (upload, new folder)",
+      "detail": "Desktop had no way to make a folder.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "C12",
+      "round": "Audit 3",
+      "area": "Drive",
+      "title": "Desktop right-click has share link, download, move",
+      "detail": "Same actions as the phone sheet.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "C13",
+      "round": "Audit 3",
+      "area": "Drive",
+      "title": "Empty Drive on phones says tap +",
+      "detail": "It said \"press Upload\", which phones don't have.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "C14",
+      "round": "Audit 3",
+      "area": "Meet",
+      "title": "Bot log only when a recording failed",
+      "detail": "Diagnostics out of sight (Read AI); in the meeting's menu otherwise.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "C15",
+      "round": "Audit 3",
+      "area": "Meet",
+      "title": "\"Action items\", one name",
+      "detail": "Was \"Tasks\" in one place and \"Action items\" in another.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "C16",
+      "round": "Audit 3",
+      "area": "Vault",
+      "title": "Lock button and auto-lock after 15 minutes idle",
+      "detail": "1Password and Bitwarden do.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "C17",
+      "round": "Audit 3",
+      "area": "Vault",
+      "title": "Honest encryption wording; chip only on logins needing re-save",
+      "detail": "The sidebar contradicted the end-to-end claim.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "C18",
+      "round": "Audit 3",
+      "area": "Teams",
+      "title": "Team name and description save on leaving the field, never empty",
+      "detail": "Saved on every keystroke; an empty name could be saved.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "C19",
+      "round": "Audit 3",
+      "area": "Tables",
+      "title": "Colour badge opens a picker",
+      "detail": "It cycled colours on click, which read as a bug.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "C20",
+      "round": "Audit 3",
+      "area": "Notes",
+      "title": "Empty states that are true",
+      "detail": "\"First line is the title\" was wrong; filtered views offer Show all notes.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "D1",
+      "round": "Audit 4",
+      "area": "Mail",
+      "title": "Internal notes say so on the box",
+      "detail": "\"Internal note · only your team sees it\", above the comment field next to Reply.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "D2",
+      "round": "Audit 4",
+      "area": "Mail",
+      "title": "A replies to all; L (label) listed",
+      "detail": "Gmail's keys.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "D3",
+      "round": "Audit 4",
+      "area": "Chat",
+      "title": "@mention autocomplete like Slack",
+      "detail": "Any word of a name, any language's letters, the conversation's people first, arrows and Tab.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "D4",
+      "round": "Audit 4",
+      "area": "Vault",
+      "title": "Search on desktop",
+      "detail": "Phones had it; desktop didn't.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "D5",
+      "round": "Audit 4",
+      "area": "Projects",
+      "title": "Grouped Active / Leads / Paused, in name order",
+      "detail": "Cards no longer reshuffle as tasks go late (Basecamp's way).",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "D6",
+      "round": "Audit 4",
+      "area": "Projects",
+      "title": "Find a project",
+      "detail": "Search field once there are more than six.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "D7",
+      "round": "Audit 4",
+      "area": "Projects",
+      "title": "One New project button",
+      "detail": "The sidebar's; the header copy is gone.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "D8",
+      "round": "Audit 4",
+      "area": "Teams",
+      "title": "One New team button; tabs Tasks and Who's busy",
+      "detail": "\"Work\" next to \"Workload\" read as the same thing.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "D9",
+      "round": "Audit 4",
+      "area": "Notes",
+      "title": "Date sections on desktop",
+      "detail": "Today, Previous 7 days, months: as on the phone and in Apple Notes.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "D10",
+      "round": "Audit 4",
+      "area": "Mail",
+      "title": "Signature designer (R7)",
+      "detail": "5 layouts, brand logo and colour, live preview, Use this signature. Free plan adds \"Sent with sprint2go\".",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "D11",
+      "round": "Audit 4",
+      "area": "Mail",
+      "title": "Tables allowed in email HTML",
+      "detail": "Designed signatures (and most designed emails) use tables; they can't run anything.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "D12",
+      "round": "Audit 4",
+      "area": "Mail",
+      "title": "Signature logos reach Gmail and Outlook",
+      "detail": "Uploaded as a company file so the mail engine attaches it; SVG logos are left out and explained.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "D13",
+      "round": "Audit 4",
+      "area": "Calendar",
+      "title": "Google Calendar's view order on computers",
+      "detail": "Day, Week, Month, Schedule, 3 days; phones keep Schedule first.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "D14",
+      "round": "Audit 4",
+      "area": "Tasks",
+      "title": "p1 to p4 in quick add say what they become",
+      "detail": "p1-p2 high, p3-p4 normal; the chip names it.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "D15",
+      "round": "Audit 4",
+      "area": "Support",
+      "title": "Tickets (R9): already built",
+      "detail": "Help & support files tickets with replies and ratings; the queue is at /admin/tickets.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "D16",
+      "round": "Audit 4",
+      "area": "Mail",
+      "title": "Amazon SES costs (R8)",
+      "detail": "docs/SES-COSTS.md: about $0.10 per 1,000 emails; the risk is reputation, not price.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "E1",
+      "round": "Audit 5",
+      "area": "Phone",
+      "title": "Create button slides away while scrolling down",
+      "detail": "It sat on rows' own controls at rest (Material's rule; Compose still shrinks).",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "E2",
+      "round": "Audit 5",
+      "area": "Meet",
+      "title": "Phone tab \"Past\", not \"Notes\"",
+      "detail": "Clashed with the Notes app.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "E3",
+      "round": "Audit 5",
+      "area": "Drive",
+      "title": "No repeated Upload/New in the header",
+      "detail": "The sidebar has Upload and New folder; the header copy from round 3 was a duplicate.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "E4",
+      "round": "Audit 5",
+      "area": "Calendar",
+      "title": "One New event button",
+      "detail": "Sidebar's (and C); the header copy is gone.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "E5",
+      "round": "Audit 5",
+      "area": "Meet",
+      "title": "One Send notetaker button; no static subtitle",
+      "detail": "Sidebar's; the header copy is gone.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "E6",
+      "round": "Audit 5",
+      "area": "Mail",
+      "title": "\"More\" folds Waiting for reply, To-do, Contacts, Files",
+      "detail": "Gmail's More; labels stay in reach. Opens itself while one is in use.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "E7",
+      "round": "Audit 5",
+      "area": "Mail",
+      "title": "Quick replies only when there's no draft",
+      "detail": "Two ways to reply side by side was noise.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "E8",
+      "round": "Audit 5",
+      "area": "Vault",
+      "title": "No static tagline in the header",
+      "detail": "Screens say what to do, not what they are.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "E9",
+      "round": "Audit 5",
+      "area": "Chat",
+      "title": "Activity on computers",
+      "detail": "Mentions and replies to you, first in Chat's sidebar (Slack's Activity); was phone-only.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "E10",
+      "round": "Audit 5",
+      "area": "Everywhere",
+      "title": "Dark mode checked after the white theme",
+      "detail": "Settings, Home and Mail read well in dark.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "E11",
+      "round": "Audit 5",
+      "area": "Everywhere",
+      "title": "Primary buttons counted on every app",
+      "detail": "Mail, Projects, Teams, Notes, Drive, Calendar, Meet, Vault: one each now (Tasks and Tables keep two different actions).",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "E12",
+      "round": "Audit 5",
+      "area": "Tables",
+      "title": "Kept \"New row\" (not Notion's \"New\")",
+      "detail": "Clearer for people who don't know databases: a deliberate no.",
+      "priority": "high",
+      "status": "done"
+    },
+    {
+      "id": "P1",
+      "round": "App pass 1",
+      "area": "Mail (user request)",
+      "title": "The inbox dropdown you asked for already exists; check it is easy to find",
+      "detail": "You asked for a dropdown to pick All or a single account, plus add a temporary or a permanent address. Commit 1c4be58 already added this: an inbox picker with All, each mailbox with its unread count and problems, temporary addresses, and an add-an-address option. It replaced the long list. If you still see the old list, the picker may be hard to spot or not on every screen size. Fix: Open Mail at 375px, 820px and 1440px and confirm the picker shows in the list header everywhere. Show the current choice as the title with a chevron, like Gmail's account switcher. Make 'Add an address' open a choice between a temporary and a permanent address. (git commit 1c4be58 (Mail: inbox picker); the Mail list header in src/components/mail/)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "P2",
+      "round": "App pass 1",
+      "area": "Vault",
+      "title": "On desktop, deleting a login uses the browser's own confirm box",
+      "detail": "The native confirm() box ignores the app's theme and motion and looks out of place. On phones the app shows its own sheet, so the two sizes behave differently. Fix: Use the same confirm sheet (or a centred modal on desktop) that phones get through setConfirmDel. Add Undo to the 'Login deleted' toast. (src/components/VaultApp.tsx:309 and :562)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P3",
+      "round": "App pass 1",
+      "area": "Vault",
+      "title": "Copied usernames are never cleared from the clipboard",
+      "detail": "Passwords clear after 30 seconds, but usernames do not. This is inconsistent with the promise shown in the vault footer. Fix: Copy usernames through the same copy-and-clear helper at line 71, or reword the footer so it only promises clearing for passwords. (src/components/VaultApp.tsx:319 and :491)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P4",
+      "round": "App pass 1",
+      "area": "Vault",
+      "title": "The login detail screen has an empty title",
+      "detail": "PushScreen is given title=\"\". Users lose track of which login they are looking at, and screen readers announce no heading. Fix: Pass it.meta.title as the title, letting it fade in as the page scrolls if the large header should stay. (src/components/VaultApp.tsx:757)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P5",
+      "round": "App pass 1",
+      "area": "Teams",
+      "title": "Deleting a team uses the browser's own confirm box and has no Undo",
+      "detail": "It is a destructive action, and the native dialog does not match the app. Deleting a whole team deserves a proper sheet. Fix: Use a confirm sheet or modal that names the team and how many tasks move, with a red Delete button and Cancel. (src/components/teams/TeamsApp.tsx:730)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P6",
+      "round": "App pass 1",
+      "area": "Settings",
+      "title": "Deleting your account asks with the browser's own confirm box",
+      "detail": "This is the most destructive action in the app, and it gets a plain dialog with no typed confirmation, unlike Google or 1Password. Fix: Use a modal where the user types their email or DELETE to enable a red button, and list what stays and what goes. (src/components/SettingsPage.tsx:1002 and :1017)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "P7",
+      "round": "App pass 1",
+      "area": "Mail",
+      "title": "Phone drawer still lists every inbox; it needs the same dropdown as desktop",
+      "detail": "The desktop sidebar already has a dropdown for choosing an inbox (InboxSwitcher), but the phone drawer still shows a flat list of All inboxes, each mailbox and each temporary address above the folders. With several addresses the folders get pushed below the fold, and choosing an inbox works differently on phone and desktop. This is the problem the user described. Fix: Replace the Inboxes nav group in the phone drawer with a switcher row like InboxSwitcher, placed under gm-drawer-head: the current inbox's icon, address and unread count, with a chevron. Tapping it opens the useActionMenu list as a bottom sheet with All inboxes, the mailboxes, the temporary addresses, New temporary address and Add an email address. Keep the tabNav and Assigned to me rows below it. (src/components/Sidebar.tsx:352-360)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "P8",
+      "round": "App pass 1",
+      "area": "Mail",
+      "title": "Phone drawer hides All inboxes when there is one mailbox plus temporary addresses",
+      "detail": "The drawer shows All inboxes only when boxes.length > 1, while the desktop shows it when there are several mailboxes or any temporary address (many = boxes.length > 1 || temps.length > 0). On a phone, a user with one mailbox and a temporary address can never view both together. Fix: Use the same condition as the desktop, boxes.length > 1 || temps.length > 0, or let the shared switcher component decide. (src/components/Sidebar.tsx:353 (compare src/components/mail/InboxSwitcher.tsx:34))",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P9",
+      "round": "App pass 1",
+      "area": "Mail",
+      "title": "Add an email address is missing from the phone drawer",
+      "detail": "The desktop menu offers admins Add an email address (onAddAccount). The phone drawer only offers Temporary address, so on a phone the only way to add a permanent mailbox is buried in Settings, which is the opposite of what the user asked for. Fix: Put both New temporary address and Add an email address in the add group of the shared switcher menu, and pass onAddAccount to the drawer. (src/components/Sidebar.tsx:388-396 (desktop has it at src/components/mail/InboxSwitcher.tsx:41))",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "P10",
+      "round": "App pass 1",
+      "area": "Mail",
+      "title": "New temporary address is filed under Projects/Clients in the phone drawer",
+      "detail": "The Temporary address row is rendered inside the nav labelled with the projects term (term.Many), and that group also appears when no projects exist. People look for it next to their inboxes, as on the desktop, not among clients. Fix: Move it into the inbox switcher's add group and remove props.onNewTemp from the condition that shows the projects group. (src/components/Sidebar.tsx:388-396)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P11",
+      "round": "App pass 1",
+      "area": "Mail",
+      "title": "On a phone, picking a folder silently resets the inbox to All",
+      "detail": "In the drawer, pick() calls onAccountFilter('all') whenever a folder is chosen. Someone viewing their work inbox who taps Sent sees Sent from every account, with nothing telling them it changed. Gmail keeps the chosen account while you move between folders, and the desktop does not reset it. Fix: Keep activeAccount when a folder is picked. Once the switcher shows the current inbox, people can choose All themselves. (src/components/Sidebar.tsx:337-340)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "P12",
+      "round": "App pass 1",
+      "area": "Mail",
+      "title": "Temporary addresses shown as a cut-off 'name@' on the phone",
+      "detail": "In the drawer, temporary inboxes are labelled a.email.split('@')[0] + '@', so two addresses on different domains look the same and the label reads like an unfinished string. The desktop shows the full address and how long it has left (lifeLeft). Fix: Show the full address and put lifeLeft(a) as the hint line, as InboxSwitcher's subOf does. (src/components/Sidebar.tsx:358)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P13",
+      "round": "App pass 1",
+      "area": "Mail",
+      "title": "Phone mailbox rows read 'My inbox' instead of the address",
+      "detail": "When there are several mailboxes, the drawer names your own mailbox 'My inbox' and only shared or delegated ones by name. With two personal addresses, both rows say 'My inbox' and cannot be told apart. Fix: Label each row with a.email, as the desktop does (InboxSwitcher.tsx:38), and put Shared or Delegated in the hint line. (src/components/Sidebar.tsx:355)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "P14",
+      "round": "App pass 1",
+      "area": "Mail",
+      "title": "Inbox problems (sync or auth errors) are not shown on the phone",
+      "detail": "The desktop menu shows each account's error state under the address (state[a.id].label). The drawer's item() does not receive accountState, so on a phone a disconnected mailbox looks fine. Fix: Use the shared subOf hint, or pass accountState to the drawer and show a warning dot with the label. (src/components/Sidebar.tsx:355 (desktop: src/components/mail/InboxSwitcher.tsx:30))",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P15",
+      "round": "App pass 1",
+      "area": "Mail",
+      "title": "No inbox indicator in the phone list header",
+      "detail": "On a phone, the search pill avatar opens account and companies, not inboxes, so nothing on the list screen says which inbox is filtered. After the drawer closes, users cannot tell whether they are looking at All or one address. Fix: Show the current inbox's name as a small tappable chip under the search pill when activeAccount is not 'all', and have it open the switcher sheet. (src/components/MessageList.tsx:335 and src/components/mail/MailTop.tsx:11-35)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P16",
+      "round": "App pass 1",
+      "area": "Mail",
+      "title": "Desktop menu with a single inbox and no temporary addresses still opens a near-empty menu",
+      "detail": "When many is false, the menu contains only the one mailbox plus the add actions, so the chevron suggests a choice that does not exist. Fix: When there is one mailbox, keep the button but rename the menu header to 'Add an address'. Alternatively, show the chevron only when many is true or an add action exists. (src/components/mail/InboxSwitcher.tsx:34-44)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P17",
+      "round": "App pass 1",
+      "area": "Mail",
+      "title": "Temporary address actions sit behind a separate small icon",
+      "detail": "The copy/share/delete button only appears next to the switcher when a temporary inbox is active, and it is a 15px icon. Users who want to copy the address while on All cannot find it. Fix: Show a trailing more button on each temporary row inside the menu (as Gmail does for account management), and keep the one next to the switcher. (src/components/mail/InboxSwitcher.tsx:62-66)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P18",
+      "round": "App pass 1",
+      "area": "Mail",
+      "title": "Temporary addresses and mailboxes have no group headings in the menu",
+      "detail": "The menu items have group keys ('boxes', 'temp', 'add') but no visible headings, so a temporary address looks like an ordinary mailbox, apart from its icon. Fix: Add small section headings 'Inboxes' and 'Temporary' (if useActionMenu supports group labels), or a divider with a caption. (src/components/mail/InboxSwitcher.tsx:38-41)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P19",
+      "round": "App pass 1",
+      "area": "Mail",
+      "title": "Brand colour dot only on desktop",
+      "detail": "The desktop switcher shows a brand-dot for the current inbox, but the phone rows do not, so the same colour cue that ties mail to a brand is missing on a phone. Fix: Pass brandColor into the phone switcher row. (src/components/mail/InboxSwitcher.tsx:54 vs src/components/Sidebar.tsx:355)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P20",
+      "round": "App pass 1",
+      "area": "Mail",
+      "title": "Switcher duplicated in two implementations",
+      "detail": "The inbox choice is built twice (InboxSwitcher for desktop, an item() list for the phone drawer), and every difference above comes from that. Keeping two copies means they will keep drifting apart. Fix: Render InboxSwitcher in the drawer too, with a 'sheet' option on phones (useActionMenu already supports sheets), and delete the boxes/temps item code. (src/components/Sidebar.tsx:326-360 and src/components/mail/InboxSwitcher.tsx)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P21",
+      "round": "App pass 1",
+      "area": "Mail",
+      "title": "Switcher button spacing is tight against Compose",
+      "detail": "The .inbox-switch margin is 12px 0 4px, and the Folders heading follows right after, so the switcher card visually merges with the folder list. Fix: Use a margin of 12px 0 12px, or add a hairline separator before the Folders heading, so the switcher reads as its own control. (src/shell.css:2775-2780)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P22",
+      "round": "App pass 1",
+      "area": "Chat",
+      "title": "Activity chips have no hover state on desktop",
+      "detail": "Every other desktop control in Chat responds to hover. The All/Mentions chips on the Activity page don't, so they look static and it's unclear they are clickable. Fix: Inside @media (hover: hover) add `.page-activity .act-chip:not(.on):hover { background: var(--hover); color: var(--text); }`. (src/components/chat/chat.css:1595-1611 (.page-activity .act-chip, no :hover rule anywhere in the file))",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P23",
+      "round": "App pass 1",
+      "area": "Chat",
+      "title": "Reduced motion does not cover huddle tile and floater entrances",
+      "detail": "Users who ask for reduced motion still see the tiles scale in, the tiles fade, and the reaction floaters slide in and out during a huddle. These are the busiest animations in the app. Fix: Add .ht-tile, .ht-* fade elements and the hf-in/hf-out elements to a prefers-reduced-motion block with `animation: none`. Keep a 0.15s opacity transition so they still fade both ways. (src/components/chat/chat.css:1330 (ht-in), 1354 (ht-fade), 1419 (hf-in), 1428 (hf-out); the reduce blocks at 1009, 1256 and 1516 omit them)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P24",
+      "round": "App pass 1",
+      "area": "Chat",
+      "title": "Reaction float is disabled under reduced motion by class name only, not by keyframe",
+      "detail": "The rule turns off `.huddle-float` but the animated element uses huddle-float as its keyframe. If that element's class differs, emoji still fly up the screen for users who asked for less motion. Fix: Check the selector at line ~598 that owns the animation and add it to the reduce block at line 1009. Better, replace the travel with a short opacity-only fade. (src/components/chat/chat.css:604 (animation: huddle-float) vs 1012 (.huddle-float selector))",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P25",
+      "round": "App pass 1",
+      "area": "Chat",
+      "title": "Message column is up to 1200px wide on desktop",
+      "detail": "At 1440px with the sidebar open, message lines can run past 120 characters, which is hard to read. Slack and Discord let bubbles stretch, but text width stays near 720-800px. Fix: Keep the container at 1200px for attachments, and cap message text at about 72ch (`.msg-text { max-width: 72ch }`). Or lower the container to 960px. (src/components/chat/chat.css:1463 (max-width: 1200px))",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P26",
+      "round": "App pass 1",
+      "area": "Chat",
+      "title": "Activity feed is capped at 760px and left-aligned on wide screens",
+      "detail": "At 1180px and 1440px the feed sits on the left with a large empty area to its right. The page looks unbalanced next to the full-width conversation view. Fix: Add `margin: 0 auto` to .page-activity .act-feed, or match the conversation container width so switching pages doesn't jump. (src/components/chat/chat.css:1587-1589)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P27",
+      "round": "App pass 1",
+      "area": "Chat",
+      "title": "The 'View:' picker uses jargon and sits below the page list",
+      "detail": "'View: Company default' is not a term from Slack. New users can't tell it reorders the sidebar sections, and it sits below Activity, Catch up and the other pages instead of next to the channel list it controls. Fix: Turn it into a small 'Sort / Group' icon menu on the Channels section header, like Slack's sidebar sort options. Rename the options to 'Sections (default)', 'Unread first', 'Recent'. (src/components/ChatApp.tsx:443-463 (view-bar) and 230-235 (viewOptions labels))",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P28",
+      "round": "App pass 1",
+      "area": "Chat",
+      "title": "Custom views duplicate Slack-style sections",
+      "detail": "'Create a view…' with its own sections and channels overlaps the admin-set sections and the per-channel section moves. Users end up with two ways to group channels and get confused about which one they are editing. Fix: Hide custom views behind a setting or remove them. Let users make personal sections directly in the sidebar, which is Slack's model. (src/components/ChatApp.tsx:234 ('__new' option), 237-240 (pickView), 1394 (view modal))",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P29",
+      "round": "App pass 1",
+      "area": "Chat",
+      "title": "Status button sits above the page navigation",
+      "detail": "In Slack and Discord your status lives with your avatar, at the top-right or bottom-left. Here a large emoji button is the first item in the Chat sidebar, which pushes Activity down and treats a rare action as primary. Fix: Move status into the user/avatar menu, or pin it to the bottom of the sidebar. Show only the emoji next to the avatar. (src/components/ChatApp.tsx:418-424)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P30",
+      "round": "App pass 1",
+      "area": "Chat",
+      "title": "Redundant sb-label class on the status button and its child",
+      "detail": "The button and its inner span both carry sb-label. When the sidebar collapses to icons, the whole button, emoji included, is hidden, so collapsed users lose access to status. Fix: Remove sb-label from the button (line 418) and keep it only on the text span, so the emoji stays visible when the sidebar is collapsed. (src/components/ChatApp.tsx:418 and 420)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P31",
+      "round": "App pass 1",
+      "area": "Chat",
+      "title": "Phone filter button changes meaning by tab",
+      "detail": "The same spot shows 'Filter' on DMs and 'Mark all as read' on Activity, and it disappears on Activity when there is nothing unread. That makes the header jump, and mark-all-read happens on one tap with only a toast and no undo. Fix: Put mark-all-read in an overflow menu or show it as a text button 'Mark all read', and add Undo to the toast. Keep the slot's width reserved so the header doesn't shift. (src/components/ChatApp.tsx:397-401 and 491)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P32",
+      "round": "App pass 1",
+      "area": "Chat",
+      "title": "Mark all as read has no undo",
+      "detail": "One accidental tap clears every unread notice. The toast only confirms the action. Fix: Pass an undo action to the toast that calls onReadNotices(ids, false) with the ids it just cleared. (src/components/ChatApp.tsx:398 (toast({ text: t('All marked as read') })))",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P33",
+      "round": "App pass 1",
+      "area": "Chat",
+      "title": "Phone home tab stacks up to five overlapping sections",
+      "detail": "Tiles, the huddle banner, Unread DMs, Mentions, recent Direct messages and Starred all render above the channels. The same conversation can show up in Catch-up tiles and in the unread lists, so channels end up far below the fold at 375px. Fix: Show tiles collapsed by default, or keep only 'Unread' plus channels. Move Mentions to the Activity tab, where Slack puts them, and drop the recent DMs slice since there is already a DMs tab. (src/components/ChatApp.tsx:497-530)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "P34",
+      "round": "App pass 1",
+      "area": "Chat",
+      "title": "Recent DMs on the phone home list are silently capped at 3",
+      "detail": "The list stops at three with no 'See all' link, so users don't know more exist. Fix: Add a 'See all DMs' row that switches to the DMs tab, or remove this section. (src/components/ChatApp.tsx:521-526 (.slice(0, 3)))",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P35",
+      "round": "App pass 1",
+      "area": "Chat",
+      "title": "Tiles are only reordered by long-press or a buried editor",
+      "detail": "Hold-to-move is not discoverable, and the only hint is help text inside the tile settings. Fix: Drop tile reordering and keep just show/hide, or show an 'Edit' link at the end of the tile row. (src/components/ChatApp.tsx:1100-1108 (Tile useLongPress) and 1154)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P36",
+      "round": "App pass 1",
+      "area": "Chat",
+      "title": "/kudos is a niche feature in the main composer",
+      "detail": "Kudos adds a separate form (Who? / For what?) to the conversation view. It isn't in Slack or Discord as a core action and adds clutter for most teams. Fix: Keep it as a slash command only, with no persistent UI, or move it behind a workspace setting that is off by default. (src/components/chat/Conversation.tsx:416 (/kudos) and 788-789 (form))",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P37",
+      "round": "App pass 1",
+      "area": "Chat",
+      "title": "Huddle live dot pulses forever in the sidebar",
+      "detail": "An endlessly pulsing green dot next to each live huddle pulls the eye constantly while users are trying to read. Fix: Pulse 3 times (`animation-iteration-count: 3`), then stay solid. Reduced motion already turns it off. (src/components/chat/chat.css:520 (animation: conn-pulse 1.4s infinite))",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P38",
+      "round": "App pass 1",
+      "area": "Chat",
+      "title": "Huddle panel is a fixed 320px wide",
+      "detail": "On iPad portrait (820px) with the sidebar open, a fixed 320px panel squeezes the conversation to about 250px. On desktop it doesn't grow. Fix: Use `width: clamp(280px, 28vw, 380px)`. Below 900px, show it as an overlay sheet instead of a side column. (src/components/chat/chat.css:1531-1533)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P39",
+      "round": "App pass 1",
+      "area": "Chat",
+      "title": "Tablet breakpoints are missing; only 767px is used",
+      "detail": "Chat CSS only switches at 767/768px, so the 820px and 1180px iPad layouts get the full desktop sidebar, conversation and details panes at once and become cramped. Fix: Add a breakpoint at max-width 1100px that collapses the details pane into an overlay and narrows the sidebar to about 240px. (src/mobile/chat.css:5 and 17; src/components/chat/chat.css:1586)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "P40",
+      "round": "App pass 1",
+      "area": "Chat",
+      "title": "Status picker explains automation in a paragraph",
+      "detail": "The 'In a meeting is set for you automatically' footnote is long helper text inside a small popover. It adds noise every time someone opens it. Fix: Remove the line and show the automatic status as a preset row with a calendar icon and an 'Auto' label when it's active. (src/components/ChatApp.tsx:1146)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P41",
+      "round": "App pass 1",
+      "area": "Tasks",
+      "title": "Sidebar has 10 views; Todoist has 4",
+      "detail": "My tasks, Today, Upcoming, Supervising, My teams, My projects, Assigned by me, Briefs, Everything and Projects x teams all sit at the same level. A new user can't tell which one is home, and the three that matter get lost. Fix: Keep Today, Upcoming and My tasks at the top. Move Supervising, Assigned by me, My teams, My projects, Briefs, Everything and Projects x teams into a collapsible 'More views' fold (.fold plus .rot-chev) that is closed by default and whose open state is saved. (src/components/TasksSidebar.tsx:62-85)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "P42",
+      "round": "App pass 1",
+      "area": "Tasks",
+      "title": "Brain dump is the main button instead of Add task",
+      "detail": "In Todoist the top action is 'Add task'. Here the compose button opens an AI brain-dump, so people looking for the plain way to add one task can't find it. Fix: Make the compose button 'Add task' (open QuickAdd), and offer Brain dump as a secondary menu item next to it, the way the phone already does at TasksView.tsx:388. (src/components/TasksSidebar.tsx:57-60)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "P43",
+      "round": "App pass 1",
+      "area": "Tasks",
+      "title": "Tasks sidebar still contains a full copy of the projects list and add form",
+      "detail": "When projectsApp is false, Tasks shows the same project list, type chips, past toggle and add-project form as ProjectsSidebar. That's two places to create a project, and the two can drift apart. Fix: Delete this block. If projects are needed in Tasks, list them as filter rows only, with no add form, and link 'Manage projects' to the Projects app. (src/components/TasksSidebar.tsx:111-174)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P44",
+      "round": "App pass 1",
+      "area": "Tasks",
+      "title": "The same red count badge means four different things",
+      "detail": "Today counts late or due today, Supervising counts tasks to review, Assigned by me counts late tasks only, and Teams counts unassigned tasks. All use .warn-count, so a red '3' can't be read without knowing the rules. Fix: Keep red only for late work. Show to-review and unassigned counts as neutral .count, and give every count a title tooltip like the team and project rows already have. (src/components/TasksSidebar.tsx:65-70,99-101)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P45",
+      "round": "App pass 1",
+      "area": "Tasks",
+      "title": "Smart-view counts have no tooltip",
+      "detail": "The badges on Supervising and Assigned by me show a number without saying what it counts. Team and project badges do have a title. Fix: Add a fourth tuple field with the tooltip text and render <span className='count' title={hint}>. (src/components/TasksSidebar.tsx:83)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P46",
+      "round": "App pass 1",
+      "area": "Tasks",
+      "title": "'Projects x teams' and 'Briefs' don't belong in the main Tasks nav",
+      "detail": "The project-by-team grid is an admin report, and briefs belong to a project. Both add noise to a personal to-do app. Fix: Move the grid to Projects (as a 'Grid' view toggle on the home) or to Admin. Show Briefs inside a project's Tasks tab only, or under the 'More views' fold. (src/components/TasksSidebar.tsx:71,75)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P47",
+      "round": "App pass 1",
+      "area": "Tasks",
+      "title": "Phone and desktop list the views in a different order",
+      "detail": "The desktop sidebar goes My tasks, Today, Upcoming. The phone browse list goes Today, Upcoming, My tasks. Someone who uses both has to relearn the order. Fix: Use the Todoist order everywhere: Today, Upcoming, My tasks. Build both lists from one shared array. (src/components/TasksSidebar.tsx:64-66 vs src/components/TasksView.tsx:319-321)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P48",
+      "round": "App pass 1",
+      "area": "Tasks",
+      "title": "The task header has too many buttons",
+      "detail": "On a project's task page the title row holds the type select, the status select, Stages, End work, people, the layout and Display slot, Template, Brain dump and Open the project. There is no clear primary action, and it wraps to two lines at 820 and 1180 px. Fix: Keep the title, people, the slot (layout, Display, New task) and one overflow menu. Move Stages, Template, Brain dump and End work into the overflow (useActionMenu). (src/components/TasksView.tsx:723-742,784-798)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "P49",
+      "round": "App pass 1",
+      "area": "Tasks",
+      "title": "Template button shows in every view",
+      "detail": "'Template' shows on Today, Upcoming and My tasks, where starting from a project template makes no sense. Fix: Render it only when client or project is set (wrap it in {(client || project) && ...}). (src/components/TasksView.tsx:786-788)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P50",
+      "round": "App pass 1",
+      "area": "Tasks",
+      "title": "Reduced motion is respected for only one animation",
+      "detail": "The only reduced-motion rule in tasks.css turns off .tbr-group. The fadeIn entrances at lines 869 and 1332 and the bulk-bar bulkUp/bulkDown animations still run for people who asked for less motion. Fix: Add those selectors to the reduced-motion block (animation: none), or use one global rule that sets animation-duration to 0.01ms under prefers-reduced-motion. (src/mobile/tasks.css:1435-1439 (also 869,1272-1275,1332))",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P51",
+      "round": "App pass 1",
+      "area": "Tasks",
+      "title": "Type filter chips are smaller than the 12 px minimum",
+      "detail": "The chips use 11.5 px text and 2 px vertical padding. That's below the CLAUDE.md minimum of 12 px for labels and far below a 44 px tap target on iPad touch. Fix: Use font-size 12px and padding 4px 10px, and set min-height var(--tap) under (pointer: coarse). (src/polish.css:1155-1164)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P52",
+      "round": "App pass 1",
+      "area": "Tasks",
+      "title": "Empty state uses a text checkmark instead of an icon",
+      "detail": "icon='✓' renders a glyph that doesn't match the lucide icons used in the other empty states, so this one looks unfinished. Fix: Use icon={<CircleCheck size={20} />}. (src/components/tasks/TaskViews.tsx:460)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P53",
+      "round": "App pass 1",
+      "area": "Tasks",
+      "title": "'Brain dump' isn't explained anywhere",
+      "detail": "The name doesn't say what the button does (turn free text into tasks with AI). The empty state is the only place that hints at it. Fix: Add a hint line in the menu item, such as 'Paste notes, get tasks', or rename it to 'Add from notes'. (src/components/TasksSidebar.tsx:59; src/components/tasks/TaskViews.tsx:395)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P54",
+      "round": "App pass 1",
+      "area": "Tasks",
+      "title": "Type filter is shared with Projects without saying so",
+      "detail": "Both sidebars save the filter under the same key, 's2g-project-type'. Choosing a type in Projects silently filters the project list in Tasks, and the reverse. Fix: Remove the copy in TasksSidebar (see the duplicate list finding), or give each app its own key. (src/components/TasksSidebar.tsx:32; src/components/ProjectsSidebar.tsx:30)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P55",
+      "round": "App pass 1",
+      "area": "Tasks",
+      "title": "'Everything' is admin-only with no explanation",
+      "detail": "Admins see an extra view called 'Everything' with no hint of what it holds. Non-admins never see it, which makes support conversations confusing. Fix: Rename it to 'All company tasks' and put it under the More views fold with a short hint. (src/components/TasksSidebar.tsx:72-77)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P56",
+      "round": "App pass 1",
+      "area": "Projects",
+      "title": "Desktop sorts the projects twice; the phone keeps a different order",
+      "detail": "rows are sorted with late work first, then each desktop group re-sorts by name, so the first sort is wasted. The phone keeps the late-first order. The same project sits in a different spot on each device. Fix: Sort by name once in rows (as Basecamp does, so cards stay where you left them) and drop the per-group sort. Late projects already stand out through their badge. (src/components/ProjectsHome.tsx:74 and 215 (phone uses rows order at 128-130))",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P57",
+      "round": "App pass 1",
+      "area": "Projects",
+      "title": "Two different New project forms",
+      "detail": "The sidebar form asks for name, email domain and type. The home form (and the phone sheet) asks only for name and type. Where you start decides what you get asked, and 'Email domain' is jargon. Fix: Use one form component everywhere: name and type, with domain under 'More options' and the hint 'mail from this domain files here'. The sidebar compose button should open the home form or a dialog, not a cramped form inside the sidebar. (src/components/ProjectsSidebar.tsx:62-75 vs src/components/ProjectsHome.tsx:83-114)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "P58",
+      "round": "App pass 1",
+      "area": "Projects",
+      "title": "New project form is squeezed into the sidebar",
+      "detail": "The sidebar's compose button opens the form inside a narrow column, with two text fields, a select and two buttons. That's tight at 1180 px and doesn't work when the sidebar is collapsed to icons. Fix: Make the compose button call the same setAdding as the home (lift the state up or use useCreateAction), so the form opens above the grid. (src/components/ProjectsSidebar.tsx:54-76)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P59",
+      "round": "App pass 1",
+      "area": "Projects",
+      "title": "Status pills have no dark-mode colors",
+      "detail": ".proj-state.ok and .bad use fixed light hex values (#dcfce7, #fee2e2) with no dark rule. In dark mode they're bright pastel blocks on dark cards. Fix: Use tokens: background color-mix(in srgb, var(--ok) 15%, transparent) with color var(--ok), and the same for danger. (src/polish.css:2637-2648)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P60",
+      "round": "App pass 1",
+      "area": "Projects",
+      "title": "Card cascade animation ignores reduced motion",
+      "detail": "Every .proj-card animates in with a stagger of up to 360 ms, and there is no prefers-reduced-motion rule for it. Fix: Add @media (prefers-reduced-motion: reduce) { .proj-card { animation: none; } .proj-card:hover { transform: none; } }. (src/polish.css:2599-2600)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P61",
+      "round": "App pass 1",
+      "area": "Projects",
+      "title": "Card-field settings are a feature to remove",
+      "detail": "A sliders button lets each person pick which of six fields cards show. Basecamp has nothing like it. It adds a control to the header, and unticking everything leaves blank cards. Fix: Remove the popover and always show type, state, next deadline and last activity. Keep 'people' off. (src/components/ProjectsHome.tsx:55-58,167-188)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P62",
+      "round": "App pass 1",
+      "area": "Projects",
+      "title": "Status pill joins up to three warnings",
+      "detail": "'2 late · 1 not picked up · 1 waiting on client' in one rounded pill wraps across lines on a 260 px card and is hard to scan. Fix: Show only the worst issue in the pill, plus '+N' with the rest in a title tooltip, the way the phone's hint() does at line 119. (src/components/ProjectsHome.tsx:223,251-259)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P63",
+      "round": "App pass 1",
+      "area": "Projects",
+      "title": "Search box appears only after more than 6 projects",
+      "detail": "The search box shows up at 7 projects, which shifts the header. Basecamp always has a 'Find' box. Fix: Always render the search box, or reserve its width. (src/components/ProjectsHome.tsx:161-166)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P64",
+      "round": "App pass 1",
+      "area": "Projects",
+      "title": "Past projects are hard to find on desktop",
+      "detail": "The phone lists 'Past projects' on the home. Desktop has it only as a toggle at the end of the sidebar. Fix: Add a muted 'Past projects (N)' link under the last group on desktop that calls onPast. (src/components/ProjectsHome.tsx:209-271)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P65",
+      "round": "App pass 1",
+      "area": "Projects",
+      "title": "'Past projects' toggle opens a list and also navigates",
+      "detail": "Clicking once expands the past list and also opens the Past scope. Clicking again collapses the list but leaves you on Past, which feels broken. Fix: Make it navigate only, since the Past page already lists them. Remove the showPast expansion, or put it on a separate chevron. (src/components/ProjectsSidebar.tsx:108-120)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P66",
+      "round": "App pass 1",
+      "area": "Projects",
+      "title": "Phone 'Past projects' row has no group title",
+      "detail": "The past group has no title, so it reads as a stray row after Paused. Fix: Give it a title (t('Archive')), or render it as a footer link styled as muted. (src/components/ProjectsHome.tsx:131)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P67",
+      "round": "App pass 1",
+      "area": "Projects",
+      "title": "A project has 12 parts; Basecamp has about 6",
+      "detail": "Overview, Tasks, Workload, Quotes, Chat, Mail, Meetings, Files, Notes, Tables, Logins and Guests are all shown by default, so the tab row and the phone section list are long. Fix: Show Overview, Tasks, Chat, Mail, Files and Notes by default. Hide Workload, Tables and Logins (people can turn them back on in tab settings), and show Quotes only when a quote exists. (src/components/ProjectPhone.tsx:38-54)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "P68",
+      "round": "App pass 1",
+      "area": "Projects",
+      "title": "Same parts get different names and icons",
+      "detail": "The right-click menu says 'Emails' with MessagesSquare and FolderOpen, while the tabs say 'Mail' with Hash and FileText. The same part looks different depending on where you open it. Fix: Use projectTabIcon() and the projectTabs names in the right-click menu. (src/components/ProjectsHome.tsx:42-44 vs src/components/ProjectPhone.tsx:27-30,46)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P69",
+      "round": "App pass 1",
+      "area": "Projects",
+      "title": "Every non-danger action row gets the template icon",
+      "detail": "ProjectSections draws LayoutTemplate for every action that isn't destructive, whatever the action actually does. Fix: Add an icon field to the action type and render a.icon. (src/components/ProjectPhone.tsx:116)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P70",
+      "round": "App pass 1",
+      "area": "Projects",
+      "title": "End work is a plain ghost button in the header",
+      "detail": "Ending a project is a big step, but the button is styled like Stages and sits right next to it. Fix: Move it into an overflow menu with danger styling and a confirm step, or Undo, like ProjectsHome:48. (src/components/TasksView.tsx:739-741)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P71",
+      "round": "App pass 1",
+      "area": "Projects",
+      "title": "Arrow on project cards appears only on hover",
+      "detail": "The arrow fades in only on hover, so it never shows on an iPad (820 or 1180 px touch), and the card footer looks empty. Fix: Under (hover: none), show the arrow at opacity 0.5. (src/polish.css:2660-2668)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P72",
+      "round": "App pass 1",
+      "area": "Calendar",
+      "title": "Phone Month ignores the date picked in the month drop-down",
+      "detail": "If you pick 20 Nov from the title's mini month, the list under the grid shows 1 Nov (or today) instead of the 20th, so the date you chose seems to have been ignored. Fix: Start `picked` from `cursor` when cursor falls in the month, and reset it whenever the cursor's day changes (key on cursor.toDateString(), not only the month): `setPicked(inMonth(cursor) ? cursor : inMonth(today) ? today : first)`. (src/components/calendar/MonthView.tsx:79-86 (PhoneMonth picked/shownKey reset))",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "P73",
+      "round": "App pass 1",
+      "area": "Calendar",
+      "title": "Desktop event panel covers the end of the week",
+      "detail": "The detail card is pinned 340px wide over the right edge of the grid. In Week view at 1180px and 1440px it hides Fri to Sun, which is often the event you just clicked, and you can't see what you're editing. Fix: Do what Google does and anchor the card beside the clicked event, flipping left when the event is in the right half. Or, if you keep a fixed panel, give the grid a matching right margin while it's open, animated with a grid-template-columns transition. (src/calendar.css:498-510 (.ev-detail absolute right:16px width:340px))",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "P74",
+      "round": "App pass 1",
+      "area": "Calendar",
+      "title": "Desktop event card has no Duplicate, Copy link or Move",
+      "detail": "On desktop the open event only shows Edit, Delete and Close. Duplicate and Copy link are only in the right-click menu, which most people never find. Google's card has a ⋮ menu for these. Fix: Pass `more={detailMore(selected)}` on desktop too and draw a ⋮ icon button in .ev-actions that opens it as an ActionSheet popover. (src/components/calendar/EventDetail.tsx:65-83 (actions); CalendarView.tsx:488 passes `more` only on phones)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P75",
+      "round": "App pass 1",
+      "area": "Calendar",
+      "title": "RSVP buttons are in a different order on phone and desktop",
+      "detail": "Desktop shows Yes, Maybe, No and phones show Yes, No, Maybe. Anyone who uses both taps the wrong answer. Fix: Use one order everywhere: Yes, No, Maybe (Google's on both platforms). (src/components/calendar/EventDetail.tsx:96-106)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P76",
+      "round": "App pass 1",
+      "area": "Calendar",
+      "title": "Notetaker controls use three different words",
+      "detail": "The same feature reads 'Record this meeting', 'Send notetaker' and 'Don't record' depending on timing. 'Record' sounds like screen or video capture, so people don't know what will happen. Fix: Use one verb pair: 'Notetaker joins' as a switch row (on or off), and 'Send notetaker now' only inside 15 minutes. Drop 'Record this meeting' and 'Don't record'. (src/components/calendar/EventDetail.tsx:178-198)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P77",
+      "round": "App pass 1",
+      "area": "Calendar",
+      "title": "Location row repeats the call app name",
+      "detail": "Events whose location is 'Google Meet' or 'Zoom' get a map-pin row reading 'Google Meet' right under the Join Google Meet button. That's noise, and it looks like a physical place. Fix: Use the existing helper: `const place = placeOf(event, link?.url); {place && <Row icon={<MapPin/>}>{place}</Row>}`. (src/components/calendar/EventDetail.tsx:202)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P78",
+      "round": "App pass 1",
+      "area": "Calendar",
+      "title": "Five views in a segmented control on desktop",
+      "detail": "Day, Week, Month, Schedule and 3 days fill the header and push the title and arrows together at 1180px. '3 days' is a phone view that desktop users rarely need. Google puts the views in one drop-down. Fix: On desktop, show one 'Week ▾' Select (the one already used for `narrow`) for all widths, and drop '3day' from the desktop list. Keep shortcuts D/W/M/A. (src/components/CalendarView.tsx:133 (views list) and 401-407 (segmented))",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P79",
+      "round": "App pass 1",
+      "area": "Calendar",
+      "title": "Tablet Today button is just a number",
+      "detail": "Under 720px (iPad portrait beside the panel) Today becomes a small calendar tile showing '15'. It reads as a date label, not a button that jumps to today. Fix: Keep the text 'Today' button at tablet widths (it is only about 60px). Use the number tile on phones only, where the top bar is Google's. (src/components/CalendarView.tsx:382-385)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P80",
+      "round": "App pass 1",
+      "area": "Calendar",
+      "title": "Folded mini month is still in the tab order",
+      "detail": "When the month drop is closed, its 42 day buttons and 12 month buttons can still be focused with Tab. Keyboard users tab through invisible dates before reaching the grid. Fix: Add `tabIndex={open ? 0 : -1}` to .md-day and .md-month buttons and to the arrow buttons, or put `inert` on the fold when closed. (src/components/calendar/MonthDrop.tsx:90-96 and 145-150 (no tabIndex); the bare chips at line 114 already do it right)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P81",
+      "round": "App pass 1",
+      "area": "Calendar",
+      "title": "Up next Join link stays focusable after it folds",
+      "detail": "The strip keeps the last meeting while folding away (aria-hidden), but its Join link and title button stay focusable, so Tab lands on an invisible Join. Fix: Add `inert={!e || undefined}` to the .fold wrapper, or tabIndex -1 on .cu-main and .cu-join when `!e`. (src/components/calendar/UpNext.tsx:32-46)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P82",
+      "round": "App pass 1",
+      "area": "Calendar",
+      "title": "Schedule says 'Nothing planned after this' while still loading",
+      "detail": "The end line shows as soon as the list renders, even though more weeks load on scroll (up to two years). It tells people their future is empty when it hasn't been checked yet. Fix: Only show the text when `weeks >= MAX_WEEKS`. Before that, keep an empty sentinel of the same height. (src/components/calendar/ScheduleView.tsx:210-212)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P83",
+      "round": "App pass 1",
+      "area": "Calendar",
+      "title": "Schedule needs an 'Earlier' button to scroll back",
+      "detail": "Google's schedule loads earlier days as you scroll up. Here you have to notice and tap an 'Earlier' pill at the very top, so scrolling up just stops. Fix: Put an IntersectionObserver on a top sentinel that calls `earlier()` (which already keeps the scroll position), and remove the button. (src/components/calendar/ScheduleView.tsx:162-164 and 118-124)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P84",
+      "round": "App pass 1",
+      "area": "Calendar",
+      "title": "Phone quick create hides More options and always uses the first calendar",
+      "detail": "The sheet has no calendar choice and no Event/Task switch (Google has both). The full editor only opens if you tap the date line or swipe up, and nothing says so. Fix: Add a visible 'More options' text button in the sheet's footer, and an Event / Task segmented control above the title, since onSave already takes a kind. (src/components/calendar/QuickCreate.tsx:42 (calendars[0].id) and 100-102 (qc-when is the only way to More))",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P85",
+      "round": "App pass 1",
+      "area": "Calendar",
+      "title": "'Move to tomorrow' on every event, including meetings with guests",
+      "detail": "One click silently moves a meeting with other people to tomorrow. Google has no such action. It makes sense for task blocks, but for meetings it's a trap. Fix: Only offer it when `props.taskOf?.(e)` or the event has no guests. Otherwise leave it out. (src/components/CalendarView.tsx:285 and 306)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P86",
+      "round": "App pass 1",
+      "area": "Calendar",
+      "title": "Clicking an empty Month day opens the New event dialog straight away",
+      "detail": "On desktop Month, any stray click in a cell opens a full modal at 9:00. Clicking to focus the window or to deselect an event ends up creating one. Fix: First click on a cell closes any open event (deselect). Then use Google's light quick-add popover anchored to the cell, with 'More options' going to the dialog. (src/components/calendar/MonthView.tsx:168 (GridMonth cell onClick → onCreate(nine(d))))",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P87",
+      "round": "App pass 1",
+      "area": "Calendar",
+      "title": "Tapping the picked day again switches to Day view",
+      "detail": "In phone Month, a second tap on the selected date leaves Month for Day view. Nothing signals this, and iOS Calendar doesn't do it, so it feels like an accidental jump. Fix: Make the second tap do nothing. Make the day heading above the list (.mp-list-head) a button that opens the day. (src/components/calendar/MonthView.tsx:106 (onClick: on ? onDay(d) : setPicked(d)))",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P88",
+      "round": "App pass 1",
+      "area": "Calendar",
+      "title": "Dead phone code in GridMonth",
+      "detail": "MonthView sends phones to PhoneMonth, so GridMonth's phone branches never run. They add upkeep and confusion for whoever fixes the next bug. Fix: Remove the phone branches, the PhoneChip component and the matching .mg-chips/.mg-more-n CSS. (src/components/calendar/MonthView.tsx:164-166, 184-187, 204-211 (PhoneChip) and the mg-chips styles)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P89",
+      "round": "App pass 1",
+      "area": "Calendar",
+      "title": "Leftover CSS for the removed New event button",
+      "detail": "The .cal-new rule styles a header button that no longer exists (commit c08b0d6 removed the repeated primary button). Fix: Delete the @container rule for .cal-new span. (src/calendar.css:1094-1098)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P90",
+      "round": "App pass 1",
+      "area": "Calendar",
+      "title": "'Now' and 'now' in different cases",
+      "detail": "The Up next strip shows 'Now', but startsIn() returns lowercase 'now', so the same state reads differently in different spots. Fix: Make startsIn return 'Now' (or reuse one helper) so all three spots match. (src/components/calendar/calTools.ts:47 (startsIn) vs UpNext.tsx:37 and EventDetail.tsx:155)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P91",
+      "round": "App pass 1",
+      "area": "Meet",
+      "title": "Delete, regenerate and clear use the browser's confirm()",
+      "detail": "Deleting a meeting with its recording, or wiping all tasks, pops a grey system dialog with no animation and no Undo. It breaks the app's look and the bar's 'Toast with Undo' rule. Fix: Use the app's ActionSheet / RepeatScope-style confirm for regenerate and recording deletion. For Delete meeting and Clear all tasks, delete straight away with a toast that has Undo, keeping the data for 10 seconds. (src/components/MeetApp.tsx:486-487, 680 (keep select) and 823)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "P92",
+      "round": "App pass 1",
+      "area": "Meet",
+      "title": "Desktop meeting header repeats its More menu",
+      "detail": "The header shows Make bot leave, Regenerate notes, Share and Delete as buttons, and the ⋯ menu next to them lists the same four again. Duplicate controls make people unsure which one to use. Fix: Keep Share (and Make bot leave while live) as buttons, and put Regenerate, Who can see this, Bot log and Delete only in ⋯, as Read AI does. (src/components/MeetApp.tsx:536-556 (buttons) vs 490-496 (more menu items))",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P93",
+      "round": "App pass 1",
+      "area": "Meet",
+      "title": "Header crammed with folder, type and filing note",
+      "detail": "Back link, status, Folder picker, Type picker, 'auto-filed', four buttons and ⋯ share one row. At 820px it wraps or squeezes, and the meeting title sits below all of it. Fix: Move Folder and Type into the 'At a glance' card (as the phone's m-facts rows do), and keep the header to Back, status and actions. (src/components/MeetApp.tsx:521-535)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P94",
+      "round": "App pass 1",
+      "area": "Meet",
+      "title": "'Bot' and 'notetaker' used for the same thing",
+      "detail": "Audit 1 settled on one notetaker name, but the dialog title says 'Send the bot to a meeting', the action says 'Make bot leave', and empty states say 'send the bot'. 'Bot' also sounds less trustworthy to meeting guests. Fix: Rename to 'Send notetaker', 'Ask notetaker to leave' and 'Notetaker log', and update the empty-state copy and the Indonesian strings. (src/components/MeetApp.tsx:492, 539, 1306, 1470, 1473; MeetPhone.tsx:392)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P95",
+      "round": "App pass 1",
+      "area": "Meet",
+      "title": "Settings has three names",
+      "detail": "The desktop sidebar says 'Filing rules & settings', the phone drawer says 'Settings', and the Folders screen and push screen say 'Meet settings'. People can't tell whether these are the same place. Fix: Use 'Meet settings' everywhere and move it to the bottom of the sidebar, away from the folder list. (src/components/MeetApp.tsx:152; MeetPhone.tsx:63, 73, 437)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P96",
+      "round": "App pass 1",
+      "area": "Meet",
+      "title": "Same pages named differently on phone and desktop",
+      "detail": "Desktop has 'Meetings' and 'Upcoming'. Phone has 'Home', 'Coming up' and 'Past meetings'. Someone switching devices can't find the same screen. Fix: Pick one pair, for example 'Meetings' and 'Upcoming', and use it in the drawer, headers and the 'See all' screen. (src/components/MeetApp.tsx:122, 392; MeetPhone.tsx:50, 238, 306)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P97",
+      "round": "App pass 1",
+      "area": "Meet",
+      "title": "Unfiled count is shown as a warning",
+      "detail": "An amber 'warn' badge on Unfiled makes unsorted meetings look like an error, even though filing is optional. It nags without pointing to a real problem. Fix: Use the plain .count style, or no count at all, since the phone already says 'N to file'. (src/components/MeetApp.tsx:148 (count warn-count))",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P98",
+      "round": "App pass 1",
+      "area": "Meet",
+      "title": "Auto-join explanation contradicts the chosen mode",
+      "detail": "Admins always read 'It joins a minute before each meeting… for everyone', even when they set the mode to 'Only meetings I accepted'. The text says the opposite of what they chose. Fix: Build the sentence from the mode label for admins too, for example '{mode}, a minute before the start. Read only: it never changes your calendar.' (src/components/MeetApp.tsx:1224-1227; MeetPhone.tsx:88-91)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P99",
+      "round": "App pass 1",
+      "area": "Meet",
+      "title": "Upcoming rows show the notetaker state twice",
+      "detail": "A row can show 'The notetaker will join' as text and also a 'Notetaker joins' switch. On a 820px row, along with Join and Send now, that's four controls fighting for space. Fix: Keep the switch only, labelled 'Notetaker'. Drop the separate 'will join' line and the 'set by you' meta. (src/components/MeetApp.tsx:1260-1264 and 1284-1299)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P100",
+      "round": "App pass 1",
+      "area": "Meet",
+      "title": "Upcoming lists calls the notetaker can't join",
+      "detail": "In-person and no-link events show up with 'No meeting link' and nothing you can do. Read AI lists only meetings with a joinable link, so the useful rows get buried. Fix: Filter `soon` to events with linkOf(e) non-null. Optionally add a folded 'N without a call link' line at the end. (src/components/MeetApp.tsx:1197 (soon filter) and 1255)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P101",
+      "round": "App pass 1",
+      "area": "Meet",
+      "title": "Phone 'Coming up' sheet is a dead end",
+      "detail": "Tapping a coming meeting opens a sheet with read-only text. It has no Join button and no notetaker switch, only 'Open in Calendar', so people can't do the obvious next step. Fix: Add a primary 'Join {app}' (when within 10 minutes) and the notetaker switch row to the sheet. Keep 'Open in Calendar' as the secondary action. (src/components/MeetPhone.tsx:164-185)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P102",
+      "round": "App pass 1",
+      "area": "Meet",
+      "title": "Mic / MicOff icon toggle is unclear",
+      "detail": "A crossed-out mic usually means 'you are muted', not 'the notetaker won't join'. Tapping it changes state with no confirmation. Fix: Use a labelled switch or a small 'Notetaker on/off' pill, and show a toast ('The notetaker won't join Standup' with Undo) when it changes. (src/components/MeetPhone.tsx:153-162)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P103",
+      "round": "App pass 1",
+      "area": "Meet",
+      "title": "Empty states use developer language",
+      "detail": "Messages like 'notes need a transcript and an AI provider in Se…', '(automatic tasks are off or were cleared)' and '(captions must be on in the meeting)' explain the system instead of telling the user what to do. Fix: Rewrite as next steps: 'No notes for this meeting. Regenerate notes' as a button, and 'Waiting for people to talk.' Move the reasons into the notetaker log. (src/components/MeetApp.tsx:811, 831, 881)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P104",
+      "round": "App pass 1",
+      "area": "Meet",
+      "title": "Deleting the recording is done from a 'Keep' drop-down",
+      "detail": "Picking a different option in a Select permanently deletes video or audio. Destructive actions hidden in a picker are easy to trigger by mistake. Fix: Show what's kept as text, plus a 'Delete recording' danger action in ⋯ that asks for confirmation with the app's own dialog. (src/components/MeetApp.tsx:674-689)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P105",
+      "round": "App pass 1",
+      "area": "Meet",
+      "title": "Phone filter chips 'Recording' and 'Failed' are unclear",
+      "detail": "'Recording' could mean 'live now' or 'has a recording'. 'Failed' puts diagnostics on the home screen, which Read AI keeps out of sight. Fix: Use All, Has tasks, Live now. Show failed meetings with a red status on the row instead of a filter. (src/components/MeetPhone.tsx:186-191 (FILTERS))",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P106",
+      "round": "App pass 1",
+      "area": "Meet",
+      "title": "Phone Folders screen repeats the drawer",
+      "detail": "Tasks from meetings and Unfiled show both in the drawer and as 'folders' on the Folders screen. They aren't folders, and the duplication muddles the navigation. Fix: Remove the Tasks and Unfiled rows from MeetFolders, so it lists only real folders. (src/components/MeetPhone.tsx:416-417 vs 50-52)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P107",
+      "round": "App pass 1",
+      "area": "Meet",
+      "title": "Ask AI is offered in four places",
+      "detail": "The sidebar has an 'Ask AI' item that opens a panel instead of a page, and the meeting page offers it in the header, the ⋯ menu and the At a glance card. That clutters the page, and the sidebar item behaves differently from its neighbours. Fix: Keep one 'Ask about this meeting' in the At a glance card. Remove it from ⋯ and move the global Ask AI to the app's docked Ask AI pill instead of a nav item. (src/components/MeetApp.tsx:130, 491, 734, 1149)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P108",
+      "round": "App pass 1",
+      "area": "Meet",
+      "title": "Native checkbox and inconsistent labels in tasks and access",
+      "detail": "The access popover uses a raw <input type=checkbox> against the app's switch style. Task checks are labelled 'Toggle done' on one row type and 'Mark done' or 'Reopen' on another. Fix: Use the app's .switch button with role=switch for 'Allow download', and use the Mark done / Reopen aria-label on both task row types. (src/components/MeetApp.tsx:916 and 1016 vs 1003)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P109",
+      "round": "App pass 1",
+      "area": "Meet",
+      "title": "'No open tasks. Nice.' empty state",
+      "detail": "A chatty line on a work screen. The bar asks for plain, specific copy. Fix: Use 'No open tasks from meetings.' (src/components/MeetApp.tsx:1116)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P110",
+      "round": "App pass 1",
+      "area": "Drive",
+      "title": "No visible file actions on iPad (touch, 768px and up)",
+      "detail": "At 820 and 1180 px on a touch iPad, the '…' button is hidden and the star/trash buttons only appear on hover. Touch users get no visible way to act on a file except a long-press they have no reason to try. Fix: Add @media (hover: none) { .d-more { display:inline-grid } .d-actions { opacity:1; transform:none } } or show .d-more on every pointer:coarse device, the way Google Drive on iPad shows ⋮ on each tile. (src/mobile/drive.css:10-12 (.d-more display:none outside phones); src/shell.css:1499-1527 (.d-actions opacity 0 until :hover))",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "P111",
+      "round": "App pass 1",
+      "area": "Drive",
+      "title": "Preview shows developer text to users",
+      "detail": "'Previews for documents arrive with the real file server.' and 'Sample video. Upload your own…' are build notes. They make the product feel unfinished. Fix: Replace with a user-facing fallback: the file icon, name and size plus 'No preview for this file type' and Download / Open buttons. Drop the sample-video note or show it only in demo workspaces. (src/components/DrivePreview.tsx:105 and :112)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "P112",
+      "round": "App pass 1",
+      "area": "Drive",
+      "title": "Trash has no 'Empty trash'",
+      "detail": "Google Drive users expect one 'Empty trash' button. Here they have to delete each item forever one at a time, and the desktop only shows a note about 30 days. Fix: Add an 'Empty trash' text button on the right of the trash note (desktop) and on the phone's dp-sort row when section==='trash'. Ask for confirmation in a sheet and offer one Undo toast. (src/components/DriveView.tsx:358 (trash note only); :167-171 (per-item menu))",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P113",
+      "round": "App pass 1",
+      "area": "Drive",
+      "title": "'Delete forever' leaves sub-folders' files orphaned",
+      "detail": "Deleting a trashed folder forever removes only its direct children. Grandchildren stay in data with a missing parent, so they never show anywhere, or they reappear later. Fix: Collect every descendant id recursively (walk parentId) and remove them all. Keep the snapshot Undo as it is. (src/App.tsx:3623 (filter i.id !== id && i.parentId !== id))",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P114",
+      "round": "App pass 1",
+      "area": "Drive",
+      "title": "'Delete forever' uses an X icon",
+      "detail": "An X reads as close or dismiss, so a permanent delete sits next to Restore looking harmless. Fix: Use Trash2 (or a Trash with X) and the danger colour on hover. Keep the title 'Delete forever'. (src/components/DriveView.tsx:129-131 and :170)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P115",
+      "round": "App pass 1",
+      "area": "Drive",
+      "title": "Desktop can't sort, the phone can",
+      "detail": "Phones get a Name / Last modified / Size sort sheet. On desktop the list header is static (cursor: default), so people can't sort by date or size the way Google Drive allows. Fix: Make Name / Modified / Size header cells buttons that reuse the same persisted 'pm-drive-sorts' and sorter(). Show an arrow on the active column and add a 'Sort' dropdown in grid mode. (src/components/DriveView.tsx:369-373 (static d-th); src/shell.css:1555-1567 (.d-th cursor default); phone sort at :492-507, :693-712)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P116",
+      "round": "App pass 1",
+      "area": "Drive",
+      "title": "Desktop file menu is missing Details",
+      "detail": "The phone menu has 'Details' (type, location, uploader). The right-click menu on desktop doesn't, so desktop users can't see where a file lives or who uploaded it. Fix: Add { label:'Details', icon: Info, group:'file' } to menuFor. On desktop, open DetailsScreen content in a right-side panel (Google Drive's 'i' panel). (src/components/DriveView.tsx:166-183 (menuFor) vs :241 (phone Details))",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P117",
+      "round": "App pass 1",
+      "area": "Drive",
+      "title": "Opening from the phone menu breaks swipe-through",
+      "detail": "Tapping a row opens the viewer with the whole folder, but 'Open' in the … menu passes [i]. The same file then has no prev/next and no count, which is inconsistent. Fix: Pass the current folder's files list to phoneMenu's Open, the same way the row tap does. (src/components/DriveView.tsx:234 (props.onOpen(i, [i])) vs :616 (props.open(i, files)))",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P118",
+      "round": "App pass 1",
+      "area": "Drive",
+      "title": "Trashing in the viewer closes it instead of moving on",
+      "detail": "Google Drive and Photos move to the next item after a delete. Here the viewer closes, and someone cleaning up a folder has to reopen it every time. Fix: After onTrash, call onNav(next ?? prev) when either exists, and close only when the list is empty. (src/components/DrivePreview.tsx:84-87)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P119",
+      "round": "App pass 1",
+      "area": "Drive",
+      "title": "Viewer's Download and Share link are limited",
+      "detail": "Download only shows for local blob uploads, and Share link never appears, though both are in the file menu. People expect them in the viewer's top bar (Drive puts them there). Fix: Show Download whenever item.url exists (the same download() helper as DriveView:153) and add a Link2 'Copy link' button when the url is not data:. (src/components/DrivePreview.tsx:72-76)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P120",
+      "round": "App pass 1",
+      "area": "Drive",
+      "title": "Flipping files zooms in from the centre in every direction",
+      "detail": "Every next/prev re-keys .lb-stage and runs zoomIn, so the motion doesn't follow the arrow or swipe direction. It reads as reopening rather than moving along. Fix: Track the direction in state and apply a .from-left / .from-right class that slides 24px with a fade (200ms ease-out). Keep zoomIn only for the first open, and turn it off under prefers-reduced-motion. (src/components/DrivePreview.tsx:99 (key=item.id); src/shell.css:1672-1679 (animation: zoomIn))",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P121",
+      "round": "App pass 1",
+      "area": "Drive",
+      "title": "No swipe down to close the viewer on phones",
+      "detail": "iOS Photos and Drive close a preview with a downward swipe. Here only the small X does, at the top edge, which is hard to reach. Fix: In onTouchEnd, close when dy > 100 and |dy| > |dx|*1.5. Have the stage follow the finger and fade the backdrop while dragging. (src/components/DrivePreview.tsx:45-54 (only sideways is handled))",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P122",
+      "round": "App pass 1",
+      "area": "Drive",
+      "title": "Wrong empty-state copy for Media, Email and Recent on phones",
+      "detail": "Media and Email attachments fall through to 'Files you open, upload or get show here, newest first.' That copy doesn't explain those sections. Fix: Add cases: media → 'Photos and videos you upload or receive show here.'; email → 'Attachments from your emails appear here automatically.' (and drop the separate drive-note above it). (src/components/DriveView.tsx:582-595)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P123",
+      "round": "App pass 1",
+      "area": "Drive",
+      "title": "Phone grid tiles hide stars and dates",
+      "detail": "In grid mode the tile shows only the name, so starred files and recent changes can't be told apart, unlike the list rows. Fix: Add a small filled star before the name when starred, and a one-line date under the name (fs-secondary, text-3). (src/components/DriveView.tsx:641-645)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P124",
+      "round": "App pass 1",
+      "area": "Drive",
+      "title": "Search results don't say where a file is",
+      "detail": "The search covers every folder and email attachments, but the results show no location. Two files with the same name look identical, and the breadcrumb is replaced by 'Search results'. Fix: In search mode, add a 'Location' column in list view and a 'in Folder / Sub' line in the card meta (reuse pathOf from MoveSheet:771). (src/components/DriveView.tsx:82 (search across all live), :312-313, :375-387)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P125",
+      "round": "App pass 1",
+      "area": "Drive",
+      "title": "Recent quietly stops at 30 files",
+      "detail": "Recent stops at 30 items with no 'show more', so older files seem to be gone. Fix: Group Recent by Today / This week / Earlier with lazy paging, or add a 'Show more' row after 30. (src/components/DriveView.tsx:87 and :549)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P126",
+      "round": "App pass 1",
+      "area": "Notes",
+      "title": "Folded sidebar shows a column of letter tiles",
+      "detail": "With the sidebar collapsed, every note becomes a 28px first-letter tile. Several notes start with the same letter, so the tiles can't be told apart and they look like app icons. Apple Notes hides the list. Fix: When .sidebar.collapsed, hide .notes-nav entirely and keep only the New note and a search icon. Remove the ni-dot span. (src/polish.css:2883-2912; src/components/notes/NotesList.tsx:335-337)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P127",
+      "round": "App pass 1",
+      "area": "Notes",
+      "title": "Recently deleted is hard to find on desktop",
+      "detail": "On desktop it sits under the whole list, below the last month, and it isn't in the 'Show' dropdown, while the phone's title menu includes it. Apple Notes lists it as a folder. Fix: Add a 'Recently deleted' option (group 'More') to the desktop Select that calls setTrash(true). Keep the bottom link only when the list is short. (src/components/notes/NotesList.tsx:160-166 and :205-216 vs :130)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P128",
+      "round": "App pass 1",
+      "area": "Notes",
+      "title": "Pin shows up twice in the desktop note header",
+      "detail": "The note header has a pin button, and the … menu next to it has 'Pin to the top' too. Two controls for one rare action. Fix: Remove the header pin button and keep Pin in the … menu (Apple Notes keeps it in the menu or swipe). (src/components/notes/NoteEditor.tsx:424-428; src/components/notes/noteMenu.ts:105)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P129",
+      "round": "App pass 1",
+      "area": "Notes",
+      "title": "Project shows up twice in the header",
+      "detail": "A ProjectPicker in the header and 'Move to a project' in the … menu do the same thing, which makes the header busy. Fix: Keep the header picker as a quiet chip (it shows the current project) and drop 'Move to a project' from the menu on desktop. The phone keeps the menu entry. (src/components/notes/NoteEditor.tsx:422; src/components/notes/noteMenu.ts:106)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P130",
+      "round": "App pass 1",
+      "area": "Notes",
+      "title": "The body placeholder is a tutorial",
+      "detail": "'Write here. A line can become a task: put the caret on it and tap Make task.' shows in every empty note. On desktop it also says 'tap' and points at a button that already sits in the toolbar. Fix: Use 'Start writing' (Apple Notes shows nothing). Teach Make task once with a one-time toast or the toolbar button's tooltip. (src/components/notes/NoteEditor.tsx:295)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P131",
+      "round": "App pass 1",
+      "area": "Notes",
+      "title": "The phone Share button opens visibility settings",
+      "detail": "The iOS share glyph tells people to expect the system share sheet or a link. Here it opens 'Who sees it'. The aria-label even says 'Who sees it'. Fix: Use the Users or Lock icon (as whoBtn does), or make Share open a sheet with 'Who sees it' and 'Copy link' rows. (src/components/notes/NoteEditor.tsx:382-385)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P132",
+      "round": "App pass 1",
+      "area": "Notes",
+      "title": "'Saved' status doesn't refresh on its own",
+      "detail": "The status checks Date.now() - updatedAt < 8000 during render, but nothing re-renders after 8s. 'Saved' can stay up indefinitely, then jump to 'Edited … by you' at an odd moment. Fix: Keep a timer state: after an edit, set saved=true and setTimeout 8s to clear it. Cross-fade between the two lines (opacity 200ms). (src/components/notes/NoteEditor.tsx:211-218)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P133",
+      "round": "App pass 1",
+      "area": "Notes",
+      "title": "The phone empty filter view sends people the wrong way",
+      "detail": "On the phone, 'No notes here yet. Tap the pen' shows when a filter (Only me, a project) hides the notes. Desktop correctly offers 'Show all notes'. Fix: When filter !== 'all', use the desktop version: 'No notes in this view' plus a 'Show all notes' link. (src/components/notes/NotesList.tsx:251 vs :157)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P134",
+      "round": "App pass 1",
+      "area": "Notes",
+      "title": "The swipe 'Move' action uses a chevron",
+      "detail": "A ChevronRight in a swipe action reads as 'open' or 'more', not move to a project. Fix: Use FolderInput (the same icon as the menu's Move to a project, noteMenu.ts:106). (src/components/notes/NotesList.tsx:374)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P135",
+      "round": "App pass 1",
+      "area": "Notes",
+      "title": "Viewers of a shared note can't pin it",
+      "detail": "Pin is limited to editors, so teammates who only read a shared note can't keep it at the top of their own list. Apple Notes pins per person. Fix: Store pins per user (pinnedBy: string[] or a local per-user set) and offer Pin to anyone who can see the note. (src/components/notes/NotesList.tsx:372 (start only if edit); src/components/notes/noteMenu.ts:105)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P136",
+      "round": "App pass 1",
+      "area": "Notes",
+      "title": "Recently deleted has no 'Delete all', and desktop rows only offer 'Put back'",
+      "detail": "Clearing out deleted notes takes one at a time through a hidden menu or a swipe. Apple Notes has 'Delete All' in Recently Deleted. Fix: Add a 'Delete all' text button next to the 30-day note, with confirmation and a batch Undo toast. Show a quiet 'Delete' button next to 'Put back' on hover on desktop. (src/components/notes/NotesList.tsx:389-399 and :423-427)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P137",
+      "round": "App pass 1",
+      "area": "Notes",
+      "title": "Phone swipe deletes deleted notes for good in one gesture",
+      "detail": "A full left swipe in Recently deleted purges the note right away. An accidental swipe destroys it, with only a short toast to recover. Fix: Make the swipe reveal a 'Delete' button that needs a tap (removes: false), or ask for confirmation in an action sheet before purge. (src/components/notes/NotesList.tsx:414)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P138",
+      "round": "App pass 1",
+      "area": "Notes",
+      "title": "Desktop rows show relative times under date headings",
+      "detail": "Under 'Previous 7 days', rows say '3 days ago', which repeats the heading. The phone uses Apple's short form (13:05, Yesterday, Mon). Fix: Use whenShort(n.updatedAt) on desktop too and keep the '· by Name' suffix. (src/components/notes/NotesList.tsx:344 vs :314 (whenShort))",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P139",
+      "round": "App pass 1",
+      "area": "Notes",
+      "title": "Pinned notes are marked twice on desktop",
+      "detail": "Pinned notes sit under a 'Pinned' heading and also show a pin icon before the title, which is visual noise. Fix: Drop the row's pin icon whenever the Pinned heading shows (not while searching). (src/components/notes/NotesList.tsx:139 and :339)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P140",
+      "round": "App pass 1",
+      "area": "Notes",
+      "title": "Person chips are limited to four arbitrary people",
+      "detail": "Search suggestions show the first four other owners in data order, not the people someone works with most, so the right person is often missing. Fix: Rank owners by number of shared notes, or by latest updatedAt, before slice(0,4). (src/components/notes/NotesList.tsx:253)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P141",
+      "round": "App pass 1",
+      "area": "Notes",
+      "title": "Desktop search has none of the phone's facets",
+      "detail": "Phones can narrow a search by Pinned, Shared with me, Has tasks, project or person. Desktop only has free text, so 'notes with tasks' can't be found. Fix: Show the same nl-chip row under the desktop search field while it has focus and q is empty. (src/components/notes/NotesList.tsx:195-217 vs :254-260)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P142",
+      "round": "App pass 1",
+      "area": "Notes",
+      "title": "The empty note pane reads like marketing",
+      "detail": "The no-note pane has a long pitch ('Private notes, meeting prep, how-tos… Link a note to a project…') where a calm placeholder would do. Fix: Use the title 'No note open' with no text, or a single line 'Pick a note or press New note'. (src/components/notes/NoteEditor.tsx:52)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P143",
+      "round": "App pass 1",
+      "area": "Notes",
+      "title": "Hold-for-redo can't be discovered",
+      "detail": "Redo is only a 450ms long-press on Undo. Nobody will find it, and on desktop it shows only in a title. Fix: After an undo, show a separate Redo button next to Undo while redo is available, as iOS's keyboard bar does. (src/components/notes/NoteEditor.tsx:482-503)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P144",
+      "round": "App pass 1",
+      "area": "Tables",
+      "title": "'New table' appears up to three times on desktop",
+      "detail": "The sidebar has a New table compose button, the Tables home header has a primary New table, and the empty state adds a third. This breaks the 'one primary per screen' rule already applied in Drive, Calendar and Meet. Fix: Remove the header primary button (keep the sidebar's, as Drive does), and keep the empty-state button only when the sidebar is folded. (src/components/tables/TablesApp.tsx:36-39, :231-233, :243-245)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "P145",
+      "round": "App pass 1",
+      "area": "Tables",
+      "title": "Native browser confirm() for every destructive action",
+      "detail": "Deleting a row, rows, a column, a field, a board group, a rule or a table opens an unstyled OS dialog with no motion and no dark mode. Notes and Drive use Undo toasts instead. Fix: Delete straight away with a toast and Undo (snapshot rows, fields and tables, like App.tsx deleteForever). Use the app's own confirm sheet only for irreversible actions such as rotating secrets. (src/components/tables/TableScreen.tsx:418, :473, :1066; src/components/tables/RecordDrawer.tsx:414, :566; src/components/tables/ColumnMenu.tsx:162; src/components/tables/FieldMenu.tsx:305; src/components/tables/BoardView.tsx:393; src/components/tables/Automations.tsx:632, :775, :854)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "P146",
+      "round": "App pass 1",
+      "area": "Tables",
+      "title": "A deleted table can't be undone",
+      "detail": "'This can't be undone' while the rest of the app offers Undo. Losing a whole database to one misclick is the worst case for a Notion-style tool. Fix: Keep the table and rows snapshot and show an Undo toast for 10s, or soft-delete into a Trash the way Notion does. (src/components/tables/TableScreen.tsx:417-421)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "P147",
+      "round": "App pass 1",
+      "area": "Tables",
+      "title": "The desktop table header is crowded",
+      "detail": "Menu, letter badge, title, project picker, Undo, Share, Automations and … all share one row. Automations is a power feature but gets the same weight as the title, and the Undo icon is unusual (Notion uses Cmd+Z only). Fix: Move Automations into the … menu (or a quiet icon), drop the header Undo button (keep Cmd+Z and Undo toasts), and keep Share as the one text button. (src/components/tables/TableScreen.tsx:629-676)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P148",
+      "round": "App pass 1",
+      "area": "Tables",
+      "title": "The long tip banner over the grid",
+      "detail": "A paragraph of instructions sits above the grid for every new user, pushes the content down, and disappears with a hard cut. Fix: Cut it to one sentence ('Click a column name for its options') or turn it into a header-cell coach mark. Add .tb-tip to exitAnimations LEAVING with a collapse rule. (src/components/tables/TableScreen.tsx:938-945; src/tables.css:2123-2136; not in src/exitAnimations.ts)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P149",
+      "round": "App pass 1",
+      "area": "Tables",
+      "title": "New tables default to the Leads template",
+      "detail": "Someone making a quick list gets Lead columns unless they notice the picker. Notion starts blank. Fix: Default template to 'blank' and keep the templates visible as the first choice row. (src/components/tables/TablesApp.tsx:61)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P150",
+      "round": "App pass 1",
+      "area": "Tables",
+      "title": "Phone home rows have no menu",
+      "detail": "On desktop, right-clicking a table card gives Open and Copy link. On the phone, holding a row does nothing, and neither offers Rename, Duplicate or Delete from the list. Fix: Bind useActionMenu (long-press) on tb-home-row with Open, Copy link, Rename, Delete (with Undo), and add the same entries to the desktop card menu. (src/components/tables/TablesApp.tsx:208-214 vs :141-149)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P151",
+      "round": "App pass 1",
+      "area": "Tables",
+      "title": "Table cards show counts and the word 'fields'",
+      "detail": "Desktop cards say 'N rows · N fields'. 'Fields' is builder jargon, and the phone already dropped counts in an earlier pass, so the two differ. Fix: Show the description or 'Edited 2h ago' instead, as in Notion's recent pages, and drop the field count. (src/components/tables/TablesApp.tsx:181)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P152",
+      "round": "App pass 1",
+      "area": "Tables",
+      "title": "The home header subtitle repeats itself",
+      "detail": "'Your own databases: leads, pipelines…' shows above existing tables every visit. It's onboarding copy that wastes space. Fix: Show the subtitle only when tables.length === 0 (the empty state already says it), or remove it. (src/components/tables/TablesApp.tsx:229)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P153",
+      "round": "App pass 1",
+      "area": "Tables",
+      "title": "The row drawer header has six icon buttons",
+      "detail": "Prev, Next, Copy link, Duplicate, Delete and Close sit in a row of small icons, with Delete right next to Close where it's easy to hit by mistake. The full page already has a … menu. Fix: Keep Prev/Next and Close, and move Copy link, Duplicate and Delete into a … menu like the page view. (src/components/tables/RecordDrawer.tsx:386-419 vs :620)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P154",
+      "round": "App pass 1",
+      "area": "Tables",
+      "title": "The colour badge is a hidden setting",
+      "detail": "The table's first-letter badge opens a colour picker on click. People don't expect a letter tile to be a control, and those who click it by accident get a popover. Fix: Move 'Colour' into the … table menu with the swatches inline, and make the badge non-interactive. (src/components/tables/TableScreen.tsx:634-645)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P155",
+      "round": "App pass 1",
+      "area": "Tables",
+      "title": "Toolbar tools lose their labels at iPad widths",
+      "detail": "Below 1080px (iPad landscape with the sidebar open, and portrait) Sort, Group, Fields and Colours become bare icons. Group and Colours icons are ambiguous, and the labels only exist as hover titles, which touch screens never show. Fix: Below 1080px, fold Group, Fields and Colours into one 'View settings' button (labelled), and keep Filter and Sort with labels. (src/tables.css:98-105 and :106-117)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P156",
+      "round": "App pass 1",
+      "area": "Tables",
+      "title": "'Colours' is a top-level toolbar button",
+      "detail": "Conditional colours are an advanced feature but sit in the main toolbar next to Filter and Sort, which crowds the bar for everyone. Fix: Move Colours into the view settings popover (with Fields), and show a small active dot on that button when rules are on. (src/components/tables/TableScreen.tsx:852-856)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P157",
+      "round": "App pass 1",
+      "area": "Tables",
+      "title": "New row is split into two primary buttons",
+      "detail": "'New row' and its template chevron are two filled primary buttons side by side, which reads as two main actions. Fix: Style them as one split button (one fill, a 1px divider, a shared radius) so the chevron reads as part of the same control. (src/components/tables/TableScreen.tsx:859-869)",
+      "priority": "low",
+      "status": "todo"
+    },
+    {
+      "id": "P158",
+      "round": "App pass 1",
+      "area": "Tables",
+      "title": "Tablet panes can switch to the phone layout",
+      "detail": "The phone layout (cards, one bar, sheets) starts whenever the pane is under 600px. On iPad portrait (820) with the sidebar open, the pane can fall below that, so a tablet gets the phone UI. Fix: Check the pane width at 820 with the sidebar open. Either fold the sidebar automatically in Tables on tablets, or lower NARROW_PANE to about 520 and keep the desktop toolbar with the folded labels. (src/components/tables/hooks.ts:28 (NARROW_PANE = 600); src/components/tables/TableScreen.tsx:77)",
+      "priority": "medium",
+      "status": "todo"
+    },
+    {
+      "id": "P159",
+      "round": "App pass 1",
+      "area": "Tables",
+      "title": "View tabs overflow uses hard-coded widths",
+      "detail": "The tab fitter reserves fixed 48px and 92px for '+' and 'N more'. Longer translations (Indonesian 'N lainnya') can overlap or clip, and tabs then jump as they move into 'more'. Fix: Measure the real widths of the more button and the add button (refs) instead of constants, and animate tabs moving into 'more' with a fade. (src/components/tables/ViewTabs.tsx:37 and :42)",
+      "priority": "low",
+      "status": "todo"
+    }
+  ]
 }

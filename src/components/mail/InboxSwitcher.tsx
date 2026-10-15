@@ -7,6 +7,7 @@ import type { Account } from '../../types';
 import type { MailState } from '../../mailStatus';
 import { useActionMenu } from '../ui/ActionSheet';
 import { lifeLeft } from '../TempAddress';
+import { usePhone } from '../../mobile/media';
 import { t, tn } from '../../i18n';
 
 export function InboxSwitcher(p: {
@@ -22,6 +23,7 @@ export function InboxSwitcher(p: {
   onTempMenu?: (a: Account, anchor: HTMLElement) => void;
 }) {
   const btn = useRef<HTMLButtonElement>(null);
+  const phone = usePhone();
   const more = useRef<HTMLButtonElement>(null);
   const boxes = p.accounts.filter((a) => !a.temp);
   const temps = p.accounts.filter((a) => a.temp);
@@ -40,7 +42,8 @@ export function InboxSwitcher(p: {
       ...(p.onNewTemp ? [{ label: t('New temporary address'), icon: Plus, hint: t('Made in seconds, deleted by itself'), group: 'add', run: p.onNewTemp }] : []),
       ...(p.onAddAccount ? [{ label: t('Add an email address'), icon: Plus, group: 'add', run: p.onAddAccount }] : []),
     ],
-    { menu: true, className: 'inbox-switch-menu' },
+    // A menu by the button on computers; a sheet from the bottom on phones.
+    { menu: !phone, className: 'inbox-switch-menu', title: t('Inboxes') },
   );
   const cur = p.accounts.find((a) => a.id === p.active);
   const Icon = cur ? iconOf(cur) : Layers;
