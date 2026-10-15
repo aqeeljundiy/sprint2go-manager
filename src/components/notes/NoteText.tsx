@@ -321,6 +321,35 @@ export const NoteText = forwardRef<NoteTextHandle, {
           cleanStyles(here);
           if (keep?.node.isConnected) sel?.collapse(keep.node, keep.at);
         }
+        // Typing shortcuts at the start of a line (Apple Notes, Notion): "- " or "* " bullets, "1. " numbers,
+        // "[] " a checklist, "# " to "### " headings. The marker goes; the line becomes the thing.
+        const ie = e.nativeEvent as InputEvent;
+        if (ie.inputType === 'insertText' && ie.data === ' ') {
+          const sel = getSelection();
+          const line = blockOf(sel?.anchorNode ?? null, el.current!);
+          const typed = line && !line.closest('ul, ol') ? (line.textContent ?? '').replace(/ /g, ' ') : '';
+          const kind = /^[-*] $/.test(typed) ? 'ul' : /^1[.)] $/.test(typed) ? 'ol' : /^\[ ?\] $/.test(typed) ? 'check' : /^#{1,3} $/.test(typed) ? (`H${typed.trim().length}` as 'H1' | 'H2' | 'H3') : null;
+          if (line && kind) {
+            // Right after this input, not inside it: the browser won't run an editing command while another one
+            // (a paste, an autocorrect) is still in progress.
+            setTimeout(() => {
+              if (!line.isConnected) return;
+              line.textContent = '';
+              line.appendChild(document.createElement('br'));
+              const r = document.createRange();
+              r.setStart(line, 0);
+              r.collapse(true);
+              const s = getSelection();
+              s?.removeAllRanges();
+              s?.addRange(r);
+              if (kind === 'ul' || kind === 'check') exec('insertUnorderedList');
+              else if (kind === 'ol') exec('insertOrderedList');
+              else exec('formatBlock', kind);
+              if (kind === 'check') blockOf(getSelection()?.anchorNode ?? null, el.current!)?.closest('ul')?.classList.add('checklist');
+              emit();
+            }, 0);
+          }
+        }
         // A new checklist line starts unticked.
         if ((e.nativeEvent as InputEvent).inputType === 'insertParagraph') {
           const b = blockOf(getSelection()?.anchorNode ?? null, el.current!);
