@@ -145,6 +145,11 @@
   --ctl-h: 32px; /* buttons, dropdowns, tabs and segmented controls on desktop */
   --tab-h: 32px;
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* The motion system (src/motion.ts): every layer enters from its home in --dur-in and leaves back there in --dur-out. */
+  --dur-in: 240ms;
+  --dur-out: 180ms;
+  --ease-out-motion: cubic-bezier(0.2, 0, 0, 1);
+  --ease-in-motion: cubic-bezier(0.4, 0, 1, 1);
 
   color-scheme: light;
 }

@@ -1,13 +1,14 @@
-// The launcher's motion on phones (research/launcher/plan.md, section 5): an app grows out of its tile (240 ms,
-// ease-out) and shrinks back into it (220 ms, ease-in), while the launcher settles between 96% and 100% (launcher.css).
-// Reduced motion: a 150 ms cross-fade. The transform is only there while the animation runs, so nothing fixed inside
-// the app (its bar, a sheet) stays trapped by it.
+// The launcher's motion on phones, from the shared layer system (src/motion.ts): the app is the layer on top, so it
+// rises from the centre over the launcher and sinks back into the centre when you leave, the same way for every app,
+// whichever tile you tapped. The launcher settles between 96% and 100% underneath (launcher.css). Reduced motion: a
+// 150 ms fade. The transform is only there while the animation runs, so nothing fixed inside the app stays trapped.
+import { play } from '../motion';
 
-const reduced = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 const app = () => document.querySelector<HTMLElement>('.app');
 
-/** While it grows or shrinks, the app is lifted over the launcher (the launcher sits over the app's screen otherwise). */
-function lift(el: HTMLElement, anim: Animation) {
+/** While it rises or sinks, the app is lifted over the launcher (the launcher sits over the app's screen otherwise). */
+function lift(el: HTMLElement, anim: Animation | null) {
+  if (!anim) return;
   el.style.position = 'relative';
   el.style.zIndex = '41';
   const drop = () => (el.style.removeProperty('position'), el.style.removeProperty('z-index'));
@@ -15,48 +16,16 @@ function lift(el: HTMLElement, anim: Animation) {
   anim.addEventListener('cancel', drop);
 }
 
-function fromTile(tile: Element | null | undefined) {
-  const r = tile?.getBoundingClientRect();
-  if (!r || !r.width) return null;
-  const sq = (tile as HTMLElement).querySelector('.ln-sq')?.getBoundingClientRect() ?? r;
-  const s = sq.width / innerWidth;
-  return { transform: `translate(${sq.left + sq.width / 2 - innerWidth / 2}px, ${sq.top + sq.height / 2 - innerHeight / 2}px) scale(${s})`, radius: `${16 / s}px` };
-}
-
-/** An app opened from its tile. Called before the app shows; the animation starts on the next frame. */
-export function launchGrow(tile: Element | null) {
-  const from = fromTile(tile);
+/** An app opened from the launcher: it rises on the next frame. (The tile argument is kept for callers; unused.) */
+export function launchGrow(_tile?: Element | null) {
   requestAnimationFrame(() => {
     const el = app();
-    if (!el || typeof el.animate !== 'function') return;
-    if (reduced() || !from) return void el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 150, easing: 'ease-out' });
-    lift(
-      el,
-      el.animate(
-        [
-          { transform: from.transform, borderRadius: from.radius, opacity: 0.4, overflow: 'hidden' },
-          { transform: 'none', borderRadius: '0px', opacity: 1, overflow: 'hidden' },
-        ],
-        { duration: 240, easing: 'cubic-bezier(0.2, 0, 0, 1)' },
-      ),
-    );
+    if (el) lift(el, play(el, 'app', 'in'));
   });
 }
 
-/** Back to the launcher: the app on screen shrinks into its tile. */
-export function launchShrink(tile: Element | null) {
+/** Back to the launcher: the app on screen sinks back, showing the launcher beneath. */
+export function launchShrink(_tile?: Element | null) {
   const el = app();
-  if (!el || typeof el.animate !== 'function') return;
-  const to = fromTile(tile);
-  if (reduced() || !to) return void el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 150, easing: 'ease-in' });
-  lift(
-    el,
-    el.animate(
-      [
-        { transform: 'none', borderRadius: '0px', opacity: 1, overflow: 'hidden' },
-        { transform: to.transform, borderRadius: to.radius, opacity: 0, overflow: 'hidden' },
-      ],
-      { duration: 220, easing: 'cubic-bezier(0.4, 0, 1, 1)' },
-    ),
-  );
+  if (el) lift(el, play(el, 'app', 'out'));
 }

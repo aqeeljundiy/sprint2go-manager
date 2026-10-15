@@ -5,6 +5,7 @@ Every change has to pass this bar before it's called done. It isn't optional pol
 ## The bar
 
 1. **Animated, both ways.** Things appear and disappear with motion, never a hard cut.
+   - **Direction comes from where a thing lives, not where you tapped** (src/motion.ts, `play(el, layer, way)`): the launcher is underneath; an app rises from the centre over it; a screen slides from the right; a drawer from its edge; a sheet and a toast from the bottom. Only a popover grows from its button. Leaving reverses entering, faster (240 ms in, 180 ms out). Use a preset, never one-off keyframes.
    - Overlays (dialogs, drawers, sheets, menus, popovers, toasts): entrance animation in CSS. The exit comes from `src/exitAnimations.ts`; add any new overlay class to its `LEAVING` list and give it an `.is-leaving` rule in `polish.css`.
    - Tabs and steps: wrap the switching content in `<TabPane key={tab}>`. Anything whose height changes (dialog bodies, steps, sections that open) goes in `<SmoothHeight>` (`src/components/ui/Smooth.tsx`). Every `.modal-body` already has it.
    - State changes (selected, on/off, hover, expanded): transition color, background, border, transform, 150 to 250 ms.
