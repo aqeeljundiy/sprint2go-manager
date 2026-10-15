@@ -615,6 +615,10 @@
       transform 0.2s var(--ease),
       opacity 0.15s;
   }
+  /* Colour-only selection (iOS, Gmail, Slack): the bar is already a pill, so no shape inside it. */
+  .tabbar-ink {
+    display: none;
+  }
   .tabbar-ink.off {
     opacity: 0;
   }
@@ -657,6 +661,7 @@
     padding: 0;
   }
   .tab-label {
+    transition: color 0.15s;
     max-width: calc(100% - 4px);
     overflow: hidden;
     white-space: nowrap;
