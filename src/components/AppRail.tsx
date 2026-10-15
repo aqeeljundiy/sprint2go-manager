@@ -143,6 +143,7 @@ export function AppRail(p: Props) {
             onClick={() => p.onApp(id)}
             onContextMenu={(e) => (setHit(id), appMenu.bind.onContextMenu(e))}
             title={name}
+            aria-label={name}
             aria-current={p.current === id ? 'page' : undefined}
             draggable
             onDragStart={(e) => ((e.dataTransfer.effectAllowed = 'move'), e.dataTransfer.setData('text/plain', id), setDrag(id))}
@@ -160,7 +161,6 @@ export function AppRail(p: Props) {
               <Icon size={19} />
               {p.badges[id] ? <i>{p.badges[id]! > 99 ? '99+' : p.badges[id]}</i> : null}
             </span>
-            <span className="rail-label">{name}</span>
           </button>
           </Fragment>
         ))}
@@ -169,7 +169,6 @@ export function AppRail(p: Props) {
             <span className="rail-icon">
               <MoreHorizontal size={18} />
             </span>
-            <span className="rail-label">{t('More')}</span>
           </button>
         )}
         {hiddenApps.length > 0 && (
@@ -177,7 +176,6 @@ export function AppRail(p: Props) {
             <span className="rail-icon">
               <Plus size={18} />
             </span>
-            <span className="rail-label">{t('{n} hidden', { n: hiddenApps.length })}</span>
           </button>
         )}
         {appMenu.menu}
