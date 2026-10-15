@@ -67,7 +67,7 @@ function check(file, line, sel, prop, value, raw) {
 }
 
 for (const file of files) {
-  const whole = file.includes('/src/mobile/');
+  const whole = file.replace(/\\/g, '/').includes('/src/mobile/'); // Windows paths use backslashes
   const text = readFileSync(file, 'utf8');
   const lines = text.split('\n');
   const stack = []; // { kind: 'phone' | 'not' | 'rule' | 'at', sel }

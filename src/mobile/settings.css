@@ -1200,7 +1200,7 @@
   grid-template-columns: repeat(auto-fit, minmax(116px, 1fr));
 }
 .settings-content .usage-grid span {
-  font-size: 12px;
+  font-size: var(--fs-caption);
 }
 .settings-content .allow-meter {
   min-width: 0;
@@ -1383,7 +1383,7 @@
 }
 
 /* Account delete: what goes and what stays, above the typed confirm */
-.delete-facts { margin: 0 0 4px; padding-left: 18px; display: grid; gap: 4px; font-size: 13px; line-height: 1.45; color: var(--text-2); }
+.delete-facts { margin: 0 0 4px; padding-left: 16px; display: grid; gap: 4px; font-size: var(--fs-secondary); line-height: 1.45; color: var(--text-2); }
 .delete-facts strong { color: var(--text); }
 
 /* Appearance: the accent colour is a full row to Workspace, 44px or taller */

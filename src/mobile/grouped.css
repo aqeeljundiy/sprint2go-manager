@@ -11,7 +11,7 @@
 }
 /* Section headers: 15/600 in sentence case, the same on phone and desktop (the system's rule; not iOS's small caps). */
 .g-head {
-  margin: 0 20px 8px;
+  margin: 0 16px 8px;
   font: var(--t-heading);
   color: var(--text);
   overflow: hidden;

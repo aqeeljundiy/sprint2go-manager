@@ -714,7 +714,7 @@
 }
 /* The destructive row stands apart: a divider and 8px before it. */
 .tb-set-sheet .as-item.danger {
-  margin-top: 9px;
+  margin-top: 8px;
   position: relative;
 }
 .tb-set-sheet .as-item.danger::before {

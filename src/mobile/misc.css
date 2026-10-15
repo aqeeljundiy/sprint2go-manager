@@ -1275,7 +1275,7 @@
 
 /* Vault notes: a multi-line field that grows with backup codes. */
 .vault-notes-input {
-  min-height: 72px;
+  min-height: 80px;
   resize: none;
   overflow: hidden;
   font: inherit;
@@ -1367,7 +1367,7 @@
 }
 .vg-meter i {
   height: 4px;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   background: var(--border);
   transition: background 0.2s ease-out;
 }
