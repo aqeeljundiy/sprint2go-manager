@@ -107,7 +107,7 @@ export function VaultSidebar({ items, clients, filter, onFilter, onNew, workspac
         </>
       )}
       <p className="muted small sb-label sb-note vault-note">
-        <ShieldCheck size={13} /> {t('Logins are kept encrypted. Copying one is logged, and the clipboard clears after 30 seconds.')}
+        <ShieldCheck size={16} /> {t('Logins are kept encrypted. Copying one is logged, and the clipboard clears after 30 seconds.')}
       </p>
     </>
   );
@@ -336,7 +336,7 @@ export function VaultView({
     return (
       <section className="tasks-pane view-enter vault-phone">
         <div className="vp-scroll">
-          {shown.length > 8 && (
+          {shown.length > 0 && (
             <label className="vp-search">
               <Search size={17} />
               <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('Search')} aria-label={t('Search logins')} enterKeyHint="search" />
@@ -351,8 +351,8 @@ export function VaultView({
             <EmptyState
               icon={<KeyRound size={22} />}
               title={t('No logins yet')}
-              text={t('Add a client login. Paste its 2FA setup key and the team gets the codes here.')}
-              // The create button is the one way to add a login on a phone (no second "New login" here).
+              text={usable ? t('Add a client login. Paste its 2FA setup key and the team gets the codes here.') : t('Logins can be added once the server is on and you are in your real company.')}
+              action={usable ? <button type="button" className="primary-btn" onClick={() => setEditing('new')}><Plus size={16} /> {t('Add a login')}</button> : undefined}
             />
           ) : (
             <VaultPhoneList items={list} clients={clients} me={me} ops={ops} onOpen={setOpenId} />
@@ -716,8 +716,12 @@ function VaultPhoneRow({ it, leaving, clients, me, ops, onOpen }: { it: VaultIte
             <span className="vp-title">{it.meta.title}</span>
             <span className="vp-user">{it.meta.username || host(it.meta.url) || (project ? project.name : t('No username'))}</span>
           </span>
-          {it.hasTotp && <ShieldCheck size={16} className="vp-mark" aria-label={t('Has a 2FA code')} />}
-          {shared && <Users size={16} className="vp-mark" aria-label={t('Shared')} />}
+          {(it.hasTotp || shared) && (
+            <span className="vp-marks">
+              {it.hasTotp && <ShieldCheck size={16} className="vp-mark" aria-label={t('Has a 2FA code')} />}
+              {shared && <Users size={16} className="vp-mark" aria-label={t('Shared')} />}
+            </span>
+          )}
         </div>
       </SwipeRow>
       {menu.menu}
@@ -996,11 +1000,11 @@ function VaultEditor({
           <div className="vault-grid vault-more">
           <label className="field">
             <span>{item?.hasTotp ? t('2FA setup key (saved; paste a new one to replace it)') : t('2FA setup key (optional)')}</span>
-            <input value={totp} onChange={(e) => setTotp(e.target.value)} placeholder={t('The key shown when you set up an authenticator app, or the otpauth:// link')} autoComplete="off" />
+            <input value={totp} onChange={(e) => setTotp(e.target.value)} placeholder={t('Setup key or otpauth link')} autoComplete="off" />
           </label>
           <label className="field">
             <span>{item?.hasNotes ? t('Notes (saved; type to replace)') : t('Notes (optional)')}</span>
-            <input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={t('Backup codes, security questions, who to ask')} autoComplete="off" />
+            <textarea className="vault-notes-input" rows={3} value={notes} onChange={(e) => { setNotes(e.target.value); e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px'; }} placeholder={t('Backup codes, security questions, who to ask')} autoComplete="off" />
           </label>
           <div className="field vault-project">
             <span>{term.One}</span>

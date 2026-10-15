@@ -640,7 +640,8 @@ function DrivePhone(props: Props & { live: DriveItem[]; q: string; query: string
                 )}
                 {(section !== 'media' || q) && (
                   <span className="fc-text">
-                    <span className="d-name">{i.name}</span>
+                    <FileIcon kind={i.kind} size={16} />
+                    <span className="d-name" title={i.name}>{i.name}</span>
                   </span>
                 )}
               </DriveItemCard>

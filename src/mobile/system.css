@@ -101,7 +101,7 @@
 
   /* ---------- Sheets: rows start at the 16 gutter (4 + the row's 12) ---------- */
   .sheet-body {
-    padding: 0 4px 12px;
+    padding: 0 4px calc(env(safe-area-inset-bottom) + 16px);
   }
 
   /* ---------- Rows in sheets and menus ---------- */
@@ -242,6 +242,7 @@
 /* N7: on touch screens a hover never sticks: rows and options go back to plain once the finger lifts. */
 @media (hover: none) {
   .as-item:hover,
+  .palette-back:hover,
   .sel-opt:hover,
   .nav-item:not(.active):hover,
   .mh-main:hover,
@@ -270,5 +271,22 @@
   .ln-h .link-btn {
     min-width: var(--tap);
     justify-content: flex-end;
+  }
+}
+
+/* Tabs inside a page on phones (a team's or project's People / Tasks / ...): the selected tab in the brand colour over a
+   2 px line that slides (slidingTabs.ts reads the border and draws a line), no tinted pill inside the bar. Filter chips
+   (Meet's) keep their pills. */
+@media (max-width: 767px) {
+  :not(.meet-pane) > .client-tabs > button {
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+    background: none;
+    transition: color 0.15s ease;
+  }
+  :not(.meet-pane) > .client-tabs > button.on {
+    border-bottom-color: var(--accent);
+    background: none;
+    color: var(--accent-text);
   }
 }

@@ -53,7 +53,7 @@ export function PastClients({ clients, tasks, canManage, onOpen, onReactivate }:
       </header>
       <div className="tracking-scroll">
         {past.length === 0 ? (
-          <EmptyState compact text={t('No past {projects}. When work with a {project} ends, choose “End work” on their page.', { projects: term.many, project: term.one })} />
+          <EmptyState icon={<Archive size={32} />} title={t('No past {projects}', { projects: term.many })} text={t('No past {projects}. When work with a {project} ends, choose “End work” on their page.', { projects: term.many, project: term.one })} />
         ) : (
           <div className="todo-group">
             {past.map((c) => {

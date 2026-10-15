@@ -572,7 +572,7 @@ export function ChatView(p: ViewProps) {
           <div className="chat-start-dm">
             <Avatar person={other} size={56} />
             <strong>{other.name}</strong>
-            {other.title && <span>{other.title}</span>}
+            {other.title && <span className="csd-title">{other.title}</span>}
             <p className="chat-start">{t('This is the start of your conversation with {name}.', { name: other.name })}</p>
             {!guest && (
               <button type="button" className="ghost-btn" onClick={() => setDetails('menu')}>

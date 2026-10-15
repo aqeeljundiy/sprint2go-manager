@@ -242,6 +242,24 @@
       transform 0.25s var(--ease),
       visibility 0s;
   }
+  /* Drawer: one 16px gutter, 44px rows. */
+  :root.phone-sidebar .sidebar .sb-top {
+    min-height: 52px;
+    padding-inline: 16px 8px;
+  }
+  :root.phone-sidebar .sidebar .nav-item {
+    min-height: var(--tap);
+  }
+  :root.phone-sidebar .sidebar .status-btn {
+    width: calc(100% - 32px);
+    min-height: var(--tap);
+    margin-inline: 16px;
+  }
+  :root.phone-sidebar .sidebar .dm-av {
+    width: 24px;
+    height: 24px;
+    font-size: var(--fs-caption);
+  }
   :root.phone-sidebar .scrim {
     display: block;
     position: fixed;
@@ -675,6 +693,9 @@
 
   /* ---------- The create button: floats 16 px above the bar at the right ---------- */
 
+  :root[data-theme='dark'] .fab {
+    color: var(--bg); /* dark ink on the lifted dark accent: white failed contrast */
+  }
   .fab {
     position: fixed;
     right: 16px;
@@ -888,7 +909,11 @@
   .palette-input {
     min-height: 56px;
     padding: 8px 4px;
-    gap: 4px;
+    gap: 8px;
+  }
+  .palette-back {
+    margin-left: 4px;
+    background: none;
   }
   .palette-input input {
     padding: 0;

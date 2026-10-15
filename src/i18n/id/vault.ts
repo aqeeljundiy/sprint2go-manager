@@ -173,6 +173,8 @@ const id: Record<string, string> = {
   "Lock": "Kunci",
   "Logins are kept encrypted. Copying one is logged, and the clipboard clears after 30 seconds.": "Login disimpan terenkripsi. Setiap penyalinan dicatat, dan papan klip dikosongkan setelah 30 detik.",
   "Re-save to encrypt": "Simpan ulang untuk mengenkripsi",
+  "Logins can be added once the server is on and you are in your real company.": "Login bisa ditambahkan setelah server menyala dan Anda berada di perusahaan asli.",
+  "Setup key or otpauth link": "Kunci penyiapan atau tautan otpauth",
 };
 
 export default id;

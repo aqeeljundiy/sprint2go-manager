@@ -6,7 +6,7 @@
    ========================================================================== */
 
 @media (max-width: 767px) {
-  /* The list: Apple Notes' grouped cards under date sections on the grouped grey, the search pill at the bottom. */
+  /* The list: flat rows under date sections, flush with the 16px gutter, the search pill at the bottom. */
   .notes-phone {
     flex: 1;
     min-height: 0;
@@ -50,7 +50,7 @@
     margin-top: 24px;
   }
   .nl-section:first-child {
-    margin-top: 12px;
+    margin-top: 16px;
   }
   .nl-sec-head {
     margin: 0 16px 8px;
@@ -60,13 +60,9 @@
     color: var(--text);
   }
   .nl-card {
-    margin: 0 16px;
-    border-radius: var(--r-card);
-    background: var(--surface);
+    margin: 0;
+    background: none;
     overflow: hidden;
-  }
-  :root[data-theme='dark'] .nl-card {
-    background: #1c1c1f;
   }
   .notes-phone > .nl-scroll > .nl-card {
     margin-top: 12px;
@@ -102,8 +98,8 @@
     content: '';
     position: absolute;
     top: 0;
-    left: 28px;
-    right: 16px;
+    left: 16px;
+    right: 0;
     height: 1px;
     background: var(--border);
   }
@@ -150,10 +146,7 @@
     height: 8px;
   }
   .note-swipe .swipe-face {
-    background: var(--surface);
-  }
-  :root[data-theme='dark'] .nl-card .note-swipe .swipe-face {
-    background: #1c1c1f;
+    background: var(--bg);
   }
   .nl-deleted-note {
     margin: 12px 16px 8px;
@@ -180,7 +173,7 @@
     min-height: 40px;
     margin-left: -12px;
   }
-  /* Search: a 48 px pill at the bottom, left of the create button. */
+  /* Search: a full-width 48 px pill at the bottom; the create button floats above the dock. */
   .nl-search-dock {
     flex: none;
     padding: 8px 16px 12px;
@@ -197,7 +190,7 @@
     align-items: center;
     gap: 8px;
     height: 48px;
-    margin-right: calc(56px + 16px);
+    margin-right: 0;
     padding: 0 8px 0 16px;
     border-radius: var(--r-pill);
     background: var(--surface);

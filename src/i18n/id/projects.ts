@@ -56,6 +56,7 @@ const id: Record<string, string> = {
 
   // Past projects and ending work (PastClients, EndClientDialog)
   'Work that has ended. Everything stays here to read, and you can start again any time.': 'Pekerjaan yang sudah berakhir. Semuanya tetap bisa dibaca di sini, dan Anda bisa memulai lagi kapan saja.',
+  'No past {projects}': 'Belum ada {projects} lama',
   'No past {projects}. When work with a {project} ends, choose “End work” on their page.': 'Belum ada {projects} lama. Saat kerja sama dengan suatu {project} berakhir, pilih “Akhiri kerja sama” di halamannya.',
   '{from} to {to}': '{from} sampai {to}',
   'Until {to}': 'Sampai {to}',

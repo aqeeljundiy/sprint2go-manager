@@ -68,11 +68,13 @@
     white-space: nowrap;
   }
   .set-account-text small {
-    font-size: var(--fs-body);
+    font-size: var(--fs-secondary);
     color: var(--text-3);
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    word-break: break-all;
   }
   /* One section, full screen: the screen's title already says it. */
   .settings-push .settings-content {
@@ -121,19 +123,50 @@
     margin-top: 4px;
   }
   .settings-push .set-block > h3 {
-    margin: 0 16px 8px;
+    margin: 0 0 8px;
   }
-  .settings-push .set-block > :not(h3) {
+  /* The card is the run of rows; headers and footer hints sit outside it on the ground. */
+  .settings-push .set-block > :not(h3, h4, p, small, .set-hint, .g-foot, .smooth-h:not(:has(.set-row, .acct-row, .g-row))) {
     background: var(--surface);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    border-radius: 0;
   }
-  .settings-push .set-block > h3 + *,
-  .settings-push .set-block > :first-child:not(h3) {
+  .settings-push .set-block > :is(h3, h4, p, small, .set-hint, .g-foot, .smooth-h:not(:has(.set-row, .acct-row, .g-row))) {
+    background: none;
+    border: 0;
+  }
+  .settings-push .set-block > :is(h3, h4, p, small, .set-hint, .g-foot, .smooth-h:not(:has(.set-row, .acct-row, .g-row))) + :not(h3, h4, p, small, .set-hint, .g-foot, .smooth-h:not(:has(.set-row, .acct-row, .g-row))),
+  .settings-push .set-block > :first-child:not(h3, h4, p, small, .set-hint, .g-foot, .smooth-h:not(:has(.set-row, .acct-row, .g-row))) {
+    border-top: 1px solid var(--border);
     border-top-left-radius: var(--r-card);
     border-top-right-radius: var(--r-card);
   }
-  .settings-push .set-block > :last-child {
+  .settings-push .set-block > :not(h3, h4, p, small, .set-hint, .g-foot, .smooth-h:not(:has(.set-row, .acct-row, .g-row))):is(:last-child, :has(+ :is(h3, h4, p, small, .set-hint, .g-foot)), :has(+ .smooth-h + :is(h3, h4, p, small, .set-hint, .g-foot)), :has(+ .smooth-h:last-child)) {
+    border-bottom: 1px solid var(--border);
     border-bottom-left-radius: var(--r-card);
     border-bottom-right-radius: var(--r-card);
+  }
+  /* A label with a picked value: one line, the value right-aligned and cut short. */
+  .settings-push .settings-content .set-block .set-row:has(> .sel) {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+  }
+  .settings-push .settings-content .set-block .set-row:has(> .sel) > span:first-child {
+    flex: 0 0 auto;
+    width: auto;
+  }
+  .settings-push .acct-list > .mx-only {
+    min-height: var(--row-1);
+  }
+  .settings-push .acct-list > .mx-only + *::before {
+    left: 16px;
+  }
+  .settings-push .settings-content .set-block .set-row:has(> .sel) > .sel {
+    flex: 0 1 auto;
+    min-width: 0;
+    margin-left: auto;
   }
   .settings-push .set-block .set-row {
     position: relative;
@@ -162,6 +195,11 @@
   .settings-push .set-row .switch {
     width: 51px;
     height: 32px;
+  }
+  .settings-push .set-row .switch::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
   }
   .settings-push .set-row .switch span {
     width: 28px;
@@ -412,7 +450,7 @@
   .settings-push .settings-content > :is(h2, h3),
   .settings-push .set-block > h2 {
     margin: 24px 0 8px;
-    padding: 0 16px;
+    padding: 0;
     font: var(--t-heading);
     letter-spacing: 0;
     text-transform: none;
@@ -428,16 +466,20 @@
     min-height: var(--row-1);
     margin: 0;
     padding: 12px 16px;
-    border: 0;
+    border: 1px solid var(--border);
+    border-top: 0;
+    border-bottom: 0;
     border-radius: 0;
     background: var(--surface);
   }
   .settings-push .settings-content > :not(.set-row) + .set-row,
   .settings-push .settings-content > .set-row:first-child {
+    border-top: 1px solid var(--border);
     border-top-left-radius: var(--r-card);
     border-top-right-radius: var(--r-card);
   }
   .settings-push .settings-content > .set-row:not(:has(+ .set-row)) {
+    border-bottom: 1px solid var(--border);
     border-bottom-left-radius: var(--r-card);
     border-bottom-right-radius: var(--r-card);
   }
@@ -466,7 +508,7 @@
   .settings-push .g-foot {
     display: block;
     margin: 8px 0 0;
-    padding: 0 16px;
+    padding: 0;
     font: var(--t-secondary);
     color: var(--text-3);
   }
@@ -781,8 +823,23 @@
 
   /* Notifications: this device's card. */
   .settings-push .push-card {
-    border: 0;
+    padding: 16px;
+    border: 1px solid var(--border);
     border-radius: var(--r-card);
+    background: var(--surface);
+  }
+  .settings-push .push-card .push-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 16px 0 0;
+    padding: 0;
+  }
+  .settings-push .push-card .push-actions > * {
+    flex: 1 1 100%;
+    justify-content: center;
+    min-height: 48px;
+    box-shadow: none;
   }
   .settings-push .push-card .push-text {
     gap: 4px;
@@ -1066,5 +1123,36 @@
     border-radius: var(--r-card);
     background: var(--surface);
     font: var(--t-secondary);
+  }
+}
+
+/* Mail storage: emptying Spam or Trash is a red text action, only when there is something to empty. */
+.settings-push .mx-empty-btn {
+  min-height: var(--tap);
+  margin-left: auto;
+  padding: 0;
+  font: var(--t-segment);
+  color: var(--danger);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* Teams: a team's dot and the Open Teams icon share one 24 px leading slot, so the names and dividers line up. */
+@media (max-width: 767px) {
+  .settings-push .set-rows .g-group:has(.has-dot) .g-row > :first-child:is(svg, .g-pic) {
+    display: inline-flex;
+    justify-content: center;
+    flex: none;
+    width: 24px;
+    min-width: 24px;
+  }
+  .settings-push .set-rows .g-group:has(.has-dot) .g-row {
+    gap: 12px;
+  }
+  .settings-push .set-rows .g-group:has(.has-dot) .g-row + .g-row::before {
+    left: 52px;
+  }
+  .settings-push .set-rows .g-foot {
+    padding: 0 16px;
   }
 }

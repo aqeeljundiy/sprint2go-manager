@@ -28,8 +28,7 @@
   /* ---------- Under the greeting (the bar's title): the day and what needs you, one secondary line ---------- */
 
   .home-greet {
-    padding: 0 16px;
-    margin-bottom: 8px;
+    padding: 4px 16px 0;
   }
   .hg-sum {
     margin: 0;
@@ -224,8 +223,14 @@
   .home-phone .htd-events + .htd-tasks .swipe-row:first-child .htd-task {
     box-shadow: inset 56px 0 0 var(--bg), inset 0 1px 0 var(--line);
   }
+  .home-phone .htd-ev {
+    align-items: stretch;
+  }
   .home-phone .htd-ev time {
-    width: 44px;
+    display: flex;
+    align-items: center;
+    flex: none;
+    width: 40px;
     margin-right: 12px;
     font: var(--t-body);
     color: var(--text-2);
@@ -233,6 +238,19 @@
   .home-phone .htd-ev-title,
   .home-phone .htd-title {
     font-size: var(--fs-body);
+  }
+  /* The whole row height is the tap, not just the line of text. */
+  .home-phone .htd-ev-title {
+    flex: 1;
+    min-width: 0;
+    min-height: var(--row-1);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    text-align: left;
+  }
+  .home-phone .htd-ev .ghost-btn {
+    align-self: center;
   }
   .home-phone .htd-ev .ghost-btn {
     min-height: var(--tap);
@@ -295,7 +313,8 @@
   /* ---------- Set-up and the demo: single rows at the end ---------- */
 
   .home-rows {
-    margin-top: 16px;
+    margin-top: 24px;
+    box-shadow: inset 0 1px 0 var(--line);
     padding: 0 16px;
   }
   .home-row {
@@ -360,5 +379,22 @@
   }
   .home-setup-sheet .setup-card > h2 {
     display: none;
+  }
+  /* Rows sit straight on the sheet (no tile inside it), on the 16 gutter. */
+  .home-setup-sheet .setup-card ul,
+  .home-try-sheet .setup-card ul {
+    border-radius: 0;
+    background: none;
+  }
+  .home-setup-sheet .setup-card li,
+  .home-try-sheet .setup-card li {
+    gap: 12px;
+    padding: 12px;
+    border-top-color: var(--line);
+  }
+  .home-setup-sheet .sheet-body,
+  .home-try-sheet .sheet-body {
+    padding-top: 4px;
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
   }
 }

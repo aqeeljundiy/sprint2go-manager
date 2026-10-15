@@ -16,7 +16,7 @@ mkdirSync(dir, { recursive: true });
 const env = existsSync('.env') ? readFileSync('.env', 'utf8') : readFileSync('.env.example', 'utf8');
 const PASSWORD = /SEED_PASSWORD=(.*)/.exec(env)?.[1]?.trim() || /SEED_PASSWORD=(.*)/.exec(readFileSync('.env.example', 'utf8'))[1].trim();
 
-const SIZES = [
+const SIZES = process.env.ONLY ? [{ id: 'phone375', width: 375, height: 812, mobile: true }] : [
   { id: 'phone375', width: 375, height: 812, mobile: true },
   { id: 'phone375dark', width: 375, height: 812, mobile: true, dark: true },
   { id: 'phone430', width: 430, height: 932, mobile: true },
@@ -138,40 +138,85 @@ for (const size of SIZES) {
     if (ok !== 200) throw new Error('login failed: ' + ok);
     await ctx.storageState({ path: auth });
   }
-  const open = async () => {
-    await page.goto(BASE + route, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(1600);
+  const app = route.split('/')[1];
+  // Goes to an address (the app may remember a last place; an exact address is always honoured).
+  const go = async (url) => {
+    await page.goto(url, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(1500);
+    // On phones the launcher can cover the app at first: step into the app through its tile.
+    const tile = page.locator(`.launcher.on [data-tile="${app}"]`);
+    if (await tile.count().catch(() => 0)) (await tile.first().click().catch(() => {}), await page.waitForTimeout(900));
   };
   const shot = async (name) => {
     const file = `${size.id}__${name}.png`;
     await page.screenshot({ path: join(dir, file) });
     return file;
   };
-  const sizeRep = { size: size.id, states: [] };
-  await open();
-  sizeRep.states.push({ state: 'start', url: page.url(), shot: await shot('00-start'), issues: await page.evaluate(measure) });
-  // Phones and the first size get every tap; the others get the start screen and the first taps only.
-  const limit = size.id === 'phone375' ? MAX : size.id === 'phone375dark' ? 0 : Math.min(12, MAX);
-  const list = (await page.evaluate(controls, RISKY.source)).slice(0, limit);
-  let n = 0;
-  for (const c of list) {
-    n++;
-    try {
-      await open();
+  // What screen this is, ignoring which item is open: the route with ids taken out, the overlay on top, and the set of
+  // components on screen (the same layout with other data is the same screen; another tab or menu is not).
+  const signature = () =>
+    page.evaluate(() => {
+      const url = location.pathname.replace(/\/[^/]*\d[^/]*/g, '/:id').replace(/\/(note|t|ch|thread|task|p|c)-[^/]+/g, '/:id');
+      const layers = [...document.querySelectorAll('.sheet, .modal, .popover, .drawer, .push-screen, .action-sheet, .menu, [role=dialog], [role=menu]')]
+        .filter((el) => { const r = el.getBoundingClientRect(); return r.width > 40 && r.height > 40 && getComputedStyle(el).visibility !== 'hidden'; })
+        .map((el) => el.className.toString().split(' ')[0])
+        .join('|');
+      const kinds = new Set();
+      document.querySelectorAll('.main *, [role=dialog] *, .sheet *, .modal *').forEach((e) => {
+        if (e.getBoundingClientRect().height > 0) e.classList.forEach((c) => !/^(on|lp|open|show|active|sel|leaving|is-|i-)/.test(c) && kinds.add(c));
+      });
+      return url + '#' + layers + '#' + [...kinds].sort().join(' ');
+    });
+  // A state is an address plus the taps since it (taps that opened menus or sheets without changing the address).
+  const replay = async (st) => {
+    await go(st.url);
+    for (const label of st.taps) {
       const now = await page.evaluate(controls, RISKY.source);
-      const same = now.find((x) => x.key === c.key) ?? now.find((x) => x.label === c.label);
-      if (!same) continue;
-      const before = await page.evaluate(() => document.body.innerHTML.length + location.href);
-      await page.mouse.click(same.x, same.y);
-      await page.waitForTimeout(700);
-      const after = await page.evaluate(() => document.body.innerHTML.length + location.href);
-      if (after === before) {
-        sizeRep.states.push({ state: `tap "${c.label}"`, nothing: true });
-        continue;
+      const c = now.find((x) => x.label === label);
+      if (!c) return false;
+      await page.mouse.click(c.x, c.y);
+      await page.waitForTimeout(650);
+    }
+    return true;
+  };
+  const sizeRep = { size: size.id, states: [] };
+  await go(BASE + route);
+  const root = { url: page.url(), taps: [], depth: 0, path: [] };
+  const seen = new Set([await signature()]);
+  sizeRep.states.push({ state: 'start', path: [], url: page.url(), shot: await shot('000-start'), issues: await page.evaluate(measure) });
+  // Phone 375 explores three levels deep; iPad and the bigger phone the first level; dark the start only.
+  const cap = size.id === 'phone375' ? MAX : size.id === 'phone375dark' ? 0 : Math.min(40, MAX);
+  const depthCap = size.id === 'phone375' ? 3 : 1;
+  const queue = [root];
+  let n = 0;
+  while (queue.length && n < cap) {
+    const st = queue.shift();
+    if (!(await replay(st).catch(() => false))) continue;
+    const list = (await page.evaluate(controls, RISKY.source)).slice(0, 60);
+    if (process.env.DEBUG) console.log(size.id, JSON.stringify(st.path), page.url(), list.length);
+    for (const c of list) {
+      if (n >= cap) break;
+      try {
+        if (!(await replay(st))) break;
+        const now = await page.evaluate(controls, RISKY.source);
+        const same = now.find((x) => x.key === c.key) ?? now.find((x) => x.label === c.label);
+        if (!same) continue;
+        await page.mouse.click(same.x, same.y);
+        await page.waitForTimeout(700);
+        // Left the app (the launcher, another app): not this app's screen.
+        if (!new URL(page.url()).pathname.startsWith('/' + app)) continue;
+        const sig = await signature();
+        if (process.env.DEBUG) console.log('  tap', c.label, '->', page.url(), seen.has(sig) ? 'seen' : 'new');
+        if (seen.has(sig)) continue;
+        seen.add(sig);
+        n++;
+        const path = [...st.path, c.label];
+        sizeRep.states.push({ state: path.map((l) => `tap "${l}"`).join(' > '), path, url: page.url(), shot: await shot(String(n).padStart(3, '0') + '-' + path.join('-').replace(/[^a-z0-9]+/gi, '-').slice(-50)), issues: await page.evaluate(measure) });
+        const moved = page.url() !== st.url;
+        if (st.depth + 1 < depthCap) queue.push({ url: moved ? page.url() : st.url, taps: moved ? [] : [...st.taps, c.label], depth: st.depth + 1, path });
+      } catch (e) {
+        sizeRep.states.push({ state: `tap "${c.label}"`, path: [...st.path, c.label], error: String(e).slice(0, 160) });
       }
-      sizeRep.states.push({ state: `tap "${c.label}"`, url: page.url(), shot: await shot(String(n).padStart(2, '0') + '-' + c.label.replace(/[^a-z0-9]+/gi, '-').slice(0, 30)), issues: await page.evaluate(measure) });
-    } catch (e) {
-      sizeRep.states.push({ state: `tap "${c.label}"`, error: String(e).slice(0, 160) });
     }
   }
   sizeRep.consoleErrors = [...new Set(errors)].slice(0, 20);

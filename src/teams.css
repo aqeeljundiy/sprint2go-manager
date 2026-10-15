@@ -639,3 +639,18 @@ button.team-row:hover,
   justify-self: center;
   margin-top: 4px;
 }
+
+/* Settings: Review as a switch row (label left, switch right). */
+.team-review-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 40px;
+  text-align: left;
+  color: var(--text);
+}
+.team-review-row > span:first-child {
+  flex: 1;
+  min-width: 0;
+}

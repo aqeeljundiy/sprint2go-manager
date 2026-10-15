@@ -45,7 +45,7 @@
   align-items: center;
   gap: 4px;
   min-height: 52px;
-  padding: 8px 4px 8px 16px;
+  padding: 8px 8px 8px 16px;
   border-bottom: 1px solid var(--line);
 }
 .tb-vpill {
@@ -54,7 +54,7 @@
   gap: 8px;
   min-width: 0;
   max-width: 60%;
-  min-height: 36px;
+  min-height: var(--tap);
   padding: 0 12px;
   border-radius: var(--r-pill);
   font: var(--t-segment);
@@ -305,15 +305,13 @@
 }
 .tb-crd-meta {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap; /* every field readable: a second line rather than one cut off at the edge */
   align-items: center;
-  gap: 12px;
+  gap: 4px 12px;
   margin-top: 4px;
   font: var(--t-secondary);
   color: var(--text-2);
   min-width: 0;
-  overflow: hidden;
-  mask-image: linear-gradient(to right, #000 calc(100% - 16px), transparent);
 }
 .tb-crd-f {
   display: inline-flex;
@@ -1454,4 +1452,21 @@ button.tb-page-title:active {
 .tb-board-wrap.phone .tb-col-empty {
   padding: 8px;
   font: var(--t-secondary);
+}
+
+/* Phone grid: one hairline weight, the 16px gutter on the pinned column, no rule under the last row. */
+.tb-grid-wrap.touch .tb-first .tb-cell,
+.tb-grid-wrap.touch .tb-th.tb-pinned,
+.tb-grid-wrap.touch .tb-first {
+  box-shadow: inset -1px -1px 0 var(--line);
+}
+.tb-grid-wrap.touch .tb-first .tb-cell,
+.tb-grid-wrap.touch .tb-th.tb-pinned {
+  padding-left: 16px;
+}
+.tb-grid-wrap.touch .tb-row:last-child .tb-cell {
+  box-shadow: inset -1px 0 0 var(--line);
+}
+@media (hover: none) {
+  .tb-grid-wrap.touch .tb-row:hover .tb-cell { background: var(--surface); }
 }

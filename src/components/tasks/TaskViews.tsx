@@ -395,7 +395,7 @@ export function TaskViews({
       ...(onBrainDump && (kind === 'mine' || kind === 'today' || kind === 'upcoming') ? [{ label: t('Brain dump'), icon: Sparkles, run: onBrainDump }] : []),
       ...(bar?.more ?? []).map((a) => ({ ...a, group: a.group ? `place-${a.group}` : 'place' })),
     ],
-    { menu: true, title: label },
+    { menu: !phone, title: label },
   );
   const allOn = selected.length === open.length && open.length > 0;
   const phoneTop =

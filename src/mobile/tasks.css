@@ -508,10 +508,16 @@
     padding-bottom: 0;
   }
   .ucal-dhead {
+    align-items: center;
     min-height: var(--row-1);
-    padding: var(--sp-4) var(--sp-2) 0 var(--gutter);
+    padding: var(--sp-2) var(--sp-1) 0 var(--gutter);
+  }
+  .ucal-day + .ucal-day .ucal-dhead {
+    margin-top: var(--sp-2);
+    border-top: 1px solid var(--line);
   }
   .ucal-dhead .t-heading {
+    padding: 0;
     font-size: var(--fs-body);
   }
   .ucal-day.no-tasks .t-heading {
@@ -596,6 +602,13 @@
   .qa-todo .qa-chips {
     gap: 8px;
     padding: 4px 16px 12px;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+  }
+  .qa-todo .qa-chips::after {
+    content: '';
+    flex: none;
+    width: 16px;
   }
   .qa-todo .qa-chip {
     height: 36px;
@@ -704,9 +717,9 @@
   }
   .qa-todo .qa-foot .qa-send {
     margin-left: auto;
-    width: 36px;
-    height: 36px;
-    min-height: 36px;
+    width: var(--tap);
+    height: var(--tap);
+    min-height: var(--tap);
     transition: opacity 0.15s ease, transform 0.15s ease;
   }
   .qa-todo .qa-foot .qa-send::before {
@@ -778,8 +791,8 @@
   }
   .tdp > .td-title-row {
     display: flex;
-    gap: 8px;
-    padding: 4px 16px 8px 8px;
+    gap: 0;
+    padding: 4px 16px 8px 4px; /* ring centred on the icon column (26), title on the value column (48) */
   }
   .tdp .td-check {
     width: 44px;
@@ -872,7 +885,7 @@
     content: '';
     position: absolute;
     top: 0;
-    left: 52px; /* lines up with the label: 16 + the 24 icon + 12 */
+    left: 48px; /* lines up with the value text: 16 + the 20 icon + 12 */
     right: 0;
     height: 1px;
     background: var(--line);
@@ -1328,7 +1341,7 @@
   }
   /* Grouped cards at 16 from the edge; each header 24 above, 8 below, at the card's text column (32). */
   .tbr-group {
-    margin: 16px 16px 0;
+    margin: 16px 0 0;
     animation: fadeIn 0.2s ease-out backwards;
   }
   .tbr-group + .tbr-group {
@@ -1452,7 +1465,7 @@
 /* ---------- Display on a phone: Todoist's sheet of grouped cards (DisplaySheet) ---------- */
 @media (max-width: 767px) {
   .ds-sheet {
-    background: var(--bg);
+    background: var(--surface-2);
   }
   .ds-sheet .sheet-body {
     padding: 0 16px 24px;
@@ -1465,9 +1478,9 @@
     align-items: center;
     gap: 8px;
     min-height: 52px;
-    margin: 0 -16px 4px;
-    padding: 0 12px;
-    background: var(--bg);
+    margin: 0 -16px 8px;
+    padding: 0 16px;
+    background: var(--surface-2);
   }
   .ds-phead h2 {
     flex: 1;
@@ -1509,13 +1522,13 @@
     transform: scale(0.94);
   }
   .ds-plab {
-    margin: 16px 4px 8px;
+    margin: 24px 16px 8px;
     color: var(--text-3);
     font-size: var(--fs-body);
     font-weight: 600;
   }
   .ds-pbody > .ds-plab:first-child {
-    margin-top: 4px;
+    margin-top: 16px;
   }
   .ds-card {
     overflow: hidden;
@@ -1761,13 +1774,23 @@
     line-height: 26px;
   }
   .tdp-lab {
-    display: block;
-    font: var(--t-caption);
-    color: var(--text-3);
+    display: none; /* rows have no labels on phones: the icon says what the row is */
   }
   .tdp-chips {
-    flex-wrap: wrap;
-    overflow-x: visible;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+  .tdp-chips > * {
+    flex: none;
+  }
+  .tdp-chips {
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+  }
+  .tdp-chips::after {
+    content: '';
+    flex: none;
+    width: 8px;
   }
   .tdp-chips .sel.td-chip,
   .tdp-chips button.td-chip,
@@ -1806,5 +1829,42 @@
     align-items: flex-start;
     justify-content: center;
     gap: 0;
+  }
+}
+
+/* ---------- The side drawer on phones (Sidebar.tsx): 16 gutter, 44 rows, the current one a tinted fill ---------- */
+@media (max-width: 767px) {
+  :root.phone-sidebar .sidebar .sb-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: var(--row-1);
+    padding: 0 4px 0 16px;
+    margin-bottom: 8px;
+  }
+  :root.phone-sidebar .sidebar .sb-top .sb-title {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+  }
+  :root.phone-sidebar .sidebar .sb-top :is(button, .icon-btn):not(.collapse-btn) {
+    width: var(--tap);
+    height: var(--tap);
+  }
+  :root.phone-sidebar .sidebar .sb-panel .nav-item {
+    min-height: var(--row-1);
+    margin: 0 8px;
+    padding-left: 8px;
+    border-radius: var(--r-tile);
+    box-shadow: none;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  :root.phone-sidebar .sidebar .sb-panel .nav-item.active {
+    background: var(--accent-soft);
+    color: var(--accent-text);
+    box-shadow: none;
+  }
+  :root.phone-sidebar .sidebar .sb-panel .nav-item.active svg {
+    color: var(--accent-text);
   }
 }

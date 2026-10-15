@@ -277,7 +277,7 @@ interface AppProps {
 }
 
 // The # fills its whole box, so at the bar's 24 px it looks bigger and heavier than the round icons beside it: drawn at 20.
-const ChannelsIcon = forwardRef<SVGSVGElement, LucideProps>((props, ref) => <Hash ref={ref} {...props} size={20} />) as LucideIcon;
+const ChannelsIcon = forwardRef<SVGSVGElement, LucideProps>((props, ref) => <Hash ref={ref} {...props} size={22} />) as LucideIcon;
 
 export default function App({ user, signedInUsers, allUsers, workspaces: allWorkspaces, setWorkspaces, onSwitchUser, onAddUser, onSignOut, onInvite: inviteUser, onWorkspace, onUpdateUser, topBar }: AppProps) {
   const [settings, updateSettings] = useSettings(user);
@@ -4143,7 +4143,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
       case 'tasks':
         return taskBrowse || !['today', 'upcoming', 'mine'].includes(taskScope.kind) ? 'browse' : taskScope.kind;
       case 'calendar':
-        return calMeetings ? 'meetings' : calView === 'month' ? 'month' : 'schedule';
+        return calMeetings ? 'meetings' : calView === 'month' || calView === 'day' || calView === 'schedule' ? calView : '';
       case 'notes':
         return notesFilter === 'shared' ? 'shared' : 'notes';
       case 'drive':
@@ -4176,7 +4176,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
         if (id === 'meetings') return setCalMeetings(true);
         setCalMeetings(false);
         // The bar's Schedule is the schedule: a Day opened from Month (or picked in the title) doesn't stay behind it.
-        return setCalView(id === 'month' ? 'month' : 'schedule');
+        return setCalView(id === 'month' ? 'month' : id === 'day' ? 'day' : 'schedule');
       case 'notes':
         setNoteId(null);
         return setNotesFilter(id === 'shared' ? 'shared' : 'all');
@@ -4343,6 +4343,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
       case 'calendar':
         return bar([
           { id: 'schedule', label: tx('calendar view', 'Schedule'), icon: List }, // the noun ("Jadwal"), not the verb
+          { id: 'day', label: t('Day'), icon: CalendarRange },
           { id: 'month', label: t('Month'), icon: CalendarDays },
           // Meetings live in Meet (one place for them); Calendar is Schedule and Month.
         ]);

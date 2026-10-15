@@ -20,11 +20,27 @@
   .project-pane .tasks-head {
     flex-wrap: nowrap;
     justify-content: flex-start;
-    gap: 8px;
+    gap: 12px;
+    margin-bottom: 16px;
   }
   .project-pane .tasks-head .proj-people {
     margin-left: auto;
     min-height: var(--tap);
+    gap: 8px;
+  }
+  /* People on phones: 32 px avatars on the system scale, initials at 13 px. */
+  .project-pane .tasks-head .proj-people .avatar-stack .avatar[style] {
+    width: 32px !important; /* Avatar sets its size inline */
+    height: 32px !important;
+    font-size: 13px !important;
+  }
+  .project-pane .tasks-head .client-status button {
+    padding-inline: 12px;
+  }
+  /* Cards line up with the header on the 16 px system gutter (the pane pads 12). */
+  .project-pane .proj-sections,
+  .project-pane .hub-overview > .needs-card.needs-card {
+    margin-inline: 4px !important; /* polish.css zeroes it with !important */
   }
   .project-pane .tasks-head .client-status > .ghost-btn,
   .project-pane .tasks-head .tpl-btn {
@@ -45,7 +61,7 @@
     gap: 12px;
     width: 100%;
     min-height: 48px;
-    padding: 8px 12px;
+    padding: 0 12px 0 16px;
     font-size: var(--fs-body);
     font-weight: 400;
     color: var(--text);
@@ -57,7 +73,7 @@
     content: '';
     position: absolute;
     top: 0;
-    left: 52px;
+    left: 60px;
     right: 0;
     height: 1px;
     background: var(--line);
@@ -69,7 +85,7 @@
     flex: none;
     display: grid;
     place-items: center;
-    width: 30px;
+    width: 32px;
     height: 32px;
     border-radius: var(--r-tile);
     background: var(--surface-2);
@@ -183,12 +199,16 @@
   .proj-new-sheet .pns-name {
     width: 100%;
     min-height: 48px;
-    padding: 0 8px;
+    padding: 0 16px;
     border: 0;
-    border-bottom: 1px solid var(--line);
+    box-shadow: inset 0 -1px 0 var(--line);
     background: none;
     font: var(--t-field);
     outline: 0;
+  }
+  .proj-new-sheet .sel-flat,
+  .proj-new-sheet .sel-flat > button {
+    padding-inline: 16px;
   }
   .proj-new-sheet .sheet-foot .primary-btn {
     flex: 1;

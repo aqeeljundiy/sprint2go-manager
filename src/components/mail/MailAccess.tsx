@@ -6,7 +6,6 @@ import { Select, type Option } from '../ui/Select';
 import { PersonSelect } from '../ui/PeoplePicker';
 import { PersonCell, Badge } from '../ui/Person';
 import { SmoothHeight, useLeaving } from '../ui/Smooth';
-import { EmptyState } from '../ui/EmptyState';
 import { loadAccess, postJson, type AccessInfo, type Forwarding, type Keep } from './teamsApi';
 import { BusyButton, ErrorLine, MailLog, SwitchLine } from './teamsBits';
 import { mark, t } from '../../i18n';
@@ -148,7 +147,11 @@ function Delegates({ ws, users, me, box, multiple, onSaved, toast }: { ws: Works
     <section className="set-block">
       <h3>{multiple ? t('Who else opens {email}', { email: box.email }) : t('Who else opens your mailbox')}</h3>
       <div className="acct-list mx-people">
-        {rows.length === 0 && <EmptyState compact text={t('Only you. Give a teammate access and they can read, answer and send from it.')} />}
+        {rows.length === 0 && (
+          <div className="acct-row mx-only">
+            <span>{t('Only you')}</span>
+          </div>
+        )}
         {rows.map(({ item: x, leaving }) => {
           const u = users.find((y) => y.id === x.userId);
           return (

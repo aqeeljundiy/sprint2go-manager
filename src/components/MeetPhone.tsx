@@ -147,7 +147,7 @@ function ComingRow({ e, p, j }: { e: CalEvent; p: HomeProps; j: ReturnType<typeo
         <CallMark kind={k} />
         <span className="mh-text">
           <strong>{e.title}</strong>
-          <small>{[dayWord(start), fmtTimeRange(e.start, e.end), others ? tn(others, '{n} other', '{n} others') : ''].filter(Boolean).join(' · ')}</small>
+          <small>{[fmtTimeRange(e.start, e.end), others ? tn(others, '{n} other', '{n} others') : ''].filter(Boolean).join(' · ')}</small>
         </span>
       </button>
       {j.can(e) && (

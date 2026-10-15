@@ -426,7 +426,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    height: 36px;
+    height: 44px;
     margin: 8px 16px 4px;
     padding: 0 8px 0 12px;
     border-radius: var(--r-tile);
@@ -447,8 +447,9 @@
   .vp-clear {
     display: grid;
     place-items: center;
-    width: 32px;
-    height: 32px;
+    width: 44px;
+    height: 44px;
+    margin-right: -8px;
     color: var(--text-3);
   }
   .vp-swipe .swipe-face {
@@ -511,8 +512,13 @@
     flex: none;
     color: var(--text-3);
   }
+  .vp-marks {
+    display: flex;
+    flex: none;
+    gap: 4px;
+  }
   .vp-mark + .vp-mark {
-    margin-left: -8px;
+    margin-left: 0;
   }
   .vp-foot {
     text-wrap: balance;
@@ -699,7 +705,7 @@
   }
   :root[data-theme='dark'] .vp-form .vault-grid,
   :root[data-theme='dark'] .vp-form > .field {
-    background: #1c1c1f;
+    background: var(--surface-2);
   }
   /* The project: a row like iOS, its name on the left and the choice in grey on the right with a ›. */
   .vp-form .vault-project {
@@ -756,7 +762,7 @@
     margin: 0 16px 8px;
     padding: 0 8px 0 16px;
     border-radius: var(--r-pill);
-    background: var(--surface);
+    background: var(--surface-2);
     color: var(--text-3);
   }
   .tdir-search input {
@@ -794,7 +800,7 @@
     overflow: hidden;
     margin: 0 16px;
     border-radius: var(--r-card);
-    background: var(--surface);
+    background: var(--surface-2);
   }
   .tdir-row {
     position: relative;
@@ -900,9 +906,98 @@
   }
   /* Member rows: no hover box left behind after a tap (it showed as a stray rounded border). */
   .team-page .tdir-member {
-    width: calc(100% + 24px);
-    margin: 0 -12px;
+    width: calc(100% + 32px);
+    margin: 0 -16px;
     min-height: 56px;
+  }
+  /* The divider stops 16 from the right edge, like the directory's list. */
+  .team-page .tdir-member + .tdir-member::before {
+    right: 16px;
+  }
+  /* A team's page sits on the same 16 gutter as the directory; tabs are full 44 px taps. */
+  .team-page > .client-tabs.team-tabs {
+    padding: 8px 16px;
+  }
+  .team-page > .client-tabs.team-tabs > [role='tab'] {
+    min-height: var(--tap);
+  }
+  .tasks-pane.team-page:not(.has-list):not(.scope-briefs):not(.tasks-browse) > .tracking-scroll {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  /* The People tab already says People: the header row only carries the count and Add people. */
+  .team-page .team-block-head > .team-people-h {
+    font: var(--t-secondary);
+    color: var(--text-3);
+  }
+  /* Task rows: the title ends in an ellipsis 8 before the date. */
+  .team-page .team-task {
+    gap: 8px;
+  }
+  .team-page .team-task .team-row-text {
+    flex: 1;
+    min-width: 0;
+  }
+  .team-page .team-task .team-row-text > * {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .team-page .team-task .team-due {
+    flex: none;
+  }
+  /* Settings: label 8 above its field, sections 24 apart, controls full width. */
+  .team-page .team-settings {
+    gap: 24px;
+  }
+  .team-page .team-settings .team-field {
+    gap: 8px;
+  }
+  .team-page .team-settings .team-field > span:first-child {
+    font: var(--t-secondary);
+    font-weight: 600;
+    color: var(--text-2);
+  }
+  .team-page .team-settings .team-field input:not([type='checkbox']) {
+    min-height: var(--tap);
+    font-size: var(--fs-field);
+  }
+  .team-page .team-settings .tb-colors {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    gap: 4px;
+  }
+  .team-page .team-settings .tb-colors .tb-dot {
+    flex: none;
+    width: 32px;
+    height: 32px;
+  }
+  .team-page .team-settings .segmented {
+    display: flex;
+    width: 100%;
+  }
+  .team-page .team-settings .segmented > button {
+    flex: 1;
+    min-height: var(--tap);
+  }
+  .team-page .team-settings .team-hint {
+    margin-top: -16px;
+  }
+  .team-review-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: var(--tap);
+    text-align: left;
+    font: var(--t-body);
+    color: var(--text);
+  }
+  .team-review-row > span:first-child {
+    flex: 1;
+    min-width: 0;
   }
   .team-page .team-row {
     border-radius: 0;
@@ -1111,14 +1206,23 @@
   }
 }
 
-@media (max-width: 767px) {
-  /* Vault's passphrase: a disabled button is neutral grey (pale green read as broken), fields at 16 (no iOS zoom). */
-  .vault-gate .primary-btn:disabled {
-    background: var(--surface-2);
-    color: var(--text-3);
-    box-shadow: none;
-    opacity: 1;
+/* Vault's passphrase: a disabled button stays accent at 40% so it reads as the action, not a field. */
+.vault-gate .primary-btn:disabled {
+  opacity: 0.4;
+  box-shadow: none;
+}
+@media (min-width: 768px) {
+  .vault-gate {
+    place-items: start center;
+    padding-top: 12vh;
   }
+  .vault-gate-card {
+    border: 0;
+    background: none;
+    box-shadow: none;
+  }
+}
+@media (max-width: 767px) {
   .vault-gate input {
     font-size: var(--fs-field);
   }
@@ -1158,4 +1262,14 @@
   :root.no-app-bar {
     --fab-space: calc(88px + var(--tabbar-h));
   }
+}
+
+/* Vault notes: a multi-line field that grows with backup codes. */
+.vault-notes-input {
+  min-height: 72px;
+  resize: none;
+  overflow: hidden;
+  font: inherit;
+  font-size: var(--fs-field);
+  line-height: 1.4;
 }

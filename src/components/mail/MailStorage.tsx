@@ -94,9 +94,11 @@ export function MailStorage({ ws, onDelete, onEmpty, onOpen }: { ws: Workspace; 
                         <small>{x.count ? t('{emails}, {size}', { emails: tn(x.count, '{n} conversation', '{n} conversations'), size: fmtSize(x.bytes) }) : t('Empty')}</small>
                       </span>
                     </span>
-                    <button type="button" className="ghost-btn outline sm" disabled={!x.count} onClick={() => (onEmpty(w), setTimeout(load, 1500))}>
+                    {x.count > 0 && (
+                    <button type="button" className="link-btn danger mx-empty-btn" onClick={() => (onEmpty(w), setTimeout(load, 1500))}>
                       {w === 'spam' ? t('Empty Spam') : t('Empty Trash')}
                     </button>
+                    )}
                   </div>
                 );
               })}

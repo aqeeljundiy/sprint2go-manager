@@ -223,7 +223,7 @@
     color: var(--accent-text, var(--accent));
   }
   .mh-up {
-    padding: 0 16px 24px;
+    padding: 0;
   }
 
   /* Meet settings (from the drawer) */
@@ -469,7 +469,7 @@
     display: grid;
     gap: 4px;
     width: 100%;
-    padding: 24px 16px 8px;
+    padding: 24px 0 8px;
     text-align: left;
   }
   .m-group-phone strong {
@@ -545,7 +545,7 @@
 @media (max-width: 767px) {
   .mh-event .mhe-line {
     margin: 0;
-    padding: 4px 16px;
+    padding: 4px 0;
     font: var(--t-body);
     color: var(--text-2);
   }

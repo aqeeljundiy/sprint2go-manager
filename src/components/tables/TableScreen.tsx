@@ -81,7 +81,7 @@ export function TableScreen(p: ScreenProps) {
   const view = base ? tweaks.effective(base) : undefined;
   const differs = base ? tweaks.differs(base) : false;
   const [cardsOn, setCardsOn] = usePersisted<Record<string, boolean>>('s2g-tb-cards', {}); // per view, on this device
-  const cards = narrow && !!view && (view.kind === 'grid' || view.kind === 'list') && (cardsOn[view.id] ?? view.kind === 'list'); // a table is a real grid on phones too; List views are cards
+  const cards = narrow && !!view && (view.kind === 'grid' || view.kind === 'list') && (cardsOn[view.id] ?? (phone || view.kind === 'list')); // phones open cards; the grid is opt-in from the views sheet
   const [q, setQ] = useState('');
   const [searching, setSearching] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());

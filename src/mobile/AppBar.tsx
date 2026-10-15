@@ -104,18 +104,27 @@ function useShrinkOnScroll(on: boolean) {
   useEffect(() => {
     if (!on) return void setSmall(false);
     const last = new WeakMap<EventTarget, number>();
+    // Only a person's scroll counts: a view scrolling itself (Calendar's grid to the current time) must not hide it.
+    let touched = 0;
+    const onInput = () => (touched = Date.now());
     const onScroll = (e: Event) => {
       const el = e.target instanceof HTMLElement ? e.target : null;
       if (!el || !el.closest('.main')) return;
       const y = el.scrollTop;
+      if (Date.now() - touched > 1500 && y > 8) return void last.set(el, y);
       const before = last.get(el) ?? 0;
       if (Math.abs(y - before) < 8 && y > 8) return;
       last.set(el, y);
       const next = y > 8 && y > before;
       setSmall((was) => (was === next ? was : next));
     };
+    const ev = ['touchmove', 'wheel', 'keydown'] as const;
+    ev.forEach((n) => document.addEventListener(n, onInput, { capture: true, passive: true }));
     document.addEventListener('scroll', onScroll, true);
-    return () => document.removeEventListener('scroll', onScroll, true);
+    return () => {
+      ev.forEach((n) => document.removeEventListener(n, onInput, true));
+      document.removeEventListener('scroll', onScroll, true);
+    };
   }, [on]);
   return small;
 }

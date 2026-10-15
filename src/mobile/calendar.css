@@ -864,7 +864,7 @@
 
 @media (max-width: 767px) {
   .is-phone .sch {
-    padding-bottom: var(--fab-space);
+    padding-bottom: calc(var(--fab-space) + 72px);
   }
   /* Another month's name in the list (the bar names the one on screen): a section header, not sticky. */
   .is-phone .sch-month {
@@ -880,7 +880,7 @@
     display: flex;
     align-items: center;
     min-height: 32px;
-    padding: 0 16px 0 56px;
+    padding: 0 16px 0 60px;
     font-size: var(--fs-secondary);
     color: var(--text-3);
   }
@@ -941,7 +941,7 @@
   /* A task due that day: a card in the task colour with its check circle. */
   .is-phone .sch-task {
     gap: 0;
-    min-height: 32px;
+    min-height: 48px;
     padding: 0 4px 0 0;
     border-radius: var(--r-tile);
     background: var(--accent);
@@ -949,7 +949,7 @@
   }
   .is-phone .sch-task .ev-check {
     width: 40px;
-    height: 32px;
+    height: 48px;
     border: 0;
     border-radius: var(--r-tile) 0 0 var(--r-tile);
     background: none;
@@ -959,8 +959,16 @@
     inset: -6px 0;
   }
   .is-phone .sch-task-title {
-    min-height: 32px;
-    padding: 0 8px 0 0;
+    min-height: 48px;
+    padding: 6px 8px 6px 0;
+    line-height: 18px;
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+    align-content: center;
     font-size: var(--fs-secondary);
     font-weight: 600;
     color: #fff;
@@ -1815,5 +1823,26 @@
 @media (max-width: 767px) {
   .is-phone .sch-task .sch-task-title {
     color: var(--text);
+  }
+}
+
+/* Day/3-day/week on phones: room under the header so the first hour label is never cut, an 8 px right gutter,
+   and the same calm card as Schedule so an event looks like one object in every view. */
+@media (max-width: 767px) {
+  .tg-phone .tg-col {
+    padding-right: 8px;
+  }
+  .tg-phone .tg-scroll {
+    padding-top: 8px;
+  }
+  .tg-phone .block-event {
+    max-width: calc(100% - 8px);
+    padding-left: 10px;
+    background: color-mix(in srgb, var(--c) calc(var(--tile-tint) * 0.6), var(--surface));
+    box-shadow: inset 4px 0 0 var(--c), 0 0 0 1px var(--surface);
+    color: var(--text);
+  }
+  .tg-phone .block-event .be-time {
+    color: var(--text-2);
   }
 }

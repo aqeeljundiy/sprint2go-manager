@@ -841,13 +841,9 @@ export function HomeView(p: Props) {
     const inNeeds = new Set(needList.flatMap((x) => (x.taskId ? [x.taskId] : [])));
     const todayTasks = dueToday.filter((tk) => !inNeeds.has(tk.id));
     const live = strip.length > 0 || (p.calls?.length ?? 0) > 0;
-    const nextEv = laterToday[0];
     const nextTask = d.mine.find((tk) => tk.due && tk.due > today);
-    const summary = needList.length
-      ? [tn(needList.length, '{n} thing needs you.', '{n} things need you.'), nextEv ? t('Next: {title} at {time}.', { title: nextEv.title, time: fmtTime(nextEv.start) }) : ''].filter(Boolean).join(' ')
-      : nextEv
-        ? t('Nothing needs you right now. Next: {title} at {time}.', { title: nextEv.title, time: fmtTime(nextEv.start) })
-        : t('Nothing needs you right now.');
+    // The day, plus what needs you; Today below already says what's next, so it isn't repeated here.
+    const summary = needList.length ? tn(needList.length, '{n} thing needs you.', '{n} things need you.') : '';
     const quiet = !live && !needList.length && !todayTasks.length && !laterToday.length && !updates.length;
     return (
       <section className="home-pane home-phone view-enter">

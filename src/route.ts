@@ -7,7 +7,7 @@ export const SECTIONS: Record<string, readonly string[]> = {
   mail: ['inbox', 'search', 'files', 'contacts'],
   chat: ['home', 'dms', 'activity', 'you'],
   tasks: ['today', 'upcoming', 'mine', 'browse'],
-  calendar: ['schedule', 'month'],
+  calendar: ['schedule', 'day', 'month'],
   notes: ['notes', 'shared', 'search'],
   drive: ['home', 'starred', 'shared', 'files'],
   projects: ['active', 'mine', 'past'],

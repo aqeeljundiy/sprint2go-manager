@@ -409,7 +409,9 @@ export function TeamPage({
   const lead = users.find((u) => u.id === tm.leadId);
   return (
     <section className="tasks-pane view-enter team-page">
-      {subPhone && <TopBar app="teams" title={<h1 className="mt-title plain small">{tm.name}</h1>} />}
+      {/* Phones: Join sits in the top bar (Slack's channel header), only while you are not in the team; no row of its own. */}
+      {subPhone && <TopBar app="teams" title={<h1 className="mt-title plain small">{tm.name}</h1>} actions={tm.members.includes(me) ? undefined : <JoinButton tm={tm} me={me} actions={actions} small />} />}
+      {!subPhone && (
       <header className="tracking-head tasks-head">
         <button className="icon-btn menu-btn" onClick={onBack} aria-label={t('All teams')}>
           <ArrowLeft size={18} />
@@ -421,6 +423,7 @@ export function TeamPage({
         </div>
         <JoinButton tm={tm} me={me} actions={actions} />
       </header>
+      )}
       <div className="client-tabs team-tabs" role="tablist">
         {tabs.map((x) => (
           <button key={x.id} role="tab" aria-selected={tab === x.id} className={tab === x.id ? 'on' : ''} onClick={() => setTab(x.id)}>
@@ -467,7 +470,7 @@ function MembersTab({ tm, teams, users, me, manage, actions }: { tm: Team; teams
       )}
       <div className="team-block">
         <div className="team-block-head">
-          <h3>{t('People')}</h3>
+          {phone ? <h3 className="team-people-h">{people.length ? tn(people.length, '{n} person', '{n} people') : t('Nobody yet')}</h3> : <h3>{t('People')}</h3>}
           {manage && <AddPeople tm={tm} users={users} me={me} onChange={(members) => actions.patch(tm.id, { members, leadId: tm.leadId && !members.includes(tm.leadId) ? undefined : tm.leadId })} />}
         </div>
         {!people.length && <p className="muted small">{manage ? t('Nobody in this team yet. Add people above.') : tm.join === 'open' ? t('Nobody in this team yet. Join it from the top.') : t('Nobody in this team yet.')}</p>}
@@ -696,9 +699,12 @@ function SettingsTab({ tm, users, isAdmin, actions, homeTemplate, onHomeTemplate
       <p className="muted small team-hint">{tm.join === 'open' ? t('Anyone in the company can join from the team page.') : t('Others can ask to join; the lead gets a notification to approve.')}</p>
       <div className="team-field">
         <span>{t('Review')}</span>
-        <label className="check-row small">
-          <input type="checkbox" checked={!!tm.review} onChange={(e) => patch({ review: e.target.checked })} /> {t('Finished tasks wait for the lead before they count as done')}
-        </label>
+        <button type="button" role="switch" aria-checked={!!tm.review} className="team-review-row" onClick={() => patch({ review: !tm.review })}>
+          <span>{t('Finished tasks wait for the lead before they count as done')}</span>
+          <span className={`switch ${tm.review ? 'on' : ''}`}>
+            <span />
+          </span>
+        </button>
       </div>
       <div className="team-field team-stages">
         <span>{t('Task stages')}</span>
