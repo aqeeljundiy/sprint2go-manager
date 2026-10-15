@@ -35,7 +35,7 @@ import { wakeThread } from '../src/mailRules.ts';
 import * as routing from './routing.ts';
 import * as offsite from './offsite.ts';
 import { certState } from './mailcert.ts';
-import { ownership as domainOwnership, domainsOnSave } from './domains.ts';
+import { ownership as domainOwnership, domainsOnSave, looksOnSave } from './domains.ts';
 import * as invites from './invites.ts';
 import { buildReply } from './ics.ts';
 import * as platform from './platform.ts';
@@ -1548,7 +1548,9 @@ function applySync(me: string, incoming: any, from: { conn?: string; operator?: 
         // Its domains: real hostnames, not another company's, none dropped while addresses use it (server/domains.ts).
         const doms = domainsOnSave(d as any, before, String(d.id));
         say(doms.why);
-        return { ...d, ...own, domains: doms.domains, primaryDomain: doms.primaryDomain, domainChecks: before.domainChecks, timeZone, accounts: boxes.accounts, plan, taskStages, chat: chat.chat, whiteLabel: ownAddress((d as any).whiteLabel, before.whiteLabel), security: sec.security } as db.Doc;
+        // How mail from each domain looks: only the company's own domains, cleaned (server/domains.ts). Brands are gone.
+        const { brands: _brands, ...dd } = d as any;
+        return { ...dd, ...own, domains: doms.domains, primaryDomain: doms.primaryDomain, domainLooks: looksOnSave((d as any).domainLooks, before.domainLooks as any, doms.domains), domainChecks: before.domainChecks, timeZone, accounts: boxes.accounts, plan, taskStages, chat: chat.chat, whiteLabel: ownAddress((d as any).whiteLabel, before.whiteLabel), security: sec.security } as db.Doc;
       }
       const { mailReady: _r, mailCredits: _c, mailCreditsNotified: _n, suspended: _s, whatsapp: _wa, mailAliases: _al, bimi: _bimi, mailGroups: _mg, mailPolicy: _mp, ...fresh } = d as any;
       if (Array.isArray(fresh.accounts)) fresh.accounts = delegation.keepServerFields(fresh.accounts, []);
@@ -1557,6 +1559,8 @@ function applySync(me: string, incoming: any, from: { conn?: string; operator?: 
         say(doms.why);
         fresh.domains = doms.domains;
         fresh.primaryDomain = doms.primaryDomain;
+        fresh.domainLooks = looksOnSave(fresh.domainLooks, undefined, doms.domains);
+        delete fresh.brands;
         delete fresh.domainChecks;
       }
       if (!isZone(fresh.timeZone)) delete fresh.timeZone; // the creator's browser said one the clock doesn't know

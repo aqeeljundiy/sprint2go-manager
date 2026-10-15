@@ -1,4 +1,4 @@
-// Settings, Mail & signature, "Design a signature": five ready-made layouts filled from your details and the brand
+// Settings, Mail & signature, "Design a signature": five ready-made layouts filled from your details and the domain's look
 // (name, title, phone, website, logo, colour), previewed live, then put into the signature editor to adjust.
 // Email-safe HTML only: tables and inline styles, so Gmail and Outlook show it as designed.
 // On the free plan the signature ends with a small "Sent with sprint2go" line; paid plans don't have it.
@@ -6,7 +6,7 @@ import { useMemo, useState } from 'react';
 import { PenLine, X } from 'lucide-react';
 import type { Workspace } from '../../types';
 import { primaryDomain } from '../../domains';
-import { brandOf } from '../../brands';
+import { lookOf } from '../../domains';
 import { Layer } from '../ui/Layer';
 import { uploadFile } from '../../sync';
 import { t } from '../../i18n';
@@ -74,10 +74,10 @@ const TEMPLATES: Tpl[] = [
 const WATERMARK = `<div style="${FONT};font-size:11px;color:#9aa0ab;padding-top:10px">Sent with <a href="https://sprint2go.com" style="color:#9aa0ab">sprint2go</a></div>`;
 
 export function SignatureDesigner({ ws, address, me, onUse, onClose }: { ws: Workspace; address: string; me: { name: string; title?: string }; onUse: (html: string) => void; onClose: () => void }) {
-  const brand = brandOf(ws, address);
+  const brand = lookOf(ws, address); // the look of the address's domain (Settings, Domains), when it has one
   const [tpl, setTpl] = useState('side');
-  const [f, setF] = useState<Fields>({ name: me.name, title: me.title ?? '', company: brand?.name ?? ws.name, phone: '', website: brand?.domains[0] ?? (primaryDomain(ws) || '') });
-  // The brand's (or company's) logo as the picture itself: the mail engine sends pictures inside an email as attached
+  const [f, setF] = useState<Fields>({ name: me.name, title: me.title ?? '', company: brand?.name ?? ws.name, phone: '', website: brand ? address.split('@')[1] ?? '' : primaryDomain(ws) || '' });
+  // The domain's (or company's) logo as the picture itself: the mail engine sends pictures inside an email as attached
   // images, which Gmail and Outlook show (a link to another site would be stripped, sanitize.ts).
   // Only PNG, JPG, GIF or WebP: mail apps don't show SVG pictures, so an SVG logo would preview here and vanish there.
   const anyLogo = brand?.logo ?? ws.logo;
@@ -143,7 +143,7 @@ export function SignatureDesigner({ ws, address, me, onUse, onClose }: { ws: Wor
                 <small>{t('Preview')}</small>
                 {/* The generated HTML is ours (escaped fields, fixed layouts), shown as it will be sent. */}
                 <div className="sigd-paper" dangerouslySetInnerHTML={{ __html: html }} />
-                {anyLogo && !raster && <small className="muted">{t('Your logo is an SVG, which mail apps don’t show. Add a PNG logo in Settings, General & email, Brands, to put it in your signature.')}</small>}
+                {anyLogo && !raster && <small className="muted">{t('Your logo is an SVG, which mail apps don’t show. Add a PNG logo in Settings, Domains, to put it in your signature.')}</small>}
                 {free && <small className="muted">{t('On the free plan the signature ends with “Sent with sprint2go”. Paid plans don’t have it.')}</small>}
               </div>
             </div>

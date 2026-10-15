@@ -18,7 +18,7 @@ import { TemplatesPicker } from './mail/Templates';
 import { startAtTop } from './mail/caret';
 import { t, tx, getLang } from '../i18n';
 import { ConfidentialSheet, OptionChips, defaultSpell, moreOptions, sendersOf, swapSignature, type SendExtras, type SpellLang } from './mail/composeExtras';
-import { brandOf } from '../brands';
+import { lookOf } from '../domains';
 import { suggestNext } from './mail/smartCompose';
 import type { Workspace } from '../types';
 // Attachments (src/components/mail/DraftFiles.tsx): uploaded when added, big ones as Drive links, Insert from Drive,
@@ -59,7 +59,7 @@ interface Props {
   /** Each address's own signature (Settings, Mail); switching From switches it. Missing: `signature` for all. */
   signatureFor?: (address: string) => string;
   /** The company: its aliases are offered as From under the mailbox they deliver into. */
-  workspace?: Pick<Workspace, 'id' | 'domains' | 'mailAliases' | 'brands'>;
+  workspace?: Pick<Workspace, 'id' | 'domains' | 'mailAliases' | 'domainLooks'>;
   /** Smart compose: on (Settings, Mail), and whether the company's AI writes it (else everyday phrases do). */
   smartCompose?: boolean;
   aiOn?: boolean;
@@ -135,10 +135,10 @@ export function Compose({ contacts, signature: baseSignature, signatureFor, work
   const fromChoices = accounts.flatMap((a) => {
     const all = workspace ? sendersOf(workspace, a) : [a.email.toLowerCase()];
     return all.map((address, i) => {
-      // A group's brands: the brand an address sends as shows next to it, so nobody writes as the wrong brand.
-      const brand = workspace ? brandOf(workspace, address) : undefined;
+      // A domain with its own sender name (Settings, Domains) shows it next to the address, so nobody writes as the wrong one.
+      const brand = workspace ? lookOf(workspace, address) : undefined;
       const kind = i ? t('Alias') : a.kind === 'shared' ? t('Shared inbox') : undefined;
-      return { value: `${a.id}|${address}`, label: i === 0 ? `${a.name} <${a.email}>` : `${a.name} <${address}>`, hint: brand ? [brand.name, kind].filter(Boolean).join(' · ') : kind, group: all.length > 1 ? a.email : undefined };
+      return { value: `${a.id}|${address}`, label: i === 0 ? `${a.name} <${a.email}>` : `${a.name} <${address}>`, hint: brand?.name ? [brand.name, kind].filter(Boolean).join(' · ') : kind, group: all.length > 1 ? a.email : undefined };
     });
   });
   const [deskWin, setWin] = useState<WinState>('normal');

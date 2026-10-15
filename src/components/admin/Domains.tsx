@@ -1,15 +1,17 @@
 // Settings, Domains: every domain the company has, the Google Workspace way. One is primary (new people get their
 // address there by default, and Email delivery shows its records); mailboxes, shared inboxes and addresses can live on
 // any of them. Records and checks come from the mail engine (/api/mail/setup and /api/mail/check, per domain); the save
-// path on the server checks the list (server/domains.ts, domainsOnSave). Brands (Brands.tsx) are optional on top.
+// path on the server checks the list (server/domains.ts, domainsOnSave). Each domain can also have its own look (DomainLook):
+// a sender name, a colour for the dot on its mailboxes and a logo for signatures. Most companies never open it.
 import { useEffect, useState } from 'react';
-import { AlertTriangle, Check, ChevronRight, Copy, Globe, Loader2, Plus, RefreshCw, Star, Trash2, X } from 'lucide-react';
-import type { Workspace } from '../../types';
+import { AlertTriangle, Check, ChevronDown, ChevronRight, Copy, Globe, ImagePlus, Loader2, Plus, RefreshCw, Star, Trash2, X } from 'lucide-react';
+import type { DomainLook, Workspace } from '../../types';
+import { ACCENTS } from '../../settings';
 import { Badge, type BadgeTone } from '../ui/Person';
 import { Layer } from '../ui/Layer';
 import { SmoothHeight, useLeaving } from '../ui/Smooth';
 import { EmptyState } from '../ui/EmptyState';
-import { cleanDomain, orderedDomains, primaryDomain, validDomain } from '../../domains';
+import { cleanDomain, domainLooks, orderedDomains, primaryDomain, validDomain } from '../../domains';
 import { toast, toastUndo } from '../../toast';
 import { server } from '../../sync';
 import { relative } from '../../utils';
@@ -174,6 +176,82 @@ function Records({ ws, domain, canManage, again }: { ws: Workspace; domain: stri
   );
 }
 
+/** A small logo for a domain's signatures: PNG, JPG or WebP (mail apps don't show SVG, and the server only keeps raster). */
+function readLogo(file: File): Promise<string | null> {
+  if (!/^image\/(png|jpe?g|webp)$/.test(file.type)) return Promise.resolve((toast({ text: t('Use a PNG, JPG or WebP image.') }), null));
+  if (file.size > 300_000) return Promise.resolve((toast({ text: t('Use a logo under 300 KB.') }), null));
+  return new Promise((ok) => {
+    const r = new FileReader();
+    r.onload = () => ok(String(r.result));
+    r.onerror = () => ok(null);
+    r.readAsDataURL(file);
+  });
+}
+
+/** "How mail from this domain looks": folded away by default; plain companies never need it. */
+function Look({ ws, domain, onWorkspace }: { ws: Workspace; domain: string; onWorkspace: (p: Partial<Workspace>) => void }) {
+  const key = lower(domain);
+  const all = domainLooks(ws);
+  const look: DomainLook = all[key] ?? {};
+  const set = !!(look.name || look.color || look.logo);
+  const [open, setOpen] = useState(false);
+  const patch = (p: Partial<DomainLook>) => {
+    const next: DomainLook = { ...look, ...p };
+    (Object.keys(next) as (keyof DomainLook)[]).forEach((k) => !next[k] && delete next[k]);
+    const looks = { ...all };
+    if (Object.keys(next).length) looks[key] = next;
+    else delete looks[key];
+    // brands: old data folded in here (domainLooks reads it); saving writes the merged looks and drops it.
+    onWorkspace({ domainLooks: Object.keys(looks).length ? looks : undefined, brands: undefined } as Partial<Workspace>);
+  };
+  return (
+    <div className={`dm-look ${open ? 'open' : ''}`}>
+      <button type="button" className="dm-look-head" aria-expanded={open} onClick={() => setOpen((x) => !x)}>
+        <span className="dm-look-mark" style={look.logo ? { background: `center / cover no-repeat url("${look.logo}")` } : look.color ? { background: look.color } : undefined} aria-hidden />
+        <span className="dm-look-text">
+          <strong>{t('How mail from this domain looks')}</strong>
+          <small>{set ? [look.name, look.logo && t('Logo'), look.color && t('Colour')].filter(Boolean).join(' · ') : t('Optional. Same as the company unless you change it.')}</small>
+        </span>
+        <ChevronDown size={16} className={`rot-chev ${open ? 'open' : ''}`} />
+      </button>
+      <div className={`fold ${open ? 'open' : ''}`}>
+        <div>
+          <div className="dm-look-body">
+            <div className="field">
+              <label htmlFor={`dm-name-${key}`}>{t('Sender name')}</label>
+              <input id={`dm-name-${key}`} value={look.name ?? ''} maxLength={60} placeholder={ws.name} onChange={(e) => patch({ name: e.target.value.slice(0, 60) })} />
+              <small className="set-hint">{t('Shown next to {domain} addresses when you write, and in signatures.', { domain })}</small>
+            </div>
+            <div className="field">
+              <span className="dm-look-label">{t('Colour')}</span>
+              <div className="dm-look-row">
+                {ACCENTS.map((c) => (
+                  <button key={c} type="button" className={`swatch ${look.color === c ? 'on' : ''}`} style={{ background: c }} onClick={() => patch({ color: look.color === c ? undefined : c })} aria-pressed={look.color === c} aria-label={t('Colour {color}', { color: c })} />
+                ))}
+              </div>
+              <small className="set-hint">{t('Marks {domain} mailboxes with a dot in the inbox list.', { domain })}</small>
+            </div>
+            <div className="field">
+              <span className="dm-look-label">{t('Logo')}</span>
+              <div className="dm-look-row">
+                <label className="ghost-btn outline sm">
+                  <ImagePlus size={14} /> {look.logo ? t('Change logo') : t('Add logo')}
+                  <input type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={async (e) => { const f = e.target.files?.[0]; e.target.value = ''; if (f) { const url = await readLogo(f); if (url) patch({ logo: url }); } }} />
+                </label>
+                {look.logo && (
+                  <button type="button" className="link-btn" onClick={() => patch({ logo: undefined })}>
+                    {t('Remove logo')}
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /** Add a domain: type it, it's added, then the records to put at the domain's DNS with Check now. */
 function AddDomain({ ws, onWorkspace, onClose }: { ws: Workspace; onWorkspace: (p: Partial<Workspace>) => void; onClose: () => void }) {
   const [raw, setRaw] = useState('');
@@ -253,10 +331,11 @@ export function DomainsSection({ ws, canManage, onWorkspace }: { ws: Workspace; 
     if (using.length)
       return toast({ text: tn(using.length, '{domain} still has {n} address on it ({list}). Move or remove it first.', '{domain} still has {n} addresses on it ({list}). Move or remove them first.', { domain: d, list: using.slice(0, 3).join(', ') + (using.length > 3 ? '…' : '') }), ms: 7000 });
     if (d === primary && ws.domains.length > 1) return toast({ text: t('{domain} is the primary domain. Make another one primary first.', { domain: d }) });
-    const before = { domains: ws.domains, primaryDomain: ws.primaryDomain, brands: ws.brands };
-    const brands = ws.brands?.map((b) => ({ ...b, domains: b.domains.filter((x) => x !== d) }));
+    const before = { domains: ws.domains, primaryDomain: ws.primaryDomain, domainLooks: ws.domainLooks };
+    const looks = { ...(ws.domainLooks ?? {}) };
+    delete looks[lower(d)];
     setOpen(null);
-    onWorkspace({ domains: ws.domains.filter((x) => x !== d), primaryDomain: d === primary ? undefined : ws.primaryDomain, ...(brands ? { brands } : {}) });
+    onWorkspace({ domains: ws.domains.filter((x) => x !== d), primaryDomain: d === primary ? undefined : ws.primaryDomain, domainLooks: Object.keys(looks).length ? looks : undefined });
     toastUndo(t('{domain} removed', { domain: d }), () => onWorkspace(before));
   };
   return (
@@ -295,6 +374,7 @@ export function DomainsSection({ ws, canManage, onWorkspace }: { ws: Workspace; 
                     {(isOpen || seen.includes(d)) && (
                       <div className="dm-body">
                         <Records ws={ws} domain={d} canManage={canManage} />
+                        {canManage && <Look ws={ws} domain={d} onWorkspace={onWorkspace} />}
                         {canManage && (
                           <div className="dm-actions">
                             {d !== primary && (

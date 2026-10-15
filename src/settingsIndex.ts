@@ -32,7 +32,7 @@ export const SETTINGS_INDEX: Record<string, { name?: string; options: string[] }
   mailgroups: { options: [mark('Groups'), mark('Shared inboxes')] },
   mailrules: { options: [mark('Retention'), mark('Mail rules')] },
   import: { options: [mark('Import mail'), mark('Import from Google'), mark('Import from Microsoft')] },
-  domains: { name: mark('Domains'), options: [mark('Add domain'), mark('Primary domain'), mark('Verify DNS'), mark('Aliases')] },
+  domains: { name: mark('Domains'), options: [mark('Add domain'), mark('Primary domain'), mark('Verify DNS'), mark('Aliases'), mark('Domain look'), mark('Sender name'), mark('Logo'), mark('Colour')] },
   'ai-apps': { name: mark('Connect AI apps'), options: [mark('Claude'), mark('ChatGPT'), mark('MCP'), mark('Connector')] },
 };
 

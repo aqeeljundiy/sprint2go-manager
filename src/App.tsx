@@ -8,7 +8,7 @@ import { flushSync } from 'react-dom';
 import { term, setTermWord, brand as product, setBrandName, brandOf, portalOrigin } from './terms';
 import { setPhotos } from './photos';
 import { mailState } from './mailStatus';
-import { brandOf as mailBrandOf } from './brands';
+import { domainLooks } from './domains';
 import { TempAddressDialog, lifeLeft } from './components/TempAddress';
 import { AppSetupCard } from './components/AppSetupCard';
 import { ProjectsCtx } from './components/ProjectPicker';
@@ -4945,7 +4945,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
         activeAccount={activeAccount}
         accountUnread={accountUnread}
         accountState={accountState}
-        brandColor={(ws.brands?.length ?? 0) > 1 ? (email) => mailBrandOf(ws, email)?.color : undefined}
+        brandColor={Object.values(domainLooks(ws)).some((l) => l.color) ? (email) => domainLooks(ws)[email.toLowerCase().split('@')[1] ?? '']?.color : undefined}
         onAddAccount={imAdmin && !inSandbox ? () => setNewAcct(true) : undefined}
         onFolderRead={(id) => {
           const ids = scoped.filter((x) => x.unread && inView(x, { kind: 'folder', id }, { me: user.id, tabs: [] })).map((x) => x.id);
@@ -5689,7 +5689,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
               onSaveToDrive={saveToDrive}
               onAddInvite={addInvite}
               inviteCard={(m) => selected && inviteCard(selected, m)}
-              onBack={() => setReaderOpen(false)}
+              onBack={() => (mobile ? setReaderOpen(false) : (setSelectedId(null), setReaderOpen(false)))}
               onArchive={archive}
               onTrash={trash}
               onSpam={spam}

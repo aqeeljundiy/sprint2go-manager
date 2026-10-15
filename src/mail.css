@@ -1358,6 +1358,105 @@
 .dm-modal {
   width: min(640px, calc(100vw - 32px));
 }
+/* A domain's look (Domains.tsx, Look): one quiet row that folds open, divider above, no box of its own. */
+.dm-look {
+  border-top: 1px solid var(--border);
+  padding-top: 4px;
+}
+.dm-look-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  padding: 4px 8px;
+  margin: 0 -8px;
+  box-sizing: content-box;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  font: inherit;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.18s var(--ease);
+}
+.dm-look-head:hover {
+  background: var(--hover);
+}
+.dm-look-head .rot-chev {
+  flex: none;
+  color: var(--text-3);
+  transition: transform 0.2s var(--ease);
+}
+.dm-look-head .rot-chev.open {
+  transform: rotate(180deg);
+}
+.dm-look-mark {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  background: var(--hover);
+  box-shadow: inset 0 0 0 1px var(--border);
+  transition: background 0.2s var(--ease);
+}
+.dm-look-text {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+}
+.dm-look-text strong {
+  font-size: 13px;
+  font-weight: 600;
+}
+.dm-look-text small {
+  font-size: 12px;
+  color: var(--text-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dm-look-body {
+  display: grid;
+  gap: 16px;
+  padding: 8px 0 8px 36px;
+}
+.dm-look-body .field {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+.dm-look-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-3);
+}
+.dm-look-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+@media (max-width: 640px) {
+  .dm-look-body {
+    padding-left: 0;
+  }
+  .dm-look-row .swatch {
+    width: 32px;
+    height: 32px;
+  }
+  .dm-look-row .ghost-btn {
+    min-height: var(--tap);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dm-look-head,
+  .dm-look-mark,
+  .dm-look-head .rot-chev {
+    transition: none;
+  }
+}
 @container (max-width: 520px) {
   .dm-body {
     padding-left: 12px;

@@ -2837,61 +2837,7 @@ body.resizing-x .pane-resize::after {
   flex: none;
   color: var(--text-3);
 }
-/* Settings, Brands (admin/Brands.tsx) */
-.brand-row {
-  width: 100%;
-  border: 0;
-  background: none;
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-  transition: background 0.18s var(--ease);
-}
-.brand-row:hover {
-  background: var(--hover);
-}
-.brand-swatch {
-  flex: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
-}
-.brand-edit {
-  display: grid;
-  gap: 16px;
-  padding: 8px 16px 16px 56px;
-}
-.brand-edit .field {
-  display: grid;
-  gap: 6px;
-}
-.brand-edit .field > span {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-3);
-}
-.brand-colors,
-.brand-domains,
-.brand-logo-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-}
-.brand-domains .mail-chip button {
-  border: 0;
-  background: none;
-  padding: 0 0 0 4px;
-  color: inherit;
-  cursor: pointer;
-  display: inline-flex;
-}
-.brand-actions {
-  display: flex;
-  justify-content: flex-end;
-}
-/* A mailbox's brand (src/brands.ts): a small dot on its icon's corner, only when the company has several brands. */
+/* A mailbox's domain colour (Settings, Domains; lookOf in src/domains.ts): a small dot on its icon's corner. */
 .nav-item.acct {
   position: relative;
 }
@@ -4247,4 +4193,34 @@ fieldset.plain:disabled {
 .nav-more-head:hover {
   color: var(--text);
   background: var(--hover);
+}
+/* Mail on a computer: with nothing open, the list takes the whole width (Gmail without a reading pane); opening an
+   email brings the reading pane in beside it, and its X closes it again. */
+@media (min-width: 1100px) {
+  .mail-view:has(> .reader-empty) > .list-pane {
+    flex: 1;
+    width: auto;
+  }
+  .mail-view > .reader-empty,
+  .mail-view:has(> .reader-empty) > .pane-resize {
+    display: none;
+  }
+  .mail-view > .reader:not(.reader-empty) {
+    animation: reader-in 0.24s cubic-bezier(0.2, 0, 0, 1) backwards;
+  }
+  .reader-bar .back-btn {
+    display: inline-grid;
+    margin-right: 4px;
+  }
+}
+@keyframes reader-in {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mail-view > .reader:not(.reader-empty) {
+    animation: none;
+  }
 }

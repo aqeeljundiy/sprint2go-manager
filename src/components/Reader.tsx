@@ -47,7 +47,7 @@ import { PersonName } from './ui/PersonCard';
 import { Wordmark } from './Logo';
 import { RichEditor } from './RichEditor';
 import { TrackingPanel } from './TrackingPanel';
-import { isMine } from '../identity';
+import { isMine, meOr } from '../identity';
 import { isTeam } from '../tracking';
 import { hasOwnText, textToHtml } from '../sanitize';
 import { ai, type Summary } from '../ai';
@@ -566,8 +566,8 @@ export function Reader(props: Props) {
             <div className="message-to">
               {open
                 ? [
-                    t('to {names}', { names: m.to.map((p) => (isMine(p.email) ? t('me') : p.name || p.email)).join(', ') }),
-                    m.cc?.length ? t('Cc {names}', { names: m.cc.map((p) => (isMine(p.email) ? t('me') : p.name || p.email)).join(', ') }) : '',
+                    t('to {names}', { names: m.to.map((p) => (isMine(p.email) ? meOr(p.email) ?? t('me') : p.name || p.email)).join(', ') }),
+                    m.cc?.length ? t('Cc {names}', { names: m.cc.map((p) => (isMine(p.email) ? meOr(p.email) ?? t('me') : p.name || p.email)).join(', ') }) : '',
                     m.bcc?.length ? t('Bcc {names}', { names: m.bcc.map((p) => p.name || p.email).join(', ') }) : '',
                   ]
                     .filter(Boolean)
@@ -939,7 +939,7 @@ export function Reader(props: Props) {
       ...(!isMine(m.from.email) ? [{ label: t('Block {name}', { name: m.from.name || m.from.email }), icon: Ban, group: 'end', run: () => props.onBlock(thread) }] : []),
     ];
     const toWords = (m: Message) => {
-      const names = [...m.to, ...(m.cc ?? [])].map((p) => (isMine(p.email) ? t('me') : p.name || p.email));
+      const names = [...m.to, ...(m.cc ?? [])].map((p) => (isMine(p.email) ? meOr(p.email) ?? t('me') : p.name || p.email));
       return names.length > 2 ? t('to {names} and {n} more', { names: names.slice(0, 2).join(', '), n: names.length - 2 }) : t('to {names}', { names: names.join(', ') });
     };
     const isLatest = (m: Message) => m.id === last.id;
@@ -1347,8 +1347,8 @@ export function Reader(props: Props) {
   return (
     <section className="reader">
       <header className="reader-bar">
-        <button className="icon-btn back-btn" onClick={props.onBack} aria-label={t('Back')}>
-          <ArrowLeft size={18} />
+        <button className="icon-btn back-btn" onClick={props.onBack} aria-label={phone ? t('Back') : t('Close')} title={phone ? undefined : t('Close (Esc)')}>
+          {phone ? <ArrowLeft size={18} /> : <X size={18} />}
         </button>
         <div className="toolbar">
           {primary && (

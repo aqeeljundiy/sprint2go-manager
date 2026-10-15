@@ -179,3 +179,68 @@ export function domainsOnSave(next: { domains?: unknown; primaryDomain?: unknown
   const p = lower(String(next.primaryDomain ?? ''));
   return { domains: out, primaryDomain: p && out.includes(p) ? p : undefined, why: why.length ? why.join(' ') : null };
 }
+
+/* ---------- How mail from a domain looks (Settings, Domains; DomainLook in src/types.ts) ---------- */
+
+// The colours Settings offers (ACCENTS in src/settings.ts); any other #rrggbb is fine too.
+const LOOK_COLORS = ['#5b5bf6', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#d946ef', '#111827'];
+// Raster only, as for /brand-icon: an SVG served or sent from us could carry script. About 300 KB of picture.
+const RASTER = /^data:image\/(?:png|jpe?g|gif|webp);base64,[A-Za-z0-9+/=]+$/;
+const LOGO_MAX = 420_000;
+export type Look = { name?: string; color?: string; logo?: string };
+
+/** One look, cleaned: a short name, a colour we offer (or a hex), a small raster logo. Null when nothing is left. */
+function cleanLook(l: unknown): Look | null {
+  if (!l || typeof l !== 'object') return null;
+  const x = l as Record<string, unknown>;
+  const out: Look = {};
+  const name = typeof x.name === 'string' ? x.name.replace(/[\r\n\t]/g, ' ').trim().slice(0, 60) : '';
+  if (name) out.name = name;
+  const color = typeof x.color === 'string' ? x.color.trim().toLowerCase() : '';
+  if (LOOK_COLORS.includes(color) || /^#[0-9a-f]{6}$/.test(color)) out.color = color;
+  const logo = typeof x.logo === 'string' ? x.logo : '';
+  if (logo && logo.length <= LOGO_MAX && RASTER.test(logo)) out.logo = logo;
+  return Object.keys(out).length ? out : null;
+}
+
+/**
+ * The domain looks as saved: only for the company's own domains (after domainsOnSave), each cleaned. The save path
+ * already lets only owners and admins change a company. Missing in the save keeps what was there.
+ */
+export function looksOnSave(asked: unknown, before: Record<string, Look> | undefined, domains: string[]): Record<string, Look> | undefined {
+  const src = asked === undefined ? before : asked;
+  if (!src || typeof src !== 'object') return undefined;
+  const ours = new Set(domains.map(lower));
+  const out: Record<string, Look> = {};
+  for (const [d, l] of Object.entries(src as Record<string, unknown>)) {
+    const k = lower(d);
+    const c = ours.has(k) ? cleanLook(l) : null;
+    if (c) out[k] = c;
+  }
+  return Object.keys(out).length ? out : undefined;
+}
+
+/**
+ * Brands are gone, folded into domains: each brand's name, colour and logo go onto each of its domains that has no
+ * look yet, then `brands` is dropped. Runs at startup; a company without `brands` is left alone, so running it again
+ * changes nothing.
+ */
+export function migrateBrands() {
+  const changed: db.Doc[] = [];
+  for (const w of db.allDocs('workspaces') as any[]) {
+    if (!('brands' in w)) continue;
+    const looks: Record<string, Look> = { ...(w.domainLooks ?? {}) };
+    for (const b of Array.isArray(w.brands) ? w.brands : [])
+      for (const d of Array.isArray(b?.domains) ? b.domains : []) {
+        const k = lower(d);
+        if (!k || looks[k]) continue;
+        const c = cleanLook({ name: b.name, color: b.color, logo: b.logo });
+        if (c) looks[k] = c;
+      }
+    const { brands: _gone, ...rest } = w;
+    changed.push({ ...rest, ...(Object.keys(looks).length ? { domainLooks: looks } : {}) });
+  }
+  if (changed.length) db.writeDocs('workspaces', changed, [], null);
+  return changed.length;
+}
+migrateBrands();

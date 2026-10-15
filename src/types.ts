@@ -354,15 +354,14 @@ export interface AwayReply {
 }
 
 /**
- * A brand inside a company (a group with several brands): its own name, colour, logo and the domains it sends from.
- * Mailboxes on those domains are the brand's (src/brands.ts); one team, one bill, one search across all of them.
+ * How mail from one of the company's domains looks (Settings, Domains): the sender name, a colour (the dot on its
+ * mailboxes) and a small raster logo for signatures. Optional; a plain company never sets it. Read it with lookOf
+ * (src/domains.ts). Replaces the old per-company brands, which the server folds in here (server/domains.ts).
  */
-export interface Brand {
-  id: string;
-  name: string;
-  color: string;
-  logo?: string; // data URL, small
-  domains: string[]; // of the company's domains
+export interface DomainLook {
+  name?: string;
+  color?: string;
+  logo?: string; // data URL of a small PNG, JPG or WebP
 }
 
 /** Another address that delivers into mailboxes: sales@ into Isabel's and Thomas's, or info@ into the hello@ shared inbox. */
@@ -382,7 +381,7 @@ export interface Workspace {
   primaryDomain?: string; // the main domain (one of domains); missing means domains[0]. Read it with primaryDomain(ws), src/domains.ts
   /** Per domain, what the server's record check last saw: who holds it and whether the mail records are in place. Set by the server. */
   domainChecks?: Record<string, { at: string; owner: 'verified' | 'pending' | 'held' | 'taken'; allOk: boolean; checks?: { key: string; ok: boolean; found: string; want: string }[] }>;
-  brands?: Brand[]; // brands inside this company, each owning some of its domains
+  domainLooks?: Record<string, DomainLook>; // per domain (lowercase): how mail from it looks, see DomainLook
   accounts: Account[];
   members: Member[];
   apps?: AppId[]; // switched-on apps (default: all)

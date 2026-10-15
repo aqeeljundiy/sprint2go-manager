@@ -90,7 +90,7 @@ interface Props {
   accountUnread: Record<string, number>;
   /** Each mailbox's state (src/mailStatus.ts): only problems show under its name. */
   accountState?: Record<string, MailState>;
-  /** The colour of the brand a mailbox belongs to (src/brands.ts), shown as a dot by its icon. */
+  /** The colour of a mailbox's domain (Settings, Domains; lookOf in src/domains.ts), shown as a dot by its icon. */
   brandColor?: (email: string) => string | undefined;
   /** Mailboxes someone gave you access to (delegation): marked as theirs in the list. */
   delegated?: Set<string>;
