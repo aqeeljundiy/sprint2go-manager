@@ -188,7 +188,7 @@ function Open(p: NoteEditorProps & { note: Note }) {
     highlight: () => text.current?.highlight(hl),
     link: () => openPanel('link'),
   };
-  const fmt = { block: (t: 'P' | 'H1' | 'H2' | 'H3' | 'BLOCKQUOTE') => text.current?.block(t), cmd: (c: string) => text.current?.cmd(c), checklist: () => text.current?.checklist(), highlight: (c: string | null) => text.current?.highlight(c) };
+  const fmt = { block: (t: 'P' | 'H1' | 'H2' | 'H3' | 'BLOCKQUOTE' | 'PRE') => text.current?.block(t), cmd: (c: string) => text.current?.cmd(c), checklist: () => text.current?.checklist(), highlight: (c: string | null) => text.current?.highlight(c), color: (c: string | null) => text.current?.color(c), code: () => text.current?.code(), callout: () => text.current?.callout() };
   const done = () => {
     text.current?.blur();
     title.current?.blur();

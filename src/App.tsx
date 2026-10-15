@@ -3,7 +3,7 @@ import { Assistant, BlockDialog, BrainDump, CalendarView, ClientApp, ConnectCale
 import { NewTableDialog, TablesHome, TablesSidebar, makeTable } from './components/tables/TablesApp';
 import type { TeamActions } from './components/teams/TeamsApp';
 import type { TemplateId } from './components/tables/fields';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { term, setTermWord, brand as product, setBrandName, brandOf, portalOrigin } from './terms';
 import { setPhotos } from './photos';
@@ -15,7 +15,7 @@ import { ProjectsCtx } from './components/ProjectPicker';
 import { ProjectsSidebar } from './components/ProjectsSidebar';
 import { ProjectsHome } from './components/ProjectsHome';
 import { Popover } from './components/ui/Popover';
-import { Brain, Briefcase, Building2, CalendarPlus, Copy, FileText, Hash, ListChecks, Mail, PenLine, Send, Sparkles, Timer, Trash2, Undo2, Upload, User as UserIcon, Video, Table2, MessagesSquare, AlertTriangle, Menu, Inbox, Search as Paperclip, Contact, Clock, History, MessageCircle, Bell, Sun, CalendarRange, CircleCheck, Layers, List, CalendarDays, Users, Star, Folder, UserRound, Archive, NotebookText, LayoutGrid } from 'lucide-react';
+import { Brain, Briefcase, Building2, CalendarPlus, Copy, FileText, Hash, ListChecks, Mail, PenLine, Send, Sparkles, Timer, Trash2, Undo2, Upload, User as UserIcon, Video, Table2, MessagesSquare, AlertTriangle, Menu, Inbox, Search as Paperclip, Contact, Clock, History, MessageCircle, Bell, Sun, CalendarRange, CircleCheck, Layers, List, CalendarDays, Users, Star, Folder, UserRound, Archive, NotebookText, LayoutGrid, type LucideIcon, type LucideProps } from 'lucide-react';
 import { DEFAULT_PERMISSIONS } from './types';
 import type { Quote, Team, Note, Account, AppId, Attachment, BlockRule, CalEvent, Channel, ChannelCategory, Client, ClientPerson, ChatFile, ChatMessage, CommentFile, Meeting, Message, Notice, RsvpStatus, TaskEvent, TaskStatus, Todo, DriveItem, DriveSection, Location, Person, Thread, User, View, Workspace, FolderId } from './types';
 import { useMailOrganize } from './components/mail/Organize';
@@ -275,6 +275,9 @@ interface AppProps {
   /** A bar on top of everything (the try-out's "You're trying sprint2go"). */
   topBar?: React.ReactNode;
 }
+
+// The # fills its whole box, so at the bar's 24 px it looks bigger and heavier than the round icons beside it: drawn at 20.
+const ChannelsIcon = forwardRef<SVGSVGElement, LucideProps>((props, ref) => <Hash ref={ref} {...props} size={20} />) as LucideIcon;
 
 export default function App({ user, signedInUsers, allUsers, workspaces: allWorkspaces, setWorkspaces, onSwitchUser, onAddUser, onSignOut, onInvite: inviteUser, onWorkspace, onUpdateUser, topBar }: AppProps) {
   const [settings, updateSettings] = useSettings(user);
@@ -4324,7 +4327,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
       case 'chat':
         return bar([
           // "Channels", not "Home": Home is its own app (Teams calls this tab Chat, Slack Home; ours is the channel list).
-          { id: 'home', label: t('Channels'), icon: Hash },
+          { id: 'home', label: t('Channels'), icon: ChannelsIcon },
           { id: 'dms', label: t('DMs'), icon: MessageCircle, badge: dmUnread },
           { id: 'activity', label: t('Activity'), icon: Bell, badge: chatActivity },
           // Slack's fourth tab: you (status, saved, drafts, Chat's settings). Search is the top bar's magnifier.
@@ -4785,9 +4788,6 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
             }}
             demo={demoEntry}
           />
-            <button className="ghost-btn outline sm" onClick={() => go('settings')}>
-              {t('Settings')}
-            </button>
           </div>
         }
         panel={

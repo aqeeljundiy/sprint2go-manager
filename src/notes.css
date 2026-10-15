@@ -317,6 +317,34 @@
   border-left: 3px solid var(--border);
   color: var(--text-2);
 }
+.note-text blockquote.callout {
+  padding: 12px 14px;
+  border-left: 0;
+  border-radius: 10px;
+  background: var(--hover);
+  color: var(--text);
+}
+.note-text code {
+  padding: 1px 5px;
+  border-radius: 6px;
+  background: var(--hover);
+  color: #d44c47;
+  font: 0.88em/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.note-text pre {
+  margin: 0.5em 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--hover);
+  overflow-x: auto;
+  white-space: pre-wrap;
+  font: 13px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.note-text pre code {
+  padding: 0;
+  background: none;
+  color: inherit;
+}
 .note-text hr {
   border: 0;
   border-top: 1px solid var(--border);
@@ -608,6 +636,55 @@
 .fmt-swatch.none {
   background: none;
   border: 1.5px dashed var(--border);
+}
+.fmt-btn.wide {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 600;
+}
+.fmt-sec {
+  display: grid;
+  gap: 8px;
+}
+.fmt-h {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+.fmt-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+}
+.fmt-chip {
+  display: grid;
+  place-items: center;
+  min-height: 44px;
+  border-radius: 12px;
+  background: var(--hover);
+  transition: background 0.15s, transform 0.15s;
+}
+.fmt-chip:active {
+  transform: scale(0.94);
+}
+.fmt-chip b {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+@media (prefers-reduced-motion: reduce) {
+  .fmt-chip:active {
+    transform: none;
+  }
 }
 .np-link {
   display: grid;

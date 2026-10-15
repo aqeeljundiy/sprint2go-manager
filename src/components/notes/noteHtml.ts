@@ -11,7 +11,7 @@ import { t } from '../../i18n';
 
 const TAGS = ['p', 'br', 'div', 'span', 'b', 'strong', 'i', 'em', 'u', 's', 'strike', 'a', 'ul', 'ol', 'li', 'blockquote', 'h1', 'h2', 'h3', 'code', 'pre', 'hr', 'font'];
 const ATTRS = ['href', 'style', 'color', 'class', 'data-task'];
-const CLASSES = new Set(['checklist', 'done', 'note-task']);
+const CLASSES = new Set(['checklist', 'done', 'note-task', 'callout']);
 
 /** What a note may hold (also what's saved): our own classes only, a task id only on a task pill. */
 export function sanitizeNote(html: string) {

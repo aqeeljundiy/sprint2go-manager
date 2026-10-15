@@ -872,7 +872,7 @@
     content: '';
     position: absolute;
     top: 0;
-    left: 48px;
+    left: 52px; /* lines up with the label: 16 + the 24 icon + 12 */
     right: 0;
     height: 1px;
     background: var(--line);
@@ -1361,7 +1361,7 @@
     position: relative;
     display: flex;
     align-items: center;
-    gap: 0;
+    gap: 12px;
     width: 100%;
     min-height: var(--row-1);
     padding: 0 12px 0 16px;
@@ -1391,7 +1391,6 @@
     place-items: center;
     width: var(--icon-m);
     height: var(--icon-m);
-    margin-right: 12px;
     color: var(--text-2);
   }
   /* A team's or project's colour is data: a dot, not a coloured "#". */

@@ -1,5 +1,5 @@
 import { useMemo, useState, type ReactNode, type RefObject } from 'react';
-import { Bold, Check, FileText, Italic, Link2, List, ListChecks, ListOrdered, Lock, Minus, Quote, Search, Strikethrough, Underline, Users } from 'lucide-react';
+import { Bold, Check, Code, FileText, Italic, Link2, List, ListChecks, ListOrdered, Lock, Megaphone, Minus, Quote, Search, SquareCode, Strikethrough, Underline, Users } from 'lucide-react';
 import type { Client, Note, User } from '../../types';
 import { term } from '../../terms';
 import { Avatar } from '../Avatar';
@@ -26,18 +26,29 @@ function Panel({ anchor, title, onClose, children, width = 300, className = '' }
   );
 }
 
-export const HIGHLIGHTS: { name: string; color: string }[] = [
-  { name: mark('Yellow'), color: 'rgba(250, 204, 21, 0.38)' },
-  { name: mark('Green'), color: 'rgba(34, 197, 94, 0.3)' },
-  { name: mark('Blue'), color: 'rgba(59, 130, 246, 0.3)' },
-  { name: mark('Pink'), color: 'rgba(236, 72, 153, 0.28)' },
+// Notion's palette: each colour as text and as a background. Mid tones and see-through backgrounds, so both read on
+// white and on dark.
+export const PALETTE: { name: string; text: string; bg: string }[] = [
+  { name: mark('Gray'), text: '#8a8986', bg: 'rgba(138, 137, 134, 0.2)' },
+  { name: mark('Brown'), text: '#a5714f', bg: 'rgba(165, 113, 79, 0.2)' },
+  { name: mark('Orange'), text: '#d9730d', bg: 'rgba(245, 140, 40, 0.24)' },
+  { name: mark('Yellow'), text: '#c29013', bg: 'rgba(250, 204, 21, 0.34)' },
+  { name: mark('Green'), text: '#3f8f5f', bg: 'rgba(34, 197, 94, 0.24)' },
+  { name: mark('Blue'), text: '#3a7fc0', bg: 'rgba(59, 130, 246, 0.24)' },
+  { name: mark('Purple'), text: '#9065b0', bg: 'rgba(147, 90, 200, 0.22)' },
+  { name: mark('Pink'), text: '#c4508c', bg: 'rgba(236, 72, 153, 0.22)' },
+  { name: mark('Red'), text: '#d44c47', bg: 'rgba(230, 70, 60, 0.22)' },
 ];
+export const HIGHLIGHTS = PALETTE.filter((c) => ['Yellow', 'Green', 'Blue', 'Pink'].includes(c.name)).map((c) => ({ name: c.name, color: c.bg }));
 
 export interface FormatActions {
-  block: (tag: 'P' | 'H1' | 'H2' | 'H3' | 'BLOCKQUOTE') => void;
+  block: (tag: 'P' | 'H1' | 'H2' | 'H3' | 'BLOCKQUOTE' | 'PRE') => void;
   cmd: (name: string) => void;
   checklist: () => void;
   highlight: (color: string | null) => void;
+  color: (color: string | null) => void;
+  code: () => void;
+  callout: () => void;
 }
 
 /**
@@ -79,6 +90,9 @@ export function FormatPanel({ caret, a, anchor, onClose }: { caret: Caret; a: Fo
               <Icon size={18} />
             </button>
           ))}
+          <button type="button" className="fmt-btn" aria-label={t('Inline code')} title={t('Inline code')} onClick={pick(a.code)}>
+            <Code size={18} />
+          </button>
         </div>
         <div className="fmt-row" role="group" aria-label={t('Lists and blocks')}>
           <button type="button" className={`fmt-btn${caret.on.has('insertUnorderedList') && !caret.inChecklist ? ' on' : ''}`} aria-label={t('Bulleted list')} onClick={pick(() => a.cmd('insertUnorderedList'))}>
@@ -97,12 +111,40 @@ export function FormatPanel({ caret, a, anchor, onClose }: { caret: Caret; a: Fo
             <Minus size={18} />
           </button>
         </div>
-        <div className="fmt-row fmt-colors" role="group" aria-label={t('Highlight')}>
-          {HIGHLIGHTS.map((h) => (
-            <button key={h.name} type="button" className="fmt-swatch" style={{ ['--hl' as string]: h.color }} aria-label={t('Highlight: {color}', { color: t(h.name) })} title={t(h.name)} onClick={pick(() => a.highlight(h.color))} />
-          ))}
-          <button type="button" className="fmt-swatch none" aria-label={t('No highlight')} title={t('No highlight')} onClick={pick(() => a.highlight(null))} />
+        <div className="fmt-row" role="group" aria-label={t('Blocks')}>
+          <button type="button" className="fmt-btn wide" onClick={pick(a.callout)}>
+            <Megaphone size={18} /> <span>{t('Callout')}</span>
+          </button>
+          <button type="button" className={`fmt-btn wide${caret.on.has('pre') ? ' on' : ''}`} aria-pressed={caret.on.has('pre')} onClick={pick(() => a.block('PRE'))}>
+            <SquareCode size={18} /> <span>{t('Code block')}</span>
+          </button>
         </div>
+        <section className="fmt-sec" aria-label={t('Text colour')}>
+          <h3 className="fmt-h">{t('Text colour')}</h3>
+          <div className="fmt-grid">
+            <button type="button" className="fmt-chip" title={t('Default')} aria-label={t('Text colour: {color}', { color: t('Default') })} onClick={pick(() => a.color(null))}>
+              <b>A</b>
+            </button>
+            {PALETTE.map((c) => (
+              <button key={c.name} type="button" className="fmt-chip" title={t(c.name)} aria-label={t('Text colour: {color}', { color: t(c.name) })} onClick={pick(() => a.color(c.text))}>
+                <b style={{ color: c.text }}>A</b>
+              </button>
+            ))}
+          </div>
+        </section>
+        <section className="fmt-sec" aria-label={t('Background')}>
+          <h3 className="fmt-h">{t('Background')}</h3>
+          <div className="fmt-grid">
+            <button type="button" className="fmt-chip" title={t('None')} aria-label={t('No highlight')} onClick={pick(() => a.highlight(null))}>
+              <b>A</b>
+            </button>
+            {PALETTE.map((c) => (
+              <button key={c.name} type="button" className="fmt-chip" title={t(c.name)} aria-label={t('Highlight: {color}', { color: t(c.name) })} onClick={pick(() => a.highlight(c.bg))}>
+                <b style={{ background: c.bg }}>A</b>
+              </button>
+            ))}
+          </div>
+        </section>
       </div>
     </Panel>
   );

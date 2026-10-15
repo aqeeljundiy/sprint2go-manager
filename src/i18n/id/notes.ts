@@ -175,6 +175,18 @@ const id: Record<string, string> = {
   "No notes in this view": "Tidak ada catatan di tampilan ini",
   "Show all notes": "Tampilkan semua catatan",
   "Tap the pen to write one.": "Ketuk pena untuk menulis catatan.",
+  "Background": "Latar",
+  "Blocks": "Blok",
+  "Brown": "Cokelat",
+  "Callout": "Sorotan",
+  "Gray": "Abu-abu",
+  "Inline code": "Kode sebaris",
+  "Orange": "Oranye",
+  "Purple": "Ungu",
+  "Red": "Merah",
+  "Text colour": "Warna teks",
+  "Text colour: {color}": "Warna teks: {color}",
+  "Code block": "Blok kode",
 };
 
 export default id;

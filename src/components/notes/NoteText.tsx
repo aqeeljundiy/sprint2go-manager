@@ -16,9 +16,12 @@ export interface NoteTextHandle {
   blur: () => void;
   /** Formatting on what's selected (or from the caret on). */
   cmd: (name: string, value?: string) => void;
-  block: (tag: 'P' | 'H1' | 'H2' | 'H3' | 'BLOCKQUOTE') => void;
+  block: (tag: 'P' | 'H1' | 'H2' | 'H3' | 'BLOCKQUOTE' | 'PRE') => void;
   checklist: () => void;
   highlight: (color: string | null) => void;
+  color: (color: string | null) => void;
+  code: () => void;
+  callout: () => void;
   moveLine: (dir: -1 | 1) => void;
   insertHtml: (html: string) => void;
   link: (href: string, text?: string) => void;
@@ -113,7 +116,7 @@ export const NoteText = forwardRef<NoteTextHandle, {
     const on = new Set<string>();
     for (const c of ['bold', 'italic', 'underline', 'strikeThrough', 'insertUnorderedList', 'insertOrderedList']) if (document.queryCommandState(c)) on.add(c);
     if (b?.matches('li.done')) on.delete('strikeThrough'); // a ticked line is struck through by its look, not by a style
-    const head = b?.closest('h1, h2, h3, blockquote');
+    const head = b?.closest('h1, h2, h3, blockquote, pre');
     if (head) on.add(head.tagName === 'BLOCKQUOTE' ? 'quote' : head.tagName.toLowerCase());
     cb.current.onCaret?.({ inList: !!list && root.contains(list), inChecklist: !!list?.classList.contains('checklist'), selection: !sel.isCollapsed, on });
   }, []);
@@ -200,6 +203,31 @@ export const NoteText = forwardRef<NoteTextHandle, {
           sel?.removeAllRanges();
           sel?.addRange(r);
         }
+      }),
+    color: (color) =>
+      run(() => {
+        exec('styleWithCSS', 'true');
+        exec('foreColor', color ?? 'inherit');
+        exec('styleWithCSS', 'false');
+      }),
+    // Inline code on the selected words; the same again takes it off.
+    code: () =>
+      run(() => {
+        const sel = getSelection();
+        const inCode = (sel?.anchorNode?.parentElement ?? null)?.closest('code');
+        if (inCode && el.current!.contains(inCode) && !inCode.closest('pre')) return void inCode.replaceWith(...inCode.childNodes);
+        const words = sel?.toString() ?? '';
+        if (!words) return;
+        exec('insertHTML', '<code>' + words.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</code>&#8203;');
+      }),
+    // A callout: a tinted box around the line (a quote with the callout class); the same again makes it a plain line.
+    callout: () =>
+      run(() => {
+        const root = el.current!;
+        const q = blockOf(getSelection()?.anchorNode ?? null, root)?.closest('blockquote');
+        if (q && root.contains(q) && q.classList.contains('callout')) return void exec('formatBlock', 'P');
+        if (!q) exec('formatBlock', 'BLOCKQUOTE');
+        blockOf(getSelection()?.anchorNode ?? null, root)?.closest('blockquote')?.classList.add('callout');
       }),
     highlight: (color) =>
       run(() => {

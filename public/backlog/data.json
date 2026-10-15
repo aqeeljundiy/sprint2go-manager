@@ -2502,6 +2502,24 @@
       "detail": "From the user, 15 Oct.",
       "priority": "high",
       "status": "todo"
+    },
+    {
+      "id": "R-M5",
+      "round": "Inbox (raw)",
+      "area": "Chat",
+      "title": "Phone Chat: Catch up pill sits too close under the header; needs breathing room",
+      "detail": "From the user, 15 Oct.",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "R-M6",
+      "round": "Inbox (raw)",
+      "area": "Tables",
+      "title": "Phone Tables: the spreadsheet grid truncates every column; default to a card list / gallery on phones (Airtable, Notion mobile)",
+      "detail": "From the user, 15 Oct: make it a gallery. Also question every view for phone friendliness.",
+      "priority": "high",
+      "status": "todo"
     }
   ]
 }

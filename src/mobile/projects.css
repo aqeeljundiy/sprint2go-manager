@@ -167,7 +167,15 @@
 
 @media (max-width: 767px) {
   .tbr-row > .icon-tile {
-    margin-right: 12px;
+    margin: 0;
+  }
+  /* A project's letter tile is 32 px: its slot grows to fit, and the divider starts at the name (16 + 32 + 12). */
+  .tbr-icon:has(.icon-tile) {
+    width: auto;
+    height: auto;
+  }
+  .tbr-row:has(.icon-tile) + .tbr-row::before {
+    left: 60px;
   }
 }
 
