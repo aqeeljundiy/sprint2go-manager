@@ -406,6 +406,7 @@ const id: Dict = {
 export const STR: Record<Lang, Dict> = { en, id };
 
 export function startLang(): Lang {
+  if (/^\/id\/?$/.test(location.pathname)) return 'id';
   try {
     const saved = localStorage.getItem('s2g-lang');
     if (saved === 'en' || saved === 'id') return saved;

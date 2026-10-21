@@ -47,7 +47,8 @@ export const DEFAULT_SETTINGS: Settings = {
   title: 'COO',
   avatarColor: '#166534',
   signature: '<p><b>James</b><br>COO</p>',
-  theme: 'system',
+  // The demo (/try) opens light, like the landing page it comes from; a visitor can still switch.
+  theme: typeof location !== 'undefined' && /^\/try(\/|$)/.test(location.pathname) ? 'light' : 'system',
   accent: '#5b5bf6',
   density: 'comfortable',
   undoSend: 10, // the mail engine holds each email this long (server/mailer.ts); Undo lasts exactly as long

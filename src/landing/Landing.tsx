@@ -67,7 +67,8 @@ function useReveal(lang: Lang) {
   }, [lang]);
 }
 
-const SECTIONS = ['product', 'agency', 'partners', 'pricing', 'faq'] as const;
+// In the order they come down the page, so the nav's pill only ever moves one way while scrolling.
+const SECTIONS = ['product', 'partners', 'agency', 'pricing', 'faq'] as const;
 
 function LangSwitch() {
   const { lang, setLang } = useT();
@@ -463,7 +464,7 @@ function Pricing() {
 function Page() {
   const { t, lang } = useT();
   useReveal(lang);
-  const [open, setOpen] = useState<number | null>(0);
+  const [open, setOpen] = useState<number | null>(null);
   const needIcons: [LucideIcon, 'warn' | undefined, ReactNode?][] = [
     [TriangleAlert, 'warn', <Bell size={13} />],
     [ListChecks, undefined],
@@ -823,14 +824,16 @@ function Page() {
 }
 
 /** The landing page, in English or Bahasa Indonesia (the browser's language first, then whatever the visitor picks). */
-export function Landing() {
-  const [lang, setLangState] = useState<Lang>(startLang);
+export function Landing({ initialLang }: { initialLang?: Lang }) {
+  const [lang, setLangState] = useState<Lang>(() => initialLang ?? startLang());
   const ctx = useMemo(
     () => ({
       lang,
       t: STR[lang],
       setLang: (l: Lang) => {
         setLangState(l);
+        // Each language has its own address (/ and /id), so a shared link opens in the language it was shared in.
+        if (location.pathname === '/' || location.pathname === '/id') history.replaceState(null, '', (l === 'id' ? '/id' : '/') + location.search + location.hash);
         try {
           localStorage.setItem('s2g-lang', l);
         } catch {

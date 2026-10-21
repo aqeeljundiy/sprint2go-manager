@@ -2365,3 +2365,62 @@ button {
     inset: -12px -4px;
   }
 }
+
+/* ---------- audit, Oct 2026 ---------- */
+/* The floating notes sit in space kept for them around the mock, never over it (CLAUDE.md, Balanced). */
+.ln-hero-art {
+  padding: 46px 0;
+}
+.ln-float.f1 {
+  top: 0;
+  left: auto;
+  right: 6%;
+}
+.ln-float.f2 {
+  top: auto;
+  bottom: 0;
+  right: 4%;
+}
+.ln-float.f3 {
+  bottom: 0;
+  left: 4%;
+}
+@media (max-width: 760px) {
+  .ln-hero-art {
+    padding: 0;
+  }
+  /* Tap targets of at least 44 px on phones. */
+  .ln-btn,
+  .ln-burger {
+    min-height: var(--tap, 44px);
+  }
+  .ln-burger {
+    width: 44px;
+    padding: 12px 10px;
+  }
+  .ln-lang button {
+    min-height: 44px;
+  }
+  .ln-foot nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .ln-foot nav {
+    gap: 0 18px;
+  }
+  /* The hero's badge stays on one line. */
+  .ln-eyebrow {
+    font-size: 12px;
+    padding: 5px 10px;
+    white-space: nowrap;
+  }
+}
+@media (max-width: 760px) {
+  .tour-tabs button {
+    min-height: 44px;
+  }
+}
+.ln-pop {
+  font-size: 12px;
+}

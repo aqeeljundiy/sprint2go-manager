@@ -1012,7 +1012,7 @@ function siteRedirect(req: IncomingMessage, res: ServerResponse, p: string) {
   if (host === `www.${SITE_HOST}`) return to(`${SITE_URL}${req.url ?? '/'}`);
   if (host !== SITE_HOST) return false;
   const landingFile = /^\/(assets\/|favicon|apple-touch-icon|icon-|manifest\.webmanifest|robots\.txt|sw\.js$)/.test(p);
-  if (p === '/' || p === '/welcome' || landingFile || p === '/api/pricing' || p === '/api/health') return false;
+  if (p === '/' || p === '/id' || p === '/welcome' || landingFile || p === '/api/pricing' || p === '/api/health') return false;
   return to(`${PUBLIC_URL}${req.url ?? '/'}`);
 }
 const BOT_LIVE = new Set(['queued', 'joining', 'waiting_room', 'recording', 'stopping', 'processing']);
@@ -1255,11 +1255,13 @@ function serveStatic(req: IncomingMessage, res: ServerResponse, site = false) {
     if (path === '/backlog' || path === '/backlog/') file = join(DIST, 'backlog', 'index.html');
   }
   // With a separate marketing site, the app's own address opens on sign-in, not the landing page.
-  if (((path === '/' && (site || (!SITE_HOST && !signedIn))) || path === '/welcome') && !branded) {
-    file = join(DIST, 'landing.html');
+  // /id is the same page in Bahasa Indonesia, rendered at build time (scripts/prerender-landing.mjs).
+  const landingId = /^\/id\/?$/.test(path) && (site || (!SITE_HOST && !signedIn));
+  if (((path === '/' && (site || (!SITE_HOST && !signedIn))) || path === '/welcome' || landingId) && !branded) {
+    file = join(DIST, landingId ? 'landing.id.html' : 'landing.html');
     // Counted here (no tracking script): where visitors came from, kept in a first-party cookie until they sign up.
     const source = visitSource(req);
-    if (path === '/' && req.method === 'GET') platform.countView('/', source);
+    if ((path === '/' || landingId) && req.method === 'GET') platform.countView('/', source);
     // Shared with the app's address (app.sprint2go.com) so sign-ups there know where the visit came from.
     if (source !== 'direct' && !cookie(req, 's2g_src')) res.setHeader('set-cookie', `s2g_src=${source}; Path=/; Max-Age=${30 * 86400}; SameSite=Lax${SITE_DOMAIN ? `; Domain=${SITE_DOMAIN}` : ''}`);
   }
