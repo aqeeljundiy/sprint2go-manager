@@ -131,7 +131,8 @@ export const countedMailboxes = (accounts: { email?: string; kind?: string; prov
 /** What each person adds to the company's shared AI allowance on "AI included" plans (per month). */
 export const ALLOWANCE = { braindump: 10, ask: 20, meetingHours: 6, summary: 50, draft: 30 };
 
-export const rp = (n: number) => 'Rp ' + Math.round(n).toLocaleString('id-ID');
+// A no-break space: "Rp" never ends a line apart from its number.
+export const rp = (n: number) => 'Rp ' + Math.round(n).toLocaleString('id-ID');
 
 /** Prices can be changed from the operator backend without a release: the server and the app apply the same override. */
 export interface PricingOverride {

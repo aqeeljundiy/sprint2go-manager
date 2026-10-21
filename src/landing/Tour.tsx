@@ -31,7 +31,11 @@ function MailMock({ m }: { m: Dict['tm'] }) {
         </div>
       ))}
       <div className="tm-found">
-        <Sparkles size={13} /> {m.found} <b>{m.foundTask}</b>, {m.foundDue} <span className="tm-add">{m.add}</span>
+        <Sparkles size={13} />
+        <span className="tm-found-txt">
+          {m.found} <b>{m.foundTask}</b>, {m.foundDue}
+        </span>
+        <span className="tm-add">{m.add}</span>
       </div>
     </div>
   );
@@ -101,7 +105,10 @@ function TasksMock({ m }: { m: Dict['tm'] }) {
         ))}
       </div>
       <div className="tm-found">
-        <Check size={13} /> {m.approved} <b>{m.cards[2]}</b>. {m.moved}
+        <Check size={13} />
+        <span className="tm-found-txt">
+          {m.approved} <b>{m.cards[2]}</b>. {m.moved}
+        </span>
       </div>
     </div>
   );

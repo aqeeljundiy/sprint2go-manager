@@ -944,7 +944,7 @@ button {
   translate: 0 18px;
   transition: opacity 0.6s ease, translate 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
-.rv.in {
+.rv[data-in] {
   opacity: 1;
   translate: 0 0;
 }
@@ -2423,4 +2423,79 @@ button {
 }
 .ln-pop {
   font-size: 12px;
+}
+/* The selection's "Make a task" sits beside the highlighted line, never over the line above it. */
+.tm-pop {
+  position: relative;
+  left: auto;
+  top: auto;
+  margin-left: 8px;
+  vertical-align: 1px;
+  font-size: 12px;
+}
+/* Headings never leave one word alone on a line; body copy avoids it where the browser can. */
+.ln h1,
+.ln h2,
+.ln h3 {
+  text-wrap: balance;
+}
+.ln p,
+.ln li,
+.ln small {
+  text-wrap: pretty;
+}
+/* The found-to-do bar: its sentence is one piece, so the comma stays with its word. */
+.tm-found-txt {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+/* The client list in the agency mock: plain dividers, no rounded ends. */
+.am-row {
+  border-radius: 0;
+}
+/* Works-with names wrap into two even rows, not a row and a leftover pair. */
+.ln-marquee.still .ln-marquee-track {
+  max-width: 980px;
+  margin: 0 auto;
+}
+/* The founder's one link reads as a button now that it stands alone. */
+.ln-founder-links .ln-btn {
+  border: 1px solid var(--border);
+}
+.ln-toggle button {
+  white-space: nowrap;
+}
+@media (max-width: 760px) {
+  /* All eight apps fit across a phone, no hidden tab off the edge. */
+  .tour-tabs {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: 2px;
+    padding: 6px;
+  }
+  .tour-tabs button {
+    padding: 10px 0;
+  }
+  .ln-toggle button {
+    padding: 8px 14px;
+  }
+}
+@media (min-width: 761px) and (max-width: 1020px) {
+  .tour-tabs {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: 2px;
+  }
+  .tour-tabs button {
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 0;
+    font-size: 12px;
+  }
+}
+@media (max-width: 1180px) {
+  /* Two notes under the mock no longer fit side by side: keep one. */
+  .ln-float.f2 {
+    display: none;
+  }
 }
