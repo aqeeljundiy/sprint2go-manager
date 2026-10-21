@@ -699,7 +699,7 @@ function Page() {
             <p>{t.about.quote}</p>
           </div>
           <article className="ln-founder rv" style={{ ['--i' as string]: 1 }}>
-            <span className="ln-founder-av">AJ</span>
+            <img className="ln-founder-av" src="/founder.jpg" alt="Aqeel" width={72} height={72} loading="lazy" />
             <div>
               <h3>Aqilla Abdurrahman Jundiy (Aqeel)</h3>
               <p className="ln-founder-role">{t.about.role}</p>

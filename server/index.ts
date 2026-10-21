@@ -1011,7 +1011,7 @@ function siteRedirect(req: IncomingMessage, res: ServerResponse, p: string) {
   const to = (url: string) => (res.writeHead(301, { location: url, 'cache-control': 'max-age=3600' }), res.end(), true);
   if (host === `www.${SITE_HOST}`) return to(`${SITE_URL}${req.url ?? '/'}`);
   if (host !== SITE_HOST) return false;
-  const landingFile = /^\/(assets\/|favicon|apple-touch-icon|icon-|manifest\.webmanifest|robots\.txt|sw\.js$)/.test(p);
+  const landingFile = /^\/(assets\/|founder\.jpg$|favicon|apple-touch-icon|icon-|manifest\.webmanifest|robots\.txt|sw\.js$)/.test(p);
   if (p === '/' || p === '/id' || p === '/welcome' || landingFile || p === '/api/pricing' || p === '/api/health') return false;
   return to(`${PUBLIC_URL}${req.url ?? '/'}`);
 }
@@ -1166,7 +1166,7 @@ async function writeMeetingNotes(id: string, again = false) {
 
 /* ---------- the app itself ---------- */
 
-const TYPES: Record<string, string> = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.ico': 'image/x-icon', '.woff2': 'font/woff2', '.json': 'application/json', '.webmanifest': 'application/manifest+json', '.webp': 'image/webp' };
+const TYPES: Record<string, string> = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.ico': 'image/x-icon', '.woff2': 'font/woff2', '.json': 'application/json', '.webmanifest': 'application/manifest+json', '.webp': 'image/webp', '.jpg': 'image/jpeg' };
 /** The company whose own address this request came to (its clients' door), if any: a live address, or <slug>.localhost to try it. */
 function brandedHost(req: IncomingMessage): any {
   const host = hostOf(req);

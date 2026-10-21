@@ -2499,3 +2499,11 @@ button {
     display: none;
   }
 }
+/* The founder's photo in place of initials. */
+img.ln-founder-av {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  background: var(--hover);
+  box-shadow: 0 0 0 3px var(--surface), 0 12px 30px -14px rgba(11, 12, 16, 0.45);
+}
