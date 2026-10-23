@@ -200,7 +200,7 @@ export function NewAccount({ workspace, userId, onAdd, onClose }: { workspace: W
           <label>{t('Email address')}</label>
           {split ? (
             <div className="email-split">
-              <input autoFocus value={local} onChange={(e) => setLocal(e.target.value.replace(/s/g, ''))} onKeyDown={(e) => e.key === 'Enter' && add()} placeholder={kind === 'shared' ? 'hello' : 'isabel'} aria-label={t('Name before the @')} />
+              <input autoFocus value={local} onChange={(e) => setLocal(e.target.value.replace(/\s/g, ''))} onKeyDown={(e) => e.key === 'Enter' && add()} placeholder={kind === 'shared' ? 'hello' : 'isabel'} aria-label={t('Name before the @')} />
               {doms.length > 1 ? <Select<string> value={domain} onChange={setDomain} label={t('Domain')} title={t('Domain')} className="sel-flat" width={220} options={doms.map((d) => ({ value: d, label: `@${d}` }))} /> : <span>@{domain}</span>}
             </div>
           ) : (
