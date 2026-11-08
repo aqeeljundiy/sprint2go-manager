@@ -260,8 +260,8 @@
     height: 20px;
     padding: 0 8px;
     border-radius: var(--r-tile);
-    background: var(--accent);
-    color: #fff;
+    background: var(--accent-fill);
+    color: var(--on-accent-fill);
     font-size: var(--fs-caption);
   }
   .sec-fold {
@@ -352,8 +352,8 @@
     height: 20px;
     padding: 0 8px;
     border-radius: var(--r-tile);
-    background: var(--accent);
-    color: #fff;
+    background: var(--accent-fill);
+    color: var(--on-accent-fill);
     font-size: var(--fs-caption);
     font-weight: 700;
   }
@@ -1155,8 +1155,8 @@
       color 0.18s;
   }
   .cmp-split.ready {
-    background: var(--accent);
-    color: #fff;
+    background: var(--accent-fill);
+    color: var(--on-accent-fill);
   }
   .cmp-split > button {
     display: grid;
@@ -1251,8 +1251,8 @@
   }
   .cmp-also.on .cmp-check {
     border-color: var(--accent);
-    background: var(--accent);
-    color: #fff;
+    background: var(--accent-fill);
+    color: var(--on-accent-fill);
   }
   .composer.is-phone .rec-bar {
     min-height: 64px;
@@ -1786,8 +1786,8 @@
       color 0.15s;
   }
   .ir-send.ready {
-    background: var(--accent);
-    color: #fff;
+    background: var(--accent-fill);
+    color: var(--on-accent-fill);
   }
   .draft-pill {
     font-size: var(--fs-caption);

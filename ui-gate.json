@@ -1,0 +1,180 @@
+{
+  "name": "sprint2go",
+  "url": "http://127.0.0.1:4342",
+  "surface": "app",
+  "settle": 1200,
+  "routes": [
+    {
+      "name": "home",
+      "path": "/try"
+    },
+    {
+      "name": "mail",
+      "path": "/try/mail"
+    },
+    {
+      "name": "chat",
+      "path": "/try/chat"
+    },
+    {
+      "name": "tasks",
+      "path": "/try/tasks"
+    },
+    {
+      "name": "calendar",
+      "path": "/try/calendar"
+    },
+    {
+      "name": "projects",
+      "path": "/try/projects"
+    },
+    {
+      "name": "meet",
+      "path": "/try/meet"
+    },
+    {
+      "name": "drive",
+      "path": "/try/drive"
+    },
+    {
+      "name": "notes",
+      "path": "/try/notes"
+    },
+    {
+      "name": "tables",
+      "path": "/try/tables"
+    },
+    {
+      "name": "teams",
+      "path": "/try/teams"
+    },
+    {
+      "name": "vault",
+      "path": "/try/vault"
+    },
+    {
+      "name": "settings",
+      "path": "/try/settings"
+    },
+    {
+      "name": "mail-compose",
+      "path": "/try/mail",
+      "steps": [
+        {
+          "click": ".compose-btn:visible, .fab:visible"
+        },
+        {
+          "wait": 500
+        }
+      ]
+    },
+    {
+      "name": "signin",
+      "path": "/signin",
+      "mock": {
+        "**/api/me": {
+          "status": 401,
+          "body": {}
+        }
+      }
+    },
+    {
+      "name": "signup",
+      "path": "/signup",
+      "mock": {
+        "**/api/me": {
+          "status": 401,
+          "body": {}
+        }
+      }
+    },
+    {
+      "name": "admin",
+      "path": "/admin"
+    },
+    {
+      "name": "landing",
+      "path": "/landing.html",
+      "themes": "light-only",
+      "surface": "marketing"
+    }
+  ],
+  "themes": {
+    "mode": "attr",
+    "attr": "data-theme",
+    "light": "light",
+    "dark": "dark"
+  },
+  "source": {
+    "include": [
+      "src"
+    ],
+    "tokenFiles": [
+      "tokens.css"
+    ]
+  },
+  "house": {
+    "mobileFullWidthButtons": false,
+    "nativeControls": true
+  },
+  "scale": {
+    "space": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      6,
+      8,
+      10,
+      12,
+      14,
+      16,
+      18,
+      20,
+      24,
+      28,
+      32,
+      36,
+      40,
+      44,
+      48,
+      52,
+      56,
+      60,
+      64,
+      80,
+      96
+    ],
+    "radius": [
+      0,
+      2,
+      4,
+      6,
+      8,
+      10,
+      12,
+      14,
+      16,
+      20,
+      24,
+      28,
+      32
+    ]
+  },
+  "ignore": [
+    "moves-by-itself@conn-dot",
+    "emoji@row-subject",
+    "emoji@row-subj-text",
+    "gradient-text-source@landing.css",
+    "moves-by-itself@=i",
+    "low-contrast@client-badge",
+    "ai-gradient@ln-final",
+    "low-contrast@src-mark",
+    "tiny-text@src-mark",
+    "external-arrow-source@Automations",
+    "emoji@ev-card-title",
+    "emoji@cm-text",
+    "emoji@mh-text"
+  ]
+}

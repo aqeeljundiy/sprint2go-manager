@@ -150,8 +150,8 @@
   }
   .gm-selall-btn.on .gm-selall-box {
     border-color: var(--accent);
-    background: var(--accent);
-    color: #fff;
+    background: var(--accent-fill);
+    color: var(--on-accent-fill);
   }
   .list-offline {
     display: block;
@@ -206,6 +206,14 @@
     width: var(--av-m);
     height: var(--av-m);
     margin: 0;
+  }
+  .recip-chips input {
+    min-height: var(--tap);
+  }
+  .gm-row .row-av::after {
+    content: '';
+    position: absolute;
+    inset: calc((var(--av-m) - var(--tap)) / 2); /* 44 pt to tap, 40 to see */
   }
   .gm-row .row-check {
     inset: 0;
@@ -2389,8 +2397,8 @@
     flex: none;
     padding: 0 8px;
     border-radius: var(--r-pill);
-    background: var(--accent);
-    color: #fff;
+    background: var(--accent-fill);
+    color: var(--on-accent-fill);
     font: var(--t-chip);
   }
   .gm-nav-count.gm-nav-new {
@@ -2495,12 +2503,12 @@
     width: 100%;
   }
   /* Contacts, Other contacts, Team: underline tabs across the width; the line slides (slidingTabs.ts). */
-  .ct-line {
+  .ct-tabs.ct-line {
     display: flex;
     margin: 0 calc(-1 * var(--gutter));
     border-bottom: 1px solid var(--line);
   }
-  .ct-line > button {
+  .ct-tabs.ct-line > button {
     flex: 1;
     min-width: 0;
     min-height: var(--tap);
@@ -2514,7 +2522,7 @@
     text-overflow: ellipsis;
     transition: color 0.15s ease, border-color 0.15s ease;
   }
-  .ct-line > button.on {
+  .ct-tabs.ct-line > button.on {
     border-bottom-color: var(--accent);
     color: var(--accent-text);
   }
@@ -2935,8 +2943,8 @@
       color 0.15s;
   }
   .compose.phone .compose-send-icon.ready {
-    background: var(--accent);
-    color: #fff;
+    background: var(--accent-fill);
+    color: var(--on-accent-fill);
   }
   /* Rows: the line stops at the right gutter too, and values sit on one centred line. */
   .compose.phone .compose-field,

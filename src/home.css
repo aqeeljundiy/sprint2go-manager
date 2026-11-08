@@ -58,7 +58,7 @@
   border: 0;
   border-top: 1px solid var(--line);
   background: none;
-  color: var(--accent);
+  color: var(--accent-text);
   font: inherit;
   font-size: 14px;
   font-weight: 600;
@@ -101,7 +101,7 @@
 .ny-row.k-assigned .ny-icon,
 .ny-row.k-queue .ny-icon {
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
 }
 .ny-row.k-mention .ny-icon,
 .ny-row.k-guest .ny-icon,
@@ -114,6 +114,7 @@
   color: var(--ok);
 }
 .ny-text {
+  min-height: var(--tap);
   flex: 1;
   min-width: 0;
   display: grid;
@@ -163,17 +164,17 @@
   background: color-mix(in oklab, var(--accent) 14%, var(--hover));
 }
 .ny-btn.primary {
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
 }
 .ny-btn.primary:hover {
-  background: var(--accent-hover);
+  background: var(--accent-fill-hover);
 }
 .sel.ny-assign {
   height: 32px;
 }
 .ny-more {
-  margin: 6px 0 4px 46px;
+  margin: 6px 0 4px 48px;
 }
 
 /* ---------- A meeting about to start, a huddle going on ---------- */
@@ -204,8 +205,8 @@
   width: 36px;
   height: 36px;
   border-radius: 12px;
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
 }
 .hcall-icon {
   background: var(--ok-solid);
@@ -251,7 +252,7 @@
   white-space: nowrap;
 }
 .upn-text small {
-  color: var(--accent);
+  color: var(--accent-text);
   font-size: 12.5px;
   font-weight: 600;
 }
@@ -376,7 +377,7 @@
 .htd-title small {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   color: var(--text-3);
   font-size: 12px;
 }
@@ -487,7 +488,7 @@
 .join-soon-chip {
   font-size: 12px;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--accent-text);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }

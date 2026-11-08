@@ -82,11 +82,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
-  padding: 7px 0 6px;
+  gap: 2px;
+  padding: 6px 0 4px; /* 12 px labels without making the rail taller: AppRail overflows by row height */
   border-radius: 14px;
   color: var(--text-3);
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 600;
   transition: color 0.15s, background 0.15s;
 }
@@ -117,7 +117,7 @@
 }
 .rail-app.on .rail-icon {
   background: var(--surface);
-  color: var(--accent);
+  color: var(--accent-text);
   box-shadow: 0 1px 2px rgba(11, 12, 16, 0.08), 0 6px 16px -8px rgba(11, 12, 16, 0.25);
 }
 .rail-icon i,
@@ -126,14 +126,14 @@
   top: -4px;
   right: -2px;
   min-width: 17px;
-  padding: 1px 5px;
+  padding: 1px 4px;
   border-radius: 10px;
-  background: var(--accent);
-  color: #fff;
-  font-size: 10px;
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
+  font-size: 12px;
   font-style: normal;
   font-weight: 700;
-  line-height: 1.4;
+  line-height: 1.3;
   box-shadow: 0 0 0 2px var(--bg);
 }
 .rail-foot {
@@ -281,9 +281,9 @@
   place-items: center;
   width: 28px;
   height: 28px;
-  border-radius: 9px;
+  border-radius: 8px;
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
 }
 .nt-icon.k-mention {
   background: color-mix(in srgb, #f59e0b 14%, transparent);
@@ -304,7 +304,7 @@
   line-height: 1.4;
 }
 .nt-text time {
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--text-3);
   font-weight: 400;
 }
@@ -361,10 +361,8 @@
 }
 .palette-group {
   padding: 10px 10px 4px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
   color: var(--text-3);
 }
 .palette li button {
@@ -372,7 +370,7 @@
   align-items: center;
   gap: 10px;
   width: 100%;
-  padding: 9px 10px;
+  padding: 8px 10px;
   border-radius: 10px;
   text-align: left;
   color: var(--text-2);
@@ -391,7 +389,7 @@
   color: var(--text);
 }
 .palette li button.hi svg {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .pi-title {
   flex: 1;
@@ -444,12 +442,12 @@
 .client-chip {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 1px 8px 1px 7px;
+  gap: 4px;
+  padding: 1px 8px 1px 8px;
   border-radius: 9999px;
   background: color-mix(in srgb, var(--c) 13%, transparent);
-  color: color-mix(in srgb, var(--c) 80%, var(--text));
-  font-size: 11.5px;
+  color: color-mix(in srgb, var(--c) 55%, var(--text));
+  font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -471,14 +469,14 @@
 .client-badge {
   width: 36px;
   height: 36px;
-  border-radius: 11px;
+  border-radius: 12px;
   font-size: 16px;
 }
 .client-dot {
   width: 20px;
   height: 20px;
-  border-radius: 7px;
-  font-size: 10.5px;
+  border-radius: 8px;
+  font-size: 12px;
 }
 .lead-tag {
   margin-left: 6px;
@@ -486,11 +484,9 @@
   border-radius: 9999px;
   background: var(--hover);
   color: var(--text-3);
-  font-size: 10px;
+  font-size: 12px;
   font-style: normal;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
 .add-client {
   display: grid;
@@ -592,7 +588,7 @@
   justify-content: flex-start;
 }
 .home-card h3 svg {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .home-card h3 .link-btn {
   margin-left: auto;
@@ -645,7 +641,7 @@
   width: 62px;
   font-size: 12.5px;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--accent-text);
   font-variant-numeric: tabular-nums;
 }
 .home-mail > span {
@@ -673,7 +669,7 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--text-3);
 }
 .home-foot {
@@ -810,7 +806,7 @@
 }
 .due.doing {
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
 }
 .assignee {
   position: relative;
@@ -869,8 +865,6 @@
   padding: 2px 4px 4px;
   font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
   color: var(--text-3);
 }
 .board-head span {
@@ -921,7 +915,7 @@
 .dump-title {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   color: var(--ai);
   font-size: 14px;
 }
@@ -984,7 +978,7 @@
   flex: 1 1 120px;
   min-width: 0;
   padding: 6px 8px;
-  border-radius: 9px;
+  border-radius: 8px;
   border: 1px solid var(--border);
   background: var(--surface);
   font-size: 13px;
@@ -1059,7 +1053,7 @@
   border-radius: 9999px;
   background: var(--surface-2);
   border: 1px solid var(--border);
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-3);
 }
@@ -1094,7 +1088,7 @@
   font-size: 14px;
 }
 .cm-head time {
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--text-3);
 }
 .cm-text {
@@ -1105,7 +1099,7 @@
 }
 .mention {
   padding: 0 3px;
-  border-radius: 5px;
+  border-radius: 4px;
   background: color-mix(in srgb, #f59e0b 16%, transparent);
   color: #b45309;
   font-weight: 600;
@@ -1127,7 +1121,7 @@
   text-align: left;
 }
 .cm-task svg {
-  color: var(--accent);
+  color: var(--accent-text);
   flex: none;
 }
 .cm-task span {
@@ -1153,7 +1147,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 9px;
+  padding: 4px 8px;
   border-radius: 9999px;
   border: 1px solid var(--border);
   background: var(--surface);
@@ -1168,7 +1162,7 @@
   opacity: 1;
 }
 .cm-action:hover {
-  color: var(--accent);
+  color: var(--accent-text);
   border-color: var(--accent);
 }
 .chat-start {
@@ -1221,7 +1215,7 @@
   align-items: center;
   gap: 8px;
   width: 100%;
-  padding: 7px 8px;
+  padding: 8px 8px;
   border-radius: 8px;
   text-align: left;
 }
@@ -1323,7 +1317,7 @@
 }
 .meet-open:hover {
   border-color: var(--accent);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .meet-detail {
   flex: 1;
@@ -1345,14 +1339,14 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-bottom: 22px;
+  margin-bottom: 24px;
   font-size: 13px;
   color: var(--text-2);
 }
 .meet-summary {
   font-size: 15.5px;
   line-height: 1.65;
-  margin: 4px 0 22px;
+  margin: 4px 0 24px;
 }
 .meet-actions-head {
   display: flex;
@@ -1439,7 +1433,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 14px 14px 14px 22px;
+  padding: 14px 14px 14px 24px;
   border-bottom: 1px solid var(--border);
 }
 .ob-steps {
@@ -1462,14 +1456,14 @@
   height: 20px;
   border-radius: 50%;
   background: var(--hover);
-  font-size: 11px;
+  font-size: 12px;
 }
 .ob-steps .on {
   color: var(--text);
 }
 .ob-steps .on b {
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
 }
 .ob-steps .done b {
   background: #10b981;
@@ -1478,7 +1472,7 @@
 .onboard-body {
   flex: 1;
   overflow-y: auto;
-  padding: 24px 26px 26px;
+  padding: 24px 24px 24px;
   animation: viewIn 0.25s var(--ease);
 }
 .onboard-body h2 {
@@ -1507,7 +1501,7 @@
 .ob-app.on {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
 }
 .ob-app strong {
   color: var(--text);
@@ -1568,7 +1562,7 @@
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 .ob-setup.on > svg {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .ob-provider {
   margin-top: 16px;
@@ -1587,7 +1581,7 @@
 }
 .ob-dns td small {
   display: block;
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--text-3);
 }
 .ob-dns .sel {
@@ -1607,7 +1601,7 @@
 .ob-person input,
 .ob-person select {
   min-width: 0;
-  padding: 9px 10px;
+  padding: 8px 10px;
   border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--surface-2);
@@ -1757,7 +1751,7 @@
 }
 .ob-industry small {
   color: var(--text-3);
-  font-size: 11.5px;
+  font-size: 12px;
 }
 .ob-industry:hover {
   background: var(--hover);

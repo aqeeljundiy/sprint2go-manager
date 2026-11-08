@@ -20,15 +20,26 @@
   --accent: var(--brand);
   --accent-hover: color-mix(in oklab, var(--brand) 86%, black);
   --accent-soft: color-mix(in oklab, var(--brand) 11%, transparent);
-  --accent-text: var(--brand-ink, color-mix(in oklab, var(--brand) 88%, black)); /* the accent as text: 4.5:1 */
+  --accent-ink: var(--brand-ink, color-mix(in oklab, var(--brand) 88%, black)); /* the accent at 4.5:1 on white */
+  --accent-text: color-mix(in oklab, var(--accent-ink) 88%, black); /* the accent as text, readable on its own tint too */
+  /* The accent as a filled surface with a label on it. Tuned per theme: white on a coral or amber brand fails, so
+     light mode fills with the deep shade, and dark mode fills with the lifted accent under dark ink. */
+  --ctl: 36px; /* buttons and icon buttons side by side, desktop */
+  --ctl-sm: 30px;
+  --accent-fill: var(--accent-ink);
+  --accent-fill-hover: color-mix(in oklab, var(--accent-fill) 88%, black);
+  --on-accent-fill: #fff;
+  --accent-on-soft: color-mix(in oklab, var(--accent-text) 80%, black); /* accent text on its own soft tint */
 
   /* Red, amber and green mean late, waiting and done, nothing else. */
-  --danger: #c93434;
+  --danger: #b42a2a;
+  --danger-fill: #b42a2a;
+  --on-danger-fill: #fff;
   --danger-soft: color-mix(in oklab, #c93434 10%, transparent);
-  --warn: #a8640c;
+  --warn: #8c5208;
   --warn-solid: #e39a26;
   --warn-soft: color-mix(in oklab, #e39a26 14%, transparent);
-  --ok: #14845a;
+  --ok: #0e6f4b;
   --ok-solid: #22a06b;
   --ok-soft: color-mix(in oklab, #22a06b 12%, transparent);
   --info: #2563eb;
@@ -160,8 +171,14 @@
   --accent-hover: color-mix(in oklab, var(--brand) 62%, #ffffff);
   --accent-soft: color-mix(in oklab, var(--brand) 18%, transparent);
   --accent-text: var(--brand-ink-dark, color-mix(in oklab, var(--brand) 60%, #ffffff));
+  --accent-fill: var(--accent);
+  --accent-fill-hover: var(--accent-hover);
+  --on-accent-fill: #121317;
+  --accent-on-soft: var(--accent-text);
 
   --danger: #f08b8b;
+  --danger-fill: #f08b8b;
+  --on-danger-fill: #121317;
   --danger-soft: color-mix(in oklab, #e26d6d 16%, transparent);
   --warn: #e8bb6a;
   --warn-solid: #d9a248;

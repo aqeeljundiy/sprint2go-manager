@@ -288,10 +288,10 @@
     content: attr(data-tab);
     display: inline-block;
     margin-left: 6px;
-    padding: 0 5px;
+    padding: 0 4px;
     border: 1px solid var(--border);
     border-radius: 4px;
-    font-size: 10px;
+    font-size: 12px;
     line-height: 14px;
     vertical-align: 1px;
     color: var(--text-3);
@@ -474,7 +474,7 @@ iframe.print-frame {
 .recip-chip button.recip-face:hover,
 .recip-chip button.recip-face[aria-expanded='true'] {
   background: none;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .recip-chip button.recip-face::after {
   display: none;

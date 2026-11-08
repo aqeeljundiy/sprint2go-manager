@@ -7,7 +7,7 @@
 
 .notes-nav .note-item {
   position: relative;
-  padding-right: 34px;
+  padding-right: 32px;
   transition: background 0.15s;
 }
 .note-item:focus-visible {
@@ -17,7 +17,7 @@
 .ni-snip mark,
 .note-item mark {
   padding: 0 1px;
-  border-radius: 3px;
+  border-radius: 4px;
   background: rgba(250, 204, 21, 0.38);
   color: inherit;
 }
@@ -245,7 +245,7 @@
   width: 100%;
   max-width: 780px;
   margin: 0 auto;
-  padding: 22px 32px 64px;
+  padding: 24px 32px 64px;
 }
 .note-side {
   padding: 0 24px 32px;
@@ -386,7 +386,7 @@
   color: var(--text);
 }
 .note-text code {
-  padding: 1px 5px;
+  padding: 1px 4px;
   border-radius: 6px;
   background: var(--hover);
   color: #d44c47;
@@ -420,13 +420,13 @@
 .note-text a[href^='mailto:'] {
   text-decoration: none;
   padding: 0 3px;
-  border-radius: 5px;
+  border-radius: 4px;
   background: var(--accent-soft);
 }
 /* A checklist: a box at the start of each line, ticked lines struck through. */
 .note-text ul.checklist {
   list-style: none;
-  padding-left: 30px;
+  padding-left: 32px;
 }
 .note-text ul.checklist > li::before {
   content: '';

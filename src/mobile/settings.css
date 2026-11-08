@@ -1186,7 +1186,7 @@
   padding: 0;
   border: 0;
   background: none;
-  color: var(--accent);
+  color: var(--accent-text);
   font: inherit;
   font-weight: 600;
   cursor: pointer;
@@ -1314,7 +1314,7 @@
     border: 0;
     background: none;
     box-shadow: none;
-    color: var(--accent);
+    color: var(--accent-text);
     font: var(--t-segment);
   }
   .settings-push .mx-add-address .ghost-btn.outline:disabled {
@@ -1396,7 +1396,7 @@
 @media (prefers-reduced-motion: reduce) { .accent-row { transition: none; } }
 
 /* Account on phones: the avatar centred at the top, Edit photo under it */
-.acct-hero { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; min-height: 44px; margin: 4px 0 24px; padding: 0; border: 0; background: none; color: var(--accent); font: inherit; font-size: var(--fs-secondary); font-weight: 600; cursor: pointer; transition: opacity 0.18s ease; }
+.acct-hero { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; min-height: 44px; margin: 4px 0 24px; padding: 0; border: 0; background: none; color: var(--accent-text); font: inherit; font-size: var(--fs-secondary); font-weight: 600; cursor: pointer; transition: opacity 0.18s ease; }
 .acct-hero:active { opacity: 0.7; }
 
 /* The side list: group headers ("You", the company) kept their height (flex shrank them to 0), long names end in an

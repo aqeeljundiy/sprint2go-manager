@@ -36,8 +36,8 @@ textarea {
 
 kbd {
   font: 500 11px/1 'Inter', sans-serif;
-  padding: 3px 5px;
-  border-radius: 5px;
+  padding: 3px 4px;
+  border-radius: 4px;
   border: 1px solid var(--border);
   background: var(--surface-2);
   color: var(--text-3);
@@ -60,25 +60,25 @@ kbd {
   align-items: center;
   gap: 8px;
   margin: 0 4px 16px;
-  padding: 11px 14px;
+  padding: 12px 14px;
   border-radius: 10px;
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
   font-weight: 600;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 4px 12px color-mix(in srgb, var(--accent) 35%, transparent);
   transition: background 0.15s, transform 0.15s;
 }
 .compose-btn:hover {
-  background: var(--accent-hover);
+  background: var(--accent-fill-hover);
 }
 .compose-btn:active {
   transform: scale(0.98);
 }
 .compose-btn kbd {
   margin-left: auto;
-  background: rgba(255, 255, 255, 0.16);
-  border-color: transparent;
-  color: rgba(255, 255, 255, 0.85);
+  background: transparent;
+  border-color: color-mix(in srgb, var(--on-accent-fill) 40%, transparent);
+  color: var(--on-accent-fill);
 }
 
 .nav {
@@ -90,7 +90,7 @@ kbd {
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 12px;
   padding: 8px 12px;
   border-radius: 8px;
   color: var(--text-2);
@@ -108,27 +108,25 @@ kbd {
   box-shadow: var(--shadow);
 }
 .nav-item.active svg {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .nav-item .count {
   margin-left: auto;
   font-size: 12px;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .dot {
   width: 9px;
   height: 9px;
-  border-radius: 3px;
+  border-radius: 4px;
   margin: 0 4px;
 }
 
 .nav-heading {
-  padding: 22px 12px 6px;
-  font-size: 11px;
+  padding: 24px 12px 6px;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
   color: var(--text-3);
 }
 
@@ -165,8 +163,8 @@ kbd {
 .icon-btn {
   display: inline-grid;
   place-items: center;
-  width: 34px;
-  height: 34px;
+  width: var(--ctl);
+  height: var(--ctl);
   border-radius: 8px;
   color: var(--text-2);
   transition: background 0.12s, color 0.12s;
@@ -176,8 +174,8 @@ kbd {
   color: var(--text);
 }
 .icon-btn.sm {
-  width: 28px;
-  height: 28px;
+  width: var(--ctl-sm);
+  height: var(--ctl-sm);
 }
 .icon-btn.starred svg {
   color: var(--star);
@@ -197,10 +195,10 @@ kbd {
 .chip {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   padding: 2px 8px;
   border-radius: 6px;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--c);
   background: color-mix(in srgb, var(--c) 12%, transparent);
@@ -209,7 +207,7 @@ kbd {
 .pill {
   font-size: 12px;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--accent-on-soft);
   background: var(--accent-soft);
   padding: 3px 8px;
   border-radius: 20px;
@@ -218,33 +216,37 @@ kbd {
 .primary-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 9px 14px;
-  border-radius: 9px;
-  background: var(--accent);
-  color: #fff;
+  min-height: var(--ctl);
+  padding: 0 16px;
+  border-radius: 8px;
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
   font-weight: 600;
   transition: background 0.15s, opacity 0.15s;
 }
 .primary-btn:hover {
-  background: var(--accent-hover);
+  background: var(--accent-fill-hover);
 }
 .primary-btn:disabled {
   opacity: 0.45;
   cursor: default;
 }
 .primary-btn kbd {
-  background: rgba(255, 255, 255, 0.16);
-  border-color: transparent;
-  color: rgba(255, 255, 255, 0.85);
+  background: transparent;
+  border-color: color-mix(in srgb, var(--on-accent-fill) 40%, transparent);
+  color: var(--on-accent-fill);
 }
 
 .ghost-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 9px 14px;
-  border-radius: 9px;
+  min-height: var(--ctl);
+  padding: 0 16px;
+  border-radius: 8px;
   color: var(--text-2);
   font-weight: 500;
 }
@@ -299,7 +301,7 @@ kbd {
   gap: 8px;
   padding: 0 10px;
   height: 38px;
-  border-radius: 9px;
+  border-radius: 8px;
   background: var(--surface-2);
   border: 1px solid var(--border);
   color: var(--text-3);
@@ -400,7 +402,7 @@ kbd {
   transition: opacity 0.14s, color 0.16s;
 }
 .row.unread .row-date {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .row-subject {
   margin-top: 2px;
@@ -494,7 +496,7 @@ kbd {
   place-items: center;
   border-radius: 16px;
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
   font-size: 22px;
   font-weight: 700;
 }
@@ -624,7 +626,7 @@ kbd {
 }
 
 .message-body {
-  padding: 2px 16px 18px 66px;
+  padding: 2px 16px 18px 64px;
   line-height: 1.65;
   font-size: 14.5px;
 }
@@ -660,7 +662,7 @@ kbd {
   height: 36px;
   border-radius: 8px;
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
 }
 .file-name {
   font-size: 13px;
@@ -746,7 +748,7 @@ kbd {
   gap: 6px;
   padding: 6px 10px;
   border-radius: 8px;
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 600;
 }
 .toast button:hover {

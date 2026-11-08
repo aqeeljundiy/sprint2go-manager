@@ -386,6 +386,7 @@
     letter-spacing: -0.01em;
   }
   .mt-title-text {
+    line-height: 1.4;
     min-width: 0;
     overflow: hidden;
     white-space: nowrap;
@@ -709,9 +710,9 @@
     height: 56px;
     padding: 0 16px;
     border-radius: var(--r-pill);
-    background: var(--accent);
-    color: #fff;
-    box-shadow: 0 6px 16px -6px color-mix(in srgb, var(--accent) 75%, transparent);
+    background: var(--accent-fill);
+    color: var(--on-accent-fill);
+    box-shadow: 0 6px 16px -6px color-mix(in srgb, var(--accent-fill) 75%, transparent);
     font-size: var(--fs-body);
     font-weight: 600;
     opacity: 0;
@@ -1102,9 +1103,9 @@
     color 0.15s;
 }
 .pull-search.ready {
-  background: var(--accent);
+  background: var(--accent-fill);
   border-color: var(--accent);
-  color: #fff;
+  color: var(--on-accent-fill);
 }
 @media (min-width: 768px) {
   .pull-search {

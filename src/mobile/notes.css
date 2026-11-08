@@ -256,8 +256,8 @@
     height: 44px;
     margin: 0 4px;
     border-radius: 50%;
-    color: #fff;
-    background: var(--accent);
+    color: var(--on-accent-fill);
+    background: var(--accent-fill);
     transition: transform 0.15s, background 0.15s;
   }
   .note-done-circle:active {

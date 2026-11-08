@@ -10,7 +10,7 @@
   --border: #e2e3e9;
   --text: #0b0c10;
   --text-2: #2e3038;
-  --text-3: #777a88;
+  --text-3: #5f6270;
   --warn: #b45309;
   --warn-soft: #fdecd8;
   --ok: #059669;
@@ -62,7 +62,7 @@ button {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  height: 40px;
+  height: 44px;
   padding: 0 18px;
   border-radius: 9999px;
   font-weight: 600;
@@ -205,21 +205,6 @@ button {
   gap: 48px;
   align-items: center;
 }
-.ln-eyebrow,
-.ln-kicker {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 12px;
-  border-radius: 9999px;
-  background: var(--accent-soft);
-  color: var(--accent);
-  font-size: 13px;
-  font-weight: 600;
-}
-.ln-kicker {
-  margin-bottom: 14px;
-}
 .ln-hero h1 {
   margin: 18px 0 18px;
   font-size: clamp(40px, 4.4vw, 60px);
@@ -273,12 +258,6 @@ button {
   border-bottom: 1px solid var(--border);
   background: var(--bg);
 }
-.mock-bar i {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--border);
-}
 .mock-bar span {
   margin: 0 auto;
   padding: 2px 14px;
@@ -286,7 +265,6 @@ button {
   background: var(--surface);
   color: var(--text-3);
   font-size: 11.5px;
-  transform: translateX(-20px);
 }
 .mock-body {
   display: grid;
@@ -319,7 +297,7 @@ button {
   justify-items: center;
   gap: 2px;
   width: 52px;
-  padding: 5px 0;
+  padding: 4px 0;
   border-radius: 10px;
   color: var(--text-3);
 }
@@ -355,7 +333,7 @@ button {
 }
 .mock-main {
   margin: 8px 8px 8px 0;
-  padding: 22px 22px 18px;
+  padding: 24px 24px 18px;
   border-radius: 14px;
   background: var(--bg);
 }
@@ -376,7 +354,7 @@ button {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 9px 12px;
+  padding: 8px 12px;
   margin-bottom: 12px;
   border-radius: 12px;
   background: var(--surface);
@@ -416,7 +394,7 @@ button {
   margin-bottom: 8px;
 }
 .mock-card.big .mk-row {
-  padding: 11px 0;
+  padding: 12px 0;
 }
 .mock-card.big .mk-txt strong {
   font-size: 14.5px;
@@ -428,7 +406,7 @@ button {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 7px 0;
+  padding: 8px 0;
   border-top: 1px solid var(--border);
 }
 .mk-row:first-of-type {
@@ -484,8 +462,8 @@ button {
 .mock-card.sm p {
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 5px 0;
+  gap: 8px;
+  padding: 4px 0;
   font-size: 12px;
   font-weight: 500;
 }
@@ -514,7 +492,7 @@ button {
 
 /* guest mock */
 .gm-body {
-  padding: 22px;
+  padding: 24px;
   background: var(--bg);
 }
 .gm-people {
@@ -589,7 +567,7 @@ button {
   grid-template-columns: 1fr auto;
   gap: 2px 12px;
   align-items: center;
-  padding: 11px 0;
+  padding: 12px 0;
   border-top: 1px solid var(--border);
 }
 .ai-job {
@@ -601,7 +579,7 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 7px 10px 7px 12px;
+  padding: 8px 10px 8px 12px;
   border-radius: 10px;
   border: 1px solid var(--border);
   font-size: 12.5px;
@@ -655,7 +633,7 @@ button {
 }
 .ln-app,
 .ln-opt {
-  padding: 22px;
+  padding: 24px;
   border-radius: 20px;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -700,7 +678,7 @@ button {
   order: 2;
 }
 .ln-lead {
-  margin: 16px 0 22px;
+  margin: 16px 0 24px;
   color: var(--text-2);
   font-size: 17px;
   line-height: 1.6;
@@ -743,7 +721,7 @@ button {
 /* ---------- pricing ---------- */
 .ln-toggle {
   display: inline-flex;
-  margin-top: 22px;
+  margin-top: 24px;
   padding: 4px;
   border-radius: 9999px;
   background: var(--hover);
@@ -821,7 +799,7 @@ button {
   padding: 0;
   display: grid;
   align-content: start;
-  gap: 9px;
+  gap: 8px;
 }
 .ln-price li {
   display: flex;
@@ -836,7 +814,7 @@ button {
   color: var(--ok);
 }
 .ln-note {
-  margin-top: 22px;
+  margin-top: 24px;
   text-align: center;
   color: var(--text-3);
   font-size: 14px;
@@ -847,7 +825,7 @@ button {
   max-width: 780px;
 }
 .ln-faq-wrap h2 {
-  margin-bottom: 26px;
+  margin-bottom: 24px;
   text-align: center;
 }
 .ln-faq {
@@ -915,7 +893,7 @@ button {
   opacity: 0.85;
 }
 .ln-foot {
-  padding: 30px 0 40px;
+  padding: 32px 0 40px;
 }
 .ln-foot-in {
   display: flex;
@@ -1104,8 +1082,8 @@ button {
 }
 .ln-burger {
   display: none;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   margin-left: auto;
   padding: 10px 8px;
   border: 0;
@@ -1144,29 +1122,10 @@ button {
 .ln-hero h1 em {
   white-space: nowrap; /* "in one app." stays together: no word left alone on the last line */
   font-style: normal;
-  background: linear-gradient(100deg, #2448ff, #6a5bff 55%, #2448ff);
-  background-size: 200% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: shine 6s ease-in-out infinite alternate;
-}
-@keyframes shine {
-  to {
-    background-position: 100% 0;
-  }
+  color: var(--accent);
 }
 .ln-hero-art {
   position: relative;
-}
-.mock-bar i:nth-child(1) {
-  background: #ff5f57;
-}
-.mock-bar i:nth-child(2) {
-  background: #febc2e;
-}
-.mock-bar i:nth-child(3) {
-  background: #28c840;
 }
 .mk-list {
   display: grid;
@@ -1214,8 +1173,8 @@ button {
   position: absolute;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 9px 14px;
+  gap: 8px;
+  padding: 8px 14px;
   border-radius: 14px;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -1253,7 +1212,7 @@ button {
 
 /* ---------- works-with strip ---------- */
 .ln-strip {
-  padding: 26px 0 8px;
+  padding: 24px 0 8px;
   text-align: center;
 }
 .ln-strip p {
@@ -1382,7 +1341,7 @@ button {
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 11px;
+  gap: 12px;
 }
 .tour-copy li {
   display: flex;
@@ -1447,7 +1406,7 @@ button {
 }
 .tc.amber {
   background: #fdecd8;
-  color: #b45309;
+  color: #92400e;
 }
 .tc.green {
   background: #dcfce7;
@@ -1553,7 +1512,7 @@ button {
 }
 .tm-guest {
   margin-left: 4px;
-  padding: 1px 7px;
+  padding: 1px 8px;
   border-radius: 9999px;
   background: #dcfce7;
   color: #15803d;
@@ -1704,7 +1663,7 @@ button {
   align-items: center;
   gap: 8px;
   padding: 8px 10px;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
   border-radius: 10px;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -1772,8 +1731,8 @@ button {
   top: -26px;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 5px 10px;
+  gap: 4px;
+  padding: 4px 10px;
   border-radius: 9px;
   background: #0b0c10;
   color: #fff;
@@ -1866,7 +1825,7 @@ button {
 .ln-about {
   max-width: 900px;
   display: grid;
-  gap: 22px;
+  gap: 24px;
 }
 .ln-quote {
   position: relative;
@@ -1891,7 +1850,7 @@ button {
 .ln-founder {
   display: flex;
   gap: 20px;
-  padding: 26px;
+  padding: 24px;
   border-radius: 22px;
   background: var(--bg);
   border: 1px solid var(--border);
@@ -1937,7 +1896,7 @@ button {
   gap: 8px;
 }
 .ln-chips span {
-  padding: 7px 14px;
+  padding: 8px 14px;
   border-radius: 9999px;
   background: var(--bg);
   border: 1px solid var(--border);
@@ -1992,7 +1951,6 @@ button {
   background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(231, 235, 255, 0.9));
   color: var(--accent);
   box-shadow: 0 24px 50px -20px rgba(0, 0, 0, 0.45), inset 0 1px 0 #fff;
-  animation: float 6s ease-in-out infinite alternate;
 }
 .ln-key.k1 {
   left: 9%;
@@ -2212,7 +2170,7 @@ button {
   position: relative;
   z-index: 1;
   width: 38px;
-  padding: 5px 0;
+  padding: 4px 0;
   border: 0;
   border-radius: 9999px;
   background: none;
@@ -2270,7 +2228,7 @@ button {
 
 /* agency mock: the agency's own name and its client workspaces */
 .am-body {
-  padding: 22px;
+  padding: 24px;
   background: var(--bg);
 }
 .am-brand {
@@ -2363,5 +2321,17 @@ button {
     content: '';
     position: absolute;
     inset: -12px -4px;
+  }
+}
+
+/* Tap targets on phones */
+@media (max-width: 767px) {
+  .tour-tabs button,
+  .ln-nav-in a,
+  .ln-foot-in a,
+  .ln-foot-in nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
   }
 }

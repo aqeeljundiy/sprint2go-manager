@@ -91,7 +91,7 @@
   outline: none;
 }
 .tb-bar .ghost-btn.on {
-  color: var(--accent);
+  color: var(--accent-on-soft);
   background: var(--accent-soft);
 }
 /* A middling pane: the quieter tools keep their icons and lose their words (they say them on hover). */
@@ -259,7 +259,7 @@
   color: var(--text-3);
 }
 .tb-th-btn .tb-sorted {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .tb-th {
   position: sticky;
@@ -330,7 +330,7 @@
 .tb-sel .tb-n {
   pointer-events: none; /* it sits over the checkbox; the click is the checkbox's */
   color: var(--text-3);
-  font-size: 11.5px;
+  font-size: 12px;
   font-variant-numeric: tabular-nums;
   transition: opacity 0.12s ease;
 }
@@ -423,7 +423,7 @@
   width: 26px;
   height: 26px;
   margin-right: 6px;
-  border-radius: 7px;
+  border-radius: 8px;
   color: var(--text-2);
   opacity: 0;
   transition: opacity 0.12s ease, background 0.12s ease;
@@ -443,7 +443,7 @@
   align-items: center;
   gap: 6px;
   margin: 6px 0 0 8px;
-  padding: 7px 12px;
+  padding: 8px 12px;
   border-radius: 8px;
   color: var(--text-2);
   font-size: 13px;
@@ -475,7 +475,7 @@
 }
 .tb-act:hover {
   background: var(--hover);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 /* values */
@@ -533,14 +533,14 @@
   place-items: center;
   width: 16px;
   height: 16px;
-  border-radius: 5px;
+  border-radius: 4px;
   border: 1.5px solid color-mix(in srgb, var(--text-3) 60%, transparent);
   transition: background 0.15s ease, border-color 0.15s ease;
 }
 .tb-check.on {
-  background: var(--accent);
+  background: var(--accent-fill);
   border-color: var(--accent);
-  color: #fff;
+  color: var(--on-accent-fill);
 }
 .tb-date.late {
   color: var(--danger, #e5484d);
@@ -582,7 +582,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 7px 8px;
+  padding: 8px 8px;
   border-radius: 8px;
   font-size: 13px;
   text-align: left;
@@ -601,10 +601,10 @@
   background: var(--hover);
 }
 .tb-pick-list button.on {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .tb-pick-add {
-  color: var(--accent) !important;
+  color: var(--accent-text) !important;
 }
 .tb-pick-clear {
   color: var(--text-2);
@@ -654,7 +654,7 @@
   background: var(--hover);
 }
 .tb-menu > button.on {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .tb-menu .danger,
 .tb-fm-acts .danger {
@@ -739,7 +739,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 7px 10px;
+  padding: 8px 10px;
   border-radius: 8px;
   font-size: 13px;
   color: var(--text);
@@ -760,8 +760,8 @@
 .tb-fm-types button {
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 7px 8px;
+  gap: 8px;
+  padding: 8px 8px;
   border-radius: 8px;
   font-size: 12.5px;
   text-align: left;
@@ -774,10 +774,10 @@
 }
 .tb-fm-types button.on {
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
 }
 .tb-fm-label {
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-3);
 }
@@ -795,7 +795,7 @@
   min-width: 0;
   padding: 6px 8px;
   border: 0;
-  border-radius: 7px;
+  border-radius: 8px;
   background: transparent;
   font: inherit;
   font-size: 13px;
@@ -952,7 +952,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 8px;
+  padding: 8px 8px;
   border-radius: 8px;
   font-size: 13px;
   color: var(--text-3);
@@ -1000,7 +1000,7 @@
 .tb-rd-text {
   width: 100%;
   min-height: 32px;
-  padding: 5px 8px;
+  padding: 4px 8px;
   border: 0;
   border-radius: 8px;
   background: transparent;
@@ -1040,7 +1040,7 @@
   min-width: 0;
 }
 .tb-rd-sec {
-  margin-top: 22px;
+  margin-top: 24px;
   display: grid;
   gap: 6px;
 }
@@ -1054,7 +1054,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 7px 8px;
+  padding: 8px 8px;
   border-radius: 8px;
   text-align: left;
   font-size: 13px;
@@ -1110,7 +1110,7 @@
 /* ---------- table cards (Tables home, a project's Tables tab) ---------- */
 
 .tb-home-group + .tb-home-group {
-  margin-top: 22px;
+  margin-top: 24px;
 }
 .tb-home-group-head {
   margin: 0 0 10px;
@@ -1371,8 +1371,8 @@
   height: 20px;
   border-radius: 50%;
   background: var(--accent-soft);
-  color: var(--accent);
-  font-size: 11px;
+  color: var(--accent-on-soft);
+  font-size: 12px;
   font-weight: 700;
 }
 .tb-act-body {
@@ -1430,7 +1430,7 @@
   font-weight: 600;
 }
 .tb-kinds small {
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--text-3);
 }
 .tb-chips.wrap {
@@ -1459,7 +1459,7 @@
   margin: 0;
   max-height: 180px;
   overflow: auto;
-  font-size: 11.5px;
+  font-size: 12px;
   white-space: pre-wrap;
   color: var(--text-2);
 }
@@ -1467,7 +1467,7 @@
 /* ---------- the Automations panel ---------- */
 
 .tb-auto-btn.on {
-  color: var(--accent);
+  color: var(--accent-on-soft);
   background: var(--accent-soft);
 }
 .tb-auto-sec {
@@ -1559,7 +1559,7 @@
   grid-template-columns: 16px minmax(0, 1fr) auto;
   gap: 8px;
   align-items: start;
-  padding: 7px 8px;
+  padding: 8px 8px;
   border-radius: 8px;
   font-size: 12.5px;
 }
@@ -1601,7 +1601,7 @@
 .tb-drop.over {
   background: var(--accent-soft);
   border-color: var(--accent);
-  color: var(--accent);
+  color: var(--accent-on-soft);
 }
 .tb-drop strong {
   color: var(--text);
@@ -1656,7 +1656,7 @@
 /* ---------- sharing with guests ---------- */
 
 .tb-share-btn.on {
-  color: var(--accent);
+  color: var(--accent-on-soft);
   background: var(--accent-soft);
 }
 .tb-share {
@@ -1709,7 +1709,7 @@
 }
 .tb-days button {
   min-width: 40px;
-  padding: 5px 8px;
+  padding: 4px 8px;
   border-radius: 8px;
   font-size: 12px;
   color: var(--text-2);
@@ -1718,7 +1718,7 @@
 }
 .tb-days button.on {
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
   font-weight: 600;
 }
 .tb-people {
@@ -1773,14 +1773,14 @@
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 700;
   background: var(--hover);
   color: var(--text-2);
 }
 .tb-steps > li.now .tb-step-n {
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
 }
 .tb-steps > li.done .tb-step-n {
   background: color-mix(in srgb, var(--ok-solid, #10b981) 18%, transparent);
@@ -1799,7 +1799,7 @@
 }
 .tb-listen .tb-spin {
   margin-top: 3px;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .tb-try {
   display: grid;
@@ -1832,7 +1832,7 @@
 }
 .tb-maptable-row.head {
   min-height: 30px;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-3);
 }
@@ -1951,8 +1951,8 @@
   min-height: 38px;
   white-space: normal;
   align-items: flex-start;
-  padding-top: 9px;
-  padding-bottom: 9px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 .tb-cell.wrap .tb-text {
   white-space: pre-wrap;
@@ -2062,7 +2062,7 @@
 }
 .tb-foot-cell button small {
   color: var(--text-3);
-  font-size: 11px;
+  font-size: 12px;
 }
 .tb-foot-cell button:hover:not(:disabled) {
   background: var(--hover);
@@ -2086,7 +2086,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 7px 8px;
+  padding: 8px 8px;
   border-radius: 8px;
   font-size: 13px;
   text-align: left;
@@ -2117,7 +2117,7 @@
   align-items: center;
   gap: 8px;
   margin: 0;
-  padding: 7px 8px;
+  padding: 8px 8px;
   font-size: 13px;
   color: var(--text-2);
 }
@@ -2126,7 +2126,7 @@
   align-items: center;
   gap: 4px;
   margin-left: auto;
-  font-size: 11.5px;
+  font-size: 12px;
 }
 .tb-colmenu-sep {
   height: 1px;
@@ -2205,7 +2205,7 @@
   text-align: left;
 }
 .tb-menu-2line small {
-  font-size: 11.5px;
+  font-size: 12px;
 }
 .tb-menu-note {
   margin: 2px 10px 6px;
@@ -2257,7 +2257,7 @@
 }
 .tb-chip.on {
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
 }
 .tab-edit-row.drop-line {
   box-shadow: inset 0 2px 0 var(--accent);
@@ -2315,7 +2315,7 @@
 .tb-files img {
   width: 26px;
   height: 26px;
-  border-radius: 5px;
+  border-radius: 4px;
   object-fit: cover;
   flex: none;
 }
@@ -2379,7 +2379,7 @@
   padding: 10px;
   border-radius: 8px;
   font-size: 13px;
-  color: var(--accent);
+  color: var(--accent-text);
   transition: background 0.12s ease;
 }
 .tb-file-add:hover {
@@ -2546,7 +2546,7 @@
   font-size: 12.5px;
 }
 .tb-gfield small {
-  font-size: 11px;
+  font-size: 12px;
 }
 .tb-gadd {
   place-items: center;
@@ -2593,7 +2593,7 @@
 }
 .tb-cal-wd {
   padding: 6px 8px;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-3);
   border-right: 1px solid var(--border);
@@ -2623,13 +2623,13 @@
   place-items: center;
   min-width: 22px;
   height: 22px;
-  border-radius: 11px;
+  border-radius: 12px;
   font-size: 12px;
   font-variant-numeric: tabular-nums;
 }
 .tb-cal-day.today .tb-cal-n {
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
 }
 .tb-cal-add {
   position: absolute;
@@ -2767,7 +2767,7 @@
   justify-items: start;
 }
 .tb-board.roomy .tb-card-f small {
-  font-size: 11px;
+  font-size: 12px;
 }
 .tb-card-opts {
   display: grid;
@@ -2874,7 +2874,7 @@
 }
 .tb-chip.linked.go:hover,
 .tb-chip.linked.go:focus-visible {
-  color: var(--accent);
+  color: var(--accent-text);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent);
   outline: none;
 }
@@ -2896,8 +2896,8 @@
   padding: 1px 6px;
   border-radius: 9999px;
   background: var(--accent-soft);
-  color: var(--accent);
-  font-size: 10.5px;
+  color: var(--accent-on-soft);
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.02em;
 }
@@ -3004,13 +3004,13 @@
   gap: 2px;
   padding: 8px 4px;
   border-radius: 10px;
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--text-2);
   background: var(--surface-2);
   transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
 .tb-menu .tb-view-kinds > button.on {
-  color: var(--accent);
+  color: var(--accent-on-soft);
   background: var(--accent-soft);
   box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--accent) 40%, transparent);
 }
@@ -3101,7 +3101,7 @@
   font-variant-numeric: tabular-nums;
 }
 .tb-qchip.on {
-  color: var(--accent);
+  color: var(--accent-on-soft);
   background: var(--accent-soft);
   box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--accent) 45%, transparent);
 }
@@ -3221,14 +3221,14 @@
 
 /* Sub-groups: a second heading, set in under the first. */
 .tb-group-row.sub {
-  padding: 6px 8px 2px 30px;
+  padding: 6px 8px 2px 32px;
 }
 .tb-group-row.sub .tb-group-toggle {
   font-size: 12.5px;
   color: var(--text-2);
 }
 .tb-group-toggle.sub {
-  margin-left: 22px;
+  margin-left: 24px;
   font-size: 12.5px;
 }
 .tb-list-sub + .tb-list-sub {
@@ -3661,7 +3661,7 @@
 .tb-tl-days span {
   display: grid;
   place-items: center;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-3);
   font-variant-numeric: tabular-nums;
 }
@@ -3669,9 +3669,9 @@
   background: color-mix(in srgb, var(--text) 3%, transparent);
 }
 .tb-tl-days span.today {
-  color: #fff;
+  color: var(--on-accent-fill);
   font-weight: 700;
-  background: var(--accent);
+  background: var(--accent-fill);
   border-radius: 6px;
 }
 .tb-tl-body {
@@ -3721,7 +3721,7 @@
   background: var(--surface-2);
 }
 .tb-tl-name:hover {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .tb-tl-track {
   position: relative;
@@ -3929,7 +3929,7 @@
 .tb-file-open {
   display: inline-flex;
   cursor: zoom-in;
-  border-radius: 5px;
+  border-radius: 4px;
   transition: transform 150ms ease-out, opacity 150ms ease-out;
 }
 .tb-file-open:hover {
@@ -3972,13 +3972,13 @@
   background: var(--hover);
 }
 .tb-follow.on {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .tb-comment-new {
   position: relative;
 }
 .tb-mention {
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 600;
 }
 .tb-mention-pick {

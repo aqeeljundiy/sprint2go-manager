@@ -9,7 +9,6 @@ import {
   Cloud,
   FileText,
   FolderOpen,
-  Handshake,
   House,
   Inbox,
   KeyRound,
@@ -23,7 +22,6 @@ import {
   TriangleAlert,
   Video,
   type LucideIcon,
-  Stamp,
   Download,
 } from 'lucide-react';
 import { Logo } from '../components/Logo';
@@ -207,9 +205,6 @@ function AppMock() {
   return (
     <div className="mock" aria-hidden="true">
       <div className="mock-bar">
-        <i />
-        <i />
-        <i />
         <span>app.sprint2go.com</span>
       </div>
       <div className="mock-body">
@@ -271,9 +266,6 @@ function GuestMock() {
   return (
     <div className="mock guest" aria-hidden="true">
       <div className="mock-bar">
-        <i />
-        <i />
-        <i />
         <span>{g.bar}</span>
       </div>
       <div className="gm-body">
@@ -312,9 +304,6 @@ function AgencyMock() {
   return (
     <div className="mock agency" aria-hidden="true">
       <div className="mock-bar">
-        <i />
-        <i />
-        <i />
         <span>{a.bar}</span>
       </div>
       <div className="am-body">
@@ -477,9 +466,6 @@ function Page() {
       <section className="ln-hero">
         <div className="ln-wrap">
           <div className="ln-hero-text">
-            <span className="ln-eyebrow a" style={{ ['--d' as string]: '0s' }}>
-              <Sparkles size={13} /> {t.hero.eyebrow}
-            </span>
             <h1>
               <span className="line a" style={{ ['--d' as string]: '.08s' }}>
                 {t.hero.line1}
@@ -591,9 +577,6 @@ function Page() {
       <section id="partners" className="ln-sec">
         <div className="ln-wrap ln-split rev">
           <div>
-            <span className="ln-kicker rv">
-              <Handshake size={14} /> {t.partners.kicker}
-            </span>
             <h2 className="rv" style={{ ['--i' as string]: 1 }}>
               {t.partners.h}
             </h2>
@@ -617,9 +600,6 @@ function Page() {
       <section id="agency" className="ln-sec alt">
         <div className="ln-wrap ln-split">
           <div>
-            <span className="ln-kicker rv">
-              <Stamp size={14} /> {t.agency.kicker}
-            </span>
             <h2 className="rv" style={{ ['--i' as string]: 1 }}>
               {t.agency.h}
             </h2>
@@ -643,9 +623,6 @@ function Page() {
       <section id="ai" className="ln-sec">
         <div className="ln-wrap ln-split">
           <div>
-            <span className="ln-kicker rv">
-              <Sparkles size={14} /> {t.ai.kicker}
-            </span>
             <h2 className="rv" style={{ ['--i' as string]: 1 }}>
               {t.ai.h}
             </h2>

@@ -28,7 +28,7 @@
   display: block;
   width: 100%;
   min-height: 42px;
-  padding: 11px 14px 4px;
+  padding: 12px 14px 4px;
   border: 0;
   outline: 0;
   resize: none;
@@ -67,8 +67,8 @@
   width: 34px;
   height: 34px;
   border-radius: 10px;
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
   transition:
     opacity 0.15s,
     transform 0.15s;
@@ -114,7 +114,7 @@
 .cmp-fmt .icon-btn {
   width: 32px;
   height: 32px;
-  border-radius: 9px;
+  border-radius: 8px;
   color: var(--text-2);
 }
 .cmp-editing {
@@ -168,7 +168,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 7px 16px;
+  padding: 8px 16px;
   font-size: 13px;
   font-weight: 500;
   color: var(--text-2);
@@ -203,7 +203,7 @@
 .cm-saved {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   margin-bottom: 2px;
   font-size: 12px;
   font-weight: 600;
@@ -250,7 +250,7 @@
 .cm-fwd-head {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   margin-bottom: 2px;
   font-size: 12px;
   font-weight: 600;
@@ -282,8 +282,8 @@
   overflow-wrap: anywhere;
 }
 .cm-text code {
-  padding: 1px 5px;
-  border-radius: 5px;
+  padding: 1px 4px;
+  border-radius: 4px;
   background: var(--surface-2);
   border: 1px solid var(--border);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -293,7 +293,7 @@
   flex: none;
 }
 .cm-tools button.on {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .draft-pill {
   display: inline-flex;
@@ -303,7 +303,7 @@
   border-radius: 999px;
   background: var(--warn-soft, rgba(227, 154, 38, 0.14));
   color: var(--warn, #a8640c);
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 700;
 }
 /* Where the unread part starts. */
@@ -732,8 +732,8 @@
 .pr-meta .count {
   padding: 1px 8px;
   border-radius: 999px;
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
   font-weight: 700;
 }
 .pr-actions {
@@ -841,8 +841,6 @@
   border: 2px solid currentColor;
   font-size: 13px;
   font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
   opacity: 0;
   transition: opacity 0.12s;
   pointer-events: none;
@@ -887,13 +885,13 @@
   flex: none;
   width: 36px;
   height: 36px;
-  border-radius: 11px;
+  border-radius: 12px;
   background: var(--surface-2);
   color: var(--text-2);
 }
 .cu-count {
   flex: none;
-  padding: 2px 9px;
+  padding: 2px 8px;
   border-radius: 999px;
   background: var(--accent-soft);
   color: var(--accent-text, var(--accent));
@@ -956,8 +954,8 @@
   width: 44px;
   height: 44px;
   border-radius: 14px;
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
 }
 .cu-actions {
   display: flex;
@@ -995,7 +993,7 @@
     transform: scale(1.12);
   }
   .huddle-name:hover {
-    color: var(--accent);
+    color: var(--accent-text);
   }
   .hs-react button:hover {
     background: var(--hover);
@@ -1057,7 +1055,7 @@
   background: var(--surface-2);
   box-shadow: inset 0 0 0 1px var(--border);
   color: var(--text-2);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -1761,7 +1759,7 @@
   margin: 0;
   padding: 1px 4px;
   border: 0;
-  border-radius: 5px;
+  border-radius: 4px;
   font: inherit;
   font-weight: 600;
   line-height: inherit;
@@ -1988,7 +1986,7 @@
   overflow-wrap: anywhere;
 }
 .csr-text mark {
-  border-radius: 3px;
+  border-radius: 4px;
   background: var(--warn-soft);
   color: inherit;
 }

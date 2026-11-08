@@ -102,8 +102,8 @@
   font-size: var(--fs-caption);
   font-weight: 700;
   line-height: 1;
-  color: #fff;
-  background: var(--accent);
+  color: var(--on-accent-fill);
+  background: var(--accent-fill);
   box-shadow: 0 0 0 2px var(--surface);
 }
 .tb-pplus {
@@ -254,8 +254,8 @@
   }
 }
 .tb-crd-check.on {
-  color: #fff;
-  background: var(--accent);
+  color: var(--on-accent-fill);
+  background: var(--accent-fill);
   box-shadow: none;
 }
 .tb-crd-body {
@@ -526,8 +526,6 @@
   margin: 8px 12px 4px;
   font-size: var(--fs-secondary);
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
   color: var(--text-3);
 }
 .tb-fs-on {
@@ -1030,8 +1028,8 @@ button.tb-page-title:active {
   font-weight: 700;
 }
 .tb-pcal-day.on .tb-pcal-n {
-  color: #fff;
-  background: var(--accent);
+  color: var(--on-accent-fill);
+  background: var(--accent-fill);
 }
 .tb-pcal-dots {
   display: flex;

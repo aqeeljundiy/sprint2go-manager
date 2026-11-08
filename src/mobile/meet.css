@@ -627,7 +627,7 @@
     padding: 0;
     border: 0;
     background: none;
-    color: var(--accent);
+    color: var(--accent-text);
   }
   .m-task-phone .mtp-ring {
     width: 20px;
@@ -736,8 +736,8 @@
     color: var(--text-2);
   }
   .m-player.audio .m-play {
-    background: var(--accent);
-    color: #fff;
+    background: var(--accent-fill);
+    color: var(--on-accent-fill);
   }
   /* In-page tabs (Tasks from meetings, a folder's parts): one underline pattern, 44 px, on the 16 px gutter. */
   .meet-pane .client-tabs,

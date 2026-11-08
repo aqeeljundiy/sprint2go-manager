@@ -28,7 +28,7 @@
   height: 40px;
   border-radius: var(--r-control, 10px);
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
   transition: background 0.2s, color 0.2s;
 }
 .push-card.on .push-icon {
@@ -82,7 +82,7 @@
 }
 .push-steps li svg {
   vertical-align: -3px;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .push-step-n {
   display: grid;
@@ -90,8 +90,8 @@
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
   font-size: 12px;
   font-weight: 700;
 }

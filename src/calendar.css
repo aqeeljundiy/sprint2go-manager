@@ -18,7 +18,7 @@
   text-align: center;
 }
 .mini-dow {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-3);
   padding: 4px 0;
 }
@@ -47,17 +47,17 @@
   bottom: 3px;
   width: 3px;
   height: 3px;
-  margin-left: -1.5px;
+  margin-left: -2px;
   border-radius: 50%;
   background: var(--text-3);
 }
 .mini-day.today {
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 700;
 }
 .mini-day.picked {
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
   border-radius: 8px;
   font-weight: 600;
 }
@@ -71,7 +71,7 @@
   width: 16px;
   height: 16px;
   margin: 0 1px;
-  border-radius: 5px;
+  border-radius: 4px;
   border: 1.5px solid var(--c);
   color: #fff;
 }
@@ -117,9 +117,12 @@
   gap: 2px;
   margin-left: auto;
 }
-.ghost-btn.sm {
-  padding: 6px 12px;
-  font-size: 13px;
+/* Controls that share a row are one height. */
+:is(.cal-nav, .cal-header, .tq-actions, .compose-foot) > :is(button, .primary-btn.sm, .ghost-btn.sm),
+.compose-foot .track-split > button {
+  min-height: var(--ctl);
+}
+.cal-nav .ghost-btn.sm {
   margin-right: 4px;
 }
 .cal-new {
@@ -161,8 +164,6 @@
 .tg-dow {
   font-size: 12px;
   font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
 .tg-num {
   display: inline-grid;
@@ -175,16 +176,16 @@
   color: var(--text);
 }
 .tg-day.today .tg-dow {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .tg-day.today .tg-num,
 .tg-day.today:hover .tg-num {
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
 }
 
 .tg-gutter {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-3);
 }
 .tg-allday > .tg-gutter {
@@ -239,7 +240,7 @@
   flex-direction: column;
   gap: 1px;
   padding: 4px 8px;
-  border-radius: 7px;
+  border-radius: 8px;
   text-align: left;
   overflow: hidden;
   background: color-mix(in srgb, var(--c) 16%, var(--surface));
@@ -393,8 +394,6 @@
   padding: 10px;
   font-size: 12px;
   font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
   color: var(--text-2);
 }
 .mg-body {
@@ -460,8 +459,8 @@
   background: var(--hover);
 }
 .mg-cell.today .mg-num {
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
 }
 .dot-event {
   display: flex;
@@ -540,7 +539,7 @@
   flex: none;
   width: 14px;
   height: 14px;
-  margin-top: 5px;
+  margin-top: 4px;
   border-radius: 4px;
   background: var(--c);
 }
@@ -554,7 +553,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 7px 0;
+  padding: 8px 0;
   line-height: 1.45;
 }
 .ev-row.top {
@@ -607,11 +606,10 @@
 }
 .invite-date span {
   padding: 2px 0;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
-  text-transform: uppercase;
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
 }
 .invite-date strong {
   padding: 4px 0 6px;
@@ -622,9 +620,9 @@
   min-width: 0;
 }
 .invite-kicker {
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .invite-title {
   margin-top: 2px;
@@ -691,8 +689,8 @@
 .modal-body input:not([type='checkbox']),
 .modal-body textarea {
   width: 100%;
-  padding: 9px 12px;
-  border-radius: 9px;
+  padding: 8px 12px;
+  border-radius: 8px;
   border: 1px solid var(--border);
   background: var(--surface-2);
   outline: 0;
@@ -768,7 +766,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 5px 10px 5px 6px;
+  padding: 4px 10px 4px 6px;
   border-radius: 20px;
   border: 1px solid var(--border);
   font-size: 12.5px;
@@ -822,7 +820,7 @@
   flex: none;
   margin-left: auto;
   font-style: normal;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-3);
   white-space: nowrap;
@@ -855,7 +853,7 @@
   display: grid;
   gap: 4px;
   margin: 0;
-  padding: 10px 12px 10px 30px;
+  padding: 10px 12px 10px 32px;
   border-radius: 10px;
   background: var(--surface-2);
   font-size: 13px;
@@ -917,7 +915,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 400;
   color: var(--text-3);
 }
@@ -933,7 +931,7 @@
 .cal-status {
   display: flex;
   align-items: flex-start;
-  gap: 9px;
+  gap: 8px;
   padding: 6px 10px 10px;
   margin-bottom: 4px;
   border-bottom: 1px solid var(--border);
@@ -993,7 +991,7 @@ a.ghost-btn {
 /* Meet's list rows share the .ev-row name (round2.css): in the event's details they stay one row, icon then text. */
 .ev-body .ev-row {
   flex-wrap: nowrap;
-  padding: 7px 0;
+  padding: 8px 0;
   border-radius: 0;
 }
 .ev-body .ev-row:hover {
@@ -1038,7 +1036,7 @@ a.ghost-btn {
   animation: fadeIn 0.18s ease-out backwards;
 }
 .hol-chip {
-  padding: 1px 7px;
+  padding: 1px 8px;
   border-radius: 6px;
   font-weight: 600;
   color: var(--danger);
@@ -1183,12 +1181,12 @@ a.ghost-btn {
   color: var(--text-3);
 }
 .md-day.today {
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 700;
 }
 .md-day.picked {
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
   font-weight: 600;
 }
 .md-day.busy::after {
@@ -1223,12 +1221,12 @@ a.ghost-btn {
   background: var(--hover);
 }
 .md-month.today {
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 700;
 }
 .md-month.picked {
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
   font-weight: 600;
 }
 
@@ -1326,8 +1324,6 @@ a.ghost-btn {
 .sch-dow {
   font-size: 12px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
   color: var(--text-3);
 }
 .sch-num {
@@ -1340,11 +1336,11 @@ a.ghost-btn {
   font-weight: 600;
 }
 .sch-day.today .sch-dow {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .sch-day.today .sch-num {
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
 }
 .sch-items {
   display: grid;
@@ -1549,7 +1545,7 @@ a.ghost-btn {
   color: var(--text-2);
 }
 .block-event.is-task {
-  padding-left: 26px;
+  padding-left: 24px;
 }
 .block-event .ev-check.sm {
   position: absolute;
@@ -1561,7 +1557,7 @@ a.ghost-btn {
 }
 .block-event.short .ev-check.sm {
   top: 50%;
-  margin-top: -7.5px;
+  margin-top: -8px;
 }
 .block-event.done .be-title {
   text-decoration: line-through;
@@ -1596,11 +1592,11 @@ a.ghost-btn {
   right: 4px;
   z-index: 2;
   transform: translateY(-50%);
-  padding: 1px 5px;
+  padding: 1px 4px;
   border-radius: 6px;
   background: #ef4444;
   color: #fff;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   line-height: 16px;
 }
@@ -1772,7 +1768,7 @@ a.ghost-btn {
 .ev-form input:not([type='checkbox']),
 .ev-form textarea {
   width: 100%;
-  padding: 9px 12px;
+  padding: 8px 12px;
   border-radius: var(--r-control, 10px);
   border: 1px solid var(--border);
   background: var(--surface-2);
@@ -1993,8 +1989,8 @@ a.ghost-btn {
   }
 }
 .rp-day.on {
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
 }
 .rp-step {
   display: inline-flex;

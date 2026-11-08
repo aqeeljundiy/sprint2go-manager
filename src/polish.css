@@ -278,7 +278,7 @@
 }
 :root[data-theme='dark'] .primary-btn:hover,
 :root[data-theme='dark'] .compose-btn:hover {
-  background: var(--accent-hover);
+  background: var(--accent-fill-hover);
 }
 :root[data-theme='dark'] .ask-msg.user,
 :root[data-theme='dark'] .dp-day.on,
@@ -560,7 +560,7 @@ details.advanced[open] summary h3::after {
 .people-btn {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   min-width: 0;
 }
 .people-btn.compact {
@@ -576,12 +576,12 @@ details.advanced[open] summary h3::after {
   align-items: center;
 }
 .av-stack .avatar + .avatar {
-  margin-left: -7px;
+  margin-left: -8px;
   box-shadow: 0 0 0 2px var(--surface);
 }
 .av-more {
   margin-left: 4px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--text-2);
 }
@@ -673,7 +673,7 @@ details.advanced[open] summary h3::after {
   white-space: pre-wrap;
 }
 .h-body time {
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--text-3);
 }
 .comment-box {
@@ -837,11 +837,11 @@ details.advanced[open] summary h3::after {
 }
 .shared-note svg { color: var(--warn); flex: none; margin-top: 1px; }
 /* Client chip on emails: the client's colour as a dot, neutral text */
-.chip.client-chip { background: var(--hover); color: var(--text-2, var(--text)); display: inline-flex; align-items: center; gap: 6px; border: 0; font: inherit; font-size: 11.5px; cursor: default; }
+.chip.client-chip { background: var(--hover); color: var(--text-2, var(--text)); display: inline-flex; align-items: center; gap: 6px; border: 0; font: inherit; font-size: 12px; cursor: default; }
 .chip.client-chip::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--c); }
 button.chip.client-chip { cursor: pointer; }
 button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, var(--hover)); }
-.chip.assignee-chip { background: var(--accent-soft, var(--hover)); color: var(--accent); font-size: 11.5px; }
+.chip.assignee-chip { background: var(--accent-soft, var(--hover)); color: var(--accent-on-soft); font-size: 12px; }
 /* Quick add: the title gets its own line, the pickers and Add sit under it (no half-wrapped rows) */
 .task-add { flex-wrap: wrap; row-gap: 6px; }
 .task-add input#new-task { flex: 1 1 calc(100% - 40px); }
@@ -866,18 +866,18 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
 .team-toggles { display: flex; flex-wrap: wrap; gap: 6px; }
 .team-toggles button { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; background: var(--hover); color: var(--text); font-size: 13px; }
 .team-toggles button small { color: var(--muted); }
-.team-toggles button.on { background: color-mix(in oklab, var(--accent) 16%, transparent); color: var(--accent); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--accent) 40%, transparent); }
+.team-toggles button.on { background: color-mix(in oklab, var(--accent) 16%, transparent); color: var(--accent-text); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--accent) 40%, transparent); }
 .sel-opt .sel-hint { margin-left: auto; color: var(--muted); font-size: 12px; }
 /* AI spending */
 .spend h3 { display: flex; align-items: center; gap: 8px; }
-.spend-src { margin-left: auto; font-size: 11.5px; font-weight: 600; padding: 3px 8px; border-radius: 999px; background: var(--warn-soft); color: var(--warn); }
+.spend-src { margin-left: auto; font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 999px; background: var(--warn-soft); color: var(--warn); }
 .spend-src.real { background: var(--ok-soft, var(--hover)); color: var(--ok, var(--text)); }
 .spend-totals { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 12px 0 8px; }
 .spend-totals div { display: flex; flex-direction: column; gap: 2px; }
 .spend-totals b { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
 .spend-totals span { color: var(--muted); font-size: 12px; }
 .spend-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 4px; }
-.spend-table th { text-align: left; font-size: 11.5px; font-weight: 600; color: var(--muted); padding: 6px 8px 6px 0; }
+.spend-table th { text-align: left; font-size: 12px; font-weight: 600; color: var(--muted); padding: 6px 8px 6px 0; }
 .spend-table td { padding: 7px 8px 7px 0; border-top: 1px solid var(--line); vertical-align: top; }
 .spend-table td:last-child, .spend-table th:last-child { text-align: right; padding-right: 0; white-space: nowrap; }
 .spend-sub { margin: 18px 0 8px; font-size: 13px; font-weight: 700; }
@@ -885,9 +885,9 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
 .spend-card { position: relative; display: flex; flex-direction: column; gap: 3px; padding: 12px; border-radius: var(--r-control); background: var(--hover); }
 .spend-card .sc-name { font-size: 12px; color: var(--muted); font-weight: 600; }
 .spend-card b { font-size: 16px; }
-.spend-card small { color: var(--muted); font-size: 11.5px; line-height: 1.35; }
+.spend-card small { color: var(--muted); font-size: 12px; line-height: 1.35; }
 .spend-card.current { box-shadow: inset 0 0 0 1.5px var(--accent); }
-.spend-card.best em { position: absolute; top: 10px; right: 10px; font-style: normal; font-size: 10.5px; font-weight: 700; color: var(--ok, var(--accent)); }
+.spend-card.best em { position: absolute; top: 10px; right: 10px; font-style: normal; font-size: 12px; font-weight: 700; color: var(--ok, var(--accent)); }
 .spend-verdict { margin: 10px 0 0; font-size: 13px; }
 @media (max-width: 767px) {
   .spend-totals, .spend-compare { grid-template-columns: 1fr 1fr; }
@@ -905,7 +905,7 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
 .mat-folders { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; margin-bottom: 16px; }
 .mat-folder { position: relative; border-radius: var(--r-control); background: var(--hover); }
 .mat-folder .mf-open { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; width: 100%; padding: 12px 36px 12px 12px; text-align: left; color: var(--text); border-radius: inherit; }
-.mat-folder .mf-open svg { color: var(--accent); }
+.mat-folder .mf-open svg { color: var(--accent-text); }
 .mat-folder .mf-open strong { font-size: 14px; }
 .mat-folder .mf-open small { color: var(--muted); font-size: 12px; }
 .mat-folder:hover { background: color-mix(in oklab, var(--accent) 8%, var(--hover)); }
@@ -915,7 +915,7 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
 .mat-row .cf-text { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; text-align: left; gap: 1px; color: var(--text); }
 .mat-row .cf-text strong { font-size: 13.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
 .mat-row .cf-text small { color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
-.mat-row .cf-icon.k-link { color: var(--accent); }
+.mat-row .cf-icon.k-link { color: var(--accent-text); }
 .mat-row .cf-icon.k-doc { color: var(--warn); }
 .mat-row .mat-more { opacity: 0; }
 .mat-row:hover .mat-more, .mat-more:focus-visible { opacity: 1; }
@@ -940,10 +940,10 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
 .pa-invite input { flex: 1 1 140px; min-width: 0; padding: 7px 10px; border-radius: var(--r-control); border: 1px solid var(--line); background: var(--surface); color: var(--text); font: inherit; font-size: 13px; }
 .person-row { flex-wrap: wrap; }
 .person-row .sel { max-width: 150px; }
-.req-chip { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 999px; background: color-mix(in oklab, var(--accent) 14%, transparent); color: var(--accent); }
+.req-chip { display: inline-flex; align-items: center; gap: 3px; font-size: 12px; font-weight: 600; padding: 1px 7px; border-radius: 999px; background: color-mix(in oklab, var(--accent) 14%, transparent); color: var(--accent-text); }
 
 /* Comments to and from clients (task panel) */
-.h-tag { font-style: normal; font-size: 10.5px; font-weight: 700; margin-left: 6px; padding: 1px 6px; border-radius: 999px; background: var(--hover); color: var(--muted); }
+.h-tag { font-style: normal; font-size: 12px; font-weight: 700; margin-left: 6px; padding: 1px 6px; border-radius: 999px; background: var(--hover); color: var(--muted); }
 .h-tag.client { background: var(--warn-soft); color: var(--warn); }
 .avatar-empty.client { background: var(--warn-soft); color: var(--warn); font-weight: 700; }
 .comment-box .cb-foot { display: flex; align-items: center; gap: 10px; justify-content: flex-end; margin-top: 6px; }
@@ -957,7 +957,7 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
 .sb-note { padding: 8px 12px; }
 .task-dot { flex: none; margin: 0 6px 0 4px; }
 .task.file-task { text-decoration: none; color: inherit; }
-.task.file-task .cf-icon { flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; background: var(--hover); color: var(--text-2, var(--text)); }
+.task.file-task .cf-icon { flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 8px; background: var(--hover); color: var(--text-2, var(--text)); }
 .client-app .task { cursor: pointer; }
 .client-app .task .av-stack { display: inline-flex; }
 .client-app .task .av-stack > span + span { margin-left: -6px; }
@@ -989,8 +989,8 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
 .request-row { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: end; }
 .request-files { display: flex; flex-wrap: wrap; gap: 6px; }
 .request-files .chip button { border: 0; background: none; padding: 0 0 0 4px; color: inherit; cursor: pointer; }
-.req-status { flex: none; font-size: 11.5px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: var(--hover); color: var(--muted); white-space: nowrap; }
-.req-status.new { background: color-mix(in oklab, var(--accent) 14%, transparent); color: var(--accent); }
+.req-status { flex: none; font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: var(--hover); color: var(--muted); white-space: nowrap; }
+.req-status.new { background: color-mix(in oklab, var(--accent) 14%, transparent); color: var(--accent-text); }
 .req-status.doing { background: color-mix(in oklab, #3b82f6 16%, transparent); color: #3b82f6; }
 .req-status.waiting { background: var(--warn-soft); color: var(--warn); }
 .req-status.done { background: var(--ok-soft, var(--hover)); color: var(--ok, var(--text)); }
@@ -1003,7 +1003,7 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
 .view-as-pill select { font: inherit; font-size: 12.5px; padding: 4px 8px; border-radius: 999px; border: 0; background: color-mix(in oklab, var(--bg) 18%, transparent); color: inherit; }
 .view-as-pill select option { color: #111; }
 @keyframes pillIn { from { opacity: 0; transform: translate(-50%, 12px); } to { opacity: 1; transform: translate(-50%, 0); } }
-.client-made { display: flex; justify-content: center; align-items: center; gap: 4px; margin: 24px 0 8px; font-size: 11.5px; color: var(--muted); }
+.client-made { display: flex; justify-content: center; align-items: center; gap: 4px; margin: 24px 0 8px; font-size: 12px; color: var(--muted); }
 .client-toast { position: fixed; left: 50%; bottom: 76px; transform: translateX(-50%); z-index: 90; }
 @media (max-width: 767px) {
   .view-as-pill { bottom: calc(76px + env(safe-area-inset-bottom)); max-width: calc(100vw - 24px); }
@@ -1019,9 +1019,9 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
 .un-row { display: flex; align-items: center; gap: 12px; padding: 8px 6px; border-radius: 10px; animation: unIn .25s var(--ease, ease) both; }
 .un-row + .un-row { border-top: 1px solid var(--line); }
 .un-row:hover { background: var(--hover); }
-.un-icon { flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; background: var(--hover); color: var(--text-2, var(--text)); }
+.un-icon { flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 8px; background: var(--hover); color: var(--text-2, var(--text)); }
 .un-row.k-late .un-icon, .un-row.k-delegated .un-icon { background: color-mix(in oklab, var(--danger, #dc2626) 14%, transparent); color: var(--danger, #dc2626); }
-.un-row.k-review .un-icon, .un-row.k-request .un-icon { background: color-mix(in oklab, var(--accent) 14%, transparent); color: var(--accent); }
+.un-row.k-review .un-icon, .un-row.k-request .un-icon { background: color-mix(in oklab, var(--accent) 14%, transparent); color: var(--accent-text); }
 .un-row.k-meeting .un-icon { background: var(--warn-soft); color: var(--warn); }
 .un-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; text-align: left; color: var(--text); background: none; border: 0; padding: 0; cursor: pointer; font: inherit; }
 .un-text strong { font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -1032,7 +1032,7 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
 .up-next.clear p { margin: 0; }
 .pulse-num { border: 0; background: none; font: inherit; color: inherit; cursor: pointer; text-align: left; }
 @keyframes unIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
-.sec-count.unread { color: var(--accent); font-weight: 700; opacity: 1; }
+.sec-count.unread { color: var(--accent-text); font-weight: 700; opacity: 1; }
 .spend-lead { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin: 8px 0 2px; }
 .spend-lead b { font-size: 26px; letter-spacing: -0.02em; }
 .spend-lead span { color: var(--muted); font-size: 13px; }
@@ -1046,10 +1046,10 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
 .home-search { display: flex; align-items: center; gap: 10px; width: 100%; margin: 0 0 14px; padding: 11px 14px; border-radius: var(--r-card); border: 0; background: var(--surface); box-shadow: 0 0 0 1px var(--line); color: var(--muted); font: inherit; font-size: 14px; text-align: left; cursor: text; transition: box-shadow .15s; }
 .home-search:hover { box-shadow: 0 0 0 1.5px color-mix(in oklab, var(--accent) 45%, var(--line)); }
 .home-search span { flex: 1; }
-.home-search kbd { font-size: 11px; padding: 2px 6px; border-radius: 6px; background: var(--hover); color: var(--muted); }
+.home-search kbd { font-size: 12px; padding: 2px 6px; border-radius: 6px; background: var(--hover); color: var(--muted); }
 .row-act { flex: none; font: inherit; font-size: 12.5px; font-weight: 600; padding: 4px 10px; border-radius: 999px; border: 0; cursor: pointer; background: var(--hover); color: var(--text); }
 .row-act:hover { background: color-mix(in oklab, var(--accent) 14%, var(--hover)); }
-.row-act.primary { background: var(--accent); color: #fff; }
+.row-act.primary { background: var(--accent-fill); color: var(--on-accent-fill); }
 .m-row { cursor: pointer; text-align: left; }
 
 /* ---------- Calendar: drag, resize, plan tasks ---------- */
@@ -1066,7 +1066,7 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
 .plan-task .pt-grip { color: var(--muted); flex: none; }
 .plan-task .pt-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .plan-task strong { font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.plan-task small { color: var(--muted); font-size: 11.5px; }
+.plan-task small { color: var(--muted); font-size: 12px; }
 .plan-task .pt-add { opacity: 0; }
 .plan-task:hover .pt-add { opacity: 1; }
 .ev-task { display: flex; flex-direction: column; gap: 8px; padding: 12px; margin: 8px 0; border-radius: var(--r-control); background: var(--hover); }
@@ -1100,7 +1100,7 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
 .note-item.active { background: color-mix(in oklab, var(--accent) 12%, transparent); }
 .ni-title { display: flex; align-items: center; gap: 5px; max-width: 100%; color: var(--muted); }
 .ni-title strong { color: var(--text); font-size: 13.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.note-item small { color: var(--muted); font-size: 11.5px; }
+.note-item small { color: var(--muted); font-size: 12px; }
 .ni-snip { color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
 .notes-pane { flex: 1; display: flex; flex-direction: column; min-height: 0; background: var(--surface); border-radius: var(--r-card); }
 .note-head { display: flex; align-items: center; gap: 6px; padding: 10px 14px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
@@ -1117,11 +1117,11 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
 .vault-note svg { flex: none; margin-top: 1px; }
 .compose-btn:disabled { opacity: 0.4; cursor: default; box-shadow: none; }
 .vault-row { cursor: default; }
-.vault-icon { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 14%, transparent); color: var(--accent); font-weight: 700; }
+.vault-icon { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 8px; background: color-mix(in oklab, var(--accent) 14%, transparent); color: var(--accent-text); font-weight: 700; }
 .vault-row .task-meta .src { display: inline-flex; align-items: center; gap: 3px; }
 .vault-code { display: inline-flex; align-items: baseline; gap: 6px; padding: 4px 10px; border-radius: 999px; border: 0; background: var(--ok-soft, var(--hover)); color: var(--ok, var(--text)); font: inherit; cursor: pointer; }
 .vault-code b { font-family: ui-monospace, Menlo, monospace; font-size: 15px; letter-spacing: .06em; }
-.vault-code small { font-size: 11px; opacity: .8; }
+.vault-code small { font-size: 12px; opacity: .8; }
 .vault-modal { width: min(620px, calc(100vw - 32px)); }
 .vault-body { display: flex; flex-direction: column; gap: 12px; }
 .vault-body .field { margin: 0; }
@@ -1144,7 +1144,7 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
   border-radius: 9999px;
   background: var(--hover);
   color: var(--text-3);
-  font-size: 10.5px;
+  font-size: 12px;
   font-style: normal;
   font-weight: 600;
 }
@@ -1173,9 +1173,9 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
   background: var(--hover);
 }
 .type-chips button.on {
-  background: var(--accent);
+  background: var(--accent-fill);
   border-color: var(--accent);
-  color: #fff;
+  color: var(--on-accent-fill);
 }
 .tasks-head .type-sel {
   flex: none;
@@ -1202,7 +1202,7 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
   letter-spacing: -0.02em;
 }
 .sh-company {
-  margin-bottom: 26px;
+  margin-bottom: 24px;
 }
 .sh-company h2 {
   display: flex;
@@ -1452,7 +1452,7 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
   border-radius: 9999px;
   background: var(--warn-soft, #fef3c7);
   color: var(--warn, #b45309);
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -1501,8 +1501,8 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
   animation: rise 0.3s ease both;
 }
 .esg-title {
@@ -1520,7 +1520,7 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
 .esg > li {
   counter-increment: esg;
   position: relative;
-  padding: 12px 14px 12px 46px;
+  padding: 12px 14px 12px 48px;
   border: 1px solid var(--border);
   border-radius: 12px;
   background: var(--surface);
@@ -1621,10 +1621,10 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
 
 /* Home: room between the greeting, the search bar and the first card */
 .home-head {
-  margin-bottom: 26px;
+  margin-bottom: 24px;
 }
 .home-search {
-  margin: 0 0 22px;
+  margin: 0 0 24px;
 }
 
 /* Sidebar counts: a clear pill, not a tinted number */
@@ -1635,16 +1635,16 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
   height: 20px;
   padding: 0 6px;
   border-radius: 9999px;
-  background: var(--accent);
-  color: #fff;
-  font-size: 11.5px;
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
+  font-size: 12px;
   font-weight: 700;
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
 .nav-item .count.warn-count {
   background: var(--warn-solid, #f59e0b) !important;
-  color: #fff !important;
+  color: #2b1a02 !important;
 }
 .nav-item .count.muted-count {
   background: var(--hover);
@@ -1665,9 +1665,9 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
   padding: 1px 8px;
   border-radius: 9999px;
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
   font-weight: 600;
-  font-size: 11.5px;
+  font-size: 12px;
 }
 .prov-acts {
   display: flex;
@@ -1688,8 +1688,6 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
   margin: 0 0 6px;
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
   color: var(--text-3);
 }
 .job-row {
@@ -1739,7 +1737,7 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
   font-size: 13px;
 }
 .signin-dev b {
-  color: var(--accent);
+  color: var(--accent-text);
   letter-spacing: 0.12em;
   font-variant-numeric: tabular-nums;
 }
@@ -1783,16 +1781,16 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
   height: 20px;
   border-radius: 50%;
   background: var(--hover);
-  font-size: 11px;
+  font-size: 12px;
   transition: background 0.25s, color 0.25s;
 }
 .esg-steps button.on {
   border-color: var(--accent);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .esg-steps button.on b {
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
 }
 .esg-steps button.done {
   color: var(--text-2);
@@ -1967,13 +1965,13 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 11px 12px;
+  padding: 12px 12px;
   border-radius: 12px;
   background: var(--surface-2, var(--bg));
   font-size: 14px;
 }
 .install-steps li svg {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .install-steps li > span {
   display: grid;
@@ -1982,8 +1980,8 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
   font-size: 12px;
   font-weight: 700;
 }
@@ -2472,7 +2470,7 @@ select,
 .temp-people button.on {
   border-color: var(--accent);
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
 }
 .temp-pop {
   padding: 6px;
@@ -2504,7 +2502,7 @@ select,
   font-size: 24px;
   letter-spacing: 0.14em;
   font-variant-numeric: tabular-nums;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 /* An app that isn't set up for you yet */
@@ -2521,7 +2519,7 @@ select,
   justify-items: center;
   gap: 10px;
   padding: 32px 28px;
-  border-radius: 22px;
+  border-radius: 24px;
   background: var(--surface);
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
@@ -2534,7 +2532,7 @@ select,
   height: 52px;
   border-radius: 16px;
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
 }
 .app-setup-card h2 {
   margin: 6px 0 0;
@@ -2566,7 +2564,7 @@ select,
 .sel-new {
   border-top: 1px solid var(--border);
   margin-top: 4px;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .sel-create {
   display: flex;
@@ -2579,8 +2577,8 @@ select,
 .sel-create input {
   flex: 1;
   min-width: 0;
-  padding: 7px 10px;
-  border-radius: 9px;
+  padding: 8px 10px;
+  border-radius: 8px;
   border: 1px solid var(--accent);
   background: var(--surface);
   color: var(--text);
@@ -2600,7 +2598,7 @@ select,
   display: grid;
   gap: 12px;
   padding: 16px;
-  border-radius: 18px;
+  border-radius: 16px;
   border: 1px solid var(--border);
   background: var(--surface);
   box-shadow: var(--shadow);
@@ -2815,6 +2813,8 @@ label.search kbd,
   border: 0;
   box-shadow: none;
   background: var(--hover);
+  color: var(--text-2);
+  font-size: 12px;
 }
 /* "Nobody yet": a soft circle instead of a dashed ring inside bars and cards */
 .task-add .avatar-empty,
@@ -2898,7 +2898,7 @@ kbd {
 .ct-meta > .due,
 .ct-meta > .client-chip,
 .ct-meta > .team-chip {
-  font-size: 11.5px;
+  font-size: 12px;
   line-height: 1.6;
   padding: 0 8px;
 }
@@ -2929,7 +2929,7 @@ kbd {
 .sidebar.collapsed .nav-item {
   position: relative;
 }
-.sidebar.collapsed .live-count {
+.sidebar.collapsed .nav-item .count.live-count {
   position: absolute;
   top: 6px;
   right: 14px;
@@ -3001,7 +3001,7 @@ kbd {
 
 .lang-chips .lang-main {
   font-style: normal;
-  font-size: 11px;
+  font-size: 12px;
   margin-left: 4px;
   opacity: 0.75;
 }
@@ -3104,9 +3104,9 @@ p.trial-note > svg:first-child {
 .proj-people-add {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   font-size: 13px;
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 550;
 }
 .pp-list {
@@ -3116,7 +3116,7 @@ p.trial-note > svg:first-child {
 }
 .pp-head {
   margin-top: 6px;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-3);
 }
@@ -3256,7 +3256,7 @@ p.trial-note > svg:first-child {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--text-2);
   white-space: nowrap;
 }
@@ -3267,7 +3267,7 @@ p.trial-note > svg:first-child {
   color: var(--text-3);
 }
 .person-chip {
-  gap: 5px;
+  gap: 4px;
 }
 
 /* Tasks: saved views as tabs, quick filters as toggles. */
@@ -3299,14 +3299,14 @@ p.trial-note > svg:first-child {
 }
 .quick-chips > button.on {
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
 }
 .link-like {
   text-align: left;
   color: var(--text);
 }
 .link-like:hover {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .proj-next {
   color: var(--text-2);
@@ -3318,7 +3318,7 @@ p.trial-note > svg:first-child {
   display: inline-flex;
 }
 .proj-card-people > * {
-  margin-left: -5px;
+  margin-left: -4px;
   box-shadow: 0 0 0 2px var(--surface);
   border-radius: 50%;
 }
@@ -3430,8 +3430,8 @@ p.trial-note > svg:first-child {
   gap: 10px;
   justify-items: start;
   width: min(460px, 100%);
-  padding: 26px 24px;
-  border-radius: 18px;
+  padding: 24px 24px;
+  border-radius: 16px;
   border: 1px solid var(--border);
   background: var(--surface);
   box-shadow: var(--shadow);
@@ -3525,12 +3525,12 @@ p.trial-note > svg:first-child {
 }
 .ed-route-head em {
   font-style: normal;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   padding: 2px 8px;
   border-radius: 20px;
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
 }
 .ed-route ul {
   margin: 0;
@@ -3922,7 +3922,7 @@ p.trial-note > svg:first-child {
   flex: none;
   font-size: 12px;
   font-weight: 650;
-  padding: 3px 9px;
+  padding: 3px 8px;
   border-radius: 20px;
   background: var(--hover);
   color: var(--text-2);
@@ -3930,7 +3930,7 @@ p.trial-note > svg:first-child {
 .help-row.unread .help-status,
 .help-status.s-waiting {
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
 }
 .help-status.s-resolved,
 .help-status.s-closed {
@@ -3975,7 +3975,7 @@ p.trial-note > svg:first-child {
 .help-file {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   padding: 4px 6px 4px 10px;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -4045,7 +4045,7 @@ a.help-file:hover {
 .help-reply textarea {
   width: 100%;
   min-height: 36px;
-  padding: 8px 11px;
+  padding: 8px 12px;
   border: 1px solid var(--border);
   border-radius: 10px;
   background: var(--surface);
@@ -4109,7 +4109,7 @@ a.help-file:hover {
 .news-card > svg {
   flex: none;
   margin-top: 2px;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .news-card.warning > svg {
   color: #b45309;
@@ -4121,7 +4121,7 @@ a.help-file:hover {
 }
 .news-card a {
   margin-left: 6px;
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 600;
 }
 .news-card.leaving {
@@ -4211,7 +4211,7 @@ a.help-file:hover {
   align-items: flex-start;
   gap: 8px;
   margin: 8px 12px;
-  padding: 9px 12px;
+  padding: 8px 12px;
   border-radius: 10px;
   background: color-mix(in srgb, #b45309 11%, transparent);
   color: var(--text);

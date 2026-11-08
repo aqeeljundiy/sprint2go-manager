@@ -286,7 +286,7 @@
   }
   .demo-bar .ghost-btn.sm,
   .demo-bar .primary-btn.sm {
-    height: 40px;
+    height: var(--tap);
     padding: 0 12px;
     font-size: var(--fs-secondary);
   }
@@ -299,6 +299,11 @@
   }
   .app.with-demo-bar .mobile-top {
     padding-top: 8px;
+  }
+  /* The demo strip stays on top, so a full-screen composer starts below it: its close and send are in the top row. */
+  .app.with-demo-bar ~ * .compose.phone.normal,
+  .app.with-demo-bar .compose.phone.normal {
+    top: calc(var(--demo-bar-h) + env(safe-area-inset-top)); /* bottom stays on the keyboard (--kb) */
   }
 
   /* "Viewing as" a guest: the same kind of strip on top instead of a pill floating over the content and the composer. */

@@ -144,7 +144,7 @@
   .t-add-row svg {
     flex: none;
     width: 24px;
-    color: var(--accent);
+    color: var(--accent-text);
   }
   .t-add-row:active {
     background: var(--hover);
@@ -516,8 +516,8 @@
     color: var(--text-3);
   }
   .ucal-cell.on b {
-    background: var(--accent);
-    color: #fff;
+    background: var(--accent-fill);
+    color: var(--on-accent-fill);
   }
   .ucal-cell .dot {
     width: 4px;
@@ -1263,8 +1263,8 @@
     margin-bottom: 8px;
     border: 0;
     border-radius: 50%;
-    background: var(--accent);
-    color: #fff;
+    background: var(--accent-fill);
+    color: var(--on-accent-fill);
     opacity: 0;
     transform: scale(0.6);
     pointer-events: none;
@@ -1545,8 +1545,8 @@
     color: var(--accent-text);
   }
   .ds-pcircle.accent {
-    background: var(--accent);
-    color: #fff;
+    background: var(--accent-fill);
+    color: var(--on-accent-fill);
     box-shadow: none;
   }
   .ds-pcircle:active {

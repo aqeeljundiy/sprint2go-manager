@@ -41,7 +41,7 @@
   margin-top: 12px;
   border-radius: 14px;
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
   transition: background 0.2s, color 0.2s;
 }
 .cn-icon.good {
@@ -162,7 +162,7 @@
 .cn-can svg {
   flex: none;
   margin-top: 2px;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .cn-actions {
   display: flex;
@@ -253,7 +253,7 @@
 }
 .chat-draft svg {
   flex: none;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .chat-draft span {
   flex: 1 1 200px;
@@ -364,7 +364,7 @@
   height: 24px;
   border-radius: 50%;
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
   font-size: 12px;
   font-weight: 700;
 }
@@ -393,7 +393,7 @@
   height: 32px;
   border-radius: 10px;
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
 }
 .g-card > .aa-list {
   padding: 12px 16px;

@@ -220,7 +220,7 @@
     transition: color 0.2s, background 0.2s;
   }
   .project-pane .eye.on {
-    color: var(--accent);
+    color: var(--accent-text);
   }
   .project-pane .eye svg {
     width: 20px;
@@ -429,7 +429,7 @@
   .proj-new-sheet .pns-type.on {
     border-color: var(--accent);
     background: var(--accent-soft);
-    color: var(--accent);
+    color: var(--accent-on-soft);
   }
 }
 @media (max-width: 767px) and (prefers-reduced-motion: reduce) {

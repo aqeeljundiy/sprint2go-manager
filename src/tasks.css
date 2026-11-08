@@ -113,7 +113,7 @@
   padding: 3px 4px 3px 12px;
   border-radius: 999px;
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
   font-size: 12.5px;
   font-weight: 600;
   animation: fadeIn 0.18s ease-out backwards;
@@ -133,7 +133,7 @@
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 .tq-display.on {
-  color: var(--accent);
+  color: var(--accent-on-soft);
   background: var(--accent-soft);
 }
 .tq-display i {
@@ -144,9 +144,9 @@
   height: 16px;
   padding: 0 4px;
   border-radius: 8px;
-  background: var(--accent);
-  color: #fff;
-  font-size: 11px;
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
+  font-size: 12px;
   font-style: normal;
   font-weight: 700;
   line-height: 16px;
@@ -190,7 +190,7 @@
 .t-h-label {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   min-width: 0;
 }
 .t-heading .t-resched {
@@ -374,7 +374,7 @@
   display: inline-block;
   width: 7px;
   height: 7px;
-  margin-right: 5px;
+  margin-right: 4px;
   border-radius: 50%;
   background: var(--c);
   vertical-align: 1px;
@@ -412,7 +412,7 @@
   background: var(--surface);
   box-shadow: 0 0 0 1.5px var(--surface);
   color: var(--text-2);
-  font-size: 10.5px;
+  font-size: 12px;
   font-style: normal;
   font-weight: 700;
 }
@@ -694,7 +694,7 @@
 .task-sheet .as-item.on,
 .qa-list .as-item.on,
 .day-pick .as-item.on {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .ts-dot {
   display: grid;
@@ -770,12 +770,12 @@
   color: var(--text-3);
 }
 .mgp-day.today {
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 700;
 }
 .mgp-day.on {
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
 }
 .mgp-day.busy::after,
 .mgp-day.hol::before {
@@ -850,7 +850,7 @@
 .tcol-head {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   min-height: 28px;
   padding: 2px 6px;
   font-size: 13px;
@@ -897,7 +897,7 @@
 }
 .tcol-add:hover {
   background: var(--hover);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .tcard {
   display: grid;
@@ -987,7 +987,7 @@
   align-items: center;
   gap: 6px;
   min-height: 26px;
-  padding: 0 8px 0 7px;
+  padding: 0 8px 0 8px;
   border: 0;
   border-radius: 999px;
   background: color-mix(in oklab, var(--st) 12%, transparent);
@@ -1109,11 +1109,11 @@
   font-variant-numeric: tabular-nums;
 }
 .ucal-cell.today b {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .ucal-cell.on {
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
 }
 .ucal-cell.on small,
 .ucal-cell.on b {
@@ -1158,7 +1158,7 @@
   color: var(--text-3);
 }
 .ucal-add:hover {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .ucal-none {
   margin: 0;
@@ -1241,8 +1241,8 @@
 }
 .pmd-act.primary {
   grid-column: span 2;
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
 }
 .pmd-act.ok {
   background: var(--ok-soft);
@@ -1260,7 +1260,7 @@
   text-align: center;
 }
 .pmd-end svg {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .pmd-end strong {
   font-size: 17px;
@@ -1301,7 +1301,7 @@
 }
 .ds-pic.on {
   border-color: var(--accent);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .ds-pic-svg {
   width: 60px;
@@ -1378,7 +1378,7 @@ button.ds-row:hover {
   font-size: 13.5px;
 }
 .ds-view.on {
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 600;
 }
 .ds-reset {
@@ -1673,7 +1673,7 @@ button.td-chip:hover,
   min-width: 0;
   min-height: 40px;
   max-height: 140px;
-  padding: 9px 12px;
+  padding: 8px 12px;
   border: 1px solid var(--border);
   border-radius: 12px;
   background: var(--surface);
@@ -1729,7 +1729,7 @@ button.td-chip:hover,
   padding: 8px 8px 32px;
 }
 .swipe-settings .as-item.on {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .swipe-note {
   margin: 12px 12px 0;
@@ -1992,7 +1992,7 @@ button.td-chip:hover,
 .app-settings-menu button {
   display: grid;
   gap: 1px;
-  padding: 9px 10px;
+  padding: 8px 10px;
   border: 0;
   border-radius: var(--r-control);
   background: none;
@@ -2392,7 +2392,7 @@ a.cf-card:focus-visible {
   color: var(--text-3);
 }
 .tsr-row.done .tsr-ic {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .tsr-row.done .tsr-title {
   color: var(--text-3);

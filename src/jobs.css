@@ -16,7 +16,7 @@
   align-items: center;
   gap: 4px;
   margin-top: 2px;
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 500;
 }
 /* Calendar, an event's panel */
@@ -30,7 +30,7 @@
   color: var(--text-2);
 }
 .ev-bot-note > svg {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .ev-bot-note .link-btn {
   margin-left: 4px;
@@ -71,7 +71,7 @@
 /* A scheduled summary posted in the channel */
 /* lined up with the text of the messages around it (10px row padding, 34px avatar, 10px gap) */
 .chat-summary {
-  margin: 8px 10px 8px 54px;
+  margin: 8px 10px 8px 56px;
   max-width: 680px;
   padding: 12px 14px;
   border-radius: 12px;
@@ -88,7 +88,7 @@
   color: var(--text-2);
 }
 .chat-summary-head > svg {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .chat-summary-head time {
   margin-left: auto;

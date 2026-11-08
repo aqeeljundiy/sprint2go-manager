@@ -41,15 +41,15 @@ body {
 .primary-btn,
 .compose-btn {
   border-radius: 9999px;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 72%, #fff) 0%, var(--accent) 100%);
-  box-shadow: var(--shadow-btn), 0 8px 24px -10px color-mix(in srgb, var(--accent) 60%, transparent);
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
+  box-shadow: var(--shadow-btn);
   transition: box-shadow 0.15s, transform 0.15s, opacity 0.15s;
 }
 .primary-btn:hover,
 .compose-btn:hover {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 72%, #fff) 0%, var(--accent) 100%);
-  box-shadow: var(--shadow-btn), 0 12px 28px -10px color-mix(in srgb, var(--accent) 70%, transparent);
-  transform: translateY(-1px);
+  background: var(--accent-fill-hover);
+  box-shadow: var(--shadow-btn);
 }
 .primary-btn:disabled {
   box-shadow: none;
@@ -75,8 +75,9 @@ body {
 }
 .danger-btn,
 .list-banner.warn .primary-btn {
-  background: linear-gradient(180deg, #f87171, #dc2626);
-  box-shadow: var(--shadow-btn), 0 8px 24px -10px rgba(220, 38, 38, 0.55);
+  background: var(--danger-fill);
+  color: var(--on-danger-fill);
+  box-shadow: var(--shadow-btn);
 }
 .track-split .track-toggle.on {
   border-radius: 9999px 0 0 9999px;
@@ -98,10 +99,10 @@ body {
   padding: 4px;
 }
 .mode-switch button {
-  padding: 7px 4px;
+  padding: 8px 4px;
 }
 .sidebar.collapsed .mode-switch {
-  border-radius: 18px;
+  border-radius: 16px;
 }
 .search {
   border-radius: 9999px;
@@ -206,10 +207,10 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--text-3);
 }
 
@@ -240,7 +241,7 @@ body {
 .elk-wordmark {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   color: var(--text);
   line-height: 1;
 }
@@ -275,7 +276,7 @@ body {
 }
 .signin-card {
   border-radius: 24px;
-  padding: 40px 32px 30px;
+  padding: 40px 32px 32px;
   box-shadow: 0 30px 80px -30px rgba(1, 88, 203, 0.35), 0 2px 6px rgba(11, 12, 16, 0.06);
 }
 .signin-card .elk-wordmark {
@@ -286,7 +287,7 @@ body {
   border-radius: 16px;
 }
 .signin-btn {
-  padding: 13px;
+  padding: 12px;
 }
 .signin-foot {
   margin-top: 18px;
@@ -294,7 +295,7 @@ body {
   color: var(--text-3);
 }
 .signin-foot a {
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 600;
 }
 /* English or Bahasa Indonesia, under the card (SignIn.tsx, LangSwitch). */

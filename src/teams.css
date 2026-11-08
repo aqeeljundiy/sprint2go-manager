@@ -22,7 +22,7 @@
 .team-in {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   color: var(--ok, #0f9d6b);
   font-weight: 500;
 }
@@ -119,8 +119,8 @@ button.team-row:hover,
   padding: 1px 8px;
   border-radius: 9999px;
   background: var(--accent-soft);
-  color: var(--accent);
-  font-size: 11px;
+  color: var(--accent-on-soft);
+  font-size: 12px;
   font-weight: 600;
 }
 .team-due {
@@ -179,7 +179,7 @@ button.team-row:hover,
 }
 .team-load-list {
   display: grid;
-  padding: 2px 0 10px 42px;
+  padding: 2px 0 10px 40px;
 }
 .team-mini {
   display: flex;
@@ -325,7 +325,7 @@ button.team-row:hover,
   padding: 0;
 }
 .wl-logo > svg {
-  padding: 9px;
+  padding: 8px;
   color: var(--text-3);
 }
 .wl-color {
@@ -494,13 +494,13 @@ button.team-row:hover,
   place-items: center;
   border: 2px solid var(--border);
   background: var(--surface);
-  color: var(--accent);
+  color: var(--accent-text);
   transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
 .cd-steps li.done .cd-dot {
-  background: var(--accent);
+  background: var(--accent-fill);
   border-color: var(--accent);
-  color: #fff;
+  color: var(--on-accent-fill);
 }
 .cd-steps li.now .cd-dot {
   border-color: var(--accent);
@@ -620,7 +620,7 @@ button.team-row:hover,
   width: 140px;
   min-height: 34px;
   padding: 0 10px;
-  border-radius: 9px;
+  border-radius: 8px;
   border: 1px solid var(--border);
   background: var(--surface-2);
   font: inherit;
@@ -637,7 +637,7 @@ button.team-row:hover,
   width: min(320px, 100%);
   min-height: 36px;
   padding: 0 10px;
-  border-radius: 9px;
+  border-radius: 8px;
   border: 1px solid var(--border);
   background: var(--surface-2);
   font: inherit;

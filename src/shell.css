@@ -216,9 +216,9 @@ body.resizing-x .pane-resize::after {
   flex-direction: column;
   align-items: center;
   gap: 3px;
-  padding: 7px 4px 6px;
-  border-radius: 9px;
-  font-size: 11.5px;
+  padding: 8px 4px 6px;
+  border-radius: 8px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--text-2);
   transition: background 0.2s, color 0.2s, box-shadow 0.2s;
@@ -232,7 +232,7 @@ body.resizing-x .pane-resize::after {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 .mode-switch button.on svg {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 /* Collapsed: a slim icon rail */
@@ -250,12 +250,12 @@ body.resizing-x .pane-resize::after {
   margin: 0 2px 12px;
 }
 .sidebar.collapsed .mode-switch button {
-  padding: 9px 0;
+  padding: 8px 0;
 }
 .sidebar.collapsed .compose-btn {
   justify-content: center;
   margin: 0 2px 12px;
-  padding: 11px 0;
+  padding: 12px 0;
 }
 /* Collapsed: a 40 px round icon, no glow (a wide shadowed blob read as a second rail). */
 .sidebar.collapsed .compose-btn,
@@ -271,7 +271,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
 .sidebar.collapsed .nav-item {
   position: relative;
   justify-content: center;
-  padding: 9px 0;
+  padding: 8px 0;
 }
 .sidebar.collapsed .nav-item .count {
   position: absolute;
@@ -280,9 +280,9 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   min-width: 16px;
   padding: 1px 4px;
   border-radius: 10px;
-  background: var(--accent);
-  color: #fff;
-  font-size: 10px;
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
+  font-size: 12px;
   text-align: center;
 }
 .sidebar.collapsed .nav + .nav {
@@ -307,7 +307,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   align-items: center;
   gap: 10px;
   width: 100%;
-  padding: 7px 8px;
+  padding: 8px 8px;
   border-radius: 10px;
   text-align: left;
   color: var(--text-3);
@@ -330,7 +330,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   text-overflow: ellipsis;
 }
 .account-text small {
-  font-size: 11.5px;
+  font-size: 12px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -387,8 +387,8 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   align-items: center;
   gap: 12px;
   width: 100%;
-  padding: 9px 12px;
-  border-radius: 9px;
+  padding: 8px 12px;
+  border-radius: 8px;
   font-weight: 500;
   text-align: left;
   color: var(--text);
@@ -409,7 +409,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   gap: 6px;
 }
 .am-storage small {
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--text-3);
   font-weight: 400;
 }
@@ -531,7 +531,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   justify-content: space-between;
   align-items: center;
   gap: 8px;
-  padding: 7px 8px 7px 16px;
+  padding: 8px 8px 8px 16px;
   border-bottom: 1px solid var(--border);
   border-radius: inherit;
   background: var(--surface-2);
@@ -603,7 +603,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 6px 5px 10px;
+  padding: 4px 6px 4px 10px;
   border-radius: 8px;
   background: var(--surface-2);
   border: 1px solid var(--border);
@@ -611,7 +611,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   animation: pop 0.18s var(--ease);
 }
 .file-chip svg {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .fc-name {
   max-width: 180px;
@@ -643,7 +643,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   border: 2px dashed var(--accent);
   border-radius: 12px;
   background: color-mix(in srgb, var(--accent) 10%, var(--surface));
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 600;
   pointer-events: none;
   z-index: 5;
@@ -714,7 +714,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   color: var(--text-3);
 }
 .cc-toggle:hover {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .recip-suggest {
   position: absolute;
@@ -734,7 +734,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   align-items: center;
   gap: 10px;
   width: 100%;
-  padding: 7px 8px;
+  padding: 8px 8px;
   border-radius: 8px;
   text-align: left;
 }
@@ -768,7 +768,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   align-items: center;
   flex-wrap: wrap;
   gap: 2px;
-  padding: 5px 10px;
+  padding: 4px 10px;
   border-bottom: 1px solid var(--border);
 }
 .tb-group {
@@ -780,7 +780,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   place-items: center;
   width: 30px;
   height: 30px;
-  border-radius: 7px;
+  border-radius: 8px;
   color: var(--text-2);
   transition: background 0.12s, color 0.12s;
 }
@@ -790,7 +790,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
 }
 .tb.on {
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
 }
 .tb-sep {
   width: 1px;
@@ -894,7 +894,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
 }
 .rich-body a,
 .prose a {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .prose {
   overflow-wrap: anywhere;
@@ -925,7 +925,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
 }
 .att-save:hover {
   background: var(--hover);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .att-save.saved {
   color: #10b981;
@@ -974,8 +974,8 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 9px 12px;
-  border-radius: 9px;
+  padding: 8px 12px;
+  border-radius: 8px;
   color: var(--text-2);
   font-weight: 500;
   text-align: left;
@@ -988,7 +988,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
 }
 .settings-nav button.on {
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
   font-weight: 600;
 }
 .settings-content {
@@ -1008,15 +1008,13 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   letter-spacing: -0.02em;
 }
 .set-intro {
-  margin: 4px 0 22px;
+  margin: 4px 0 24px;
   color: var(--text-2);
 }
 .settings-content h3 {
   margin: 28px 0 12px;
   font-size: 12px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
   color: var(--text-3);
 }
 .field {
@@ -1029,6 +1027,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   font-weight: 600;
 }
 .field input {
+  min-height: var(--tap);
   padding: 10px 12px;
   border-radius: 10px;
   border: 1px solid var(--border);
@@ -1056,7 +1055,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   display: flex;
   align-items: center;
   gap: 20px;
-  margin-bottom: 22px;
+  margin-bottom: 24px;
   padding: 18px;
   border: 1px solid var(--border);
   border-radius: 14px;
@@ -1134,7 +1133,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
 .badge-soon {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   padding: 4px 10px;
   border-radius: 20px;
   background: var(--hover);
@@ -1271,7 +1270,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   width: 10px;
   height: 10px;
   margin-right: 6px;
-  border-radius: 3px;
+  border-radius: 4px;
 }
 
 /* ---------- Drive ---------- */
@@ -1352,7 +1351,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
 .icon-seg button {
   display: grid;
   place-items: center;
-  padding: 5px 8px;
+  padding: 4px 8px;
 }
 .drive-scroll {
   flex: 1;
@@ -1376,15 +1375,13 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   margin: 4px 0 10px;
   font-size: 12px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
   color: var(--text-3);
 }
 .folder-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
   gap: 10px;
-  margin-bottom: 26px;
+  margin-bottom: 24px;
 }
 .file-grid {
   display: grid;
@@ -1508,7 +1505,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   border-radius: 20px;
   background: rgba(0, 0, 0, 0.55);
   color: #fff;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
   backdrop-filter: blur(6px);
 }
@@ -1519,7 +1516,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   display: flex;
   gap: 2px;
   padding: 2px;
-  border-radius: 9px;
+  border-radius: 8px;
   background: var(--surface);
   box-shadow: var(--shadow);
   opacity: 0;
@@ -1555,7 +1552,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   grid-template-columns: minmax(0, 1fr) 140px 90px 80px;
   align-items: center;
   gap: 12px;
-  padding: 7px 14px;
+  padding: 8px 14px;
   border-bottom: 1px solid var(--border);
   cursor: pointer;
   transition: background 0.12s;
@@ -1569,13 +1566,11 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   background: var(--hover);
 }
 .d-th {
-  padding: 9px 14px;
+  padding: 8px 14px;
   background: var(--surface-2);
   color: var(--text-3);
   font-size: 12px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
   cursor: default;
   animation: none;
 }
@@ -1627,7 +1622,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   border: 2px dashed var(--accent);
   border-radius: 12px;
   background: color-mix(in srgb, var(--accent) 10%, var(--surface));
-  color: var(--accent);
+  color: var(--accent-text);
   animation: fadeIn 0.15s;
   pointer-events: none;
 }
@@ -1763,13 +1758,13 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
 /* ---------- Density ---------- */
 
 :root[data-density='compact'] .row {
-  padding-top: 7px;
-  padding-bottom: 7px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 :root[data-density='compact'] .row .avatar {
   width: 28px !important;
   height: 28px !important;
-  font-size: 11px !important;
+  font-size: 12px !important;
 }
 :root[data-density='compact'] .row.unread::before {
   top: 20px;
@@ -1930,7 +1925,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   background: var(--hover);
 }
 .track-toggle.on {
-  color: var(--accent);
+  color: var(--accent-on-soft);
   border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
   background: var(--accent-soft);
 }
@@ -1947,15 +1942,15 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 2px 7px;
+  padding: 2px 8px;
   border-radius: 6px;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--text-3);
   background: var(--hover);
 }
 .seen-chip.yes {
-  color: #059669;
+  color: #047857;
   background: color-mix(in srgb, #10b981 13%, transparent);
 }
 :root[data-theme='dark'] .seen-chip.yes {
@@ -1971,7 +1966,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
 
 .head-eye {
   flex: none;
-  color: var(--accent);
+  color: var(--accent-text);
   margin-left: -4px;
 }
 
@@ -1979,7 +1974,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   display: flex;
   align-items: center;
   gap: 6px;
-  margin: -4px 16px 6px 66px;
+  margin: -4px 16px 6px 64px;
   font-size: 12px;
   color: #059669;
 }
@@ -2003,7 +1998,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   padding: 10px 14px;
   background: linear-gradient(90deg, var(--accent-soft), transparent);
   border-bottom: 1px solid var(--border);
-  color: var(--accent);
+  color: var(--accent-on-soft);
 }
 .tp-head strong {
   color: var(--text);
@@ -2062,7 +2057,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   padding: 2px 8px;
   border-radius: 20px;
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
   font-size: 12px;
   font-weight: 600;
 }
@@ -2107,7 +2102,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
 }
 .tp-ev.click .tp-icon {
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
 }
 .tp-ev.auto .tp-icon {
   background: var(--hover);
@@ -2137,7 +2132,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   padding: 8px 14px;
   border-top: 1px solid var(--border);
   background: var(--surface-2);
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--text-3);
 }
 
@@ -2171,7 +2166,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   border-left: 0;
   border-radius: 0 8px 8px 0;
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
   transition: background 0.15s;
 }
 .track-more svg {
@@ -2203,8 +2198,6 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   padding: 8px 10px 6px;
   font-size: 12px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
   color: var(--text-3);
 }
 .tm-row {
@@ -2212,7 +2205,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   align-items: center;
   gap: 12px;
   padding: 8px 10px;
-  border-radius: 9px;
+  border-radius: 8px;
   cursor: pointer;
 }
 .tm-row:hover {
@@ -2220,7 +2213,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
 }
 .tm-row > svg {
   flex: none;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .tm-row span,
 .tm-remind > span {
@@ -2235,7 +2228,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
 }
 .tm-row small,
 .tm-remind small {
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--text-3);
 }
 .tm-row input {
@@ -2256,7 +2249,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
 }
 .tm-foot {
   padding: 8px 10px 6px;
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--text-3);
   border-top: 1px solid var(--border);
 }
@@ -2269,7 +2262,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   padding: 2px 8px;
   border-radius: 20px;
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
   font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
@@ -2361,7 +2354,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   margin-bottom: 8px;
   border-radius: 8px;
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
 }
 .kpi-value {
   font-size: 24px;
@@ -2454,8 +2447,8 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
 .te-status {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 3px 9px;
+  gap: 4px;
+  padding: 3px 8px;
   border-radius: 20px;
   font-size: 12px;
   font-weight: 600;
@@ -2469,7 +2462,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
 }
 .te-status.clicked {
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
 }
 .te-status.seen {
   background: color-mix(in srgb, #10b981 13%, transparent);
@@ -2551,8 +2544,9 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
 }
 .primary-btn.sm,
 .ghost-btn.sm {
-  padding: 5px 11px;
-  font-size: 12.5px;
+  min-height: var(--ctl-sm);
+  padding: 0 12px;
+  font-size: 13px;
   margin: 0;
 }
 .live-dot {
@@ -2601,7 +2595,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
 }
 .feed-click .feed-icon {
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
 }
 .feed-doc .feed-icon {
   background: color-mix(in srgb, #8b5cf6 14%, transparent);
@@ -2627,7 +2621,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
 }
 .feed time {
   flex: none;
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--text-3);
 }
 
@@ -2691,8 +2685,8 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   align-items: center;
   gap: 10px;
   width: 100%;
-  padding: 5px 6px;
-  border-radius: 11px;
+  padding: 4px 6px;
+  border-radius: 12px;
   text-align: left;
   transition: background 0.15s;
 }
@@ -2717,7 +2711,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--text-3);
 }
 .ws-chev {
@@ -2747,10 +2741,8 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
 }
 .ws-menu-title {
   padding: 8px 10px 4px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
   color: var(--text-3);
 }
 .ws-item {
@@ -2773,14 +2765,14 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   min-width: 20px;
   padding: 1px 6px;
   border-radius: 10px;
-  background: var(--accent);
-  color: #fff;
-  font-size: 11px;
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
+  font-size: 12px;
   font-weight: 700;
   text-align: center;
 }
 .ws-check {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 /* Inboxes (multiple accounts) */
@@ -2873,7 +2865,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   text-overflow: ellipsis;
 }
 .acct-text small {
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 500;
   color: #b45309;
 }
@@ -2921,7 +2913,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
 .logo-drop {
   position: relative;
   flex: none;
-  border-radius: 18px;
+  border-radius: 16px;
   overflow: hidden;
 }
 .logo-over {
@@ -2969,7 +2961,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
 .modal-note svg {
   flex: none;
   margin-top: 1px;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .modal .field {
   margin-bottom: 0;
@@ -3001,13 +2993,13 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 .kind-pick button.on svg {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .kind-pick strong {
   font-size: 13px;
 }
 .kind-pick small {
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--text-3);
 }
 
@@ -3035,7 +3027,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
 }
 .ws-preview-btn {
   padding: 8px 14px;
-  border-radius: 9px;
+  border-radius: 8px;
   color: #fff;
   font-size: 13px;
   font-weight: 600;
@@ -3059,9 +3051,9 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   place-items: center;
   width: 32px;
   height: 32px;
-  border-radius: 9px;
+  border-radius: 8px;
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
 }
 .acct-info {
   flex: 1;
@@ -3080,7 +3072,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
 .acct-status {
   padding: 2px 8px;
   border-radius: 20px;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
   color: #b45309;
   background: color-mix(in srgb, #f59e0b 13%, transparent);
@@ -3095,7 +3087,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   align-items: center;
   gap: 10px;
   padding: 12px;
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 600;
   transition: background 0.12s;
 }
@@ -3103,7 +3095,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   background: var(--hover);
 }
 .link-btn {
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 2px;
@@ -3147,7 +3139,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   justify-items: center;
   gap: 6px;
   padding: 36px 28px 28px;
-  border-radius: 22px;
+  border-radius: 24px;
   background: var(--surface);
   border: 1px solid var(--border);
   box-shadow: var(--shadow-lg);
@@ -3234,12 +3226,12 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   height: 40px;
   border-radius: 50%;
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
 }
 .signin-btn {
   width: 100%;
   justify-content: center;
-  padding: 11px;
+  padding: 12px;
 }
 .signin-error {
   margin: 0;
@@ -3248,7 +3240,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
 }
 .signin-note {
   margin: 0;
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--text-3);
   text-align: center;
 }
@@ -3258,10 +3250,8 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
 
 .am-label {
   padding: 4px 12px 2px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
   color: var(--text-3);
 }
 .am-user .amu-text {
@@ -3274,7 +3264,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
 .am-user small {
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--text-3);
   font-weight: 400;
 }
@@ -3283,8 +3273,8 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   padding: 1px 6px;
   border-radius: 6px;
   background: var(--accent-soft);
-  color: var(--accent);
-  font-size: 11px;
+  color: var(--accent-on-soft);
+  font-size: 12px;
   font-weight: 600;
   vertical-align: 1px;
 }
@@ -3295,7 +3285,7 @@ aside.sidebar.collapsed .sb-panel .compose-btn {
   color: var(--text-2);
 }
 .role-select {
-  padding: 5px 8px;
+  padding: 4px 8px;
   border-radius: 8px;
   border: 1px solid var(--border);
   background: var(--surface);
@@ -3314,7 +3304,7 @@ fieldset.plain:disabled {
   display: flex;
   align-items: center;
   border: 1px solid var(--border);
-  border-radius: 9px;
+  border-radius: 8px;
   background: var(--surface-2);
   overflow: hidden;
 }
@@ -3351,7 +3341,7 @@ fieldset.plain:disabled {
   border-bottom: 0;
 }
 .access-btn {
-  gap: 5px;
+  gap: 4px;
 }
 .access-btn .chev {
   transition: transform 0.2s var(--ease);
@@ -3450,10 +3440,10 @@ fieldset.plain:disabled {
 }
 .demo-tag {
   padding: 1px 6px;
-  border-radius: 5px;
+  border-radius: 4px;
   background: var(--surface-2);
   color: var(--text-2);
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.02em;
 }
@@ -3465,7 +3455,7 @@ fieldset.plain:disabled {
 .ask-ai {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 8px;
   margin: 0 4px 12px;
   padding: 8px 12px;
   border-radius: 10px;
@@ -3489,7 +3479,7 @@ fieldset.plain:disabled {
 .sidebar.collapsed .ask-ai {
   justify-content: center;
   margin: 0 2px 12px;
-  padding: 9px 0;
+  padding: 8px 0;
 }
 
 /* Assistant panel */
@@ -3529,7 +3519,7 @@ fieldset.plain:disabled {
   display: grid;
 }
 .ai-head small {
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--text-3);
 }
 .ai-orb {
@@ -3572,7 +3562,7 @@ fieldset.plain:disabled {
 }
 .ai-msg {
   max-width: 92%;
-  padding: 10px 13px;
+  padding: 10px 12px;
   border-radius: 14px;
   font-size: 13.5px;
   line-height: 1.5;
@@ -3596,8 +3586,8 @@ fieldset.plain:disabled {
 }
 .ai-msg.user {
   align-self: flex-end;
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-fill);
+  color: var(--on-accent-fill);
   border-bottom-right-radius: 4px;
 }
 .ai-msg.ai {
@@ -3648,9 +3638,9 @@ fieldset.plain:disabled {
 .ai-sources button {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   max-width: 100%;
-  padding: 4px 9px;
+  padding: 4px 8px;
   border-radius: 20px;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -3661,7 +3651,7 @@ fieldset.plain:disabled {
 }
 .ai-sources button:hover {
   border-color: var(--accent);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .ai-input {
   display: flex;
@@ -3713,7 +3703,7 @@ fieldset.plain:disabled {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 11px;
+  padding: 4px 12px;
   border-radius: 20px;
   border: 1px solid color-mix(in srgb, var(--ai) 28%, var(--border));
   background: var(--ai-soft);
@@ -3759,10 +3749,8 @@ fieldset.plain:disabled {
   align-items: center;
   gap: 6px;
   margin-bottom: 4px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
   color: var(--ai);
 }
 .ais-todo {
@@ -3789,7 +3777,7 @@ fieldset.plain:disabled {
 .smart-replies > span {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   margin-right: 2px;
   font-size: 12px;
   font-weight: 600;
@@ -3797,8 +3785,8 @@ fieldset.plain:disabled {
 }
 .smart-replies button {
   max-width: 100%;
-  padding: 7px 12px;
-  border-radius: 18px;
+  padding: 8px 12px;
+  border-radius: 16px;
   border: 1px solid var(--border);
   background: var(--surface);
   font-size: 13px;
@@ -3915,7 +3903,7 @@ fieldset.plain:disabled {
 .aw-head {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   margin-bottom: 6px;
   color: var(--ai);
   font-size: 13px;
@@ -3929,7 +3917,7 @@ fieldset.plain:disabled {
 .ai-writer textarea {
   width: 100%;
   padding: 8px 10px;
-  border-radius: 9px;
+  border-radius: 8px;
   border: 1px solid var(--border);
   background: var(--surface);
   resize: none;
@@ -3971,7 +3959,7 @@ fieldset.plain:disabled {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   margin-top: 8px;
   padding-top: 8px;
   border-top: 1px solid var(--border);
@@ -4109,7 +4097,7 @@ fieldset.plain:disabled {
   color: var(--text-3);
 }
 .due {
-  padding: 1px 7px;
+  padding: 1px 8px;
   border-radius: 6px;
   background: var(--hover);
   font-weight: 600;
@@ -4125,7 +4113,7 @@ fieldset.plain:disabled {
 }
 .due.soon {
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-on-soft);
 }
 .ai-tag {
   display: inline-flex;
@@ -4148,7 +4136,7 @@ fieldset.plain:disabled {
   color: var(--text-3);
 }
 .todo-src:hover {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .todo-actions {
   display: flex;
@@ -4196,10 +4184,10 @@ fieldset.plain:disabled {
   background: none;
   color: var(--text-3);
   font: inherit;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
   cursor: pointer;
   transition: color 0.16s var(--ease), background 0.16s var(--ease);
 }
