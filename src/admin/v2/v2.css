@@ -3805,7 +3805,7 @@
     border: 10px solid transparent;
     background-clip: padding-box;
     box-sizing: content-box;
-    margin: -10px;
+    margin: -10px; /* system: cancels the 10px transparent border that grows the switch tap target to 44px */
   }
   :root[data-ui='v2'] .a2-tr > .r {
     margin-left: auto;
