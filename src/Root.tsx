@@ -12,7 +12,7 @@ import App from './App';
 import { clientActions } from './clientActions';
 import { accessFor, afterEnd, clientInbox, portalsFor } from './clientView';
 import { WorkspaceSwitcher } from './components/WorkspaceSwitcher';
-import { ActingBanner, AdminApp, AdminV2, ClientApp, ConnectApp, Onboarding, SharedHome } from './lazy';
+import { ActingBanner, AdminApp, ClientApp, ConnectApp, Onboarding, SharedHome } from './lazy';
 import { setPhotos } from './photos';
 import { Wordmark } from './components/Logo';
 import { AcceptInvite, SignIn, SignUp } from './components/SignIn';
@@ -102,7 +102,7 @@ export default function Root() {
     );
   if (mode === 'two-step' && session?.twoStep) return <TwoStepGate need={session.twoStep} email={session.email} companies={session.companies} />;
   if (mode === 'ready' && session?.suspended) return <Suspended reason={session.suspended.reason} />;
-  if (admin && !trying && (mode === 'ready' || mode === 'demo')) return /^\/admin\/v2(\/|$)/.test(location.pathname) ? <AdminV2 /> : <AdminApp />;
+  if (admin && !trying && (mode === 'ready' || mode === 'demo')) return <AdminApp />;
   if (connecting && mode === 'ready' && session && !session.suspended) return <ConnectApp actingAs={session.actingAs} />;
   if (mode === 'ready' && session)
     return (

@@ -45,7 +45,5 @@ export const TemplateDialog = split(() => import('./components/TemplateDialog').
 export const EndClientDialog = split(() => import('./components/EndClientDialog').then((m) => m.EndClientDialog));
 export const BlockDialog = split(() => import('./components/BlockDialog').then((m) => m.BlockDialog));
 export const AdminApp = split(() => import('./admin/AdminApp').then((m) => m.AdminApp));
-// The rebuilt console at /admin/v2: its own root and styles, loaded only there (v1 at /admin is unchanged).
-export const AdminV2 = split(() => import('./admin/v2/AdminV2').then((m) => m.AdminV2));
 export const ActingBanner = split(() => import('./admin/AdminApp').then((m) => m.ActingBanner));
 export const ConnectApp = split(() => import('./components/ConnectApp').then((m) => m.ConnectApp));
