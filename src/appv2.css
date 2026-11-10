@@ -133,6 +133,16 @@
   :root[data-app='v2'] .primary-btn:hover {
     box-shadow: none;
   }
+  :root[data-app='v2'] .chat-search-row {
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--v2-line);
+  }
+  :root[data-app='v2'] .chat-search-row:hover {
+    box-shadow: inset 0 0 0 1px var(--v2-line-strong);
+  }
+  :root[data-app='v2'] .sidebar .nav-item .count {
+    border-radius: 6px;
+  }
   :root[data-app='v2'] .search {
     border-radius: var(--v2-r);
     background: var(--surface);
@@ -273,7 +283,7 @@
   .v2-density button {
     display: grid;
     place-items: center;
-    width: 32px;
+    width: 28px;
     height: 28px;
     border-radius: 6px;
     color: var(--text-3);
@@ -336,6 +346,10 @@
 .pv2-kpi.on {
   background: var(--accent-soft);
 }
+.pv2-kpi.on small,
+.pv2-kpi.on .pv2-kpi-label {
+  color: var(--text-2);
+}
 .pv2-kpi-label {
   font-size: 13px;
   color: var(--text-2);
@@ -392,6 +406,9 @@
   background: var(--accent-soft);
   color: var(--accent-on-soft);
   box-shadow: inset 0 0 0 1px transparent;
+}
+.pv2-chip.on span {
+  color: var(--text-2);
 }
 .pv2-layout button {
   display: inline-flex;

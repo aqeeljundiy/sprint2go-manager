@@ -254,6 +254,7 @@
     padding-top: 0;
   }
   .trow-title {
+    min-height: var(--tap);
     font: var(--t-body);
   }
   .trow-meta {

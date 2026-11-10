@@ -170,7 +170,8 @@
   --accent: color-mix(in oklab, var(--brand) 74%, #f2f2f2);
   --accent-hover: color-mix(in oklab, var(--brand) 62%, #ffffff);
   --accent-soft: color-mix(in oklab, var(--brand) 18%, transparent);
-  --accent-text: var(--brand-ink-dark, color-mix(in oklab, var(--brand) 60%, #ffffff));
+  /* lifted a step past the ink, so accent words stay at 4.5:1 on the accent's own soft tint too (chips, pills) */
+  --accent-text: color-mix(in oklab, var(--brand-ink-dark, color-mix(in oklab, var(--brand) 60%, #ffffff)) 82%, #ffffff);
   --accent-fill: var(--accent);
   --accent-fill-hover: var(--accent-hover);
   --on-accent-fill: #121317;

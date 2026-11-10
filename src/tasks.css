@@ -1100,6 +1100,7 @@
   background: var(--hover);
 }
 .ucal-cell small {
+  white-space: nowrap;
   color: var(--text-3);
   font-size: 12px;
   font-weight: 600;
@@ -1110,6 +1111,12 @@
 }
 .ucal-cell.today b {
   color: var(--accent-text);
+}
+.ucal-cell.today small {
+  color: var(--text-2);
+}
+.ucal-cell b {
+  white-space: nowrap;
 }
 .ucal-cell.on {
   background: var(--accent-fill);
