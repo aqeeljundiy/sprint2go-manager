@@ -1116,12 +1116,14 @@
   color: var(--text-2);
 }
 /* Dark: the picked day on the accent's tint with accent words (dark ink on a mid-tone fill fell under 4.5:1). */
-:root[data-theme='dark'] .ucal-cell.on {
-  background: var(--accent-soft);
-}
-:root[data-theme='dark'] .ucal-cell.on small,
-:root[data-theme='dark'] .ucal-cell.on b {
-  color: var(--accent-text);
+@media (min-width: 768px) {
+  :root[data-theme='dark'] .ucal-cell.on {
+    background: var(--accent-soft);
+  }
+  :root[data-theme='dark'] .ucal-cell.on small,
+  :root[data-theme='dark'] .ucal-cell.on b {
+    color: var(--accent-text);
+  }
 }
 .ucal-cell b {
   white-space: nowrap;
