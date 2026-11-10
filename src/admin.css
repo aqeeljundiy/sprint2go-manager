@@ -3128,3 +3128,47 @@ button.adm-q-text:hover strong {
     transition: none;
   }
 }
+
+/* ---------- phones: every control at least 44px tall; quiet text kept at 4.5:1 (ui-gate) ---------- */
+.adm-brand-tag,
+.adm-searchbtn kbd,
+.adm-stat-hint,
+.adm-flag {
+  color: var(--text-2);
+}
+.adm-flag.on,
+.adm-banner.good > span {
+  color: color-mix(in srgb, var(--ad-green) 82%, black);
+}
+:root[data-theme='dark'] .adm-flag.on,
+:root[data-theme='dark'] .adm-banner.good > span {
+  color: var(--ad-green);
+}
+@media (max-width: 767px) {
+  .adm .primary-btn.sm,
+  .adm .ghost-btn.sm,
+  .adm-modal .primary-btn.sm,
+  .adm-modal .ghost-btn.sm,
+  .adm .adm-back,
+  .adm .sel,
+  .adm .adm-q-text,
+  .adm .adm-link,
+  .adm .adm-field input,
+  .adm .adm-input,
+  .adm .adm-money,
+  .adm .adm-price-grid input {
+    min-height: 44px;
+  }
+  .adm .adm-search {
+    min-height: 44px;
+  }
+  .adm .adm-search input {
+    min-height: var(--tap);
+  }
+  .adm .adm-switch-row .switch {
+    border: 8px solid transparent;
+    background-clip: padding-box;
+    box-sizing: content-box;
+    margin: -8px;
+  }
+}
