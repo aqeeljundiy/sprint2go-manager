@@ -575,3 +575,22 @@
     border: 1px solid var(--v2-line);
   }
 }
+@media (min-width: 768px) {
+  /* shortcut hints read as text inside a field, not a box inside a box */
+  :root[data-app='v2'] .search kbd {
+    background: none;
+    border: 0;
+    box-shadow: none;
+  }
+  :root[data-app='v2'] .sidebar .nav-item .count {
+    border-radius: 999px;
+  }
+  :root[data-app='v2'] .inbox-switch-icon {
+    border-radius: 6px;
+  }
+  /* one height for the same quiet button wherever it sits */
+  :root[data-app='v2'] .set-row .ghost-btn.outline,
+  :root[data-app='v2'] .ucal-more {
+    min-height: var(--ctl);
+  }
+}
