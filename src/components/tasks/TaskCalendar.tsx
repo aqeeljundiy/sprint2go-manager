@@ -126,7 +126,7 @@ export function TaskCalendar({
           }}
           onPointerCancel={() => (sw.current = null)}
         >
-          <div key={week} className={`ucal-days7 ${dir}`}>
+          <div key={week} className={`ucal-days7 ${dir}`} role="listbox" aria-label={t('Pick a day')}>
             {strip.map((d) => (
               <DayCell key={d} day={d} today={today} selected={selected} busy={busy.has(d)} onPick={go} onHold={onAdd} />
             ))}
@@ -179,7 +179,8 @@ function DayCell({ day, today, selected, busy, onPick, onHold }: { day: string; 
       onClick={() => onPick(day)}
       disabled={past}
       aria-label={busy ? t('{day}, has tasks. Hold to add a task', { day: fmtWeekdayLong(d) }) : t('{day}. Hold to add a task', { day: fmtWeekdayLong(d) })}
-      aria-current={day === selected ? 'date' : undefined}
+      role="option"
+      aria-selected={day === selected}
       {...press}
     >
       <small>{fmtDate(d, { weekday: 'short' })}</small>
