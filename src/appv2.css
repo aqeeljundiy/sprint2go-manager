@@ -67,3 +67,10 @@
 .settings-content textarea {
   border-radius: 8px;
 }
+
+.home-search kbd {
+  border-radius: 4px;
+}
+.load-go {
+  min-height: 58px;
+}

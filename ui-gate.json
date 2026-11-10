@@ -5,12 +5,16 @@
   "settle": 1200,
   "routes": [
     {
-      "name": "home",
-      "path": "/try"
+      "name": "app-home",
+      "path": "/"
     },
     {
-      "name": "settings",
-      "path": "/try/settings"
+      "name": "app-settings",
+      "path": "/settings"
+    },
+    {
+      "name": "app-settings-account",
+      "path": "/settings/account"
     },
     {
       "name": "admin-today",

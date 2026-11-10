@@ -3220,3 +3220,7 @@ small.adm-block {
 .adm-tr {
   min-height: 56px;
 }
+
+.adm-searchbtn kbd {
+  border-radius: 2px;
+}

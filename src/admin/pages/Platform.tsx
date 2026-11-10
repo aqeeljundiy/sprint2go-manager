@@ -231,7 +231,7 @@ function Relay({ relay }: { relay: System['relay'] }) {
   return (
     <>
       {relay.reachable ? t('Answering at {address}', { address: relay.checked ?? '' }) : t('Set up, but nothing answers at {address}', { address: relay.checked ?? relay.addresses.join(', ') })}
-      {' · '}
+      {', '}
       <button type="button" className="adm-link muted" onClick={run} disabled={test === 'running'}>
         {test === 'running' ? t('Testing…') : t('Test from this browser')}
       </button>

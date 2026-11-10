@@ -477,7 +477,7 @@ export function HomeView(p: Props) {
                     <>
                       <strong>{u.id === p.me.id ? t('You') : u.name.split(' ')[0]}</strong>
                       {bar(open, max, late > 0)}
-                      <small>{late ? t('{open} open · {week} this week · {late} late', { open, week, late }) : t('{open} open · {week} this week', { open, week })}</small>
+                      <small>{late ? t('{open} open, {week} this week, {late} late', { open, week, late }) : t('{open} open, {week} this week', { open, week })}</small>
                     </>
                   );
                   return p.onOpenPerson ? (
