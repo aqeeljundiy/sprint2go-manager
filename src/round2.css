@@ -3189,6 +3189,16 @@ button.chat-members:hover {
   color: var(--text-3);
   font-size: 12px;
 }
+/* the meeting's facts, separated by a small gap and a hairline, not a run of middle dots */
+.m-bits {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 8px;
+}
+.m-bits > span + span {
+  padding-left: 8px;
+  border-left: 1px solid var(--line);
+}
 .m-err {
   color: var(--danger);
 }

@@ -530,7 +530,6 @@
     border-color: var(--v2-line-strong);
     box-shadow: none;
   }
-  :root[data-app='v2'] .tb-table-card,
   :root[data-app='v2'] .team-card-x,
   :root[data-app='v2'] .file-card,
   :root[data-app='v2'] .composer {
@@ -542,5 +541,37 @@
 @media (prefers-reduced-motion: reduce) {
   .pv2-table-wrap {
     animation: none;
+  }
+}
+
+/* Single-line labels that cut off with an ellipsis keep room for g, j, p and y. */
+:root .sb-label,
+:root .sb-label > small,
+:root .compose-btn kbd,
+:root .push-title,
+:root .mt-cal-text {
+  line-height: 1.35;
+}
+@media (min-width: 768px) {
+  :root[data-app='v2'] .file-card .d-thumb {
+    border-radius: 4px;
+  }
+  :root[data-app='v2'] .inbox-switch-icon {
+    border-radius: 8px;
+  }
+  :root[data-app='v2'] .tb-table-card {
+    border-radius: 20px;
+  }
+  :root[data-app='v2'] .tb-table-card .client-badge {
+    border-radius: 6px;
+  }
+  :root[data-app='v2'][data-theme='dark'] .file-card .d-thumb {
+    background: color-mix(in srgb, var(--text) 9%, var(--surface));
+  }
+}
+@media (min-width: 768px) {
+  :root[data-app='v2'] .tb-table-card {
+    box-shadow: none;
+    border: 1px solid var(--v2-line);
   }
 }
