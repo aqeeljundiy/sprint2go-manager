@@ -1,0 +1,69 @@
+/* App home and Settings in the owner's "A+B" light style: calm and roomy, thin grey hairlines instead of shadows,
+   8px controls, headings never tighter than -0.01em. Scoped to the home pane and the settings page only; the phone
+   layer (src/mobile) still loads after this and keeps its own system. */
+
+.home-pane,
+.settings-body {
+  --v2-line: #e6e8ec;
+}
+:root[data-theme='dark'] .home-pane,
+:root[data-theme='dark'] .settings-body {
+  --v2-line: #24272e;
+}
+
+/* ---------- home ---------- */
+.home-head h1 {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+.home-grid .home-card,
+.home-grid .side-card {
+  border: 1px solid var(--v2-line);
+  box-shadow: none;
+  border-radius: 12px;
+  transition: border-color 0.15s ease-out;
+}
+.home-grid .home-card:hover,
+.home-grid .side-card:hover {
+  border-color: color-mix(in srgb, var(--text) 16%, var(--v2-line));
+}
+.home-card h3 {
+  font-weight: 650;
+  letter-spacing: 0;
+}
+.home-search {
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px var(--v2-line);
+}
+.home-task {
+  border-radius: 8px;
+}
+.home-brief {
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+/* ---------- settings ---------- */
+.settings-nav {
+  border-right-color: var(--v2-line);
+}
+.settings-nav button {
+  border-radius: 8px;
+}
+.settings-content h2 {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.settings-content .card,
+.settings-content .set-card,
+.settings-content .plan-card {
+  border-color: var(--v2-line);
+  box-shadow: none;
+}
+.settings-content .primary-btn,
+.settings-content .ghost-btn,
+.settings-content input:not([type='checkbox']):not([type='radio']),
+.settings-content textarea {
+  border-radius: 8px;
+}

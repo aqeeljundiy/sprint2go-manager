@@ -131,7 +131,7 @@ export function Stats({ children }: { children: ReactNode }) {
 export function Stat({ label, value, hint, delta, onClick, tone, i = 0 }: { label: string; value: ReactNode; hint?: ReactNode; delta?: { text: string; dir: 'up' | 'down' | 'flat'; good: boolean } | null; onClick?: () => void; tone?: 'warn' | 'bad'; i?: number }) {
   const Tag = onClick ? 'button' : 'div';
   return (
-    <Tag type={onClick ? 'button' : undefined} className={`adm-stat ${tone ?? ''} ${onClick ? 'click' : ''}`} onClick={onClick} style={{ ['--i' as string]: i }}>
+    <Tag type={onClick ? 'button' : undefined} aria-label={onClick ? label : undefined} className={`adm-stat ${tone ?? ''} ${onClick ? 'click' : ''}`} onClick={onClick} style={{ ['--i' as string]: i }}>
       <span className="adm-stat-label">{label}</span>
       <b>{value}</b>
       {(delta || hint) && (

@@ -184,7 +184,7 @@ function Health() {
                         : [t('Nobody has opened one yet')]
                       )
                         .concat(tn(demo.keepDays, 'removed after {n} day unused', 'removed after {n} days unused'))
-                        .join(' · '),
+                        .join(', '),
                     },
                   ]
                 : []),

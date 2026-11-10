@@ -3192,3 +3192,31 @@ small.adm-block {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
+
+/* ui-gate round 3 */
+@media (max-width: 767px) {
+  .adm .adm-field input:not([type='checkbox']):not([type='range']),
+  .adm-modal .adm-field input:not([type='checkbox']):not([type='range']),
+  .adm .adm-field input.adm-money {
+    min-height: var(--tap);
+  }
+}
+.adm-stat b {
+  overflow: visible;
+}
+.adm-searchbtn kbd {
+  border-radius: 4px;
+}
+.adm-searchbtn {
+  border-radius: 8px;
+}
+.adm .switch span,
+.adm-modal .switch span {
+  border-radius: 999px;
+}
+.adm-tr.head {
+  min-height: 48px;
+}
+.adm-tr {
+  min-height: 56px;
+}

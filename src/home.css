@@ -177,6 +177,7 @@
   margin: 6px 0 4px 48px;
   align-self: flex-start;
   width: auto;
+  text-align: left;
 }
 
 /* ---------- A meeting about to start, a huddle going on ---------- */
