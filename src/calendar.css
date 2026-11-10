@@ -451,7 +451,7 @@
   min-width: 26px;
   height: 26px;
   padding: 0 6px;
-  border-radius: 13px;
+  border-radius: 999px;
   font-size: 13px;
   font-weight: 600;
 }
@@ -1503,7 +1503,7 @@ a.ghost-btn {
   place-items: center;
   width: 22px;
   height: 22px;
-  border-radius: 50%;
+  border-radius: 999px;
   border: 2px solid var(--c, var(--accent));
   color: #fff;
   transition: background 0.15s, transform 0.15s;

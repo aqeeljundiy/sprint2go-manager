@@ -852,7 +852,7 @@ function DrivePhone(props: Props & { bulkBar: ReactNode; isSel: (i: DriveItem) =
                   <Middle name={i.name} />
                   <span className="dp-meta">
                     {i.starred && <Star size={12} className="dp-star" fill="currentColor" />}
-                    {q ? `${where(i)} · ${fmtDay(i.modified)}` : props.meta(i)}
+                    {(q ? [where(i), fmtDay(i.modified)] : props.meta(i).split(' · ')).map((b, k) => <span key={k} className="dp-bit">{b}</span>)}
                   </span>
                 </span>
               </DriveItemCard>

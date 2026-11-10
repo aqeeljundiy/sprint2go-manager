@@ -996,7 +996,7 @@ h4,
   place-items: center;
   width: var(--tile, 32px);
   height: var(--tile, 32px);
-  border-radius: calc(var(--tile, 32px) * 0.22);
+  border-radius: calc(var(--tile, 32px) * 0.25); /* 6, 8, 10, 14: on the radius scale */
   background: color-mix(in srgb, var(--c, var(--accent)) var(--tile-tint), var(--surface));
   color: color-mix(in srgb, var(--c, var(--accent)) var(--tile-ink), white);
 }

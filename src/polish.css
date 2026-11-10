@@ -1060,7 +1060,7 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
 .block-event.editable:hover .be-resize::after { opacity: .45; }
 .plan-hint { margin: 0 12px 6px; }
 .plan-list { gap: 2px; }
-.plan-task { display: flex; align-items: center; gap: 8px; padding: 7px 8px; margin: 0 8px; border-radius: 10px; cursor: grab; background: var(--hover); }
+.plan-task { display: flex; align-items: center; gap: 8px; padding: 8px 8px; margin: 0 8px; border-radius: 10px; cursor: grab; background: var(--hover); }
 .plan-task:hover { background: color-mix(in oklab, var(--accent) 10%, var(--hover)); }
 .plan-task.late strong { color: var(--danger, #dc2626); }
 .plan-task .pt-grip { color: var(--muted); flex: none; }
@@ -1091,14 +1091,14 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
 .ended-banner { margin: 12px 16px 0; padding: 10px 14px; border-radius: var(--r-control); background: var(--hover); color: var(--text); font-size: 13px; }
 
 /* ---------- Notes ---------- */
-.notes-search { display: flex; align-items: center; gap: 8px; margin: 4px 10px 6px; padding: 7px 10px; border-radius: var(--r-control); background: var(--hover); color: var(--muted); }
+.notes-search { display: flex; align-items: center; gap: 8px; margin: 4px 10px 6px; padding: 8px 10px; border-radius: var(--r-control); background: var(--hover); color: var(--muted); }
 .notes-search input { flex: 1; border: 0; background: transparent; font: inherit; font-size: 13px; color: var(--text); outline: none; }
 .notes-filters { margin: 0 6px 6px; }
 .notes-nav { gap: 2px; }
-.note-item { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: calc(100% - 16px); margin: 0 8px; padding: 9px 10px; border-radius: 10px; text-align: left; color: var(--text); background: none; border: 0; cursor: pointer; font: inherit; }
+.note-item { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: calc(100% - 16px); margin: 0 8px; padding: 8px 10px; border-radius: 10px; text-align: left; color: var(--text); background: none; border: 0; cursor: pointer; font: inherit; }
 .note-item:hover { background: var(--hover); }
 .note-item.active { background: color-mix(in oklab, var(--accent) 12%, transparent); }
-.ni-title { display: flex; align-items: center; gap: 5px; max-width: 100%; color: var(--muted); }
+.ni-title { display: flex; align-items: center; gap: 6px; max-width: 100%; color: var(--muted); }
 .ni-title strong { color: var(--text); font-size: 13.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .note-item small { color: var(--muted); font-size: 12px; }
 .ni-snip { color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
@@ -2658,6 +2658,9 @@ select,
 .proj-state-more {
   font-weight: 700;
   opacity: 0.8;
+}
+.proj-foot small {
+  font-size: 12px;
 }
 .proj-foot {
   display: flex;

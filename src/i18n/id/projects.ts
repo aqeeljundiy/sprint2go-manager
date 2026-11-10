@@ -197,6 +197,15 @@ const id: Record<string, string> = {
   "{name} posted an update on {project}: at risk": "{name} mengirim kabar tentang {project}: berisiko",
   "{name} posted an update on {project}: off track": "{name} mengirim kabar tentang {project}: melenceng",
   "{name} posted an update on {project}: on track": "{name} mengirim kabar tentang {project}: sesuai rencana",
+  "Approvals and replies": "Persetujuan dan balasan",
+  "Clear filter": "Hapus filter",
+  "Late tasks": "Tugas terlambat",
+  "Live {projects}": "{projects} berjalan",
+  "No {project} fits this filter. Clear it to see them all.": "Tidak ada {project} yang cocok dengan filter ini. Hapus filter untuk melihat semuanya.",
+  "Open tasks with nobody on them": "Tugas terbuka tanpa penanggung jawab",
+  "Waiting on {whos}": "Menunggu {whos}",
+  "across {n} {projects}": "di {n} {projects}",
+  "{n} leads": "{n} prospek",
 };
 
 export default id;

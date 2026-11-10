@@ -355,11 +355,11 @@ function MeetingRows({ list, clients, tasks, onOpen, onFile, showStatusDone = fa
             <CallMark kind={m.platform ?? 'meet'} size={28} />
             <span className="m-main">
               <strong>{m.title}</strong>
-              <small>
-                {fullDate(m.at)}
-                {m.type ? ` · ${TYPE_LABEL[m.type]}` : ''}
-                {open ? ` · ${tn(open, '{n} open task', '{n} open tasks')}` : ''}
-                {m.error && <span className="m-err"> · {t(m.error)}</span>}
+              <small className="m-bits">
+                <span>{fullDate(m.at)}</span>
+                {m.type ? <span>{TYPE_LABEL[m.type]}</span> : null}
+                {open ? <span>{tn(open, '{n} open task', '{n} open tasks')}</span> : null}
+                {m.error && <span className="m-err">{t(m.error)}</span>}
               </small>
             </span>
             {c && (
