@@ -17,58 +17,6 @@
       "path": "/settings/account"
     },
     {
-      "name": "app-projects",
-      "path": "/projects"
-    },
-    {
-      "name": "app-tasks",
-      "path": "/tasks"
-    },
-    {
-      "name": "app-tasks-upcoming",
-      "path": "/tasks/upcoming"
-    },
-    {
-      "name": "app-mail",
-      "path": "/mail"
-    },
-    {
-      "name": "app-chat",
-      "path": "/chat"
-    },
-    {
-      "name": "app-calendar",
-      "path": "/calendar"
-    },
-    {
-      "name": "app-calendar-month",
-      "path": "/calendar/month"
-    },
-    {
-      "name": "app-drive",
-      "path": "/drive"
-    },
-    {
-      "name": "app-teams",
-      "path": "/teams"
-    },
-    {
-      "name": "app-tables",
-      "path": "/tables"
-    },
-    {
-      "name": "app-notes",
-      "path": "/notes"
-    },
-    {
-      "name": "app-meet",
-      "path": "/meet"
-    },
-    {
-      "name": "app-vault",
-      "path": "/vault"
-    },
-    {
       "name": "admin-today",
       "path": "/admin"
     },

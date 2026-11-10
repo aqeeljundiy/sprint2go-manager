@@ -6,7 +6,7 @@ import { Popover } from './ui/Popover';
 import { Badge, PersonCell } from './ui/Person';
 import { HealthPill, latestUpdate, healthLabel, MyWork } from './ProjectPulse';
 import { usePersisted } from '../settings';
-import { Archive, ArrowRight, Check, ChevronRight, LayoutGrid, Menu, Pause, Play, Plus, Rows3, Search, X } from 'lucide-react';
+import { Archive, ArrowRight, Check, ChevronRight, Menu, Pause, Play, Plus, Search } from 'lucide-react';
 import { projectTabIcon } from './ProjectPhone';
 import { useActionMenu } from './ui/ActionSheet';
 import type { Client, Todo, User } from '../types';
@@ -23,7 +23,6 @@ import { usePhone } from '../mobile/media';
 import { TasksBrowse, type BrowseGroup } from './tasks/TasksBrowse';
 import { t, tn, tx } from '../i18n';
 import { fmtDay } from '../i18n/format';
-import { useUiLook } from '../uiLook';
 
 /**
  * The Projects app's home: every project, the ones that need something first. Each card says what's wrong (late,
@@ -35,11 +34,6 @@ export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu,
   const [view] = usePersisted<'all' | 'work'>('s2g-proj-view', 'all'); // the sidebar's All projects / My work
   const myWork = !!me && !!onOpenTask && !!onToggleTask && <MyWork phone={phone} tasks={tasks} projects={projects} me={me} onOpenTask={onOpenTask} onToggleTask={onToggleTask} />;
   const [find, setFind] = useState(''); // desktop: "Find a project"
-  // The new look (src/uiLook.ts): numbers you can click to filter, status chips, and a table next to the cards.
-  const [look] = useUiLook();
-  const v2 = look === 'v2' && !phone;
-  const [layout, setLayout] = usePersisted<'cards' | 'table'>('s2g-proj-layout', 'cards');
-  const [focus, setFocus] = usePersisted<'all' | 'active' | 'lead' | 'paused' | 'late' | 'nobody' | 'guest'>('s2g-proj-focus', 'all');
   // Right-click a card (long-press on touch): the same things the project's own menu does, without opening it first.
   const [hit, setHit] = useState<Client | null>(null);
   const cardMenu = useActionMenu(() =>
@@ -85,22 +79,6 @@ export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu,
   };
   // Name order, once, on every device: cards stay where you left them (Basecamp's way); late work shows on its badge.
   const rows = live.map((c) => ({ c, s: stats(c) })).sort((a, b) => a.c.name.localeCompare(b.c.name));
-  const keep = (r: (typeof rows)[number]) => (focus === 'all' ? true : focus === 'late' ? r.s.late > 0 : focus === 'nobody' ? r.s.nobody > 0 : focus === 'guest' ? r.s.guest > 0 : r.c.status === focus);
-  const total = (k: 'late' | 'nobody' | 'guest' | 'open') => rows.reduce((n, r) => n + r.s[k], 0);
-  const kpis = [
-    { id: 'all' as const, label: t('Live {projects}', { projects: term.many }), value: rows.length, sub: tn(rows.filter((r) => r.c.status === 'lead').length, '{n} lead', '{n} leads') },
-    { id: 'late' as const, label: t('Late tasks'), value: total('late'), sub: tn(rows.filter((r) => r.s.late).length, 'in {n} {project}', 'across {n} {projects}', { project: term.one, projects: term.many }), tone: total('late') ? 'bad' : '' },
-    { id: 'nobody' as const, label: t('Not picked up'), value: total('nobody'), sub: t('Open tasks with nobody on them') },
-    { id: 'guest' as const, label: t('Waiting on {whos}', { whos: term.whos }), value: total('guest'), sub: t('Approvals and replies') },
-  ];
-  const chips = [
-    ['all', t('All')],
-    ['active', t('Active')],
-    ['lead', t('Leads')],
-    ['paused', t('Paused')],
-  ] as const;
-  const q2 = find.trim().toLowerCase();
-  const shown = rows.filter((r) => keep(r) && (!q2 || r.c.name.toLowerCase().includes(q2)));
   const save = () => {
     if (!name.trim()) return;
     onCreate?.(name.trim(), type || undefined, domain.trim().replace(/^@/, '') || undefined);
@@ -230,87 +208,7 @@ export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu,
       </header>
       <div className="tracking-scroll">
         {newForm}
-        {v2 && view !== 'work' && rows.length > 0 && (
-          <div className="pv2-top">
-            <div className="pv2-kpis">
-              {kpis.map((k) => (
-                <button key={k.id} type="button" className={`pv2-kpi${focus === k.id ? ' on' : ''}${k.tone ? ' ' + k.tone : ''}`} aria-pressed={focus === k.id} onClick={() => setFocus(focus === k.id ? 'all' : k.id)}>
-                  <span className="pv2-kpi-label">{k.label}</span>
-                  <strong className="pv2-kpi-value">{k.value}</strong>
-                  <small>{k.sub}</small>
-                </button>
-              ))}
-            </div>
-            <div className="pv2-tools">
-              <div className="pv2-chips" role="group" aria-label={t('Show')}>
-                {chips.map(([id, label]) => (
-                  <button key={id} type="button" className={`pv2-chip${focus === id ? ' on' : ''}`} aria-pressed={focus === id} onClick={() => setFocus(id)}>
-                    {label} <span>{id === 'all' ? rows.length : rows.filter((r) => r.c.status === id).length}</span>
-                  </button>
-                ))}
-                {['late', 'nobody', 'guest'].includes(focus) && (
-                  <button type="button" className="pv2-chip on" onClick={() => setFocus('all')} aria-label={t('Clear filter')}>
-                    {kpis.find((k) => k.id === focus)?.label} <X size={13} />
-                  </button>
-                )}
-              </div>
-              <div className="segmented pv2-layout">
-                <button className={layout === 'cards' ? 'on' : ''} onClick={() => setLayout('cards')}>
-                  <LayoutGrid size={14} /> {t('Cards')}
-                </button>
-                <button className={layout === 'table' ? 'on' : ''} onClick={() => setLayout('table')}>
-                  <Rows3 size={14} /> {t('Table')}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-        {v2 && view !== 'work' && rows.length > 0 && shown.length === 0 ? (
-          <EmptyState compact icon={<Search size={20} />} title={t('Nothing matches')} text={t('No {project} fits this filter. Clear it to see them all.', { project: term.one })} action={<button className="ghost-btn sm" onClick={() => (setFocus('all'), setFind(''))}>{t('Clear filter')}</button>} />
-        ) : v2 && view !== 'work' && rows.length > 0 && layout === 'table' ? (
-          <div className="pv2-table-wrap">
-            <table className="pv2-table">
-              <thead>
-                <tr>
-                  <th>{term.One}</th>
-                  <th>{t('Status')}</th>
-                  <th>{t('Owner')}</th>
-                  <th className="num">{t('Open')}</th>
-                  <th className="num">{t('Late')}</th>
-                  <th>{t('Next deadline')}</th>
-                  <th>{t('Last activity')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {shown.map(({ c, s }) => {
-                  const owner = users.find((u) => u.id === c.ownerId);
-                  return (
-                    <tr key={c.id} tabIndex={0} onClick={() => onOpen(c.id)} onKeyDown={(e) => e.key === 'Enter' && onOpen(c.id)} onContextMenu={(e) => (setHit(c), cardMenu.bind.onContextMenu(e))}>
-                      <td>
-                        <span className="pv2-name">
-                          <ProjectBadge p={c} kind="client-badge" />
-                          <span>
-                            <strong>{c.name}</strong>
-                            {c.type && <small>{t(c.type)}</small>}
-                          </span>
-                        </span>
-                      </td>
-                      <td>
-                        <span className={`pv2-status st-${c.status}`}>{c.status === 'lead' ? tx('status', 'Lead') : c.status === 'paused' ? t('Paused') : t('Active')}</span>
-                      </td>
-                      <td>{owner ? <span className="pv2-owner"><Avatar person={owner} size={24} /> {owner.name.split(' ')[0]}</span> : <span className="muted">{t('Nobody')}</span>}</td>
-                      <td className="num">{s.open}</td>
-                      <td className={`num${s.late ? ' bad' : ''}`}>{s.late}</td>
-                      <td>{s.next ? <span className="pv2-next" title={s.next.title}>{fmtDay(s.next.due!)} <small>{s.next.title}</small></span> : <span className="muted">{t('None')}</span>}</td>
-                      <td className="muted">{s.last ? relative(s.last) : t('No activity yet')}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-            <p className="pv2-count">{tn(shown.length, '{n} {project}', '{n} {projects}', { project: term.one, projects: term.many })}</p>
-          </div>
-        ) : view === 'work' && myWork ? (
+        {view === 'work' && myWork ? (
           myWork
         ) : rows.length === 0 ? (
           <EmptyState
@@ -334,7 +232,7 @@ export function ProjectsHome({ projects, tasks, users, onOpen, onCreate, onMenu,
             ['paused', t('Paused')],
           ] as const).map(([status, heading]) => {
             const q = find.trim().toLowerCase();
-            const list = rows.filter((r) => r.c.status === status && (!q || r.c.name.toLowerCase().includes(q)) && (!v2 || keep(r)));
+            const list = rows.filter((r) => r.c.status === status && (!q || r.c.name.toLowerCase().includes(q)));
             if (!list.length) return null;
             return (
           <section key={status} className="proj-group">

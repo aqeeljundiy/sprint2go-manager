@@ -612,8 +612,6 @@ const id: Record<string, string> = {
   'e.g. Design': 'mis. Desain',
   'e.g. Jakarta': 'mis. Jakarta',
   'e.g. she/her': 'mis. dia (perempuan)',
-  "The look {product} had before. Switch back any time.": "Tampilan {product} sebelumnya. Bisa diganti kapan saja.",
-  "The new workspace: a path bar on top, quieter lines, roomier pages.": "Ruang kerja baru: jalur di atas, garis lebih tenang, halaman lebih lega.",
 };
 
 export default id;

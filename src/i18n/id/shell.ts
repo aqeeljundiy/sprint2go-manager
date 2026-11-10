@@ -429,7 +429,6 @@ const id: Record<string, string> = {
   "Archived": "Diarsipkan",
   'Profile of {name}': 'Profil {name}',
   'More apps': 'Aplikasi lainnya',
-  "My files": "File saya",
 };
 
 export default id;

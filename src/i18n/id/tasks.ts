@@ -789,7 +789,6 @@ const id: Record<string, string> = {
   'Search tasks': 'Cari tugas',
   'Titles, notes, checklists and comments, done tasks too.': 'Judul, catatan, daftar periksa, dan komentar, termasuk tugas yang selesai.',
   'Try other words. Titles, notes, checklists and comments are searched.': 'Coba kata lain. Judul, catatan, daftar periksa, dan komentar ikut dicari.',
-  'Pick a day': 'Pilih hari',
 };
 
 export default id;
