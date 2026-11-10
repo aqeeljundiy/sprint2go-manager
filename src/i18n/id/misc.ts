@@ -134,6 +134,8 @@ const id: Record<string, string> = {
   'Verify DNS': 'Verifikasi DNS',
   'Who can see billing': 'Siapa yang bisa melihat tagihan',
   "Domain look": "Tampilan domain",
+  "Row density": "Kerapatan baris",
+  "You are here": "Posisi Anda",
 };
 
 export default id;
