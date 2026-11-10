@@ -1,6 +1,7 @@
 import './v2.css';
+import './ab.css';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { Activity, ArrowLeft, Building2, Check, ClipboardList, CreditCard, Gauge, Inbox, Infinity as InfinityIcon, Languages, LifeBuoy, LogOut, Megaphone, Menu, Monitor, Moon, PanelLeftClose, PanelLeftOpen, Search, ServerCog, ShieldCheck, Sparkles, Sun, TrendingUp, UserCog, Users, X, type LucideIcon } from 'lucide-react';
+import { Activity, ArrowLeft, Building2, Check, ClipboardList, CreditCard, Gauge, Inbox, Infinity as InfinityIcon, Languages, LifeBuoy, LogOut, Megaphone, Menu, Monitor, Moon, PanelLeftClose, PanelLeftOpen, Rows3, Rows4, Search, ChevronRight, ServerCog, ShieldCheck, Sparkles, Sun, TrendingUp, UserCog, Users, X, type LucideIcon } from 'lucide-react';
 import { Wordmark } from '../../components/Logo';
 import { signOut } from '../../sync';
 import { ApiError, get, post, ROLE_LABEL, type Perm } from './api';
@@ -29,6 +30,12 @@ const NAV: { group: string; items: Item[] }[] = [
   { get group() { return t('Business'); }, items: [{ id: 'money', get label() { return tx('nav', 'Money'); }, icon: CreditCard }, { id: 'ai', label: 'AI', icon: Sparkles }, { id: 'growth', get label() { return t('Growth'); }, icon: TrendingUp }] },
   { get group() { return tx('nav', 'Run'); }, items: [{ id: 'product', get label() { return t('Product'); }, icon: Megaphone }, { id: 'platform', get label() { return t('Platform'); }, icon: ServerCog }, { id: 'team', get label() { return t('Team & settings'); }, icon: UserCog }] },
 ];
+
+
+/** The Section / Page path in the top bar. */
+const navGroupOf = (id: string) => NAV.find((g) => g.items.some((x) => x.id === id))?.group ?? NAV[0].group;
+const navLabelOf = (id: string) => NAV.flatMap((g) => g.items).find((x) => x.id === id)?.label ?? t('Today');
+const crumbTab = (id: string) => id.charAt(0).toUpperCase() + id.slice(1).replace(/-/g, ' ');
 
 /** /admin/v2/<section>/<id or tab>/<tab> */
 function parse(path: string) {
@@ -132,6 +139,44 @@ export function AdminV2() {
     return () => window.removeEventListener('keydown', k);
   }, [toggleFold]);
   const [search, setSearch] = useState(false);
+  // Density: comfortable (roomy, the default) or compact (more rows on screen); remembered on this device.
+  const [compact, setCompact] = useState(() => {
+    try {
+      return localStorage.getItem('s2g-adm2-compact') === '1';
+    } catch {
+      return false;
+    }
+  });
+  const toggleCompact = useCallback(() => {
+    setCompact((c) => {
+      try {
+        localStorage.setItem('s2g-adm2-compact', c ? '0' : '1');
+      } catch {
+        /* private window */
+      }
+      return !c;
+    });
+  }, []);
+  const goRef = useRef<(to: string) => void>(() => {});
+  // g then a letter jumps to a section (g t Today, g k Tickets, g c Companies, g p People, g m Money, g a AI).
+  useEffect(() => {
+    let armed = 0;
+    const map: Record<string, string> = { t: 'today', k: 'tickets', c: 'companies', p: 'people', w: 'whitelist', m: 'money', a: 'ai', g: 'growth', r: 'product', l: 'platform', s: 'team' };
+    const k = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement;
+      if (e.metaKey || e.ctrlKey || e.altKey || el.closest('input, textarea, select, [contenteditable="true"]')) return;
+      const key = e.key.toLowerCase();
+      if (armed && Date.now() - armed < 1200 && map[key]) {
+        armed = 0;
+        e.preventDefault();
+        goRef.current(`/admin/v2/${map[key]}`);
+        return;
+      }
+      armed = key === 'g' ? Date.now() : 0;
+    };
+    window.addEventListener('keydown', k);
+    return () => window.removeEventListener('keydown', k);
+  }, []);
   const [open, setOpen] = useState(0); // new and open tickets, for the nav
   const load = useCallback(() => get('me').then(setMe, () => setMe('denied')), []);
   useEffect(() => void load(), [load]);
@@ -175,6 +220,7 @@ export function AdminV2() {
       document.querySelector<HTMLElement>('.a2-main h1')?.focus?.();
     } else location.assign(to);
   }, []);
+  goRef.current = go;
   const toast = useCallback((text: string, action?: { label: string; run: () => void }) => {
     const id = Date.now() + Math.random();
     setToasts((list) => [...list.slice(-2), { id, text, action }]);
@@ -228,7 +274,7 @@ export function AdminV2() {
 
   return (
     <AdminCtx.Provider value={ctx}>
-      <div className={`a2 ${navOpen ? 'nav-open' : ''} ${folded ? 'folded' : ''}`}>
+      <div className={`a2 ab ${navOpen ? 'nav-open' : ''} ${folded ? 'folded' : ''} ${compact ? 'compact' : ''}`}>
         <header className="a2-topbar">
           <button className="icon-btn" onClick={() => setNavOpen(true)} aria-label={t('Open menu')}>
             <Menu size={18} />
@@ -313,9 +359,35 @@ export function AdminV2() {
             </span>
           </div>
         </aside>
-        <main className="a2-main" key={section + a}>
-          {page}
-        </main>
+        <div className="ab-work">
+          <div className="ab-bar">
+            <nav className="ab-crumbs" aria-label={t('Where you are')}>
+              <span>{navGroupOf(section)}</span>
+              <ChevronRight size={14} aria-hidden />
+              <button type="button" className={a ? '' : 'on'} onClick={() => go(`/admin/v2/${section}`)}>
+                {navLabelOf(section)}
+              </button>
+              {a && (
+                <>
+                  <ChevronRight size={14} aria-hidden />
+                  <span className="on ab-crumb-last">{b || /^[a-z]+$/.test(a) ? crumbTab(a) : a}</span>
+                </>
+              )}
+            </nav>
+            <span className="spacer" />
+            <button type="button" className="ab-cmdk" onClick={() => setSearch(true)}>
+              <Search size={14} />
+              <span>{t('Search')}</span>
+              <kbd>Ctrl K</kbd>
+            </button>
+            <button type="button" className="icon-btn sm ab-density" onClick={toggleCompact} aria-pressed={compact} title={compact ? t('Comfortable rows') : t('Compact rows')} aria-label={compact ? t('Comfortable rows') : t('Compact rows')}>
+              {compact ? <Rows3 size={16} /> : <Rows4 size={16} />}
+            </button>
+          </div>
+          <main className="a2-main" key={section + a}>
+            {page}
+          </main>
+        </div>
         {search && <Palette onClose={() => setSearch(false)} go={go} />}
         <div className="a2-toasts" role="status" aria-live="polite">
           {toasts.map((tst) => (

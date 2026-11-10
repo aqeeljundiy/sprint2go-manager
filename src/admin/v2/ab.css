@@ -1,0 +1,400 @@
+/* Operator console v2, "A+B" look (owner's chosen style): a calm, roomy workspace with big numbers (A) and a precise
+   pro tool (B). Thin grey hairlines instead of shadows and soft tiles, 8px controls, a Section / Page path in the top
+   bar, compact or comfortable rows, Ctrl K and g + letter. Light first; dark follows the same tokens.
+   Everything is scoped to .ab inside :root[data-ui='v2'], so v1 and the app never see it. */
+
+:root[data-ui='v2'] .a2.ab {
+  --ab-canvas: #f6f7f9;
+  --ab-line: #e6e8ec;
+  --ab-line-strong: #d7dae1;
+  --ab-r: 8px;
+  --ab-r-lg: 12px;
+  --ab-row: 52px;
+  --ab-pad: 40px;
+  background: var(--ab-canvas);
+  grid-template-columns: var(--ad-nav) minmax(0, 1fr);
+}
+:root[data-theme='dark'][data-ui='v2'] .a2.ab {
+  --ab-canvas: #0e1013;
+  --ab-line: #24272e;
+  --ab-line-strong: #30343c;
+}
+:root[data-ui='v2'] .a2.ab.compact {
+  --ab-row: 40px;
+  --ab-pad: 28px;
+}
+
+/* ---------- nav: flat on the canvas, a hairline on its edge ---------- */
+:root[data-ui='v2'] .ab .a2-nav {
+  background: var(--ab-canvas);
+  border-right: 1px solid var(--ab-line);
+  padding: 16px 12px 12px;
+}
+:root[data-ui='v2'] .ab .a2-nav-item {
+  border-radius: var(--ab-r);
+  transition: background 0.15s ease-out, color 0.15s ease-out;
+}
+:root[data-ui='v2'] .ab .a2-nav-item.on {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px var(--ab-line);
+}
+:root[data-ui='v2'] .ab .a2-nav-item.on svg {
+  color: var(--accent);
+}
+:root[data-ui='v2'] .ab .a2-searchbtn {
+  display: none;
+}
+:root[data-ui='v2'] .ab .a2-brand-tag {
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-on-soft);
+}
+
+/* ---------- the work column: top bar, then the page ---------- */
+:root[data-ui='v2'] .ab-work {
+  display: grid;
+  grid-template-rows: 52px minmax(0, 1fr);
+  min-width: 0;
+  min-height: 0;
+  background: var(--surface);
+}
+:root[data-ui='v2'] .ab-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px 0 24px;
+  border-bottom: 1px solid var(--ab-line);
+  min-width: 0;
+}
+:root[data-ui='v2'] .ab-bar .spacer {
+  flex: 1;
+}
+:root[data-ui='v2'] .ab-crumbs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  font-size: 14px;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+:root[data-ui='v2'] .ab-crumbs svg {
+  flex: none;
+  color: var(--ab-line-strong);
+}
+:root[data-ui='v2'] .ab-crumbs button {
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  padding: 4px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+:root[data-ui='v2'] .ab-crumbs button:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+:root[data-ui='v2'] .ab-crumbs .on {
+  color: var(--text);
+  font-weight: 600;
+}
+:root[data-ui='v2'] .ab-crumb-last {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 4px 6px;
+}
+:root[data-ui='v2'] .ab-cmdk {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 8px 0 10px;
+  min-width: 200px;
+  border: 1px solid var(--ab-line);
+  border-radius: var(--ab-r);
+  background: var(--surface);
+  color: var(--text-3);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+:root[data-ui='v2'] .ab-cmdk span {
+  flex: 1;
+  text-align: left;
+}
+:root[data-ui='v2'] .ab-cmdk:hover {
+  border-color: var(--ab-line-strong);
+  color: var(--text-2);
+}
+:root[data-ui='v2'] .ab-cmdk kbd {
+  font: inherit;
+  font-size: 12px;
+  padding: 0 6px;
+  line-height: 20px;
+  border-radius: 6px;
+  border: 1px solid var(--ab-line);
+  color: var(--text-3);
+}
+:root[data-ui='v2'] .ab .ab-density[aria-pressed='true'] {
+  background: var(--accent-soft);
+  color: var(--accent-on-soft);
+}
+
+/* the page itself sits flush in the work column: no card around it */
+:root[data-ui='v2'] .ab .a2-main {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--surface);
+}
+:root[data-ui='v2'] .ab .a2-page {
+  max-width: 1200px;
+  padding: 32px var(--ab-pad) 72px;
+  transition: padding 0.2s ease-out;
+}
+
+/* ---------- headings: calm, never tighter than -0.01em ---------- */
+:root[data-ui='v2'] .ab .a2-head {
+  margin-bottom: 28px;
+}
+:root[data-ui='v2'] .ab .a2-head h1 {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+:root[data-ui='v2'] .ab .a2-head p {
+  margin-top: 8px;
+  color: var(--text-3);
+}
+:root[data-ui='v2'] .ab .a2-section {
+  margin-bottom: 40px;
+}
+:root[data-ui='v2'] .ab .a2-section-head h2 {
+  font-size: 16px;
+  font-weight: 650;
+  letter-spacing: -0.005em;
+}
+
+/* ---------- KPI strip: one hairline frame, big numbers, dividers between ---------- */
+:root[data-ui='v2'] .ab .a2-stats {
+  gap: 0;
+  border: 1px solid var(--ab-line);
+  border-radius: var(--ab-r-lg);
+  overflow: hidden;
+  margin-bottom: 40px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  background: var(--ab-line);
+  gap: 1px;
+}
+:root[data-ui='v2'] .ab .a2-stat {
+  border-radius: 0;
+  background: var(--surface);
+  padding: 20px 24px 22px;
+  gap: 8px;
+}
+:root[data-ui='v2'] .ab .a2-stat.click:hover {
+  background: color-mix(in srgb, var(--accent) 3%, var(--surface));
+}
+:root[data-ui='v2'] .ab .a2-stat-label {
+  font-size: 13px;
+  color: var(--text-3);
+}
+:root[data-ui='v2'] .ab .a2-stat b {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+:root[data-ui='v2'] .ab .a2-stat.click .a2-stat-label::after {
+  content: '→';
+  margin-left: 6px;
+  opacity: 0;
+  transform: translateX(-4px);
+  display: inline-block;
+  transition: opacity 0.15s, transform 0.15s;
+}
+:root[data-ui='v2'] .ab .a2-stat.click:hover .a2-stat-label::after {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- lists: one hairline frame, divider rows, roomy or compact ---------- */
+:root[data-ui='v2'] .ab .a2-table {
+  border-color: var(--ab-line);
+  border-radius: var(--ab-r-lg);
+}
+:root[data-ui='v2'] .ab .a2-tr {
+  min-height: var(--ab-row);
+  border-top-color: var(--ab-line);
+  transition: background 0.12s, min-height 0.2s ease-out;
+}
+:root[data-ui='v2'] .ab .a2-tr.head {
+  min-height: 40px;
+  background: var(--surface);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+:root[data-ui='v2'] .ab .a2-search {
+  height: 32px;
+  border-color: var(--ab-line);
+  border-radius: var(--ab-r);
+}
+/* filter chips (views): pills with a count, the chosen one filled */
+:root[data-ui='v2'] .ab .a2-views {
+  background: none;
+  padding: 0;
+  gap: 6px;
+}
+:root[data-ui='v2'] .ab .a2-views button {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--ab-r);
+  border: 1px solid var(--ab-line);
+  background: var(--surface);
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+:root[data-ui='v2'] .ab .a2-views button.on {
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--ab-line));
+  background: var(--accent-soft);
+  color: var(--accent-on-soft);
+}
+
+/* ---------- controls: 8px everywhere in v2 ---------- */
+:root[data-ui='v2'] .ab .primary-btn,
+:root[data-ui='v2'] .ab .ghost-btn,
+:root[data-ui='v2'] .a2-modal .primary-btn,
+:root[data-ui='v2'] .a2-modal .ghost-btn {
+  border-radius: var(--ab-r);
+}
+:root[data-ui='v2'] .ab .ghost-btn {
+  border: 1px solid var(--ab-line);
+  background: var(--surface);
+}
+:root[data-ui='v2'] .ab .ghost-btn:hover {
+  border-color: var(--ab-line-strong);
+  background: var(--hover);
+}
+:root[data-ui='v2'] .ab input:not([type='checkbox']):not([type='radio']),
+:root[data-ui='v2'] .ab textarea,
+:root[data-ui='v2'] .a2-modal input:not([type='checkbox']):not([type='radio']),
+:root[data-ui='v2'] .a2-modal textarea {
+  border-radius: var(--ab-r);
+}
+:root[data-ui='v2'] .ab .a2-tabs {
+  border-bottom: 1px solid var(--ab-line);
+  margin-bottom: 28px;
+}
+:root[data-ui='v2'] .a2-modal {
+  border: 1px solid var(--ab-line, #e6e8ec);
+  border-radius: 12px;
+}
+
+/* ---------- saved views (Today and lists): a row of named filters ---------- */
+:root[data-ui='v2'] .ab-saved {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: -12px 0 20px;
+}
+:root[data-ui='v2'] .ab-saved > span {
+  font-size: 12px;
+  color: var(--text-3);
+  margin-right: 4px;
+}
+:root[data-ui='v2'] .ab-saved button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px dashed var(--ab-line-strong);
+  border-radius: var(--ab-r);
+  background: none;
+  color: var(--text-2);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+:root[data-ui='v2'] .ab-saved button:hover {
+  background: var(--hover);
+}
+:root[data-ui='v2'] .ab-saved button.on {
+  border-style: solid;
+  border-color: var(--accent);
+  color: var(--accent-on-soft);
+  background: var(--accent-soft);
+}
+
+/* ---------- tablets ---------- */
+@media (max-width: 1099px) {
+  :root[data-ui='v2'] .a2.ab {
+    --ab-pad: 28px;
+  }
+  :root[data-ui='v2'] .ab-cmdk {
+    min-width: 0;
+  }
+  :root[data-ui='v2'] .ab-cmdk span,
+  :root[data-ui='v2'] .ab-cmdk kbd {
+    display: none;
+  }
+}
+
+/* ---------- phones: the app's 52px top bar, safe areas, no clipping ---------- */
+@media (max-width: 767px) {
+  :root[data-ui='v2'] .a2.ab {
+    --ab-pad: 16px;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+  :root[data-ui='v2'] .ab .a2-topbar {
+    padding: env(safe-area-inset-top, 0px) max(8px, env(safe-area-inset-right, 0px)) 0 max(8px, env(safe-area-inset-left, 0px));
+    height: calc(52px + env(safe-area-inset-top, 0px));
+    border-bottom-color: var(--ab-line);
+  }
+  :root[data-ui='v2'] .ab-work {
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+  :root[data-ui='v2'] .ab-bar {
+    padding: 8px 16px;
+    min-height: 44px;
+  }
+  :root[data-ui='v2'] .ab-cmdk {
+    display: none;
+  }
+  :root[data-ui='v2'] .ab-crumbs {
+    font-size: var(--fs-secondary);
+  }
+  :root[data-ui='v2'] .ab .a2-page {
+    padding: 24px max(16px, env(safe-area-inset-left, 0px)) calc(88px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-right, 0px));
+  }
+  :root[data-ui='v2'] .ab .a2-head h1 {
+    font-size: var(--fs-display);
+  }
+  :root[data-ui='v2'] .ab .a2-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  :root[data-ui='v2'] .ab .a2-stat {
+    padding: 16px;
+  }
+  :root[data-ui='v2'] .ab .a2-stat b {
+    font-size: var(--fs-display);
+  }
+  :root[data-ui='v2'] .ab .a2-nav {
+    padding-top: calc(12px + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-ui='v2'] .ab *,
+  :root[data-ui='v2'] .ab-work * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

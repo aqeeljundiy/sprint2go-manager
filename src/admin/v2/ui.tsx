@@ -496,8 +496,48 @@ export function Table<T>({ id, rows, cols, rowKey, onOpen, views, search, bulk, 
   const templateT = [bulk ? '40px' : null, ...cols.filter((c) => c.hide !== 'tablet').map((c) => c.width ?? '1fr')].filter(Boolean).join(' ');
   const allOn = slice.length > 0 && slice.every((r) => sel.has(rowKey(r)));
   const filtered = !!q || (view !== firstWithRows && rows.length > 0);
+  // Saved views: a named mix of view, filter words and sort, kept per table on this device.
+  const savedKey = `s2g-adm2-saved:${id}`;
+  const [saved, setSaved] = useState<{ name: string; view: string; q: string; sort: string }[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem(savedKey) ?? '[]');
+    } catch {
+      return [];
+    }
+  });
+  const keepSaved = (list: typeof saved) => {
+    setSaved(list);
+    try {
+      localStorage.setItem(savedKey, JSON.stringify(list));
+    } catch {
+      /* private window */
+    }
+  };
+  const sortStr = sort ? (sort.dir === -1 ? '-' : '') + sort.key : '';
+  const activeSaved = saved.find((x) => x.view === view && x.q === q && x.sort === sortStr)?.name;
   return (
     <div className="a2-table-wrap">
+      {(views || search) && (saved.length > 0 || filtered) && (
+        <div className="ab-saved" aria-label={t('Saved views')}>
+          <span>{t('Saved views')}</span>
+          {saved.map((x) => (
+            <button key={x.name} type="button" className={activeSaved === x.name ? 'on' : ''} onClick={() => (setUrl({ view: x.view, q: x.q, sort: x.sort || null, page: 1 }), clear())} onContextMenu={(e) => (e.preventDefault(), keepSaved(saved.filter((y) => y.name !== x.name)))} title={t('Right-click to remove')}>
+              {x.name}
+            </button>
+          ))}
+          {filtered && !activeSaved && (
+            <button
+              type="button"
+              onClick={() => {
+                const name = `${v?.label ?? t('All')}${q ? ` · ${q}` : ''}`;
+                keepSaved([...saved.filter((y) => y.name !== name), { name, view, q, sort: sortStr }]);
+              }}
+            >
+              + {t('Save this view')}
+            </button>
+          )}
+        </div>
+      )}
       {(views || search) && (
         <div className="a2-table-bar">
           {counted && (
