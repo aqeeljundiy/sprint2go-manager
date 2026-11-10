@@ -97,7 +97,7 @@ export function InviteCard({ invite: inv, state, conflicts, answerOff, onAnswerO
     return (
       <div className="mail-invite reply">
         <div className="mi-main">
-          <div className="invite-kicker">{t('Answer to your invite')}</div>
+          <div className="invite-lead">{t('Answer to your invite')}</div>
           <div className="invite-title">
             {!who
               ? t('An answer about “{title}”', { title: inv.title })
@@ -122,7 +122,7 @@ export function InviteCard({ invite: inv, state, conflicts, answerOff, onAnswerO
         <strong>{fmtDate(inv.start, { day: 'numeric', timeZone: tile })}</strong>
       </div>
       <div className="mi-main">
-        <div className="invite-kicker">
+        <div className="invite-lead">
           {cancelled
             ? orgName
               ? t('Cancelled by {name}', { name: orgName })

@@ -18,3 +18,4 @@ research/
 /data-test
 audit/
 .ui-gate/
+scripts/.*.tmp.mjs

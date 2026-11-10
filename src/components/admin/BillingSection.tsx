@@ -175,7 +175,7 @@ export function BillingSection({ ws, people, isOwner, onPlan, onExport, toast }:
 
       <div className="plan-card">
         <div className="pc-main">
-          <span className="pc-kicker">{plan.trialEnds ? tn(trialDays, 'Free trial · {n} day left', 'Free trial · {n} days left') : plan.paused ? t('Paused') : t('Current plan')}</span>
+          <span className="pc-lead">{plan.trialEnds ? tn(trialDays, 'Free trial · {n} day left', 'Free trial · {n} days left') : plan.paused ? t('Paused') : t('Current plan')}</span>
           <h3>
             {planName(plan)} <span className="pc-track">{plan.tier === 'free' ? t('your own AI keys') : TRACK_NAME[plan.track]}</span>
           </h3>

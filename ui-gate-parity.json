@@ -1,0 +1,17 @@
+{
+  "controls": {
+    "admin-platform": {
+      "database # kb backed up # min ago": "database"
+    },
+    "admin-today": {
+      "monthly revenue rp # rb booked from plans": "monthly revenue",
+      "companies # +# this month": "companies",
+      "active people, # days # of #": "active people, # days",
+      "open tickets # first reply none yet": "open tickets"
+    },
+    "admin-money": {
+      "paying # # on free months \u00b7 # paused": "paying",
+      "invoiced in nov # rp # rp # paid": "invoiced in nov #"
+    }
+  }
+}

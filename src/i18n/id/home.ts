@@ -164,8 +164,8 @@ const id: Record<string, string> = {
   '{n} late': '{n} terlambat',
   '{n} not picked up': '{n} belum diambil',
   'No team has late or unassigned work.': 'Tidak ada tim dengan pekerjaan terlambat atau tanpa penanggung jawab.',
-  '{open} open · {week} this week': '{open} berjalan · {week} minggu ini',
-  '{open} open · {week} this week · {late} late': '{open} berjalan · {week} minggu ini · {late} terlambat',
+  '{open} open, {week} this week': '{open} berjalan, {week} minggu ini',
+  '{open} open, {week} this week, {late} late': '{open} berjalan, {week} minggu ini, {late} terlambat',
 
   // Waiting on you, team queue (HomeView)
   'Nothing is waiting on you.': 'Tidak ada yang menunggu Anda.',

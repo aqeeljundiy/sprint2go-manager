@@ -1782,7 +1782,7 @@
     font-weight: 700;
     line-height: 22px;
   }
-  .gm-reader .mail-invite .invite-kicker {
+  .gm-reader .mail-invite .invite-lead {
     color: var(--text-3);
   }
   /* "Join Google Meet": a text button with the video icon, not a full-width outlined button. */

@@ -148,7 +148,7 @@
   text-decoration-color: var(--text-3);
   color: var(--text-2);
 }
-.mail-invite.cancelled .invite-kicker {
+.mail-invite.cancelled .invite-lead {
   color: var(--text-2);
 }
 .mail-invite.reply {

@@ -51,7 +51,7 @@ export function Companies() {
   return (
     <Page
       title={t('Companies')}
-      sub={[tn(real.length, '{n} customer', '{n} customers'), tn(paying, '{n} paying', '{n} paying'), tn(risk, '{n} at risk', '{n} at risk')].join(' · ')}
+      sub={[tn(real.length, '{n} customer', '{n} customers'), tn(paying, '{n} paying', '{n} paying'), tn(risk, '{n} at risk', '{n} at risk')].join(', ')}
       actions={
         may('customers') && (
           <button className="primary-btn sm" onClick={() => setCreating(true)}>
@@ -114,7 +114,7 @@ export function Companies() {
               </span>
             ),
           },
-          { key: 'health', label: t('Health'), width: '110px', sort: (c) => c.health.score, render: (c) => <HealthPill h={c.health} /> },
+          { key: 'health', label: t('Health'), width: '110px', align: 'right', sort: (c) => c.health.score, render: (c) => <HealthPill h={c.health} /> },
           {
             key: 'plan',
             label: t('Plan'),
@@ -350,7 +350,7 @@ export function CompanyPage({ id, tab }: { id: string; tab: string }) {
           <HealthPill h={c.health} />
           {c.internal && <Badge tone="info">{c.home ? t('Our own company') : t('Ours or test')}</Badge>}
           <span className="muted">
-            {[planLabel(c.plan), tn(c.people, '{n} person', '{n} people'), c.since ? t('since {date}', { date: day(c.since) }) : '', c.lastActive ? t('active {when}', { when: rel(c.lastActive) }) : t('never active')].filter(Boolean).join(' · ')}
+            {[planLabel(c.plan), tn(c.people, '{n} person', '{n} people'), c.since ? t('since {date}', { date: day(c.since) }) : '', c.lastActive ? t('active {when}', { when: rel(c.lastActive) }) : t('never active')].filter(Boolean).join(', ')}
           </span>
         </span>
       }
@@ -481,7 +481,7 @@ function Overview({ c, reload }: { c: Full; reload: () => void }) {
                   c.mailChecks ? (c.mailChecks.allOk ? t('records ok') : t('records missing')) : '',
                 ]
                   .filter(Boolean)
-                  .join(' · '),
+                  .join(', '),
               },
               { k: t('Apps'), v: c.apps ? c.apps.join(', ') : t('all') },
               { k: t('Brand'), v: c.whiteLabel ? (c.whiteLabel.domain ? t('{name} at {domain}', { name: c.whiteLabel.name, domain: c.whiteLabel.domain }) : c.whiteLabel.name) : 'sprint2go' },

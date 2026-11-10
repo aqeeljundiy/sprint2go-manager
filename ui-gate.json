@@ -5,98 +5,248 @@
   "settle": 1200,
   "routes": [
     {
-      "name": "home",
-      "path": "/try"
+      "name": "app-home",
+      "path": "/"
     },
     {
-      "name": "mail",
-      "path": "/try/mail"
+      "name": "app-settings",
+      "path": "/settings"
     },
     {
-      "name": "chat",
-      "path": "/try/chat"
+      "name": "app-settings-account",
+      "path": "/settings/account"
     },
     {
-      "name": "tasks",
-      "path": "/try/tasks"
-    },
-    {
-      "name": "calendar",
-      "path": "/try/calendar"
-    },
-    {
-      "name": "projects",
-      "path": "/try/projects"
-    },
-    {
-      "name": "meet",
-      "path": "/try/meet"
-    },
-    {
-      "name": "drive",
-      "path": "/try/drive"
-    },
-    {
-      "name": "notes",
-      "path": "/try/notes"
-    },
-    {
-      "name": "tables",
-      "path": "/try/tables"
-    },
-    {
-      "name": "teams",
-      "path": "/try/teams"
-    },
-    {
-      "name": "vault",
-      "path": "/try/vault"
-    },
-    {
-      "name": "settings",
-      "path": "/try/settings"
-    },
-    {
-      "name": "mail-compose",
-      "path": "/try/mail",
-      "steps": [
-        {
-          "click": ".compose-btn:visible, .fab:visible"
-        },
-        {
-          "wait": 500
-        }
-      ]
-    },
-    {
-      "name": "signin",
-      "path": "/signin",
-      "mock": {
-        "**/api/me": {
-          "status": 401,
-          "body": {}
-        }
-      }
-    },
-    {
-      "name": "signup",
-      "path": "/signup",
-      "mock": {
-        "**/api/me": {
-          "status": 401,
-          "body": {}
-        }
-      }
-    },
-    {
-      "name": "admin",
+      "name": "admin-today",
       "path": "/admin"
     },
     {
-      "name": "landing",
-      "path": "/landing.html",
-      "themes": "light-only",
-      "surface": "marketing"
+      "name": "admin-tickets",
+      "path": "/admin/tickets"
+    },
+    {
+      "name": "admin-companies",
+      "path": "/admin/companies"
+    },
+    {
+      "name": "admin-company",
+      "path": "/admin/companies/elk"
+    },
+    {
+      "name": "admin-company-billing",
+      "path": "/admin/companies/elk/billing"
+    },
+    {
+      "name": "admin-people",
+      "path": "/admin/people"
+    },
+    {
+      "name": "admin-person",
+      "path": "/admin/people/u-emma"
+    },
+    {
+      "name": "admin-whitelist",
+      "path": "/admin/whitelist"
+    },
+    {
+      "name": "admin-money",
+      "path": "/admin/money"
+    },
+    {
+      "name": "admin-invoices",
+      "path": "/admin/money/invoices"
+    },
+    {
+      "name": "admin-plans",
+      "path": "/admin/money/plans"
+    },
+    {
+      "name": "admin-ai",
+      "path": "/admin/ai"
+    },
+    {
+      "name": "admin-ai-keys",
+      "path": "/admin/ai/keys"
+    },
+    {
+      "name": "admin-ai-models",
+      "path": "/admin/ai/models"
+    },
+    {
+      "name": "admin-growth",
+      "path": "/admin/growth"
+    },
+    {
+      "name": "admin-product",
+      "path": "/admin/product"
+    },
+    {
+      "name": "admin-flags",
+      "path": "/admin/product/flags"
+    },
+    {
+      "name": "admin-platform",
+      "path": "/admin/platform"
+    },
+    {
+      "name": "admin-platform-mail",
+      "path": "/admin/platform/mail"
+    },
+    {
+      "name": "admin-backups",
+      "path": "/admin/platform/backups"
+    },
+    {
+      "name": "admin-team",
+      "path": "/admin/team"
+    },
+    {
+      "name": "admin-replies",
+      "path": "/admin/team/replies"
+    },
+    {
+      "name": "admin-audit",
+      "path": "/admin/team/audit"
+    },
+    {
+      "name": "admin-companies-empty",
+      "path": "/admin/companies",
+      "mock": {
+        "**/api/admin/companies": {
+          "status": 200,
+          "body": {
+            "companies": []
+          }
+        }
+      }
+    },
+    {
+      "name": "admin-companies-error",
+      "path": "/admin/companies",
+      "mock": {
+        "**/api/admin/companies": {
+          "status": 500,
+          "body": {
+            "error": "The server could not load companies."
+          }
+        }
+      }
+    },
+    {
+      "name": "admin-v2-today",
+      "path": "/admin/v2"
+    },
+    {
+      "name": "admin-v2-tickets",
+      "path": "/admin/v2/tickets"
+    },
+    {
+      "name": "admin-v2-companies",
+      "path": "/admin/v2/companies"
+    },
+    {
+      "name": "admin-v2-company",
+      "path": "/admin/v2/companies/elk"
+    },
+    {
+      "name": "admin-v2-company-billing",
+      "path": "/admin/v2/companies/elk/billing"
+    },
+    {
+      "name": "admin-v2-people",
+      "path": "/admin/v2/people"
+    },
+    {
+      "name": "admin-v2-person",
+      "path": "/admin/v2/people/u-emma"
+    },
+    {
+      "name": "admin-v2-whitelist",
+      "path": "/admin/v2/whitelist"
+    },
+    {
+      "name": "admin-v2-money",
+      "path": "/admin/v2/money"
+    },
+    {
+      "name": "admin-v2-invoices",
+      "path": "/admin/v2/money/invoices"
+    },
+    {
+      "name": "admin-v2-plans",
+      "path": "/admin/v2/money/plans"
+    },
+    {
+      "name": "admin-v2-ai",
+      "path": "/admin/v2/ai"
+    },
+    {
+      "name": "admin-v2-ai-keys",
+      "path": "/admin/v2/ai/keys"
+    },
+    {
+      "name": "admin-v2-ai-models",
+      "path": "/admin/v2/ai/models"
+    },
+    {
+      "name": "admin-v2-growth",
+      "path": "/admin/v2/growth"
+    },
+    {
+      "name": "admin-v2-product",
+      "path": "/admin/v2/product"
+    },
+    {
+      "name": "admin-v2-flags",
+      "path": "/admin/v2/product/flags"
+    },
+    {
+      "name": "admin-v2-platform",
+      "path": "/admin/v2/platform"
+    },
+    {
+      "name": "admin-v2-platform-mail",
+      "path": "/admin/v2/platform/mail"
+    },
+    {
+      "name": "admin-v2-backups",
+      "path": "/admin/v2/platform/backups"
+    },
+    {
+      "name": "admin-v2-team",
+      "path": "/admin/v2/team"
+    },
+    {
+      "name": "admin-v2-replies",
+      "path": "/admin/v2/team/replies"
+    },
+    {
+      "name": "admin-v2-audit",
+      "path": "/admin/v2/team/audit"
+    },
+    {
+      "name": "admin-v2-companies-empty",
+      "path": "/admin/v2/companies",
+      "mock": {
+        "**/api/admin/companies": {
+          "status": 200,
+          "body": {
+            "companies": []
+          }
+        }
+      }
+    },
+    {
+      "name": "admin-v2-companies-error",
+      "path": "/admin/v2/companies",
+      "mock": {
+        "**/api/admin/companies": {
+          "status": 500,
+          "body": {
+            "error": "The server could not load companies."
+          }
+        }
+      }
     }
   ],
   "themes": {
@@ -176,5 +326,6 @@
     "emoji@ev-card-title",
     "emoji@cm-text",
     "emoji@mh-text"
-  ]
+  ],
+  "storageState": ".ui-gate/auth.json"
 }

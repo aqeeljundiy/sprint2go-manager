@@ -3128,3 +3128,99 @@ button.adm-q-text:hover strong {
     transition: none;
   }
 }
+
+/* ---------- phones: every control at least 44px tall; quiet text kept at 4.5:1 (ui-gate) ---------- */
+.adm-brand-tag,
+.adm-searchbtn kbd,
+.adm-stat-hint,
+.adm-flag {
+  color: var(--text-2);
+}
+.adm-flag.on,
+.adm-banner.good > span {
+  color: color-mix(in srgb, var(--ad-green) 82%, black);
+}
+:root[data-theme='dark'] .adm-flag.on,
+:root[data-theme='dark'] .adm-banner.good > span {
+  color: var(--ad-green);
+}
+@media (max-width: 767px) {
+  .adm .primary-btn.sm,
+  .adm .ghost-btn.sm,
+  .adm-modal .primary-btn.sm,
+  .adm-modal .ghost-btn.sm,
+  .adm .adm-back,
+  .adm .sel,
+  .adm .adm-q-text,
+  .adm .adm-link,
+  .adm .adm-field input,
+  .adm .adm-field .adm-money,
+  .adm-modal .adm-field input,
+  .adm .adm-input,
+  .adm .adm-money,
+  .adm .adm-price-grid input {
+    min-height: 44px;
+  }
+  .adm .adm-search {
+    min-height: 44px;
+  }
+  .adm .adm-search input {
+    min-height: var(--tap);
+  }
+  .adm .adm-switch-row .switch {
+    border: 8px solid transparent;
+    background-clip: padding-box;
+    box-sizing: content-box;
+    margin: -8px;
+  }
+}
+
+/* ui-gate: readable small print, numbers that never clip, kbd corners that nest */
+.adm-part small,
+.adm-funnel-row small,
+small.adm-block {
+  font-size: 12px;
+}
+.adm-stat b {
+  line-height: 1.3;
+}
+.adm-searchbtn kbd,
+.adm-palette-input kbd {
+  border-radius: 6px;
+}
+.adm-tr > span.r {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ui-gate round 3 */
+@media (max-width: 767px) {
+  .adm .adm-field input:not([type='checkbox']):not([type='range']),
+  .adm-modal .adm-field input:not([type='checkbox']):not([type='range']),
+  .adm .adm-field input.adm-money {
+    min-height: var(--tap);
+  }
+}
+.adm-stat b {
+  overflow: visible;
+}
+.adm-searchbtn kbd {
+  border-radius: 4px;
+}
+.adm-searchbtn {
+  border-radius: 8px;
+}
+.adm .switch span,
+.adm-modal .switch span {
+  border-radius: 999px;
+}
+.adm-tr.head {
+  min-height: 48px;
+}
+.adm-tr {
+  min-height: 56px;
+}
+
+.adm-searchbtn kbd {
+  border-radius: 2px;
+}

@@ -91,7 +91,7 @@ export function UnlimitedSection({ ws, users, me, canManage, onExport, toast }: 
 
       <div className="plan-card unl-card">
         <div className="pc-main">
-          <span className="pc-kicker">{t('Current plan')}</span>
+          <span className="pc-lead">{t('Current plan')}</span>
           <h3>
             <InfinityIcon size={20} /> {t('Unlimited')}
           </h3>
