@@ -490,8 +490,13 @@
   gap: 8px;
   align-items: baseline;
   max-width: 280px;
+  min-width: 0;
+}
+.pv2-next small {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .pv2-status {
   display: inline-flex;
@@ -593,4 +598,10 @@
   :root[data-app='v2'] .ucal-more {
     min-height: var(--ctl);
   }
+}
+/* Shortcut hints inside a search button read as quiet text, not a box inside a box (Home, the operator console). */
+.home-search kbd,
+.adm-searchbtn kbd {
+  background: none;
+  padding: 0;
 }
