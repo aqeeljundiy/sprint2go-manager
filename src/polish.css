@@ -4301,3 +4301,12 @@ a.help-file:hover {
   .pa-invite > button { min-height: 48px; width: 100%; }
   .portal-admin, .portal-admin p, .pa-hero { overflow-wrap: anywhere; min-width: 0; max-width: 100%; box-sizing: border-box; }
 }
+
+/* Dark mode: the selected settings item and the setup links keep 4.5:1 */
+:root[data-theme='dark'] .settings-nav button.on,
+:root[data-theme='dark'] .settings-nav button.on .nav-name {
+  color: var(--text);
+}
+:root[data-theme='dark'] .setup-card .setup-go {
+  color: var(--text);
+}

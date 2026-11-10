@@ -481,3 +481,16 @@
     animation-duration: 0.01ms !important;
   }
 }
+
+/* Phone: a field and its small button share the 44px tap height */
+@media (max-width: 767px) {
+  :root[data-ui='v2'] .ab .a2-inline > .ghost-btn,
+  :root[data-ui='v2'] .ab .a2-inline > .primary-btn,
+  :root[data-ui='v2'] .ab .a2-inline > .ghost-btn.sm,
+  :root[data-ui='v2'] .ab .a2-main .a2-inline > .ghost-btn.sm,
+  :root[data-ui='v2'] .ab .a2-inline > input,
+  :root[data-ui='v2'] .ab .a2-inline > select {
+    height: var(--tap);
+    min-height: var(--tap);
+  }
+}
