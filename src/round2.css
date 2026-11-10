@@ -2177,7 +2177,7 @@ button.chat-members:hover {
   font-size: clamp(24px, 4vw, 32px);
   letter-spacing: -0.03em;
 }
-.portal-kicker {
+.portal-lead {
   margin: 0;
   color: var(--text-3);
   font-weight: 600;
@@ -2761,7 +2761,7 @@ button.chat-members:hover {
   border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--border));
   background: linear-gradient(135deg, var(--accent-soft), var(--surface) 70%);
 }
-.pc-kicker {
+.pc-lead {
   font-size: 12px;
   font-weight: 700;
   color: var(--accent-text);

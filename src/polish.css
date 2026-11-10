@@ -42,7 +42,7 @@
 .jump,
 .topic-chips b,
 .timeline time,
-.pc-kicker {
+.pc-lead {
   color: var(--accent-text);
 }
 
@@ -1043,7 +1043,7 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
 /* Landing on an item from a notification or search */
 .flash { animation: flashIn 2.2s var(--ease, ease); border-radius: 10px; }
 @keyframes flashIn { 0%, 30% { background: color-mix(in oklab, var(--accent) 22%, transparent); box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent) 45%, transparent); } 100% { background: transparent; box-shadow: none; } }
-.home-search { display: flex; align-items: center; gap: 10px; width: 100%; margin: 0 0 14px; padding: 11px 14px; border-radius: var(--r-card); border: 0; background: var(--surface); box-shadow: 0 0 0 1px var(--line); color: var(--muted); font: inherit; font-size: 14px; text-align: left; cursor: text; transition: box-shadow .15s; }
+.home-search { display: flex; align-items: center; gap: 10px; width: 100%; margin: 0 0 14px; padding: 12px 16px; border-radius: var(--r-card); border: 0; background: var(--surface); box-shadow: 0 0 0 1px var(--line); color: var(--muted); font: inherit; font-size: 14px; text-align: left; cursor: text; transition: box-shadow .15s; }
 .home-search:hover { box-shadow: 0 0 0 1.5px color-mix(in oklab, var(--accent) 45%, var(--line)); }
 .home-search span { flex: 1; }
 .home-search kbd { font-size: 12px; padding: 2px 6px; border-radius: 6px; background: var(--hover); color: var(--muted); }
@@ -1904,7 +1904,7 @@ button.chip.client-chip:hover { background: color-mix(in oklab, var(--c) 14%, va
   display: grid;
   justify-items: center;
   gap: 10px;
-  padding: 26px 22px calc(18px + env(safe-area-inset-bottom));
+  padding: 24px 24px calc(16px + env(safe-area-inset-bottom));
   border-radius: 24px 24px 0 0;
   background: var(--surface);
   box-shadow: 0 -20px 60px -20px rgba(0, 0, 0, 0.35);

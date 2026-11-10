@@ -2155,7 +2155,7 @@ export function SharedPage({ m, brand, tasks, users, onClose }: { m: Meeting; br
         </button>
       </div>
       <div className="portal">
-        <p className="portal-kicker">{t('{brand} · Shared meeting · read only', { brand })}</p>
+        <p className="portal-lead">{t('{brand} · Shared meeting · read only', { brand })}</p>
         <h1 className="m-title">{m.title}</h1>
         <p className="m-sub">
           {[fullDate(m.at), m.minutes ? hoursOf(m.minutes) : '', fmtList(m.attendees)].filter(Boolean).join(' · ')}

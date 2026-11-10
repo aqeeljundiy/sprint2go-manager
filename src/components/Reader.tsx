@@ -773,7 +773,7 @@ export function Reader(props: Props) {
               <strong>{new Date(thread.invite.start).getDate()}</strong>
             </div>
             <div className="invite-info">
-              <div className="invite-kicker">{t('Meeting proposed in this email')}</div>
+              <div className="invite-lead">{t('Meeting proposed in this email')}</div>
               <div className="invite-title">{thread.invite.title}</div>
               <div className="invite-when">
                 {fmtDate(thread.invite.start, { weekday: 'long' })} · {fmtTimeRange(thread.invite.start, thread.invite.end)}
