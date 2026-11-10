@@ -170,10 +170,6 @@
   .dp-ext {
     flex: none;
   }
-  .dp-meta .dp-bit + .dp-bit {
-    padding-left: 8px;
-    border-left: 1px solid var(--line);
-  }
   .dp-meta {
     display: flex;
     align-items: center;

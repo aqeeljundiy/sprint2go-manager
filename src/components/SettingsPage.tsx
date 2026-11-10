@@ -5,7 +5,6 @@ import { PushScreen } from './ui/PushScreen';
 import { usePhone } from '../mobile/media';
 import { doneSettingsList, takeSettingsList } from './settingsList';
 import { term, brand as product } from '../terms';
-import { useUiLook } from '../uiLook';
 import { Handshake, Ban, Bell, Building2, ChevronDown, ChevronRight, Columns3, CreditCard, HardDrive, KeyRound, KeySquare, Stamp, LayoutGrid, UserPlus, Inbox, Plus, Sparkles, Trash2, Users, Keyboard, Menu, Palette, PenLine, ShieldCheck, UserRound, Video, type LucideIcon, FlaskConical, Send, LifeBuoy, FolderInput } from 'lucide-react';
 import { ACCENTS, type Settings } from '../settings';
 import { mailState, type MailState } from '../mailStatus';
@@ -263,7 +262,6 @@ function SectionScreen({ phone, open, title, onBack, children }: { phone: boolea
 export function SettingsPage({ email, settings: s, update, section, onSection, usage, onMenu, workspace: ws, onWorkspace, onHolidays, holidayCal, onAddAccount, onRemoveAccount, mailExtras, users, me, onPhoto, onProfile, onPreviewOnboarding, myApps, myRole, onInvite, onRole, onRemoveMember, onAccess, blocked, onUnblock, admin, demo, embedded, mailTeams, accountState }: Props & { embedded?: boolean }) {
   // Phones: the list of sections, and the one open over it (Settings opened for one section starts on it).
   const onPhone = usePhone();
-  const [look, setLook] = useUiLook();
   const phone = onPhone && !embedded;
   const stateOf = (a: Account) => accountState?.[a.id] ?? mailState(a, ws);
   const [sectionOpen, setSectionOpen] = useState(() => !embedded && !takeSettingsList());
@@ -743,16 +741,6 @@ export function SettingsPage({ email, settings: s, update, section, onSection, u
                   </button>
                 ))}
               </div>
-              <h3>{t('Look')}</h3>
-              {/* The new workspace look or the classic one (src/uiLook.ts); ?ui=v1 in the address does the same. */}
-              <div className="segmented">
-                {(['v2', 'v1'] as const).map((l) => (
-                  <button key={l} className={look === l ? 'on' : ''} onClick={() => setLook(l)}>
-                    {l === 'v2' ? t('New') : t('Classic')}
-                  </button>
-                ))}
-              </div>
-              <small className="set-hint">{look === 'v2' ? t('The new workspace: a path bar on top, quieter lines, roomier pages.') : t('The look {product} had before. Switch back any time.', { product: product.name })}</small>
               <h3>{t('Accent colour')}</h3>
               {/* One tappable row to the brand colour (it was an 18px link). */}
               <button type="button" className="accent-row" onClick={() => onSection('workspace')}>

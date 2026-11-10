@@ -93,8 +93,6 @@ import { AppSettingsButton, appSettingsLinks } from './components/AppSettings';
 import { Avatar } from './components/Avatar';
 import { Notifications, NoticesScreen } from './components/Notifications';
 import { CommandPalette, type PaletteItem } from './components/CommandPalette';
-import { WorkBar } from './components/WorkBar';
-import { useUiLook } from './uiLook';
 import { flashOption, settingsEntries } from './settingsIndex';
 import { HomeView } from './components/HomeView';
 import { TaskDrawer } from './components/TaskDrawer';
@@ -285,40 +283,8 @@ interface AppProps {
 // The # fills its whole box, so at the bar's 24 px it looks bigger and heavier than the round icons beside it: drawn at 20.
 const ChannelsIcon = forwardRef<SVGSVGElement, LucideProps>((props, ref) => <Hash ref={ref} {...props} size={22} />) as LucideIcon;
 
-/** The new look's top bar: a section's name as people read it (the ids come from sectionNow). */
-function sectionName(app: string, id: string | undefined): string | undefined {
-  if (!id) return undefined;
-  const names: Record<string, () => string> = {
-    inbox: () => t('Inbox'),
-    files: () => (app === 'drive' ? t('My files') : t('Files')),
-    contacts: () => t('Contacts'),
-    dms: () => t('Direct messages'),
-    activity: () => t('Activity'),
-    you: () => t('You'),
-    today: () => t('Today'),
-    upcoming: () => t('Upcoming'),
-    mine: () => (app === 'projects' ? t('My work') : t('My tasks')),
-    browse: () => t('Browse'),
-    schedule: () => t('Schedule'),
-    day: () => t('Day'),
-    month: () => t('Month'),
-    meetings: () => t('Meetings'),
-    notes: () => t('Notes'),
-    shared: () => t('Shared'),
-    starred: () => t('Starred'),
-    active: () => t('Active'),
-    past: () => t('Past'),
-    folders: () => t('Folders'),
-    teams: () => t('Teams'),
-    people: () => t('People'),
-    home: () => (app === 'chat' ? t('Channels') : t('Recent')),
-  };
-  return names[id]?.();
-}
-
 export default function App({ user, signedInUsers, allUsers, workspaces: allWorkspaces, setWorkspaces, onSwitchUser, onAddUser, onSignOut, onInvite: inviteUser, onWorkspace, onUpdateUser, topBar }: AppProps) {
   const [settings, updateSettings] = useSettings(user);
-  const [uiLook] = useUiLook(); // the new look (v2) or the classic one: src/uiLook.ts
   const [previewOnboarding, setPreviewOnboarding] = useState(() => new URLSearchParams(location.search).get('preview') === 'onboarding');
   setPhotos(allUsers); // every Avatar finds people's photos by email
 
@@ -5103,17 +5069,6 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
       />
 
       <main className="main" key={`${ws.id}:${mode}`}>
-        {uiLook === 'v2' && !mobile && mode !== 'home' && (
-          <WorkBar
-            company={ws.name}
-            app={mode === 'settings' ? t('Settings') : (APPS.find((a) => a.id === mode)?.name ?? '')}
-            section={mode === 'settings' ? undefined : sectionName(mode, sectionNow(mode))}
-            onApp={() => setSectionFor(mode, SECTIONS_OF[mode]?.[0] ?? '')}
-            onSearch={searchHere}
-            density={settings.density}
-            onDensity={(d) => updateSettings({ density: d })}
-          />
-        )}
         {mobile && (
           <MobileTop
             title={mode === 'settings' ? t('Settings') : (APPS.find((a) => a.id === mode)?.name ?? '')}

@@ -1681,10 +1681,10 @@
   .mp-day {
     display: grid;
     justify-items: center;
-    position: relative;
-    align-content: center;
+    align-content: start;
+    gap: 4px;
     min-height: 48px;
-    padding: 0;
+    padding: 4px 0 0;
     color: var(--text);
   }
   .mp-day.out {
@@ -1710,12 +1710,6 @@
   .mp-day.on.today .mp-num {
     background: var(--accent-fill);
     color: var(--on-accent-fill);
-  }
-  .mp-day .mp-dots {
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
   }
   .mp-dots {
     display: flex;
