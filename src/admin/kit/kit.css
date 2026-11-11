@@ -222,3 +222,17 @@ html[data-s2k] body {
   width: calc(var(--ak-space) * 8);
   height: calc(var(--ak-space) * 8);
 }
+
+/* A funnel step's share of the biggest step, as a quiet bar. */
+.s2k-bar {
+  flex: 0 0 30%;
+  height: calc(var(--ak-space) * 2);
+  border-radius: var(--ak-radius-chip);
+  background: linear-gradient(90deg, var(--ak-accent) var(--w), var(--ak-surface-2) var(--w));
+}
+@media (max-width: 640px) {
+  .s2k-bar {
+    flex-basis: 100%;
+    order: 3;
+  }
+}
