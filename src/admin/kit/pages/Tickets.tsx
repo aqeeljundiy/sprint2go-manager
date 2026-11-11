@@ -5,6 +5,7 @@ import { dateTime, post, rel, PRIORITY_LABEL, STATE_LABEL, type Priority, type T
 import { useAct, useAdmin, useApi } from '../../ui';
 import { Card, Chip, Drawer, Dropdown, Failed, Menu, Page, Tabs, esc, useKitList, type Tone } from '../parts';
 import { ICON } from '../nav';
+import { useSettingsForm } from './Money';
 import { t, tn } from '../../../i18n';
 
 /** One word per state. "Not answered yet" is what the old "New" and "Open" both meant to an operator. */
@@ -70,7 +71,7 @@ export function Tickets() {
     <Page
       title={t('Tickets')}
       sub={data ? (late ? tn(late, '{n} ticket is past the reply target. Due first is on top.', '{n} tickets are past the reply target. Due first is on top.') : t('Reply due first is on top.')) : undefined}
-      actions={may('support') && <button className="ak-btn ak-btn--primary" type="button" onClick={() => setCreating(true)}>{t('Log a ticket')}</button>}
+      actions={<><a className="ak-btn" href="/admin/v2/tickets/settings">{t('Support settings')}</a>{may('support') && <button className="ak-btn ak-btn--primary" type="button" onClick={() => setCreating(true)}>{t('Log a ticket')}</button>}</>}
     >
       {error && <Failed error={error} retry={reload} />}
       <ak-stats>
@@ -236,6 +237,50 @@ export function TicketPage({ id }: { id: string }) {
           )}
         </div>
       </div>
+    </Page>
+  );
+}
+
+/** Support settings, next to the tickets they shape: reply targets and saved replies (were in Team & settings). */
+export function TicketSettings() {
+  const { may } = useAdmin();
+  const act = useAct();
+  const { s, setS, changed, save, undo } = useSettingsForm();
+  const macros = useApi<{ macros: { id: string; title: string; body: string; by: string; at: string }[] }>('macros');
+  const [edit, setEdit] = useState<{ id?: string; title: string; body: string } | null>(null);
+  const can = may('support');
+  const hours = (k: 'urgent' | 'paid' | 'other', label: string) => s && (
+    <div className="ak-field"><label htmlFor={`sla-${k}`}>{label}</label><input id={`sla-${k}`} className="ak-input" inputMode="numeric" disabled={!may('team')} value={String(s.slaHours[k])} onChange={(e) => setS({ ...s, slaHours: { ...s.slaHours, [k]: Number(e.target.value.replace(/\D/g, '')) || 1 } })} /></div>
+  );
+  return (
+    <Page title={t('Support settings')} sub={t('How fast we answer, and the replies we reuse.')} actions={<a className="ak-btn" href="/admin/v2/tickets">{t('Back to tickets')}</a>}>
+      <div className="ak-columns">
+        <Card title={t('First reply within (hours)')}>
+          {!s ? <ak-placeholder lines="4" /> : (
+            <div className="s2k-form">
+              {hours('urgent', t('Urgent tickets'))}
+              {hours('paid', t('Paying companies'))}
+              {hours('other', t('Everyone else'))}
+              <div className="ak-field"><label htmlFor="sla-name">{t('Name on our replies')}</label><input id="sla-name" className="ak-input" disabled={!may('team')} value={s.supportName} onChange={(e) => setS({ ...s, supportName: e.target.value })} /></div>
+              {may('team') && <div className="s2k-row"><button className="ak-btn ak-btn--primary" type="button" disabled={!changed} onClick={save}>{t('Save')}</button>{changed && <button className="ak-btn ak-btn--ghost" type="button" onClick={undo}>{t('Undo changes')}</button>}</div>}
+            </div>
+          )}
+        </Card>
+        <Card title={t('Saved replies')} aside={can && <button className="ak-btn" type="button" onClick={() => setEdit({ title: '', body: '' })}>{t('New saved reply')}</button>} flush>
+          {!macros.data ? <ak-placeholder lines="3" /> : macros.data.macros.length === 0 ? <div className="ak-card__body ak-muted">{t('None yet. Use {name} for their first name and {me} for yours.', { name: '{name}', me: '{me}' })}</div> : (
+            <ul className="s2k-rows">{macros.data.macros.map((m) => <li key={m.id}><span className="s2k-rows__main"><b>{m.title}</b><small>{m.body.slice(0, 120)}</small></span>{can && <><button className="ak-btn" type="button" onClick={() => setEdit({ id: m.id, title: m.title, body: m.body })}>{t('Edit')}</button><button className="ak-btn ak-btn--ghost" type="button" onClick={() => void act(() => post('macro', { delete: m.id }), t('Deleted')).then(macros.reload)}>{t('Delete')}</button></>}</li>)}</ul>
+          )}
+        </Card>
+      </div>
+      <Drawer open={!!edit} onClose={() => setEdit(null)} heading={edit?.id ? t('Edit saved reply') : t('New saved reply')}>
+        {edit && (
+          <form className="s2k-form" onSubmit={(e) => (e.preventDefault(), void act(() => post('macro', edit), t('Saved')).then((ok) => ok && (setEdit(null), macros.reload())))}>
+            <div className="ak-field"><label htmlFor="mc-title">{t('Title')}</label><input id="mc-title" className="ak-input" value={edit.title} onChange={(e) => setEdit({ ...edit, title: e.target.value })} /></div>
+            <div className="ak-field"><label htmlFor="mc-body">{t('Reply')}</label><textarea id="mc-body" className="ak-input" rows={8} value={edit.body} onChange={(e) => setEdit({ ...edit, body: e.target.value })} /></div>
+            <div className="s2k-row"><button className="ak-btn ak-btn--primary" disabled={!edit.title.trim() || !edit.body.trim()}>{t('Save')}</button><button className="ak-btn ak-btn--ghost" type="button" onClick={() => setEdit(null)}>{t('Cancel')}</button></div>
+          </form>
+        )}
+      </Drawer>
     </Page>
   );
 }

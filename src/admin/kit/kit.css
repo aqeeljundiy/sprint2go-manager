@@ -211,3 +211,14 @@ html[data-s2k] body {
   font-size: var(--ak-text-md);
   font-weight: var(--ak-weight-bold);
 }
+
+/* sprint2go's own mark (public/favicon.svg) beside the name, as in the app. */
+.s2k-mark {
+  width: calc(var(--ak-space) * 6);
+  height: calc(var(--ak-space) * 6);
+  align-self: center;
+}
+.s2k-mark--big {
+  width: calc(var(--ak-space) * 8);
+  height: calc(var(--ak-space) * 8);
+}

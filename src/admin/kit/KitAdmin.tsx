@@ -12,6 +12,7 @@ import { Today } from './pages/Today';
 
 const Sample = lazy(() => import('./pages/Sample').then((m) => ({ default: m.Sample })));
 const Tickets = lazy(() => import('./pages/Tickets').then((m) => ({ default: m.Tickets })));
+const TicketSettings = lazy(() => import('./pages/Tickets').then((m) => ({ default: m.TicketSettings })));
 const Ticket = lazy(() => import('./pages/Tickets').then((m) => ({ default: m.TicketPage })));
 const Companies = lazy(() => import('./pages/Companies').then((m) => ({ default: m.Companies })));
 const Company = lazy(() => import('./pages/Companies').then((m) => ({ default: m.CompanyPage })));
@@ -37,7 +38,7 @@ function route(path: string): ReactNode {
   const { section, a, b } = parse(path);
   switch (section) {
     case '_kit': return <Sample />;
-    case 'tickets': return a ? <Ticket id={a} key={a} /> : <Tickets />;
+    case 'tickets': return a === 'settings' ? <TicketSettings /> : a ? <Ticket id={a} key={a} /> : <Tickets />;
     case 'companies': return a ? <Company id={a} tab={b} key={a} /> : <Companies />;
     case 'people': return a ? <Person id={a} key={a} /> : <People />;
     case 'money': return <Money tab={a} />;
@@ -145,7 +146,7 @@ function Frame({ path, signedOut, children }: { path?: string; signedOut?: boole
   const side = useRef<HTMLElement & { refresh?: () => void }>(null);
   // The first page's link is marked in the template itself: the kit reads it while building the sidebar.
   const first = useRef(path);
-  const html = useMemo(() => sidebarHtml(`<span class="s2k-word">sprint<b>2</b>go</span>`, first.current === undefined ? null : navIdOf(first.current)), []);
+  const html = useMemo(() => sidebarHtml(`<img class="s2k-mark" src="/favicon.svg" alt=""><span class="s2k-word">sprint<b>2</b>go</span>`, first.current === undefined ? null : navIdOf(first.current)), []);
   useLayoutEffect(() => {
     const s = side.current;
     if (!s || path === undefined || path === first.current) return;
@@ -172,7 +173,7 @@ function Frame({ path, signedOut, children }: { path?: string; signedOut?: boole
 function Gate({ title, text, children }: { title: string; text: ReactNode; children: ReactNode }) {
   return (
     <div className="s2k-gate">
-      <span className="s2k-word s2k-word--big">sprint<b>2</b>go</span>
+      <span className="s2k-brand"><img className="s2k-mark s2k-mark--big" src="/favicon.svg" alt="" /><span className="s2k-word s2k-word--big">sprint<b>2</b>go</span></span>
       <section className="ak-card s2k-gate__card">
         <div className="ak-card__body ak-stack">
           <h1>{title}</h1>
