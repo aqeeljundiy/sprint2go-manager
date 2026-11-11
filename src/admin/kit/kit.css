@@ -184,3 +184,14 @@ html[data-s2k] body {
   overflow: visible;
   overscroll-behavior: auto;
 }
+
+/* A record's name that opens it: text colour, the accent on hover, never underlined. */
+.s2k-link {
+  color: var(--ak-text);
+  font-weight: var(--ak-weight-medium);
+  text-decoration: none;
+  transition: color var(--ak-dur-fast) var(--ak-ease);
+}
+.s2k-link:hover {
+  color: var(--ak-accent);
+}
