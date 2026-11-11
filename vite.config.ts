@@ -33,9 +33,9 @@ function serviceWorker(): Plugin {
 
 export default defineConfig({
   plugins: [react(), serviceWorker()],
-  // `npm run dev` talks to the local server (npm run server) for data, sign-in and AI.
+  // `npm run dev` talks to the local server (npm run server) for data, sign-in and AI (S2G_API picks another address).
   // Two pages: the app (index.html) and the public landing page (landing.html, small and fast, no app code).
   build: { rollupOptions: { input: { app: 'index.html', landing: 'landing.html' } } },
   // AI apps' addresses too (/mcp and their sign-in); /oauth/authorize stays here: it's the app's consent screen.
-  server: { proxy: Object.fromEntries(['/api', '/mcp', '/oauth/token', '/oauth/register', '/oauth/revoke', '/.well-known/oauth-'].map((p) => [p, { target: 'http://127.0.0.1:8787', changeOrigin: false }])) },
+  server: { proxy: Object.fromEntries(['/api', '/mcp', '/oauth/token', '/oauth/register', '/oauth/revoke', '/.well-known/oauth-'].map((p) => [p, { target: process.env.S2G_API ?? 'http://127.0.0.1:8787', changeOrigin: false }])) },
 });

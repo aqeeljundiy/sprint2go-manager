@@ -1,0 +1,186 @@
+/* The console v2's own few pieces (brand, sign-in gate, small layouts). Theme values only: every colour, size,
+   corner and timing comes from public/admin-v2/admin-theme.css. */
+
+.s2k-word {
+  font-weight: var(--ak-weight-bold);
+  font-size: var(--ak-text-lg);
+  letter-spacing: var(--ak-tracking-title);
+  color: var(--ak-text);
+}
+.s2k-word b {
+  color: var(--ak-accent);
+}
+.s2k-word--big {
+  font-size: var(--ak-text-title);
+}
+.s2k-brand {
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--ak-space) * 2);
+}
+.s2k-brand__tag {
+  font-size: var(--ak-text-xs);
+  font-weight: var(--ak-weight-medium);
+  color: var(--ak-text-muted);
+}
+.s2k-side-foot {
+  margin-top: auto;
+  display: grid;
+  gap: var(--ak-space);
+  padding-top: calc(var(--ak-space) * 3);
+}
+.s2k-search {
+  justify-content: flex-start;
+  gap: calc(var(--ak-space) * 2);
+}
+.s2k-search svg {
+  width: calc(var(--ak-space) * 4);
+  height: calc(var(--ak-space) * 4);
+}
+.s2k-search .ak-kbd {
+  margin-left: auto;
+}
+
+/* Signed out, or waiting for the two-step code: alone in the middle, brand above it. */
+.s2k-gate {
+  min-height: 80vh;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: calc(var(--ak-space) * 6);
+}
+.s2k-gate__card {
+  width: min(calc(var(--ak-space) * 100), calc(100vw - var(--ak-page-pad-phone) * 2));
+}
+.s2k-gate h1 {
+  margin: 0;
+  font-size: var(--ak-text-lg);
+}
+.s2k-gate p {
+  margin: 0;
+}
+.s2k-qr {
+  display: grid;
+  place-items: center;
+  min-height: calc(var(--ak-space) * 48);
+}
+.s2k-mono,
+.s2k-code {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+}
+.s2k-code {
+  font-size: var(--ak-text-lg);
+}
+
+/* Each page slides in on its own (the frame and sidebar stay). */
+.s2k-route {
+  animation: s2k-in var(--ak-dur) var(--ak-ease) backwards;
+}
+@keyframes s2k-in {
+  from {
+    opacity: 0;
+    transform: translateY(calc(var(--ak-space) * 1));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .s2k-route {
+    animation: none;
+  }
+}
+
+/* Two columns, main and supporting (about 2 to 1); one column on narrow screens. */
+.s2k-split {
+  display: grid;
+  gap: calc(var(--ak-space) * 4);
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  align-items: start;
+}
+@media (max-width: 1100px) {
+  .s2k-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* A list of work rows inside a card: a line between rows, none after the last. */
+.s2k-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.s2k-rows > li {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--ak-space) * 3);
+  min-height: var(--ak-row-h);
+  padding: calc(var(--ak-space) * 2) calc(var(--ak-space) * 4);
+  border-top: 1px solid var(--ak-border);
+}
+.s2k-rows > li:first-child {
+  border-top: 0;
+}
+.s2k-rows__main {
+  flex: 1;
+  min-width: 0;
+}
+.s2k-rows__main > * {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.s2k-rows__main small {
+  color: var(--ak-text-muted);
+  font-size: var(--ak-text-sm);
+}
+@media (max-width: 640px) {
+  .s2k-rows > li {
+    flex-wrap: wrap;
+  }
+  .s2k-rows__main > * {
+    white-space: normal;
+  }
+}
+
+/* Label and value pairs. */
+.s2k-kv {
+  display: grid;
+  grid-template-columns: minmax(calc(var(--ak-space) * 28), auto) minmax(0, 1fr);
+  gap: calc(var(--ak-space) * 2) calc(var(--ak-space) * 4);
+  margin: 0;
+}
+.s2k-kv dt {
+  color: var(--ak-text-muted);
+}
+.s2k-kv dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.s2k-form {
+  display: grid;
+  gap: calc(var(--ak-space) * 4);
+  max-width: calc(var(--ak-space) * 160);
+}
+.s2k-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--ak-space) * 2);
+}
+.s2k-num {
+  font-variant-numeric: tabular-nums;
+}
+.s2k-pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin: 0;
+}
+
+/* The app's phone layer pins the body (src/mobile/shell.css, "Pinned chrome"): the console v2 scrolls the page itself,
+   as the kit expects (its tab bar and sheets are fixed to the screen). */
+html[data-s2k],
+html[data-s2k] body {
+  overflow: visible;
+  overscroll-behavior: auto;
+}

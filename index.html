@@ -16,6 +16,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script>
+      // The operator console v2 (/admin/v2) is built on aqeel-admin-kit: its stylesheet, theme and script load here,
+      // only on those addresses, before the page is drawn (so the sidebar never flashes half-built).
+      var p = location.pathname;
+      if (p === '/admin/v2' || p.indexOf('/admin/v2/') === 0)
+        document.write('<link rel="stylesheet" href="/admin-v2/kit/admin-kit.css"><link rel="stylesheet" href="/admin-v2/admin-theme.css"><scr' + 'ipt defer blocking="render" src="/admin-v2/kit/admin-kit.js"></scr' + 'ipt>');
+    </script>
   </head>
   <body>
     <div id="root"></div>

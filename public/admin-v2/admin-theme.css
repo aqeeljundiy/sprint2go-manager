@@ -1,0 +1,92 @@
+/*
+  Admin theme for: sprint2go operator console (/admin/v2)
+  Built on 12 Nov 2026 from: sprint2go's own design, tidied (src/tokens.css, the landing page's src/landing/landing.css,
+  and the v1 console's survey: 19 text sizes, 19 corner sizes, 13 control heights, 19 durations folded into the scale
+  below) using references/translation.md, "Tidying an existing backend". This file is the only place this backend's
+  look is defined.
+
+  Site character
+  1. Who: the founder plus one or two support or finance operators, at a desk; a phone for "is anything broken" and one quick ticket reply.
+  2. Mood: calm, precise, friendly (white, one electric blue, rounded Plus Jakarta Sans).
+  3. Density: many small decisions every day (tickets, codes, trials, warnings), a few careful money tasks a month.
+  4. Shows most: text (tickets, names, addresses) and numbers (rupiah, health, counts). Almost no pictures.
+  5. Must not resemble: the Continue shop admin (orange, pills, rail), InTRIZ Studio (charcoal, Manrope, strip),
+     Continue Lab (dark green flush sidebar, square corners), the P&P and aqeelOS backends, nor the sprint2go customer
+     app itself (the console is the back office, not one more app in the rail).
+*/
+:root {
+  /* Type: the app's own family and its 24/17/15/13/12 scale, one step smaller for desk work */
+  --ak-font: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ak-text-xs: 12px;            /* v1's most used size (x75); chips, captions */
+  --ak-text-sm: 13px;            /* second lines, hints (app --fs-secondary) */
+  --ak-text-md: 14px;            /* body: v1 used 13.5 and 14, snapped to 14 */
+  --ak-text-lg: 17px;            /* section headings (app --fs-title) */
+  --ak-text-title: 24px;         /* page titles (app --fs-display) */
+  --ak-text-xl: 26px;            /* summary numbers, a touch above the title */
+  --ak-weight-normal: 400;
+  --ak-weight-medium: 600;       /* the app's labels and buttons are 600 */
+  --ak-weight-bold: 700;
+  --ak-tracking-title: -0.02em;  /* app --ls-display */
+
+  /* Colour: the app's one white page, cards set apart by a fine edge and a soft shadow, sprint2go blue only as accent */
+  --ak-bg: #ffffff;              /* app --bg: "one white page", a grey page read as dead */
+  --ak-surface: #ffffff;
+  --ak-surface-2: #f1f2f5;       /* app --hover */
+  --ak-border: #e2e3e9;          /* app and landing --border */
+  --ak-border-strong: #c9ccd6;
+  --ak-text: #0b0c10;            /* Elkiya ink, app --text */
+  --ak-text-muted: #5f6270;      /* landing --text-3: 6.2:1 on white */
+  --ak-accent: #2448ff;          /* sprint2go blue, never the customer's company colour */
+  --ak-accent-text: #ffffff;     /* 6.9:1 on the blue */
+  --ak-success: #0e6f4b;         /* app --ok */
+  --ak-warn: #8c5208;            /* app --warn */
+  --ak-danger: #b42a2a;          /* app --danger */
+  --ak-info: #0e7490;            /* shifted to teal: the app's #2563eb is too close to the accent blue */
+
+  /* Shape: the app's radii 10 / 16 / pill */
+  --ak-radius-control: 10px;     /* app buttons and fields: 10 (not the landing's pills: this is the work tool) */
+  --ak-radius-card: 16px;        /* app cards and sheets: 16 */
+  --ak-radius-inner: 9px;
+  --ak-radius-chip: 999px;       /* app badges are pills on the name's line */
+  --ak-radius-pop: 12px;         /* v1's most used corner (x31) */
+
+  /* Density: many small decisions a day, so the app's desk control height, not the phone's 44 */
+  --ak-space: 4px;               /* app spacing 4/8/12/16/24/32/48 */
+  --ak-control-h: 36px;          /* app --ctl */
+  --ak-row-h: 48px;              /* app row 48 */
+
+  /* Layout: one width for every page */
+  --ak-page-max: none;
+  --ak-page-pad: 32px;
+  --ak-page-pad-phone: 16px;     /* app --gutter */
+  --ak-sidebar-w: 248px;         /* v1 nav 240, plus the floating inset */
+
+  /* Motion: CLAUDE.md "enter 150 to 300 ms with ease-out"; v1's most used 150 ms */
+  --ak-dur-fast: 150ms;
+  --ak-dur: 240ms;               /* the app's 240 ms in */
+  --ak-dur-slow: 380ms;
+  --ak-ease: cubic-bezier(0.2, 0.8, 0.2, 1); /* the one non-plain curve v1 uses */
+
+  /* Depth: the app sets panels apart by a fine edge and a soft shadow with a hint of blue */
+  --ak-shadow-card: 0 1px 2px rgba(11, 12, 16, 0.04), 0 8px 24px -16px rgba(36, 72, 255, 0.16);
+  --ak-shadow-pop: 0 24px 60px -24px rgba(16, 18, 24, 0.24), 0 2px 6px rgba(16, 18, 24, 0.06);
+
+  /* Sidebar: an inset panel in the app rail's quiet grey (app --surface-2) on the white page; the active page in a soft blue tile */
+  --ak-sidebar-bg: #f5f6f8;
+  --ak-sidebar-text: #3d404a;    /* app --text-2 */
+  --ak-nav-active-bg: #e7ebff;   /* landing --accent-soft */
+  --ak-nav-active-text: #1834d6; /* landing --accent-hover: the blue at a weight small text reads in */
+  --ak-sidebar-brand: #0b0c10;
+  --ak-chart-1: #2448ff;
+
+  /* Layout choices, each from the character above */
+  --ak-style-nav: labels;        /* 11 pages in 5 small groups: the whole map stays visible, nothing to open (line 3: many quick hops a day) */
+  --ak-style-sidebar: floating;  /* the app's look is rounded cards with a soft shadow (line 2), and no other kit site floats it */
+  --ak-style-stats: cards;       /* every number on Today opens the rows behind it (tickets waiting, trials ending) */
+  --ak-style-tabs: segmented;    /* app-like brand: the app's own .segmented control; views are cut to three or four */
+  --ak-style-table: lined;       /* dense operational lists: tickets, companies, invoices (line 3) */
+  --ak-style-head: plain;        /* not a document brand; titles sit clean on the white page */
+  /* Who waits: an operator checking many small things a day. Waiting should feel calm and never urgent (line 2),
+     not game-like (segments is Continue's) nor a report bar (Lab's). */
+  --ak-style-loader: ring;
+}
