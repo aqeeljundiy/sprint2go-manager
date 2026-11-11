@@ -195,3 +195,19 @@ html[data-s2k] body {
 .s2k-link:hover {
   color: var(--ak-accent);
 }
+
+/* One plan's price fields in a row that wraps (the save button sits right under them). */
+.s2k-price {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(calc(var(--ak-space) * 36), 1fr));
+  gap: calc(var(--ak-space) * 3);
+  align-items: end;
+}
+.s2k-price > b {
+  grid-column: 1 / -1;
+}
+.ak-card h3 {
+  margin: 0;
+  font-size: var(--ak-text-md);
+  font-weight: var(--ak-weight-bold);
+}
