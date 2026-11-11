@@ -107,7 +107,7 @@ export function Drawer({ open, onClose, heading, side, children }: { open: boole
 }
 
 /** A button that opens a list of actions. Items are plain buttons; the kit clicks the original. */
-export function Menu({ label, items, trigger }: { label: string; trigger?: ReactNode; items: ({ label: string; run: () => void; danger?: boolean } | 'divider' | null | false)[] }) {
+export function Menu({ label, items, trigger }: { label: string; trigger?: ReactNode; items: ({ label: string; run: () => void; danger?: boolean } | 'divider' | null | false | undefined | '')[] }) {
   return (
     <ak-menu label={label} align="end" trigger-class={trigger ? 'ak-btn ak-btn--ghost ak-btn--icon' : 'ak-btn'}>
       {trigger && <span slot="trigger">{trigger}</span>}
