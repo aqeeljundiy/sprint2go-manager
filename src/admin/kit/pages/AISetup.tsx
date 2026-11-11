@@ -73,13 +73,15 @@ function Models({ d, reload }: { d: AIData; reload: () => void }) {
   const opts = d.options.text.map((o) => ({ value: `${o.provider}|${o.model}`, label: `${o.name} · ${o.providerName}${o.hasKey ? '' : ` (${t('no key')})`}` }));
   return (
     <Card flush>
-      <ul className="s2k-rows">
+      <ul className="s2k-rows s2k-rows--wrap">
         {d.jobs.map((j) => (
           <li key={j.id}>
             <span className="s2k-rows__main"><b>{j.name}</b><small>{j.hint}{j.per100 ? ` · ${t('{amount} per 100 uses', { amount: rp(j.per100) })}` : ''}{j.gone ? ` · ${j.gone}` : ''}</small></span>
             <Chip tone={j.state === 'ok' ? 'success' : j.state === 'fallback' ? 'warn' : 'danger'}>{j.state === 'ok' ? t('Working') : j.state === 'fallback' ? t('On its fallback') : t('No key')}</Chip>
-            <Dropdown label={t('First choice for {job}', { job: j.name })} disabled={!can} value={val(j.primary)} options={opts} onChange={(v) => void act(() => post('ai/job', { job: j.id, primary: choice(v), fallback: j.fallback && { provider: j.fallback.provider, model: j.fallback.model } }), t('Saved')).then(reload)} />
-            <Dropdown label={t('Fallback for {job}', { job: j.name })} disabled={!can} value={val(j.fallback)} options={[{ value: '', label: t('No fallback') }, ...opts]} onChange={(v) => void act(() => post('ai/job', { job: j.id, primary: { provider: j.primary.provider, model: j.primary.model }, fallback: choice(v) }), t('Saved')).then(reload)} />
+            <span className="s2k-pickers">
+            <Dropdown block label={t('First choice for {job}', { job: j.name })} disabled={!can} value={val(j.primary)} options={opts} onChange={(v) => void act(() => post('ai/job', { job: j.id, primary: choice(v), fallback: j.fallback && { provider: j.fallback.provider, model: j.fallback.model } }), t('Saved')).then(reload)} />
+            <Dropdown block label={t('Fallback for {job}', { job: j.name })} disabled={!can} value={val(j.fallback)} options={[{ value: '', label: t('No fallback') }, ...opts]} onChange={(v) => void act(() => post('ai/job', { job: j.id, primary: { provider: j.primary.provider, model: j.primary.model }, fallback: choice(v) }), t('Saved')).then(reload)} />
+            </span>
           </li>
         ))}
       </ul>

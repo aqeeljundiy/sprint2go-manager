@@ -236,3 +236,18 @@ html[data-s2k] body {
     order: 3;
   }
 }
+
+/* Rows whose controls need room (a job's two model pickers): the controls take their own line when narrow. */
+.s2k-rows--wrap > li {
+  flex-wrap: wrap;
+}
+.s2k-pickers {
+  flex: 1 1 calc(var(--ak-space) * 120);
+  min-width: 0;
+  display: grid;
+  gap: calc(var(--ak-space) * 2);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--ak-space) * 56)), 1fr));
+}
+.s2k-pickers > ak-select {
+  min-width: 0;
+}
