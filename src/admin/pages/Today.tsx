@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { AlertTriangle, CalendarClock, Clock, CreditCard, KeyRound, LifeBuoy, ShieldAlert, Trash2, TrendingDown, UserPlus } from 'lucide-react';
+import { AlertTriangle, CalendarClock, Sprout, Clock, CreditCard, KeyRound, LifeBuoy, ShieldAlert, Trash2, TrendingDown, UserPlus } from 'lucide-react';
 
 import { rel, dateTime, day, duration, post, rp, rpShort, type CompanyRow } from '../api';
 import { Confirm, CopyBtn, deltaOf, Empty, Failed, Loading, Page, Stat, Stats, useAct, useAdmin, useApi } from '../ui';
@@ -141,6 +141,18 @@ export function Today() {
             </Row>
           ))}
         </Group>
+        {/* v2: the companies in their first week, under their own name and with a welcome, not an alarm */}
+        {adminV2 && (
+          <Group title={t('Not started yet')} n={raw.atRisk.length - q.atRisk.length}>
+            {raw.atRisk.filter((c) => fresh.has(c.id)).map((c) => (
+              <Row key={c.id} icon={<Sprout size={15} />} tone="info" title={c.name} sub={[t('new this week'), c.lastActive ? t('last seen {ago}', { ago: rel(c.lastActive) }) : t('not signed in yet'), t('{amount}/month', { amount: rpShort(c.mrr) })].join(' · ')} onOpen={() => go(`/admin/companies/${c.id}`)}>
+                <button className="ghost-btn sm" onClick={() => go(`/admin/companies/${c.id}`)}>
+                  {t('Open company')}
+                </button>
+              </Row>
+            ))}
+          </Group>
+        )}
         <Group title={t('Trials ending this week')} n={q.trialsEnding.length}>
           {q.trialsEnding.map((c) => (
             <Row key={c.id} icon={<CalendarClock size={15} />} title={c.name} sub={t('ends {day} · then {amount}/month', { day: day(c.trialEnds), amount: rpShort(c.after) })} onOpen={() => go(`/admin/companies/${c.id}`)}>

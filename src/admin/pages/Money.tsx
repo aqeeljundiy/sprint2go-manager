@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FileText, Plus, RotateCcw, Tag } from 'lucide-react';
+import { Download, FileText, Plus, RotateCcw, Tag } from 'lucide-react';
 import { Select } from '../../components/ui/Select';
 import { DatePicker } from '../../components/ui/DatePicker';
 import { day, monthName, planLabel, post, rp, rpShort, STATE_LABEL, type CompanyRow } from '../api';
@@ -8,6 +8,17 @@ import { StateBadge } from './Companies';
 import { t, tn, tx } from '../../i18n';
 import { fmtNumber } from '../../i18n/format';
 import { adminV2 } from '../../surface';
+
+/** v2: the invoice list as a CSV (number, company, month, total, status, due, paid). */
+function invoicesCsv(rows: InvoiceRow[]) {
+  const q = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  const lines = [['Invoice', 'Company', 'Month', 'Total', 'Status', 'Due', 'Paid'].join(','), ...rows.map((i) => [i.number, i.company, i.period, i.total, i.overdue ? 'overdue' : i.status, i.dueAt?.slice(0, 10), i.paidAt?.slice(0, 10) ?? ''].map(q).join(','))];
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([lines.join('\n')], { type: 'text/csv' }));
+  a.download = 'sprint2go-invoices.csv';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
 
 export function Money({ tab }: { tab: string }) {
   const { go } = useAdmin();
@@ -165,6 +176,7 @@ function Invoices() {
   const send = (list: InvoiceRow[], clear: () => void) => Promise.all(list.map((i) => post('invoice/status', { id: i.id, status: 'sent' }))).then(() => (clear(), reload()));
   if (error) return <Failed error={error} retry={reload} />;
   if (!data) return <Loading rows={6} />;
+  const drafts = data.invoices.filter((i) => i.status === 'draft');
   const STATUS: Record<InvoiceRow['status'], string> = { draft: t('Draft'), sent: t('Sent'), paid: t('Paid'), void: t('Void') };
   const label = (i: InvoiceRow) => (i.overdue ? t('Overdue') : STATUS[i.status]);
   const tone = (i: InvoiceRow) => (i.overdue ? 'bad' : i.status === 'paid' ? 'good' : i.status === 'sent' ? 'accent' : 'neutral');
@@ -173,11 +185,24 @@ function Invoices() {
       title={t('Invoices')}
       hint={t('PPN 11% included; bank details from Team & settings')}
       actions={
-        may('billing') && (
-          <button className="primary-btn sm" onClick={() => void act(() => post<{ made: number }>('invoice/generate').then((r) => r), t('Drafts made for every paying company without one this month')).then(reload)}>
-            <FileText size={13} /> {t('Make this month’s invoices')}
-          </button>
-        )
+        <>
+          {/* v2: the month's jobs next to the list: send every draft (asks first, with count and total), and a CSV */}
+          {adminV2 && may('billing') && drafts.length > 0 && (
+            <button className="ghost-btn sm" onClick={() => setSending({ list: drafts, clear: () => {} })}>
+              {tn(drafts.length, 'Send {n} draft', 'Send {n} drafts')}
+            </button>
+          )}
+          {adminV2 && (
+            <button className="ghost-btn sm" onClick={() => invoicesCsv(data.invoices)}>
+              <Download size={13} /> {t('Download CSV')}
+            </button>
+          )}
+          {may('billing') && (
+            <button className="primary-btn sm" onClick={() => void act(() => post<{ made: number }>('invoice/generate').then((r) => r), t('Drafts made for every paying company without one this month')).then(reload)}>
+              <FileText size={13} /> {t('Make this month’s invoices')}
+            </button>
+          )}
+        </>
       }
     >
       <Table
@@ -187,6 +212,7 @@ function Invoices() {
         onOpen={(i) => window.open(`/api/admin/invoice.html?id=${i.id}`, '_blank')}
         search={(i) => `${i.number} ${i.company}`}
         initialSort={{ key: 'number', dir: -1 }}
+        viewsMenu
         views={[
           { id: 'todo', label: t('To send'), test: (i) => i.status === 'draft' },
           { id: 'overdue', label: t('Overdue'), test: (i) => i.overdue },
@@ -230,6 +256,27 @@ function Invoices() {
           { key: 'total', label: t('Total'), width: '130px', align: 'right', sort: (i) => i.total, render: (i) => rp(i.total) },
           { key: 'status', label: t('Status'), width: '110px', sort: (i) => (i.overdue ? 0 : ['draft', 'sent', 'paid', 'void'].indexOf(i.status) + 1), render: (i) => <Badge tone={tone(i) as 'bad'}>{label(i)}</Badge> },
           { key: 'due', label: t('Due'), width: '100px', align: 'right', hide: 'tablet', sort: (i) => i.dueAt, render: (i) => <span className="muted">{i.status === 'paid' ? t('paid {date}', { date: day(i.paidAt) }) : day(i.dueAt)}</span> },
+          // v2: each invoice's next step on its row: send a draft (asks first), mark a sent one paid
+          ...(adminV2 && may('billing')
+            ? [
+                {
+                  key: 'next',
+                  label: '',
+                  width: '120px',
+                  align: 'right' as const,
+                  render: (i: InvoiceRow) =>
+                    i.status === 'draft' ? (
+                      <button className="ghost-btn sm" onClick={() => setSending({ list: [i], clear: () => {} })}>
+                        {t('Send')}
+                      </button>
+                    ) : i.status === 'sent' ? (
+                      <button className="ghost-btn sm" onClick={() => void act(() => post('invoice/status', { id: i.id, status: 'paid', method: 'bank transfer' }), t('{number} marked paid', { number: i.number })).then(reload)}>
+                        {t('Mark paid')}
+                      </button>
+                    ) : null,
+                },
+              ]
+            : []),
         ]}
       />
       {sending && (

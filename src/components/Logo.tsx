@@ -1,4 +1,5 @@
 import { useId } from 'react';
+import { adminV2, v2 } from '../surface';
 // sprint2go brand marks. The product colour stays sprint2go blue in every workspace.
 
 /** The mark: two forward chevrons in a rounded square ("go"). */
@@ -21,9 +22,13 @@ export function Logo({ size = 28 }: { size?: number }) {
 }
 
 /** "sprint2go" set in the brand face, with the 2 in sprint2go blue. */
+/** v2: the wordmark's letters on the type scale (v1: 105% of the height, 21 px in the console). */
+const SCALE = adminV2 ? [12, 13, 14, 15, 17, 24] : [12, 13, 15, 17, 24, 36];
+const wordSize = (height: number) => (v2 ? SCALE.reduce((b, x) => (Math.abs(x - height * 1.05) < Math.abs(b - height * 1.05) ? x : b)) : height * 1.05);
+
 export function Wordmark({ height = 22 }: { height?: number }) {
   return (
-    <span className="s2g-wordmark" style={{ fontSize: height * 1.05 }} aria-label="sprint2go">
+    <span className="s2g-wordmark" style={{ fontSize: wordSize(height) }} aria-label="sprint2go">
       <Logo size={height * 1.15} />
       <span>
         sprint<b>2</b>go

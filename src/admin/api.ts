@@ -1,4 +1,5 @@
 import { t, tn, tx } from '../i18n';
+import { adminV2 } from '../surface';
 import { fmtDate, fmtDay, fmtNumber } from '../i18n/format';
 
 /** The operator backend's calls. Every error becomes a thrown Error carrying the server's message (and its status). */
@@ -16,7 +17,17 @@ async function read(r: Response) {
   if (!r.ok) throw new ApiError((data as { error?: string }).error ?? t('Request failed ({status})', { status: r.status }), r.status, data as Record<string, unknown>);
   return data;
 }
-export const get = <T = any>(path: string): Promise<T> => fetch(`/api/admin/${path}`).then(read);
+// v2: two parts of a page asking for the same list at the same moment (the menu's ticket count and the Tickets page)
+// share one request instead of loading it twice.
+const inflight = new Map<string, Promise<unknown>>();
+export const get = <T = any>(path: string): Promise<T> => {
+  if (!adminV2) return fetch(`/api/admin/${path}`).then(read);
+  const running = inflight.get(path);
+  if (running) return running as Promise<T>;
+  const p = fetch(`/api/admin/${path}`).then(read).finally(() => inflight.delete(path));
+  inflight.set(path, p);
+  return p;
+};
 export const post = <T = any>(path: string, body: unknown = {}): Promise<T> => fetch(`/api/admin/${path}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }).then(read);
 
 export const rp = (n: number) => 'Rp ' + Math.round(n).toLocaleString('id-ID');

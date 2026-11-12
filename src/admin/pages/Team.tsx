@@ -415,6 +415,7 @@ function Audit() {
       search={(e) => `${e.operator} ${e.action} ${e.targetName ?? ''} ${e.detail ?? ''}`}
       initialSort={{ key: 'at', dir: -1 }}
       dense
+      viewsMenu
       views={[
         { id: 'all', label: t('Everything'), test: () => true },
         { id: 'customers', label: t('Customers'), test: (e) => ['company', 'person'].includes(area(e.action)) },

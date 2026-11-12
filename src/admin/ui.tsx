@@ -157,7 +157,12 @@ function CountUp({ value }: { value: ReactNode }) {
     return () => cancelAnimationFrame(raf);
   }, [text]); // eslint-disable-line react-hooks/exhaustive-deps
   if (!text || !m) return <>{value}</>;
-  return <>{shown}</>;
+  // The real figure stays in the page the whole time (screen readers, copy, search); the counting one is drawn over it.
+  return (
+    <span className="count-up" data-shown={shown !== text ? shown : undefined}>
+      <span className="count-final">{text}</span>
+    </span>
+  );
 }
 /** A number with what it means: a trend against before, and whether up is good. */
 export function Stat({ label, value, hint, delta, onClick, tone, i = 0 }: { label: string; value: ReactNode; hint?: ReactNode; delta?: { text: string; dir: 'up' | 'down' | 'flat'; good: boolean } | null; onClick?: () => void; tone?: 'warn' | 'bad'; i?: number }) {
@@ -460,7 +465,7 @@ export interface View<T> {
  * Sortable list with views (filters with counts), search, row selection and bulk actions. The chosen view and sort are
  * remembered per operator on this device.
  */
-export function Table<T>({ id, rows, cols, rowKey, onOpen, views, search, bulk, empty, initialSort, dense, rowTone }: { id: string; rows: T[]; cols: Col<T>[]; rowKey: (r: T) => string; onOpen?: (r: T) => void; views?: View<T>[]; search?: (r: T) => string; bulk?: (sel: T[], clear: () => void) => ReactNode; empty?: { title: string; text?: string }; initialSort?: { key: string; dir: 1 | -1 }; dense?: boolean; rowTone?: (r: T) => string | undefined }) {
+export function Table<T>({ id, rows, cols, rowKey, onOpen, views, search, bulk, empty, initialSort, dense, rowTone, viewsMenu }: { id: string; rows: T[]; cols: Col<T>[]; rowKey: (r: T) => string; onOpen?: (r: T) => void; views?: View<T>[]; search?: (r: T) => string; bulk?: (sel: T[], clear: () => void) => ReactNode; empty?: { title: string; text?: string }; initialSort?: { key: string; dir: 1 | -1 }; dense?: boolean; rowTone?: (r: T) => string | undefined; /** v2: the views as one "Show" picker, for a list under a page's own tabs (one row of tabs, never two). */ viewsMenu?: boolean }) {
   const store = `s2g-admin-table:${id}`;
   const saved = useMemo(() => {
     try {
@@ -504,12 +509,16 @@ export function Table<T>({ id, rows, cols, rowKey, onOpen, views, search, bulk, 
     <div className="adm-table-wrap">
       {(views || search) && (
         <div className="adm-table-bar">
-          {counted && (
+          {counted && adminV2 && viewsMenu && (
+            <Select value={view} options={counted.map((x) => ({ value: x.id, label: x.n ? `${x.label} · ${x.n}` : x.label }))} onChange={(id) => (setView(id), setSel(new Set()))} label={t('Show')} width={240} />
+          )}
+          {counted && !(adminV2 && viewsMenu) && (
             <div className="segmented sm adm-views">
               {counted.map((x) => (
                 <button key={x.id} type="button" className={view === x.id ? 'on' : ''} onClick={() => (setView(x.id), setSel(new Set()))}>
                   {x.label}
-                  <span className="adm-count">{x.n}</span>
+                  {/* v2: no "0" chips: an empty view says nothing until it has something */}
+                  {x.n || !adminV2 ? <span className="adm-count">{x.n}</span> : null}
                 </button>
               ))}
             </div>

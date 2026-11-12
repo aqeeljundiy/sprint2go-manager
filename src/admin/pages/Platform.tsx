@@ -418,6 +418,7 @@ function Errors() {
       onOpen={(e) => setOpen(open === e.id ? null : e.id)}
       search={(e) => `${e.message} ${e.path ?? ''} ${e.companies.join(' ')}`}
       initialSort={{ key: 'last', dir: -1 }}
+      viewsMenu
       views={[
         { id: 'open', label: t('Happening'), test: (e) => !e.resolvedAt },
         { id: 'server', label: t('Server'), test: (e) => !e.resolvedAt && e.source === 'server' },

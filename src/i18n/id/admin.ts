@@ -1472,6 +1472,11 @@ const id: Record<string, string> = {
   "{reads} and {n} changes": "{reads} dan {n} perubahan",
   "{reads} only": "Hanya {reads}",
   "{total} in all. Each company’s owner gets their invoice by email now; it can’t be called back.": "Total {total}. Pemilik setiap perusahaan menerima invoicenya lewat email sekarang; tidak bisa ditarik kembali.",
+  // /admin/v2: Not started yet on Today, invoice row actions
+  "Send {n} drafts": "Kirim {n} draf",
+  "new this week": "baru minggu ini",
+  "not signed in yet": "belum pernah masuk",
+  "{number} marked paid": "{number} ditandai lunas",
 };
 
 export default id;
