@@ -12,9 +12,9 @@ import App from './App';
 import { clientActions } from './clientActions';
 import { accessFor, afterEnd, clientInbox, portalsFor } from './clientView';
 import { WorkspaceSwitcher } from './components/WorkspaceSwitcher';
-import { ActingBanner, AdminApp, AdminV2, ClientApp, ConnectApp, Onboarding, SharedHome } from './lazy';
+import { ActingBanner, AdminApp, ClientApp, ConnectApp, Onboarding, SharedHome } from './lazy';
 // The team app at /v2 (since 13 Nov 2026): v1's own screens with the v2 layer on top (src/surface.ts,
-// docs/v1-checklist.md). /admin/v2 stays on the kit build until the owner approves the new Home.
+// docs/v1-checklist.md), and the operator console at /admin/v2 the same way.
 import { setPhotos } from './photos';
 import { Wordmark } from './components/Logo';
 import { AcceptInvite, SignIn, SignUp } from './components/SignIn';
@@ -104,7 +104,7 @@ export default function Root() {
     );
   if (mode === 'two-step' && session?.twoStep) return <TwoStepGate need={session.twoStep} email={session.email} companies={session.companies} />;
   if (mode === 'ready' && session?.suspended) return <Suspended reason={session.suspended.reason} />;
-  if (admin && !trying && (mode === 'ready' || mode === 'demo')) return /^\/admin\/v2(\/|$)/.test(location.pathname) ? <AdminV2 /> : <AdminApp />;
+  if (admin && !trying && (mode === 'ready' || mode === 'demo')) return <AdminApp />; // /admin and /admin/v2: one console, v2 with its layer (src/surface.ts); the kit console (src/admin/kit) stays in the repo, unrouted
   if (connecting && mode === 'ready' && session && !session.suspended) return <ConnectApp actingAs={session.actingAs} />;
   if (mode === 'ready' && session)
     return (

@@ -4,6 +4,9 @@ import { Select } from '../../components/ui/Select';
 import { SmoothHeight } from '../../components/ui/Smooth';
 import { t, tn, tx } from '../../i18n';
 import { fmtNumber, fmtPercent } from '../../i18n/format';
+import { adminV2 } from '../../surface';
+/** v2: the next ticket to answer first: past target, then the soonest reply due, then the rest by age. */
+const dueOrder = (tk: TicketRow) => (tk.status === 'resolved' || tk.status === 'closed' ? '3' : tk.breaching ? '0' + (tk.dueAt ?? '') : tk.dueAt ? '1' + tk.dueAt : '2' + tk.updatedAt);
 
 import { rel, dateTime, duration, post, PRIORITY_LABEL, rpShort, STATE_LABEL, STATUS_LABEL, type Priority, type TicketRow, type TicketStatus } from '../api';
 import { Badge, Dialog, Empty, Failed, Field, HealthPill, Initials, KV, Loading, Menu, Page, Section, Table, useAct, useAdmin, useApi, Who } from '../ui';
@@ -48,7 +51,7 @@ export function Tickets() {
         rowKey={(tk) => tk.id}
         onOpen={(tk) => go(`/admin/tickets/${tk.id}`)}
         search={(tk) => `${tk.number} ${tk.subject} ${tk.requester.email} ${tk.requester.name ?? ''} ${tk.company ?? ''} ${tk.tags.join(' ')}`}
-        initialSort={{ key: 'updated', dir: -1 }}
+        initialSort={adminV2 ? { key: 'due', dir: 1 } : { key: 'updated', dir: -1 }}
         rowTone={(tk) => (tk.breaching ? 'tone-bad' : tk.priority === 'urgent' && live(tk) ? 'tone-warn' : undefined)}
         views={[
           { id: 'mine', label: t('Mine'), test: (tk) => tk.assignee === me.email && tk.status !== 'resolved' && tk.status !== 'closed' },
@@ -102,6 +105,7 @@ export function Tickets() {
           { key: 'status', label: t('Status'), width: '130px', sort: (tk) => ['new', 'open', 'waiting', 'resolved', 'closed'].indexOf(tk.status), render: (tk) => <StatusBadge s={tk.status} /> },
           { key: 'priority', label: t('Priority'), width: '90px', hide: 'tablet', sort: (tk) => ['low', 'normal', 'high', 'urgent'].indexOf(tk.priority), render: (tk) => (tk.priority === 'normal' ? <span className="muted">{PRIORITY_LABEL.normal}</span> : <Badge tone={PRIO_TONE[tk.priority]}>{PRIORITY_LABEL[tk.priority]}</Badge>) },
           { key: 'assignee', label: t('On it'), width: '120px', hide: 'phone', sort: (tk) => tk.assignee ?? '', render: (tk) => (tk.assignee ? <span className="adm-ellipsis">{tk.assignee === me.email ? t('You') : tk.assignee.split('@')[0]}</span> : <span className="muted">{t('nobody')}</span>) },
+          ...(adminV2 ? [{ key: 'due', label: t('Reply due'), width: '110px', align: 'right' as const, hide: 'tablet' as const, sort: dueOrder, render: (tk: TicketRow) => <span className={tk.breaching ? 'adm-late' : 'muted'}>{tk.status === 'resolved' || tk.status === 'closed' ? '' : tk.breaching ? t('past target') : tk.dueAt ? rel(tk.dueAt) : ''}</span> }] : []),
           { key: 'updated', label: t('Updated'), width: '110px', align: 'right', sort: (tk) => tk.updatedAt, render: (tk) => <span className={tk.breaching ? 'adm-late' : 'muted'}>{tk.breaching ? t('past target') : rel(tk.updatedAt)}</span> },
         ]}
       />

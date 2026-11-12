@@ -6,6 +6,7 @@ import { ApiError, STATE_LABEL, day, get, post, rel, rp, rpShort } from '../api'
 import { Badge, Confirm, Dialog, Empty, Failed, Field, Loading, Menu, MoneyInput, Page, Section, Stat, Stats, Tabs, useAct, useAdmin, useApi } from '../ui';
 import { t, tn, tx } from '../../i18n';
 import { fmtList, fmtNumber, fmtPercent } from '../../i18n/format';
+import { adminV2 } from '../../surface';
 
 interface Choice {
   provider: string;
@@ -244,7 +245,7 @@ function Margin({ d }: { d: AIData }) {
         </Section>
       )}
       {!!m.unlimited?.length && (
-        <Section title={t('Unlimited')} hint={t('{amount} of AI this month on the Whitelist, left out of the margin above', { amount: rp(m.unlimitedCost ?? 0) })}>
+        <Section title={t('Unlimited')} hint={adminV2 ? t('{amount} of AI this month on Unlimited companies, left out of the margin above', { amount: rp(m.unlimitedCost ?? 0) }) : t('{amount} of AI this month on the Whitelist, left out of the margin above', { amount: rp(m.unlimitedCost ?? 0) })}>
           <div className="adm-mini-list">
             {m.unlimited.map((c) => (
               <button key={c.id} type="button" className="adm-ai-line" onClick={() => go('/admin/whitelist')}>

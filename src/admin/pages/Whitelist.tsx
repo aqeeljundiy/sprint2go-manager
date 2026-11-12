@@ -1,3 +1,4 @@
+import { adminV2 } from '../../surface';
 import { useEffect, useRef, useState } from 'react';
 import { Check, HardDrive, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import { bytes, day, get, post, rp } from '../api';
@@ -64,7 +65,7 @@ export function Whitelist() {
   const { data, error, reload } = useApi<Data>('whitelist');
   const [adding, setAdding] = useState(false);
   const [editing, setEditing] = useState<Row | null>(null);
-  const title = t('Whitelist');
+  const title = adminV2 ? t('Unlimited') : t('Whitelist'); // v2: the word customers see in the app
   if (error) return <Page title={title}><Failed error={error} retry={reload} /></Page>;
   if (!data) return <Page title={title}><Loading rows={5} /></Page>;
   const full = data.rows.filter((r) => (r.aiLimit > 0 && r.aiUsed >= r.aiLimit) || (r.sesLimit > 0 && r.sesUsed >= r.sesLimit));
@@ -92,7 +93,7 @@ export function Whitelist() {
           rowKey={(r) => r.workspaceId}
           onOpen={(r) => (data.can ? setEditing(r) : go(`/admin/companies/${r.workspaceId}`))}
           search={(r) => `${r.name} ${r.owner?.email ?? ''} ${r.note}`}
-          empty={{ title: t('No company is on the Whitelist'), text: t('Add one to give it every feature with no plan limits and no bills, for an investor, a partner or a friend.') }}
+          empty={{ title: adminV2 ? t('No company is Unlimited yet') : t('No company is on the Whitelist'), text: t('Add one to give it every feature with no plan limits and no bills, for an investor, a partner or a friend.') }}
           cols={[
             {
               key: 'company',
@@ -208,7 +209,7 @@ function AddCompany({ rate, onClose, onDone }: { rate: number; onClose: () => vo
   const ok = !!pick && v.aiLimit >= 0 && v.sesLimit >= 0;
   return (
     <Dialog
-      title={t('Add a company to the Whitelist')}
+      title={adminV2 ? t('Make a company Unlimited') : t('Add a company to the Whitelist')}
       onClose={onClose}
       foot={
         <>
@@ -226,7 +227,7 @@ function AddCompany({ rate, onClose, onDone }: { rate: number; onClose: () => vo
                 .finally(() => setBusy(false));
             }}
           >
-            {t('Add to the Whitelist')}
+            {adminV2 ? t('Make Unlimited') : t('Add to the Whitelist')}
           </button>
         </>
       }
@@ -253,7 +254,7 @@ function AddCompany({ rate, onClose, onDone }: { rate: number; onClose: () => vo
                     <Check size={14} className="adm-wl-go" />
                   </button>
                 ))}
-                {found.length === 0 && <small className="muted">{t('No company matches, or it’s already on the Whitelist.')}</small>}
+                {found.length === 0 && <small className="muted">{adminV2 ? t('No company matches, or it’s already Unlimited.') : t('No company matches, or it’s already on the Whitelist.')}</small>}
               </div>
             )}
           </Field>
@@ -274,7 +275,7 @@ function EditCompany({ row, rate, onClose, onDone }: { row: Row; rate: number; o
   if (removing)
     return (
       <Confirm
-        title={t('Take {company} off the Whitelist', { company: row.name })}
+        title={adminV2 ? t('Take {company} off Unlimited', { company: row.name }) : t('Take {company} off the Whitelist', { company: row.name })}
         text={t('It goes back to {plan}, the plan it had before, and is billed again from today. People’s rules are removed.', { plan: planName(row.prevPlan) })}
         action={t('Take off')}
         danger
@@ -312,7 +313,7 @@ function EditCompany({ row, rate, onClose, onDone }: { row: Row; rate: number; o
     >
       <div className="adm-form">
         <div className="adm-wl-picked">
-          <Who name={row.name} email={row.owner?.email} color={row.color} sub={t('On the Whitelist since {date}. Before: {plan}.', { date: day(row.addedAt), plan: planName(row.prevPlan) })} />
+          <Who name={row.name} email={row.owner?.email} color={row.color} sub={adminV2 ? t('Unlimited since {date}. Before: {plan}.', { date: day(row.addedAt), plan: planName(row.prevPlan) }) : t('On the Whitelist since {date}. Before: {plan}.', { date: day(row.addedAt), plan: planName(row.prevPlan) })} />
           <button type="button" className="ghost-btn sm" onClick={() => (onClose(), go(`/admin/companies/${row.workspaceId}`))}>
             {t('Open')}
           </button>

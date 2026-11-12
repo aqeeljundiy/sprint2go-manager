@@ -1,9 +1,11 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { AlertTriangle, CalendarClock, Clock, CreditCard, KeyRound, LifeBuoy, ShieldAlert, Trash2, TrendingDown, UserPlus } from 'lucide-react';
 
-import { rel, dateTime, day, duration, post, rp, rpShort } from '../api';
-import { CopyBtn, deltaOf, Empty, Failed, Loading, Page, Stat, Stats, useAct, useAdmin, useApi } from '../ui';
+import { rel, dateTime, day, duration, post, rp, rpShort, type CompanyRow } from '../api';
+import { Confirm, CopyBtn, deltaOf, Empty, Failed, Loading, Page, Stat, Stats, useAct, useAdmin, useApi } from '../ui';
 import { t, tn, tx } from '../../i18n';
+import { adminV2 } from '../../surface';
+import { GRACE_DAYS, isNewCompany } from '../kit/rules';
 
 interface TodayData {
   kpis: { mrr: number; mrrLastMonth: number | null; companies: number; unlimited?: number; newThisMonth: number; active7: number; activePrev7: number; people: number; openTickets: number; medianFirstReplyMin: number | null; satisfaction: number | null };
@@ -57,9 +59,15 @@ export function Today() {
   const { me, go, may } = useAdmin();
   const { data, error, reload } = useApi<TodayData>('today', [], 60_000);
   const act = useAct();
+  // v2: a company in its first week is "Not started yet", never "At risk" (it had no chance to use sprint2go yet).
+  const companies = useApi<{ companies: CompanyRow[] }>(adminV2 ? 'companies' : null);
+  // v2: a reminder emails the customer, so it asks first with the invoice and the amount.
+  const [reminding, setReminding] = useState<TodayData['queue']['overdue'][number] | null>(null);
   if (error) return <Page title={t('Today')}><Failed error={error} retry={reload} /></Page>;
   if (!data) return <Page title={t('Today')}><Loading rows={6} /></Page>;
-  const { kpis: k, queue: q } = data;
+  const { kpis: k, queue: raw } = data;
+  const fresh = new Set((companies.data?.companies ?? []).filter(isNewCompany).map((c) => c.id));
+  const q = adminV2 ? { ...raw, atRisk: raw.atRisk.filter((c) => !fresh.has(c.id)) } : raw;
   const hour = new Date().getHours();
   const name = (me.name || me.email).split(/[ @]/)[0];
   // Indonesian greets the late afternoon ("sore") apart from the night ("malam"); English says good evening to both.
@@ -117,7 +125,7 @@ export function Today() {
           {q.overdue.map((i) => (
             <Row key={i.id} icon={<CreditCard size={15} />} tone="warn" title={i.company ? t('{company} owes {amount}', { company: i.company, amount: rp(i.total) }) : t('A company owes {amount}', { amount: rp(i.total) })} sub={`${i.number} · ${t('due {day}', { day: day(i.dueAt) })}`} onOpen={() => go(`/admin/companies/${i.workspaceId}/billing`)}>
               {may('billing') && (
-                <button className="ghost-btn sm" onClick={() => void act(() => post('invoice/status', { id: i.id, status: 'sent' }), t('Reminder sent'))}>
+                <button className="ghost-btn sm" onClick={() => (adminV2 ? setReminding(i) : void act(() => post('invoice/status', { id: i.id, status: 'sent' }), t('Reminder sent')))}>
                   {t('Remind')}
                 </button>
               )}
@@ -128,7 +136,7 @@ export function Today() {
           {q.atRisk.map((c) => (
             <Row key={c.id} icon={<TrendingDown size={15} />} tone="warn" title={c.name} sub={[t('Health {score}', { score: c.score }), c.lastActive ? t('last seen {ago}', { ago: rel(c.lastActive) }) : t('never active'), t('{amount}/month', { amount: rpShort(c.mrr) })].join(' · ')} onOpen={() => go(`/admin/companies/${c.id}`)}>
               <button className="ghost-btn sm" onClick={() => go(`/admin/companies/${c.id}`)}>
-                {t('Look')}
+                {adminV2 ? t('Open company') : t('Look')}
               </button>
             </Row>
           ))}
@@ -175,7 +183,19 @@ export function Today() {
             <Row key={w.kind} icon={<AlertTriangle size={15} />} tone="info" title={w.text} onOpen={w.to ? () => go(w.to!) : undefined} />
           ))}
         </Group>
+        {adminV2 && raw.atRisk.length > q.atRisk.length && (
+          <p className="adm-note muted">{tn(raw.atRisk.length - q.atRisk.length, '{n} new company is left out of At risk: new companies count as "Not started yet" for their first {days} days.', '{n} new companies are left out of At risk: new companies count as "Not started yet" for their first {days} days.', { days: GRACE_DAYS })}</p>
+        )}
       </div>
+      {reminding && (
+        <Confirm
+          title={t('Email a reminder to {company}?', { company: reminding.company ?? reminding.workspaceId })}
+          text={t('They get invoice {number} for {amount} again by email.', { number: reminding.number, amount: rp(reminding.total) })}
+          action={t('Send reminder')}
+          onClose={() => setReminding(null)}
+          onConfirm={() => act(() => post('invoice/status', { id: reminding.id, status: 'sent' }), t('Reminder sent')).then(() => setReminding(null))}
+        />
+      )}
     </Page>
   );
 }

@@ -9,6 +9,7 @@ import { Badge as UiBadge, PersonCell } from '../components/ui/Person';
 import { EmptyState } from '../components/ui/EmptyState';
 import { Layer } from '../components/ui/Layer';
 import { t, tn } from '../i18n';
+import { adminV2 } from '../surface';
 
 /* ---------- the backend's shared state ---------- */
 
@@ -127,13 +128,44 @@ export function Tabs<T extends string>({ value, items, onChange }: { value: T; i
 export function Stats({ children }: { children: ReactNode }) {
   return <div className="adm-stats">{children}</div>;
 }
+/**
+ * v2: a figure counts up to its value when the page opens (0.6 s, the number part only: "Rp 3,1 jt" counts 0 to 3,1).
+ * Once per value; reduced motion shows it at once. Anything that isn't a plain figure is shown as it is.
+ */
+function CountUp({ value }: { value: ReactNode }) {
+  const text = typeof value === 'number' ? String(value) : typeof value === 'string' ? value : null;
+  const m = text?.match(/^(\D*?)(\d{1,3}(?:[.]\d{3})+|\d+)(?:([.,])(\d{1,2}))?(\D*)$/) ?? null;
+  const [shown, setShown] = useState(text ?? '');
+  useEffect(() => {
+    if (!text || !m || matchMedia('(prefers-reduced-motion: reduce)').matches) return void setShown(text ?? '');
+    const [, pre, int, sep, frac, post] = m;
+    const target = Number(int.replace(/\./g, '') + (frac ? '.' + frac : ''));
+    const digits = frac?.length ?? 0;
+    const fmt = (n: number) => {
+      const [i, d] = n.toFixed(digits).split('.');
+      const grouped = /\./.test(int) ? Number(i).toLocaleString('id-ID') : i;
+      return pre + grouped + (d ? sep + d : '') + post;
+    };
+    const start = performance.now();
+    let raf = 0;
+    const step = (now: number) => {
+      const p = Math.min(1, (now - start) / 600);
+      setShown(fmt(target * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [text]); // eslint-disable-line react-hooks/exhaustive-deps
+  if (!text || !m) return <>{value}</>;
+  return <>{shown}</>;
+}
 /** A number with what it means: a trend against before, and whether up is good. */
 export function Stat({ label, value, hint, delta, onClick, tone, i = 0 }: { label: string; value: ReactNode; hint?: ReactNode; delta?: { text: string; dir: 'up' | 'down' | 'flat'; good: boolean } | null; onClick?: () => void; tone?: 'warn' | 'bad'; i?: number }) {
   const Tag = onClick ? 'button' : 'div';
   return (
     <Tag type={onClick ? 'button' : undefined} aria-label={onClick ? label : undefined} className={`adm-stat ${tone ?? ''} ${onClick ? 'click' : ''}`} onClick={onClick} style={{ ['--i' as string]: i }}>
       <span className="adm-stat-label">{label}</span>
-      <b>{value}</b>
+      <b>{adminV2 ? <CountUp value={value} /> : value}</b>
       {(delta || hint) && (
         <span className="adm-stat-foot">
           {delta && delta.dir !== 'flat' && (

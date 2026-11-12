@@ -18,6 +18,5 @@ export const adminHome = v2 ? '/admin/v2' : '/admin';
 /** A console address written the v1 way (/admin/tickets) for this surface (/admin/v2/tickets on v2). */
 export const adminPath = (to: string) => (adminV2 && /^\/admin(\/|$)/.test(to) && !/^\/admin\/v2(\/|$)/.test(to) ? to.replace(/^\/admin/, '/admin/v2') : to);
 
-// The v2 layer's styles all sit under html.s2v2, so they never touch v1. Only the team app and portal for now:
-// /admin/v2 is still the kit build until the owner approves the new Home (then it becomes v1's console + the layer).
-if (teamV2 && typeof document !== 'undefined') document.documentElement.classList.add('s2v2');
+// The v2 layer's styles all sit under html.s2v2, so they never touch v1.
+if (v2 && typeof document !== 'undefined') document.documentElement.classList.add('s2v2');

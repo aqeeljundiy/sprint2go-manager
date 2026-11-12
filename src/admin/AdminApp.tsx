@@ -3,7 +3,7 @@ import { Activity, ArrowLeft, Building2, Check, ClipboardList, CreditCard, Eye, 
 import { Wordmark } from '../components/Logo';
 import { signOut } from '../sync';
 import { ApiError, get, post, ROLE_LABEL, type Perm } from './api';
-import { AdminCtx, Initials, type Ctx, type Me } from './ui';
+import { AdminCtx, Confirm, Initials, type Ctx, type Me } from './ui';
 import { Today } from './pages/Today';
 import { Tickets, TicketPage } from './pages/Tickets';
 import { Companies, CompanyPage } from './pages/Companies';
@@ -19,12 +19,16 @@ import { Popover } from '../components/ui/Popover';
 import { LANGS, getLang, isLang, rememberLang, setLang, t, tx, type Lang } from '../i18n';
 import { tj } from '../i18n/tj';
 import { useLang } from '../i18n/useLang';
+// /admin/v2 (src/surface.ts): this same console with the v2 layer; its addresses live under /admin/v2.
+import { adminPath, adminV2, appHome } from '../surface';
+/** The console's own address without the v2 prefix: the pages always think in /admin/… */
+const v1Path = (p: string) => (adminV2 ? p.replace(/^\/admin\/v2(?=\/|$)/, '/admin') : p);
 
 type Item = { id: string; label: string; icon: LucideIcon; perm?: Perm };
 // Getters: each read gives the words in the console's language of the moment (docs/i18n.md).
 const NAV: { group: string; items: Item[] }[] = [
   { get group() { return tx('nav', 'Inbox'); }, items: [{ id: 'today', get label() { return t('Today'); }, icon: Gauge }, { id: 'tickets', get label() { return t('Tickets'); }, icon: LifeBuoy }] },
-  { get group() { return t('Customers'); }, items: [{ id: 'companies', get label() { return t('Companies'); }, icon: Building2 }, { id: 'people', get label() { return t('People'); }, icon: Users }, { id: 'whitelist', get label() { return t('Whitelist'); }, icon: InfinityIcon }] },
+  { get group() { return t('Customers'); }, items: [{ id: 'companies', get label() { return t('Companies'); }, icon: Building2 }, { id: 'people', get label() { return t('People'); }, icon: Users }, { id: 'whitelist', get label() { return adminV2 ? t('Unlimited') : t('Whitelist'); }, icon: InfinityIcon }] }, // v2: the word customers see
   { get group() { return t('Business'); }, items: [{ id: 'money', get label() { return tx('nav', 'Money'); }, icon: CreditCard }, { id: 'ai', label: 'AI', icon: Sparkles }, { id: 'growth', get label() { return t('Growth'); }, icon: TrendingUp }] },
   { get group() { return tx('nav', 'Run'); }, items: [{ id: 'product', get label() { return t('Product'); }, icon: Megaphone }, { id: 'platform', get label() { return t('Platform'); }, icon: ServerCog }, { id: 'team', get label() { return t('Team & settings'); }, icon: UserCog }] },
 ];
@@ -84,7 +88,9 @@ export function AdminApp() {
   const [lang, pickLang] = useConsoleLang(me && me !== 'denied' ? me.lang : null);
   const [langOpen, setLangOpen] = useState(false);
   const langBtn = useRef<HTMLButtonElement>(null);
-  const [path, setPath] = useState(location.pathname);
+  const [path, setPath] = useState(() => v1Path(location.pathname));
+  // v2: signing in as a customer always asks first, with the ticket it is for (the riskiest thing an operator does).
+  const [asking, setAsking] = useState<{ userId: string; ticket?: number } | null>(null);
   const [toasts, setToasts] = useState<{ id: number; text: string; out?: boolean; action?: { label: string; run: () => void } }[]>([]);
   const [tick, setTick] = useState(0);
   const [navOpen, setNavOpen] = useState(false);
@@ -126,7 +132,7 @@ export function AdminApp() {
   const load = useCallback(() => get('me').then(setMe, () => setMe('denied')), []);
   useEffect(() => void load(), [load]);
   useEffect(() => {
-    const pop = () => setPath(location.pathname);
+    const pop = () => setPath(v1Path(location.pathname));
     window.addEventListener('popstate', pop);
     return () => window.removeEventListener('popstate', pop);
   }, []);
@@ -156,8 +162,8 @@ export function AdminApp() {
 
   const go = useCallback((to: string) => {
     if (to.startsWith('/admin')) {
-      history.pushState(null, '', to);
-      setPath(to.split('?')[0]);
+      history.pushState(null, '', adminPath(to)); // /admin/v2/… on v2
+      setPath(v1Path(to.split('?')[0]));
       setNavOpen(false);
       document.querySelector('.adm-main')?.scrollTo({ top: 0 });
     } else location.assign(to);
@@ -196,9 +202,11 @@ export function AdminApp() {
     tick,
     bump: () => setTick((n) => n + 1),
     signInAs: (userId, ticket) =>
-      void post('person/signin-as', { userId, ticket })
-        .then(() => location.assign('/'))
-        .catch((e: Error) => toast(e.message)),
+      adminV2
+        ? setAsking({ userId, ticket })
+        : void post('person/signin-as', { userId, ticket })
+            .then(() => location.assign('/'))
+            .catch((e: Error) => toast(e.message)),
   };
   let page: ReactNode;
   if (section === 'tickets') page = a ? <TicketPage id={a} key={a} /> : <Tickets />;
@@ -263,7 +271,7 @@ export function AdminApp() {
                 {g.items.map((it) => (
                   <a
                     key={it.id}
-                    href={`/admin/${it.id}`}
+                    href={adminPath(`/admin/${it.id}`)}
                     className={`adm-nav-item ${section === it.id ? 'on' : ''}`}
                     onClick={(e) => {
                       if (e.metaKey || e.ctrlKey) return;
@@ -302,7 +310,7 @@ export function AdminApp() {
                   ))}
                 </div>
               </Popover>
-              <a className="icon-btn sm" href="/" title={t('Back to the app')} aria-label={t('Back to the app')}>
+              <a className="icon-btn sm" href={appHome} title={t('Back to the app')} aria-label={t('Back to the app')}>
                 <ArrowLeft size={15} />
               </a>
               <button className="icon-btn sm" onClick={() => void signOut()} title={t('Sign out')} aria-label={t('Sign out')}>
@@ -315,6 +323,21 @@ export function AdminApp() {
           {page}
         </main>
         {search && <Palette onClose={() => setSearch(false)} go={go} />}
+        {asking && (
+          <Confirm
+            title={t('Sign in as this person?')}
+            text={asking.ticket ? t('You will see and act as them for up to 12 hours. It is logged with your name and ticket #{n}, and they can see it.', { n: asking.ticket }) : t('You will see and act as them for up to 12 hours. It is logged with your name and the ticket number, and they can see it.')}
+            reason={asking.ticket ? undefined : t('Ticket number this is for (the server asks for it)')}
+            action={t('Sign in as them')}
+            danger
+            onClose={() => setAsking(null)}
+            onConfirm={({ reason }) =>
+              post('person/signin-as', { userId: asking.userId, ticket: asking.ticket ?? (Number(reason.replace(/\D/g, '')) || reason) })
+                .then(() => location.assign(appHome))
+                .catch((e: Error) => (setAsking(null), toast(e.message)))
+            }
+          />
+        )}
         <div className="adm-toasts" role="status" aria-live="polite">
           {toasts.map((tst) => (
             <div key={tst.id} className={`adm-toast ${tst.out ? 'out' : ''}`}>

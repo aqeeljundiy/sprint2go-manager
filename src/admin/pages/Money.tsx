@@ -3,15 +3,16 @@ import { FileText, Plus, RotateCcw, Tag } from 'lucide-react';
 import { Select } from '../../components/ui/Select';
 import { DatePicker } from '../../components/ui/DatePicker';
 import { day, monthName, planLabel, post, rp, rpShort, STATE_LABEL, type CompanyRow } from '../api';
-import { Badge, Bars, Dialog, Empty, Failed, Field, Legend, Loading, MoneyInput, Page, Section, Stat, Stats, Switch, Table, Tabs, useAct, useAdmin, useApi, WHY } from '../ui';
+import { Badge, Bars, Confirm, Dialog, Empty, Failed, Field, Legend, Loading, MoneyInput, Page, Section, Stat, Stats, Switch, Table, Tabs, useAct, useAdmin, useApi, WHY } from '../ui';
 import { StateBadge } from './Companies';
 import { t, tn, tx } from '../../i18n';
 import { fmtNumber } from '../../i18n/format';
+import { adminV2 } from '../../surface';
 
 export function Money({ tab }: { tab: string }) {
   const { go } = useAdmin();
   return (
-    <Page title={tx('nav', 'Money')} sub={t('Booked from plans until payments are connected; bank transfers are marked paid by hand.')}>
+    <Page title={tx('nav', 'Money')} sub={adminV2 ? t('Counted from plans. Bank transfers are marked paid by hand.') : t('Booked from plans until payments are connected; bank transfers are marked paid by hand.')}>
       <Tabs
         value={tab}
         onChange={(id) => go(`/admin/money/${id}`)}
@@ -61,7 +62,15 @@ function Revenue() {
         <Stat label={t('On trial')} value={data.trials.count} hint={t('{amount}/month if all convert', { amount: rpShort(data.trials.after) })} />
         <Stat label={t('Invoiced in {month}', { month: monthName(data.invoiced.month) })} value={rpShort(data.invoiced.total)} hint={t('{amount} paid', { amount: rpShort(data.invoiced.paid) })} tone={data.invoiced.overdue ? 'warn' : undefined} onClick={() => go('/admin/money/invoices')} />
       </Stats>
-      <Section title={t('How monthly revenue moved')} hint={t('From daily snapshots; history starts the day this was switched on')}>
+      {/* v2: revenue is defined once. The card's monthly revenue is the plans booked now; this chart shows that same
+          figure per month (this month = the card), and the movement chart below is called what it is. v1 showed only
+          the movement, so "Nov: Rp 118 rb" under the chart read like a second revenue figure. */}
+      {adminV2 && (
+        <Section title={t('Monthly revenue, month by month')} hint={t('This month: booked today, the same figure as the card')}>
+          <Bars fmt={rpShort} data={data.movement.map((m, i) => ({ label: monthName(m.month), parts: [{ name: t('Monthly revenue'), value: i === data.movement.length - 1 ? data.mrr : m.mrr, tone: 'accent' }] }))} />
+        </Section>
+      )}
+      <Section title={adminV2 ? t('What changed each month') : t('How monthly revenue moved')} hint={adminV2 ? t('New, grown, shrunk and lost monthly revenue, from daily snapshots') : t('From daily snapshots; history starts the day this was switched on')}>
         <Bars
           fmt={rpShort}
           data={data.movement.map((m) => ({
@@ -151,6 +160,9 @@ function Invoices() {
   const { go, may } = useAdmin();
   const { data, error, reload } = useApi<{ invoices: InvoiceRow[] }>('invoices');
   const act = useAct();
+  // v2: emailing invoices to customers asks first, naming how many and the total (the why review).
+  const [sending, setSending] = useState<{ list: InvoiceRow[]; clear: () => void } | null>(null);
+  const send = (list: InvoiceRow[], clear: () => void) => Promise.all(list.map((i) => post('invoice/status', { id: i.id, status: 'sent' }))).then(() => (clear(), reload()));
   if (error) return <Failed error={error} retry={reload} />;
   if (!data) return <Loading rows={6} />;
   const STATUS: Record<InvoiceRow['status'], string> = { draft: t('Draft'), sent: t('Sent'), paid: t('Paid'), void: t('Void') };
@@ -187,7 +199,7 @@ function Invoices() {
           may('billing')
             ? (sel, clear) => (
                 <>
-                  <button className="ghost-btn sm" onClick={() => void Promise.all(sel.filter((i) => i.status === 'draft' || i.status === 'sent').map((i) => post('invoice/status', { id: i.id, status: 'sent' }))).then(() => (clear(), reload()))}>
+                  <button className="ghost-btn sm" onClick={() => { const list = sel.filter((i) => i.status === 'draft' || i.status === 'sent'); if (adminV2) setSending({ list, clear }); else void send(list, clear); }}>
                     {t('Send')}
                   </button>
                   <button className="ghost-btn sm" onClick={() => void Promise.all(sel.filter((i) => i.status !== 'paid' && i.status !== 'void').map((i) => post('invoice/status', { id: i.id, status: 'paid', method: 'bank transfer' }))).then(() => (clear(), reload()))}>
@@ -220,6 +232,15 @@ function Invoices() {
           { key: 'due', label: t('Due'), width: '100px', align: 'right', hide: 'tablet', sort: (i) => i.dueAt, render: (i) => <span className="muted">{i.status === 'paid' ? t('paid {date}', { date: day(i.paidAt) }) : day(i.dueAt)}</span> },
         ]}
       />
+      {sending && (
+        <Confirm
+          title={tn(sending.list.length, 'Email {n} invoice to the customer?', 'Email {n} invoices to the customers?')}
+          text={t('{total} in all. Each company’s owner gets their invoice by email now; it can’t be called back.', { total: rp(sending.list.reduce((n, i) => n + i.total, 0)) })}
+          action={t('Send invoices')}
+          onClose={() => setSending(null)}
+          onConfirm={() => act(() => send(sending.list, sending.clear), tn(sending.list.length, '{n} invoice sent', '{n} invoices sent')).then(() => setSending(null))}
+        />
+      )}
     </Section>
   );
 }
@@ -255,6 +276,10 @@ function Plans() {
   const act = useAct();
   const [draft, setDraft] = useState<{ prices: Prices; addons: Record<string, number>; topUp: number } | null>(null);
   const [newCoupon, setNewCoupon] = useState(false);
+  // v2: changing the live prices always asks first, and says plainly who pays them (every company, on its next invoice).
+  const [asking, setAsking] = useState<'save' | 'reset' | null>(null);
+  const savePrices = () => act(() => post('pricing', draft), t('Prices saved: the app and landing page use them now')).then(pricing.reload);
+  const resetPrices = () => act(() => post('pricing', { reset: true }), t('Back to the default prices')).then(pricing.reload);
   useEffect(() => {
     if (pricing.data) setDraft(JSON.parse(JSON.stringify({ prices: pricing.data.prices, addons: pricing.data.addons, topUp: pricing.data.topUp })));
   }, [pricing.data]);
@@ -273,11 +298,11 @@ function Plans() {
           can && (
             <>
               {pricing.data.overridden && (
-                <button className="ghost-btn sm" onClick={() => void act(() => post('pricing', { reset: true }), t('Back to the default prices')).then(pricing.reload)}>
+                <button className="ghost-btn sm" onClick={() => (adminV2 ? setAsking('reset') : void resetPrices())}>
                   <RotateCcw size={13} /> {t('Defaults')}
                 </button>
               )}
-              <button className="primary-btn sm" disabled={!changed} onClick={() => void act(() => post('pricing', draft), t('Prices saved: the app and landing page use them now')).then(pricing.reload)}>
+              <button className="primary-btn sm" disabled={!changed} onClick={() => (adminV2 ? setAsking('save') : void savePrices())}>
                 {t('Save prices')}
               </button>
             </>
@@ -310,6 +335,24 @@ function Plans() {
             <MoneyInput value={draft.topUp} disabled={!can} onChange={(n) => setDraft((d) => (d ? { ...d, topUp: n } : d))} label={t('AI top-up')} />
           </Field>
         </div>
+        {/* v2: the save sits under the fields it saves too, with who it affects (the why review). */}
+        {adminV2 && can && (
+          <div className="adm-save-row">
+            <small className="muted">{t('Saving changes the landing page and the app at once; every company is billed the new price on its next invoice.')}</small>
+            <button className="primary-btn sm" disabled={!changed} onClick={() => setAsking('save')}>
+              {t('Save prices')}
+            </button>
+          </div>
+        )}
+        {asking && (
+          <Confirm
+            title={asking === 'save' ? t('Change the live prices?') : t('Go back to the default prices?')}
+            text={t('The landing page and the app show the new prices at once, and every company, including those already paying, is billed the new price on its next invoice.')}
+            action={asking === 'save' ? t('Save prices') : t('Use the defaults')}
+            onClose={() => setAsking(null)}
+            onConfirm={() => (asking === 'save' ? savePrices() : resetPrices()).finally(() => setAsking(null))}
+          />
+        )}
       </Section>
       <Section
         title={t('Coupons')}

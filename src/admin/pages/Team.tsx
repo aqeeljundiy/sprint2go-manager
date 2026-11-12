@@ -5,9 +5,13 @@ import { t, tn, tx } from '../../i18n';
 
 import { rel, dateTime, post, PRIORITY_LABEL, ROLE_HINT, ROLE_LABEL, type OpRole } from '../api';
 import { Badge, Confirm, CopyBtn, Dialog, Empty, Failed, Field, Loading, Page, Section, Switch, Table, Tabs, useAct, useAdmin, useApi, Who } from '../ui';
+import { adminV2 } from '../../surface';
+import { Agents } from './Agents';
 
 export function Team({ tab }: { tab: string }) {
-  const { go } = useAdmin();
+  const { go, me } = useAdmin();
+  // v2: owners also get Agent access (tokens for AI agents on /admin/mcp), the same API the kit console used.
+  const agents = adminV2 && me.role === 'owner';
   return (
     <Page title={t('Team & settings')} sub={t('Who runs sprint2go, what they may do, and how the backend behaves.')}>
       <Tabs
@@ -18,10 +22,11 @@ export function Team({ tab }: { tab: string }) {
           { id: 'replies', label: t('Saved replies') },
           { id: 'settings', label: t('Settings') },
           { id: 'audit', label: t('Audit log') },
+          ...(agents ? [{ id: 'agents', label: t('Agent access') }] : []),
         ]}
       />
       <div className="adm-tab-body" key={tab}>
-        {tab === 'replies' ? <Replies /> : tab === 'settings' ? <Settings /> : tab === 'audit' ? <Audit /> : <Operators />}
+        {tab === 'agents' && agents ? <Agents /> : tab === 'replies' ? <Replies /> : tab === 'settings' ? <Settings /> : tab === 'audit' ? <Audit /> : <Operators />}
       </div>
     </Page>
   );

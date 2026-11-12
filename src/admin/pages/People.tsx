@@ -5,6 +5,7 @@ import { rel, dateTime, day, post, ROLE_LABEL, type PersonRow } from '../api';
 import { Badge, Confirm, CopyBtn, Dialog, Empty, Failed, Initials, Loading, Menu, Page, Section, Table, useAct, useAdmin, useApi, Who } from '../ui';
 import { TicketList } from './Tickets';
 import { t, tn, tx } from '../../i18n';
+import { adminV2 } from '../../surface';
 
 /** Someone's role in a company (owner, admin, member), in the console's language; anything else as it is. */
 const roleName = (role: string) => (role === 'owner' ? tx('role', 'owner') : role === 'admin' ? tx('role', 'admin') : role === 'member' ? tx('role', 'member') : role);
@@ -49,7 +50,8 @@ export function People() {
                 color={p.color}
                 badges={
                   <>
-                    {p.operator && <Badge tone="accent">{ROLE_LABEL[p.operator]}</Badge>}
+                    {/* v2: "Operator" (the role word "Owner" read like the company's owner in the next column) */}
+                    {p.operator && <Badge tone="accent">{adminV2 ? t('Operator') : ROLE_LABEL[p.operator]}</Badge>}
                     {p.suspended && <Badge tone="bad">{t('Suspended')}</Badge>}
                     {p.disposable && <Badge tone="warn">{t('Throwaway')}</Badge>}
                   </>
@@ -63,9 +65,9 @@ export function People() {
             width: 'minmax(0, 2fr)',
             hide: 'phone',
             sort: (p) => p.companies.length,
-            render: (p) => <span className="adm-ellipsis">{p.companies.length ? p.companies.map((c) => `${c.name} (${roleName(c.role)})`).join(', ') : p.guestOf.length ? <span className="muted">{t('Guest of {companies}', { companies: p.guestOf.join(', ') })}</span> : <span className="muted">{t('nowhere')}</span>}</span>,
+            render: (p) => <span className={adminV2 ? 'adm-wrap' : 'adm-ellipsis'}>{p.companies.length ? p.companies.map((c) => `${c.name} (${roleName(c.role)})`).join(', ') : p.guestOf.length ? <span className="muted">{t('Guest of {companies}', { companies: p.guestOf.join(', ') })}</span> : <span className="muted">{t('nowhere')}</span>}</span>,
           },
-          { key: 'seen', label: t('Last seen'), width: '120px', align: 'right', sort: (p) => p.lastSeen ?? '', render: (p) => <span className="muted">{!p.hasLogin ? t('never signed in') : p.lastSeen ? rel(p.lastSeen) : t('not yet')}</span> },
+          { key: 'seen', label: t('Last seen'), width: '120px', align: 'right', sort: (p) => p.lastSeen ?? '', render: (p) => <span className="muted">{!p.hasLogin ? t('never signed in') : p.lastSeen ? rel(p.lastSeen) : adminV2 ? t('never signed in') : t('not yet')}</span> },
         ]}
       />
     </Page>
@@ -135,7 +137,7 @@ export function PersonPage({ id }: { id: string }) {
       actions={
         !u.deleted && (
           <>
-            {may('impersonate') && !u.suspended && (
+            {may('impersonate') && !u.suspended && !adminV2 && (
               <button className="primary-btn sm" onClick={() => signInAs(u.id)}>
                 <LogIn size={13} /> {t('Sign in as {name}', { name: first })}
               </button>
@@ -143,6 +145,7 @@ export function PersonPage({ id }: { id: string }) {
             <Menu
               label={t('More')}
               items={[
+                adminV2 && may('impersonate') && !u.suspended && { label: t('Sign in as {name}…', { name: first }), run: () => signInAs(u.id), hint: t('Asks for the ticket first, and is logged') },
                 may('impersonate') &&
                   (u.hasLogin
                     ? { label: t('Give a reset code'), run: () => void post<{ code: string }>('person/reset-code', { userId: u.id }).then((r) => setShown({ kind: 'code', value: r.code })).catch((e: Error) => toast(e.message)) }

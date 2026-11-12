@@ -11,6 +11,15 @@ import { TicketList } from './Tickets';
 import { t, tn, tx } from '../../i18n';
 import { tj } from '../../i18n/tj';
 import { fmtDate, fmtNumber } from '../../i18n/format';
+import { adminV2 } from '../../surface';
+import { GRACE_DAYS, isNewCompany } from '../kit/rules';
+
+/** v2: "At risk" waits for a company's first week (GRACE_DAYS); before that it's "Not started yet". v1 counts it at once. */
+const atRisk = (c: CompanyRow) => !c.internal && c.health.label === 'risk' && c.state !== 'free' && !(adminV2 && isNewCompany(c));
+/** The health pill, or on v2 "Not started yet" for a company in its first week. */
+function Health({ c }: { c: CompanyRow }) {
+  return adminV2 && isNewCompany(c) ? <Badge tone="neutral">{t('Not started yet')}</Badge> : <HealthPill h={c.health} />;
+}
 
 export const STATE_TONE: Record<State, 'good' | 'accent' | 'warn' | 'bad' | 'neutral' | 'info'> = { paying: 'good', trial: 'accent', comp: 'info', paused: 'warn', suspended: 'bad', free: 'neutral', unlimited: 'info' };
 export function StateBadge({ s }: { s: State }) {
@@ -47,7 +56,7 @@ export function Companies() {
   const rows = data.companies;
   const real = rows.filter((c) => !c.internal);
   const paying = real.filter((c) => c.state === 'paying').length;
-  const risk = real.filter((c) => c.health.label === 'risk').length;
+  const risk = adminV2 ? real.filter(atRisk).length : real.filter((c) => c.health.label === 'risk').length;
   return (
     <Page
       title={t('Companies')}
@@ -72,12 +81,13 @@ export function Companies() {
           { id: 'paying', label: STATE_LABEL.paying, test: (c) => !c.internal && c.state === 'paying' },
           { id: 'trial', label: t('On trial'), test: (c) => !c.internal && c.state === 'trial' },
           { id: 'ending', label: t('Trial ending'), test: (c) => !c.internal && c.state === 'trial' && !!c.plan?.trialEnds && c.plan.trialEnds < soon() },
-          { id: 'risk', label: t('At risk'), test: (c) => !c.internal && c.health.label === 'risk' && c.state !== 'free' },
+          { id: 'risk', label: t('At risk'), test: atRisk },
+          ...(adminV2 ? [{ id: 'new', label: t('Not started yet'), test: (c: CompanyRow) => !c.internal && isNewCompany(c) }] : []),
           { id: 'unlimited', label: STATE_LABEL.unlimited, test: (c) => c.state === 'unlimited' },
           { id: 'suspended', label: STATE_LABEL.suspended, test: (c) => !!c.suspended },
           { id: 'internal', label: t('Ours & tests'), test: (c) => c.internal },
         ]}
-        empty={{ title: t('No companies here'), text: t('A company appears when someone finishes signing up, or when you create one.') }}
+        empty={adminV2 ? { title: t('No companies here'), text: t('A company appears when someone finishes signing up, or when you create one. New companies count as "Not started yet" for their first {n} days, not "At risk".', { n: GRACE_DAYS }) } : { title: t('No companies here'), text: t('A company appears when someone finishes signing up, or when you create one.') }}
         bulk={(sel, clear) => (
           <>
             {may('customers') && (
@@ -114,7 +124,7 @@ export function Companies() {
               </span>
             ),
           },
-          { key: 'health', label: t('Health'), width: '110px', align: 'right', sort: (c) => c.health.score, render: (c) => <HealthPill h={c.health} /> },
+          { key: 'health', label: t('Health'), width: '110px', align: 'right', sort: (c) => c.health.score, render: (c) => <Health c={c} /> },
           {
             key: 'plan',
             label: t('Plan'),
@@ -347,7 +357,7 @@ export function CompanyPage({ id, tab }: { id: string; tab: string }) {
       sub={
         <span className="adm-head-badges">
           <StateBadge s={c.state} />
-          <HealthPill h={c.health} />
+          {adminV2 && isNewCompany(c) ? <Badge tone="neutral">{t('Not started yet')}</Badge> : <HealthPill h={c.health} />}
           {c.internal && <Badge tone="info">{c.home ? t('Our own company') : t('Ours or test')}</Badge>}
           <span className="muted">
             {[planLabel(c.plan), tn(c.people, '{n} person', '{n} people'), c.since ? t('since {date}', { date: day(c.since) }) : '', c.lastActive ? t('active {when}', { when: rel(c.lastActive) }) : t('never active')].filter(Boolean).join(', ')}
@@ -356,7 +366,7 @@ export function CompanyPage({ id, tab }: { id: string; tab: string }) {
       }
       actions={
         <>
-          {owner && may('impersonate') && (
+          {owner && may('impersonate') && !adminV2 && (
             <button className="ghost-btn sm" onClick={() => signInAs(owner.id)}>
               <LogIn size={13} /> {t('Sign in as owner')}
             </button>
@@ -364,6 +374,7 @@ export function CompanyPage({ id, tab }: { id: string; tab: string }) {
           <Menu
             label={t('More')}
             items={[
+              adminV2 && !!owner && may('impersonate') && { label: t('Sign in as the owner…'), run: () => signInAs(owner!.id), hint: t('Asks for the ticket first, and is logged') },
               may('customers') && (c.suspended ? { label: t('Lift the suspension'), run: () => void act(() => post('company/suspend', { id, on: false }), t('Suspension lifted')) } : { label: t('Suspend'), run: () => setConfirm('suspend'), hint: t('Read-only, with a reason they see') }),
               may('customers') && { label: c.internal ? t('Count as a customer') : t('Mark as ours or test'), run: () => void act(() => post('company/internal', { id, on: !c.internal }), c.internal ? t('Counted again') : t('Left out of the numbers')), hint: t('Leaves it out of revenue and growth') },
               may('customers') && { label: t('Export its data'), run: () => location.assign(`/api/admin/company/export?id=${encodeURIComponent(id)}`), hint: t('Everything, as JSON') },
@@ -688,9 +699,9 @@ function UnlimitedTab({ c }: { c: Full }) {
   return (
     <Section title={t('Plan')}>
       <div className="adm-banner note">
-        <span>{t('{company} is on the Whitelist: every feature, no plan limits and no invoices. Its monthly limits for AI and Boosted sending are set there.', { company: c.name })}</span>
+        <span>{adminV2 ? t('{company} is Unlimited: every feature, no plan limits and no invoices. Its monthly limits for AI and Boosted sending are set under Unlimited.', { company: c.name }) : t('{company} is on the Whitelist: every feature, no plan limits and no invoices. Its monthly limits for AI and Boosted sending are set there.', { company: c.name })}</span>
         <button type="button" className="ghost-btn sm" onClick={() => go('/admin/whitelist')}>
-          {t('Open the Whitelist')}
+          {adminV2 ? t('Open Unlimited') : t('Open the Whitelist')}
         </button>
       </div>
     </Section>
