@@ -26,7 +26,7 @@ const files = [];
   for (const f of readdirSync(dir)) {
     const p = join(dir, f);
     if (statSync(p).isDirectory()) { if (f !== 'landing') walk(p); }
-    else if (f.endsWith('.css') && f !== 'tokens.css') files.push(p);
+    else if (f.endsWith('.css') && f !== 'tokens.css' && f !== 'v2-scale.css') files.push(p); // v2-scale.css: a generated copy of v1's rules (scripts/v2-scale.mjs)
   }
 })(SRC);
 
