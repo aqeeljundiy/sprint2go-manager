@@ -10764,6 +10764,150 @@
       "detail": "Proof: r2-tables-row.png: 'Komentar' now uses the 15/600 heading, with 'Belum ada komentar' under it (an existing i18n key) Files: src/mobile/tables.css, src/components/tables/RecordDrawer.tsx",
       "priority": "high",
       "status": "done"
+    },
+    {
+      "id": "IN-13nov-1",
+      "round": "Inbox",
+      "area": "ui",
+      "title": "Selected menu item: light mode should match dark",
+      "detail": "The selector in dark mode is better. In light mode the selected menu has a drop shadow but does not fill everything out. Light and dark mode need consistency. Screenshots: admin-kit-reviews/sprint2go-manager/feedback-13nov/01 (dark) vs 02 (light)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "IN-13nov-2",
+      "round": "Inbox",
+      "area": "ai",
+      "title": "Ask AI panel cannot be resized",
+      "detail": "Ask AI, I could not resize it. Things must be flexible: open from the side, or as a pop-up. Screenshots: admin-kit-reviews/sprint2go-manager/feedback-13nov/03",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "IN-13nov-3",
+      "round": "Inbox",
+      "area": "tasks",
+      "title": "Brain dump: typing area does not feel like a field",
+      "detail": "The part where I type does not feel like a field because there is other text around it; it does not feel perfect. Nice that I can scale it. Screenshots: admin-kit-reviews/sprint2go-manager/feedback-13nov/04",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "IN-13nov-4",
+      "round": "Inbox",
+      "area": "admin",
+      "title": "app.sprint2go.com = my personal workspaces only (internal)",
+      "detail": "After thinking about it, app.sprint2go.com is only for my personal workspaces. Make it internal.",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "IN-13nov-5",
+      "round": "Inbox",
+      "area": "admin",
+      "title": "/admin: AI subscriptions via OAuth (Claude, GPT...) with priority, per workspace",
+      "detail": "On /admin: use OAuth of Claude, GPT or whatever, similar to aqeelOS, with priority mode like aqeelOS. Choose which workspace gets which subscription for AI and TTS, so I can use many Claude/GPT subscriptions across many workspaces.",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "IN-13nov-6",
+      "round": "Inbox",
+      "area": "ai",
+      "title": "TTS: maybe Parakeet on the VPS?",
+      "detail": "For TTS maybe Parakeet, if the VPS is strong enough; an option, or maybe not.",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "IN-13nov-7",
+      "round": "Inbox",
+      "area": "chat",
+      "title": "Chat thread panel cannot be resized",
+      "detail": "In chat, open a topic, go to the thread menu: I could not resize it. That is a bummer. It has to be flexible. Screenshots: admin-kit-reviews/sprint2go-manager/feedback-13nov/05",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "IN-13nov-8",
+      "round": "Inbox",
+      "area": "tables",
+      "title": "Tables: square inside a square when editing a cell",
+      "detail": "On the Title cell there is a square inside a square. The Stage picker is good. Take a lot from Notion and how it works. Screenshots: admin-kit-reviews/sprint2go-manager/feedback-13nov/06 (bad) and 07 (good)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "IN-13nov-9",
+      "round": "Inbox",
+      "area": "calendar",
+      "title": "Event / Task switch: small gap in the label",
+      "detail": "There is a menu label thing with a small gap. Not sure if intended. Screenshots: admin-kit-reviews/sprint2go-manager/feedback-13nov/08",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "IN-13nov-10",
+      "round": "Inbox",
+      "area": "notes",
+      "title": "Notes: width unclear; should work like Notion blocks",
+      "detail": "Cannot tell the width etc. Could be better. In Notion you can move lines; every line is its own layer/block of data. That is how Notion works. Screenshots: admin-kit-reviews/sprint2go-manager/feedback-13nov/09",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "IN-13nov-11",
+      "round": "Inbox",
+      "area": "meetings",
+      "title": "Meetings must actually work",
+      "detail": "Meetings: I really want it to function, but for now it is not working yet.",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "IN-13nov-12",
+      "round": "Inbox",
+      "area": "mail",
+      "title": "Inbox: Primary / Promotions / Social / Updates too wide",
+      "detail": "The category tabs are too wide. Screenshots: admin-kit-reviews/sprint2go-manager/feedback-13nov/10",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "IN-13nov-13",
+      "round": "Inbox",
+      "area": "mail",
+      "title": "Inbox should feel like Gmail: not full width, easier to digest",
+      "detail": "When I open email, Gmail feels easier to digest, I guess because it does not force the whole width. Screenshots: admin-kit-reviews/sprint2go-manager/feedback-13nov/11 (Gmail)",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "IN-13nov-14",
+      "round": "Inbox",
+      "area": "mail",
+      "title": "Mail: an \"All inboxes\" view without any filter",
+      "detail": "I have a lot of emails and inboxes. It is already filtered by primary, promotion, social, update, but what about all inboxes without any filters? That is important.",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "IN-13nov-15",
+      "round": "Inbox",
+      "area": "ideas",
+      "title": "Come up with a few initiatives",
+      "detail": "Maybe you could come up with a few initiatives as well. That would be cool.",
+      "priority": "high",
+      "status": "todo"
+    },
+    {
+      "id": "IN-13nov-16",
+      "round": "Inbox",
+      "area": "admin",
+      "title": "Install Amazon SES on the backend",
+      "detail": "After that, I want to install Amazon SES on the backend.",
+      "priority": "high",
+      "status": "todo"
     }
   ]
 }
