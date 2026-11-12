@@ -288,3 +288,21 @@
   box-shadow: none;
   background: transparent;
 }
+
+/* ---------- Event / Task switch: no gap round the chosen side (IN-13nov-9) ----------
+   The chosen side was a light tint inside a grey track, 2 px in from its edge, so a thin grey gap ran round it. The
+   switch now has no track: the chosen side is the tinted pill, like the tabs in Chat and Tables, and still slides. */
+:root.s2v2 .segmented.ev-kind,
+:root.s2v2 .segmented.qc-kind {
+  background: transparent;
+  padding: 0;
+  gap: 4px;
+}
+:root.s2v2 .segmented.ev-kind > button:not(.on):hover,
+:root.s2v2 .segmented.qc-kind > button:not(.on):hover {
+  background: var(--hover);
+}
+:root.s2v2 .segmented.ev-kind > button,
+:root.s2v2 .segmented.qc-kind > button {
+  min-height: 32px;
+}
