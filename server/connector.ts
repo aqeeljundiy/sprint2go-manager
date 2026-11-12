@@ -1,3 +1,4 @@
+// ak-allow: own-mcp the customer app's connector at /mcp: each person signs in with OAuth (PKCE) and sees only their own data (docs/connector.md); the operator console's agent access is server/opmcp.
 // The sprint2go connector: people add sprint2go to Claude (Settings, Connectors, Add custom connector), ChatGPT and
 // other apps that speak MCP. The AI runs on their own plan; sprint2go only answers.
 //  - /mcp: the MCP server (Streamable HTTP, one request at a time, no sessions kept here). Tools: server/mcpTools.ts.

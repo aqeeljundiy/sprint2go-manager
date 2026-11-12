@@ -22,4 +22,5 @@ export const access = createAgentAccess({
     db.audit(e.who, e.action, targetOf(e.target), `${titles.get(tool) || tool}${e.ok ? '' : ' (failed)'}${e.target && e.target !== '{}' ? ' ' + e.target : ''}`);
   },
   limits: { perMinute: 60, perDay: 2000 },
+  settingsPath: 'Team › Agent access',
 });

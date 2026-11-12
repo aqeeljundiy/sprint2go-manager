@@ -19,7 +19,7 @@ import { dirname } from 'node:path';
 import { z } from 'zod';
 
 export { z };
-export const AK_MCP_VERSION = '0.25.0';
+export const AK_MCP_VERSION = '0.26.0';
 
 const TOKEN_RE = /^akt_([a-f0-9]{12})_([A-Za-z0-9_-]{32})$/;
 const KINDS = ['read', 'write', 'send'];
@@ -66,8 +66,9 @@ function validate(tools) {
  * @param {(e:{who:string, agentId:string, action:string, target:string, ok:boolean, ms:number}) => any} o.audit
  *        writes one row into the backend's own activity log; called for every tool call and token change
  * @param {{perMinute?:number, perDay?:number, badAuthPer15m?:number}} [o.limits]
+ * @param {string} [o.settingsPath]           where the owner makes tokens, named in the signed-out answer
  */
-export function createAgentAccess({ site, tools, store, audit, limits = {} }) {
+export function createAgentAccess({ site, tools, store, audit, limits = {}, settingsPath = 'Settings › Agent access' }) {
   if (!site || !Array.isArray(tools) || !store || typeof audit !== 'function') throw new Error('ak-mcp: createAgentAccess needs site, tools, store and audit');
   validate(tools);
   const perMinute = limits.perMinute ?? 60, perDay = limits.perDay ?? 2000, badAuth = limits.badAuthPer15m ?? 20;
@@ -76,8 +77,13 @@ export function createAgentAccess({ site, tools, store, audit, limits = {} }) {
   const log = async (e) => { try { await audit(e); } catch (err) { console.error('[ak-mcp] audit failed', err); } };
 
   // ---- tokens ----
-  let cache = null;
-  const load = async () => (cache ??= await store.load());
+  // Tokens are cached, and read again when an unknown id arrives (at most twice a second): a token made in another copy of
+  // this module (Next.js route bundles, several server processes) works at once without a restart.
+  let cache = null, readAt = 0;
+  const load = async (fresh = false) => {
+    if (!cache || fresh === 'now' || (fresh && Date.now() - readAt > 500)) { cache = await store.load(); readAt = Date.now(); }
+    return cache;
+  };
   const persist = async (list) => { cache = list; await store.save(list); };
   const safe = (t) => ({ id: t.id, name: t.name, scopes: t.scopes, hint: `akt_${t.id}_…`, createdAt: t.createdAt, createdBy: t.createdBy, lastUsedAt: t.lastUsedAt || null, uses: t.uses || 0, revokedAt: t.revokedAt || null, revokedBy: t.revokedBy || null });
   const cleanScopes = (scopes) => [...new Set((Array.isArray(scopes) ? scopes : ['read']).filter((s) => s === 'read' || writeNames.includes(s)))];
@@ -85,7 +91,9 @@ export function createAgentAccess({ site, tools, store, audit, limits = {} }) {
   async function verify(raw) {
     const m = TOKEN_RE.exec(raw || '');
     if (!m) return null;
-    const t = (await load()).find((x) => x.id === m[1]);
+    // Read again every 30 s at most, so a revoke made by another server copy takes effect within half a minute.
+    let t = (await load(Date.now() - readAt > 30e3 ? 'now' : false)).find((x) => x.id === m[1]);
+    if (!t) t = (await load(true)).find((x) => x.id === m[1]);
     if (!t || t.revokedAt) return null;
     const a = Buffer.from(sha(m[2]), 'hex'), b = Buffer.from(t.hash, 'hex');
     return a.length === b.length && timingSafeEqual(a, b) ? t : null;
@@ -96,7 +104,12 @@ export function createAgentAccess({ site, tools, store, audit, limits = {} }) {
     t.lastUsedAt = now();
     if (from) t.lastUsedFrom = from.slice(0, 64);
     // A busy agent must not rewrite the file on every call: at most once a minute per token.
-    if (Date.now() - (lastWrite.get(t.id) || 0) > 60e3) { lastWrite.set(t.id, Date.now()); await persist(cache); }
+    if (Date.now() - (lastWrite.get(t.id) || 0) > 60e3) {
+      lastWrite.set(t.id, Date.now());
+      // Save on top of the latest list, so a token made or revoked elsewhere in the meantime is kept.
+      const list = await load('now'), cur = list.find((x) => x.id === t.id);
+      if (cur) { cur.uses = Math.max(cur.uses || 0, t.uses); cur.lastUsedAt = t.lastUsedAt; cur.lastUsedFrom = t.lastUsedFrom; await persist(list); }
+    }
   }
 
   // ---- rate limits (in memory, per process) ----
@@ -144,12 +157,14 @@ export function createAgentAccess({ site, tools, store, audit, limits = {} }) {
     if ([...url.searchParams.keys()].some((k) => /token|key|secret|auth|bearer|password/i.test(k)))
       return rpcError(400, -32600, 'Never put a token in the address. Send it as the header  Authorization: Bearer <token>');
     const ip = (request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'local').split(',')[0].trim();
-    if (failedTooOften(ip)) return rpcError(429, -32000, 'Too many failed attempts. Wait 15 minutes.', { 'retry-after': '900' });
     const m = /^Bearer\s+(\S+)$/i.exec(request.headers.get('authorization') || '');
     const token = m ? await verify(m[1]) : null;
+    // A valid token always gets in: the failed-try limit only stops guessing, so it never locks out a real agent
+    // (behind a proxy that hides addresses, every caller shares one address).
     if (!token) {
+      if (failedTooOften(ip)) return rpcError(429, -32000, 'Too many failed attempts. Wait 15 minutes.', { 'retry-after': '900' });
       failed(ip);
-      return rpcError(401, -32001, `Signed out. Ask the owner of ${site} for an agent token (Settings › Agent access) and send it as  Authorization: Bearer <token>`, { 'www-authenticate': `Bearer realm="${site} agent access"` });
+      return rpcError(401, -32001, `Signed out. Ask the owner of ${site} for an agent token (${settingsPath}) and send it as  Authorization: Bearer <token>`, { 'www-authenticate': `Bearer realm="${site} agent access"` });
     }
     if (request.method !== 'POST') return rpcError(405, -32000, 'This server is stateless: send JSON-RPC with POST.', { allow: 'POST' });
     const wait = limited(token.id);
@@ -183,7 +198,7 @@ export function createAgentAccess({ site, tools, store, audit, limits = {} }) {
   async function stdio({ token = process.env.AK_MCP_TOKEN } = {}) {
     const { StdioServerTransport } = await import('@modelcontextprotocol/sdk/server/stdio.js');
     const t = await verify(token);
-    if (!t) { console.error(`[ak-mcp] Signed out: set AK_MCP_TOKEN to a token from ${site} Settings › Agent access.`); process.exit(1); }
+    if (!t) { console.error(`[ak-mcp] Signed out: set AK_MCP_TOKEN to a token from ${site} ${settingsPath}.`); process.exit(1); }
     const server = serverFor(t);
     await touch(t, 'stdio');
     await server.connect(new StdioServerTransport());
@@ -197,12 +212,12 @@ export function createAgentAccess({ site, tools, store, audit, limits = {} }) {
     if (!name) throw new Error('Give the token a name, for example the agent that will use it.');
     const id = randomBytes(6).toString('hex'), secret = randomBytes(24).toString('base64url');
     const rec = { id, name, scopes: cleanScopes(scopes), hash: sha(secret), createdAt: now(), createdBy: by || '', lastUsedAt: null, uses: 0, revokedAt: null };
-    await persist([...(await load()), rec]);
+    await persist([...(await load('now')), rec]);
     await log({ who: by || '', agentId: id, action: 'mcp.token.create', target: `${name} (${rec.scopes.join(', ')})`, ok: true, ms: 0 });
     return { token: `akt_${id}_${secret}`, record: safe(rec) };
   }
   async function update(id, patch, by) {
-    const list = await load(), t = list.find((x) => x.id === id);
+    const list = await load('now'), t = list.find((x) => x.id === id);
     if (!t) throw new Error('No such token.');
     if (t.revokedAt) throw new Error('This token is revoked. Make a new one instead.');
     if (patch.name !== undefined) t.name = String(patch.name).trim().slice(0, 60) || t.name;
@@ -213,7 +228,7 @@ export function createAgentAccess({ site, tools, store, audit, limits = {} }) {
   }
   // Revoked tokens stay in the list (who, when) and never work again: a leaked token must not come back.
   async function revoke(id, by) {
-    const list = await load(), t = list.find((x) => x.id === id);
+    const list = await load('now'), t = list.find((x) => x.id === id);
     if (!t) throw new Error('No such token.');
     if (!t.revokedAt) { t.revokedAt = now(); t.revokedBy = by || ''; await persist(list); }
     await log({ who: by || '', agentId: id, action: 'mcp.token.revoke', target: t.name, ok: true, ms: 0 });
