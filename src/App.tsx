@@ -220,7 +220,8 @@ type ViewCtx = { me?: string; todo?: Set<string>; projectOf?: (t: Thread) => str
 function inView(t: Thread, v: View, ctx: ViewCtx = {}): boolean {
   if (v.kind === 'tracking' || v.kind === 'files') return false;
   // Inbox tabs (mail/sortPrefs.ts): the inbox is Primary when tabs are on; each tab is its own part of the inbox.
-  if (v.kind === 'category') return inView(t, { kind: 'folder', id: 'inbox' }) && tabOf(t, ctx.tabs ?? []) === v.id;
+  // 'all' (v2): the whole inbox, every tab together.
+  if (v.kind === 'category') return inView(t, { kind: 'folder', id: 'inbox' }) && (v.id === 'all' || tabOf(t, ctx.tabs ?? []) === v.id);
   if (v.kind === 'folder' && v.id === 'inbox' && (ctx.tabs?.length ?? 0) > 1 && tabOf(t, ctx.tabs!) !== 'primary') return false;
   const kept = t.location !== 'trash' && t.location !== 'spam';
   if (v.kind === 'todos') return kept && !!ctx.todo?.has(t.id);
@@ -3814,7 +3815,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
 
   /* ---------------- Render ---------------- */
 
-  const title = mode === 'mail' && parsedQuery ? t('Search results') : view.kind === 'category' ? categoryName(view.id) : view.kind === 'contacts' ? t('Contacts') : view.kind === 'folder' ? folderName(view.id) : view.kind === 'tracking' ? t('Waiting for reply') : view.kind === 'files' ? t('Files') : view.kind === 'todos' ? t('To-do') : view.kind === 'project' ? (wsClientsAll.find((c) => c.id === view.id)?.name ?? term.one) : organize.labelTitle(view.id);
+  const title = mode === 'mail' && parsedQuery ? t('Search results') : view.kind === 'category' ? (view.id === 'all' ? t('All mail in the inbox') : categoryName(view.id)) : view.kind === 'contacts' ? t('Contacts') : view.kind === 'folder' ? folderName(view.id) : view.kind === 'tracking' ? t('Waiting for reply') : view.kind === 'files' ? t('Files') : view.kind === 'todos' ? t('To-do') : view.kind === 'project' ? (wsClientsAll.find((c) => c.id === view.id)?.name ?? term.one) : organize.labelTitle(view.id);
   const appMode = mode === 'settings' ? lastMode : mode;
 
   /** Each app's gear: Settings at that app's section (only sections this person can use). */

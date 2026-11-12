@@ -306,3 +306,86 @@
 :root.s2v2 .segmented.qc-kind > button {
   min-height: 32px;
 }
+
+/* ---------- Inbox (IN-13nov-12, 13, 14) ----------
+   Tabs as wide as their words, not a quarter of the page each. A narrow list scrolls them sideways instead of
+   cutting a word; very narrow lists keep v1's icons-only tabs. */
+:root.s2v2 .list-pane .mail-tabs {
+  justify-content: flex-start;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+:root.s2v2 .list-pane .mail-tabs::-webkit-scrollbar {
+  display: none;
+}
+:root.s2v2 .list-pane .mail-tabs > button {
+  flex: 0 0 auto;
+  padding: 0 12px;
+}
+/* Icons only when the list has room for them; a split-view list fits all five names. */
+@container (min-width: 560px) {
+  :root.s2v2 .list-pane .mail-tabs > button > svg {
+    display: block;
+  }
+}
+:root.s2v2 .list-pane .mail-tabs > button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+@container (max-width: 380px) {
+  :root.s2v2 .list-pane .mail-tabs > button {
+    padding: 0 10px;
+  }
+}
+
+/* Reading width, like Gmail: an open email reads in a column of about 75 characters' room (860 px), not across a
+   2000 px screen; the actions bar above it still spans the pane. */
+:root.s2v2 .reader-in {
+  max-width: 860px;
+}
+
+/* The list on a wide screen (nothing open beside it): one line per email, Gmail's way. Sender, subject, the start
+   of the email and the date sit on one line, so the eye runs down a column instead of across a stretched card.
+   The chips (who handles it, the project) and attachments go on a second line only when an email has them. */
+@media (min-width: 1200px) {
+  :root.s2v2 .mail-view:not(:has(.reader:not(.reader-empty))) .list-pane .row-main {
+    display: grid;
+    grid-template-columns: minmax(140px, 200px) fit-content(50%) minmax(0, 1fr) auto;
+    column-gap: 12px;
+    align-items: center;
+  }
+  :root.s2v2 .mail-view:not(:has(.reader:not(.reader-empty))) .list-pane .row-top {
+    display: contents;
+  }
+  :root.s2v2 .mail-view:not(:has(.reader:not(.reader-empty))) .list-pane .row-from {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+  }
+  :root.s2v2 .mail-view:not(:has(.reader:not(.reader-empty))) .list-pane .row-subject {
+    grid-column: 2;
+    grid-row: 1;
+    margin-top: 0;
+  }
+  :root.s2v2 .mail-view:not(:has(.reader:not(.reader-empty))) .list-pane .row-snippet {
+    grid-column: 3;
+    grid-row: 1;
+    margin-top: 0;
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  :root.s2v2 .mail-view:not(:has(.reader:not(.reader-empty))) .list-pane .row-date {
+    grid-column: 4;
+    grid-row: 1;
+  }
+  :root.s2v2 .mail-view:not(:has(.reader:not(.reader-empty))) .list-pane .row-main > :not(.row-top, .row-subject, .row-snippet) {
+    grid-column: 2 / 5;
+  }
+  :root.s2v2 .mail-view:not(:has(.reader:not(.reader-empty))) .list-pane .row-meta:empty {
+    display: none;
+  }
+}

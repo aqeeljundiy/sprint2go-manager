@@ -2,7 +2,7 @@
 // the inbox tabs (desktop) and their rows on phones, multiple inboxes, the Spam and Trash notice, the Important
 // marker, and the inbox settings (desktop and phone). The logic is in ./sorting.ts and src/mailQuery.ts.
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Bookmark, ChevronRight, Inbox, Info, ListFilter, MessagesSquare, Plus, Search, SlidersHorizontal, Tag, Trash2, Users, X, type LucideIcon } from 'lucide-react';
+import { Bookmark, ChevronRight, Inbox, Info, Layers, ListFilter, MessagesSquare, Plus, Search, SlidersHorizontal, Tag, Trash2, Users, X, type LucideIcon } from 'lucide-react';
 import type { Thread } from '../../types';
 import { CATEGORIES, EMPTY_FORM, formToQuery, hasTerm, queryToForm, toggleTerm, type Category, type SearchForm } from '../../mailQuery';
 import { Sheet } from '../ui/Sheet';
@@ -16,6 +16,10 @@ import { lastMessage, listDate, participants } from '../../utils';
 import type { Person } from '../../types';
 import { CATEGORY_HINT, categoryName, deleteForever, newId, ruleFromSearch, tabOf, tabsOn, useMailPrefs, type Advance, type InboxType, type SavedSearch } from './sortPrefs';
 import { t, tn } from '../../i18n';
+import { teamV2 } from '../../surface';
+
+/** A tab of the inbox: a category, or (v2) 'all', the whole inbox with no tab filter. */
+export type InboxTab = Category | 'all';
 
 export const CATEGORY_ICON: Record<Category, LucideIcon> = { primary: Inbox, promotions: Tag, social: Users, updates: Info, forums: MessagesSquare };
 
@@ -248,7 +252,7 @@ function tabNews(threads: Thread[], c: Category, on: Category[]) {
 }
 
 /** The inbox's tabs on desktop (Primary, Promotions, Social, Updates, Forums, the ones switched on). */
-export function InboxTabs({ inbox, current, onPick }: { inbox: Thread[]; current: Category; onPick: (c: Category) => void }) {
+export function InboxTabs({ inbox, current, onPick }: { inbox: Thread[]; current: InboxTab; onPick: (c: InboxTab) => void }) {
   const [prefs, update] = useMailPrefs();
   const on = tabsOn(prefs);
   // Right-click the bar (long-press on touch): hide a tab, bring one back, or turn tabs off, like Gmail's labels.
@@ -267,6 +271,13 @@ export function InboxTabs({ inbox, current, onPick }: { inbox: Thread[]; current
   return (
     <>
     <div className="cs-tabs mail-tabs" role="tablist" aria-label={t('Inbox tabs')} {...menu.bind} onContextMenu={onContext}>
+      {/* v2: everything in the inbox at once, no tab filter (owner, 13 Nov: "what about all inboxes without any filters?"). */}
+      {teamV2 && (
+        <button type="button" role="tab" data-tab="all" aria-selected={current === 'all'} className={current === 'all' ? 'on' : ''} onClick={() => onPick('all')} title={t('Everything in the inbox, every tab together')}>
+          <Layers size={15} />
+          <span className="mail-tab-name">{t('All')}</span>
+        </button>
+      )}
       {on.map((c) => {
         const Icon = CATEGORY_ICON[c];
         const news = c === 'primary' ? null : tabNews(inbox, c, on);
@@ -315,12 +326,18 @@ export function TabRows({ inbox, onPick }: { inbox: Thread[]; onPick: (c: Catego
 }
 
 /** The tabs in the phone drawer, under the inbox. */
-export function TabNav({ current, inbox, onPick }: { current: Category | null; inbox: Thread[]; onPick: (c: Category) => void }) {
+export function TabNav({ current, inbox, onPick }: { current: InboxTab | null; inbox: Thread[]; onPick: (c: InboxTab) => void }) {
   const [prefs] = useMailPrefs();
   const on = tabsOn(prefs);
   if (on.length < 2) return null;
   return (
     <>
+      {teamV2 && (
+        <button type="button" className={`gm-nav${current === 'all' ? ' active' : ''}`} aria-current={current === 'all' || undefined} onClick={() => onPick('all')}>
+          <Layers size={20} />
+          <span className="gm-nav-label">{t('All mail in the inbox')}</span>
+        </button>
+      )}
       {on
         .filter((c) => c !== 'primary')
         .map((c) => {

@@ -8,7 +8,7 @@ export type FolderId = 'inbox' | 'all' | 'starred' | 'sent' | 'drafts' | 'archiv
 /** Where a thread physically lives. "starred" and "sent" are views, not locations. */
 export type Location = 'inbox' | 'drafts' | 'archive' | 'spam' | 'trash';
 
-export type View = { kind: 'folder'; id: FolderId } | { kind: 'label'; id: string } | { kind: 'tracking'; id: 'tracking' } | { kind: 'todos'; id: 'todos' } | { kind: 'project'; id: string } | { kind: 'category'; id: 'primary' | 'promotions' | 'social' | 'updates' | 'forums' } | { kind: 'contacts'; id: 'contacts' } | { kind: 'files'; id: 'files' }; // files: every attachment (src/components/mail/FilesView.tsx); category: an inbox tab (src/components/mail/sortPrefs.ts)
+export type View = { kind: 'folder'; id: FolderId } | { kind: 'label'; id: string } | { kind: 'tracking'; id: 'tracking' } | { kind: 'todos'; id: 'todos' } | { kind: 'project'; id: string } | { kind: 'category'; id: 'primary' | 'promotions' | 'social' | 'updates' | 'forums' | 'all' } | { kind: 'contacts'; id: 'contacts' } | { kind: 'files'; id: 'files' }; // files: every attachment (src/components/mail/FilesView.tsx); category: an inbox tab (src/components/mail/sortPrefs.ts); 'all' is the whole inbox with no tab filter (v2)
 
 export interface Person {
   name: string;

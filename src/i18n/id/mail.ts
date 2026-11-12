@@ -688,6 +688,9 @@ const id: Record<string, string> = {
   'Edit address': 'Ubah alamat',
   'Move to {field}': 'Pindahkan ke {field}',
   'Options for {name}': 'Opsi untuk {name}',
+  // v2 inbox: the whole inbox, no tab filter
+  'All mail in the inbox': 'Semua email di kotak masuk',
+  'Everything in the inbox, every tab together': 'Semua isi kotak masuk, semua tab sekaligus',
 };
 
 export default id;
