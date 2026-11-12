@@ -12,10 +12,9 @@ import App from './App';
 import { clientActions } from './clientActions';
 import { accessFor, afterEnd, clientInbox, portalsFor } from './clientView';
 import { WorkspaceSwitcher } from './components/WorkspaceSwitcher';
-import { ActingBanner, AdminApp, AdminV2, AppV2, ClientApp, ConnectApp, Onboarding, PortalV2, SharedHome } from './lazy';
-
-/** /v2 and below: the customer app and client portal rebuilt on aqeel-admin-kit. */
-const isV2 = () => /^\/v2(\/|$)/.test(location.pathname);
+import { ActingBanner, AdminApp, AdminV2, ClientApp, ConnectApp, Onboarding, SharedHome } from './lazy';
+// The team app at /v2 (since 13 Nov 2026): v1's own screens with the v2 layer on top (src/surface.ts,
+// docs/v1-checklist.md). /admin/v2 stays on the kit build until the owner approves the new Home.
 import { setPhotos } from './photos';
 import { Wordmark } from './components/Logo';
 import { AcceptInvite, SignIn, SignUp } from './components/SignIn';
@@ -156,7 +155,7 @@ function ServerRoot({ me }: { me: string }) {
   // Only a client somewhere (no workspace of their own): straight to their portal.
   if (user && !workspaces.some((w) => w.members.some((m) => m.userId === me))) return <ClientRoot me={user} />;
   if (!user) return <NoWorkspace email="" onBack={() => void signOut()} />;
-  if (isV2()) return <AppV2 user={user} users={users} workspaces={workspaces} />; // the kit build at /v2; v1 below stays the backup
+  // /v2: the same App as v1 (its routes under /v2, tryOut.ts routeBase) with the v2 layer on top; v1 at / is the backup.
   return (
     <>
     <PausedBanner workspaces={workspaces} me={me} />
@@ -467,8 +466,9 @@ function ClientRoot({ me }: { me: User }) {
     },
   });
   const inbox = [me.id, clientInbox(me.email)];
-  // The client portal v2 at /v2 takes the same props as v1's; v1 at / is unchanged.
-  const Portal = isV2() ? PortalV2 : ClientApp;
+  // /v2 shows v1's portal too (unchanged for now: its v2 layer waits for the owner's yes on the new Home). The kit
+  // build of the portal (PortalV2, src/app-v2) stays in the repo, no longer routed.
+  const Portal = ClientApp;
   return (
     <>
     <Portal

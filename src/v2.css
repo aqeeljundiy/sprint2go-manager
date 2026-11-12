@@ -1,0 +1,265 @@
+/* ==========================================================================
+   The v2 layer (/v2): v1's own screens, tidied and brought to life. Everything here sits under html.s2v2
+   (src/surface.ts, public/admin-v2/boot.js), so v1 at / never sees it. What it keeps and adds, line by line:
+   docs/v1-checklist.md. Motion uses the app's presets only (viewIn, cardIn, zoomIn in shell.css; the
+   --dur-in / --ease-out-motion tokens), answers what the person did, and stops for reduced motion.
+   Loads after appv2.css and before the phone layer (src/mobile), which keeps its own system.
+   ========================================================================== */
+
+/* ---------- Digits in Google Sans Flex, text in Plus Jakarta Sans (owner's rule, 13 Nov) ----------
+   The font file boot.js loads has the digits 0-9 only, so every letter falls through to Jakarta. */
+:root.s2v2 {
+  --font: 'Google Sans Flex', 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+/* ---------- Home, desktop: one tidy scale (from v1's own values, nothing restyled) ----------
+   v1 had two card corners (16 and 12), two card headings (15/700 and 14/650), two inner edges (16 and 18 px),
+   sub-lines at 12 and 12.5, a square tick next to round ones, and due chips bigger than project chips. */
+.s2v2 .home-grid .home-card,
+.s2v2 .home-grid .side-card {
+  border-radius: var(--r-card);
+}
+.s2v2 .side-card h3,
+.s2v2 .home-card h3 {
+  padding: 16px 16px 4px;
+  font-size: 15px;
+  font-weight: 700;
+}
+.s2v2 .home-card .card-body {
+  padding: 4px 6px 12px;
+}
+.s2v2 .hsec {
+  padding: 12px 16px 8px;
+}
+.s2v2 .ny-row {
+  padding-inline: 0;
+}
+.s2v2 .ny-text small,
+.s2v2 .home-card h3 .link-btn,
+.s2v2 .htd-title small,
+.s2v2 .load-text small {
+  font-size: 13px;
+}
+.s2v2 .home-card h3 .link-btn {
+  font-weight: 600;
+}
+.s2v2 .customise-btn {
+  font-weight: 600;
+}
+.s2v2 .home-search {
+  border-radius: var(--r-control);
+}
+.s2v2 .home-search kbd {
+  border-radius: var(--r-pill);
+}
+/* One tick for a task everywhere on Home: round, like the Today block, Tasks and Calendar. */
+.s2v2 .home-task .todo-check {
+  border-radius: var(--r-round);
+}
+/* Due chips the same size as project chips, side by side; a long title ends in "…" before them. */
+.s2v2 .home-task .due,
+.s2v2 .home-task .client-chip {
+  flex: none;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+}
+.s2v2 .home-task .ht-title {
+  display: block; /* v1's grid can't end a line in "…": the title was cut mid-letter */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.s2v2 .home-task .ht-brief {
+  display: block;
+}
+/* The greeting's one line under it (what needs you, what's next). Customise stays level with the greeting. */
+.s2v2 .home-sum {
+  margin: 6px 0 0;
+  color: var(--text-2);
+  font-size: 15px;
+}
+.s2v2 .home-head:has(.home-sum) .customise-btn {
+  margin-bottom: 36px;
+}
+
+/* Phones: the Today block's tick is a circle like every other tick (v1 drew it 22 by 24, an oval). */
+@media (max-width: 767px) {
+  .s2v2 .home-phone .htd-task .trow-check .ring {
+    width: 24px;
+    height: 24px;
+  }
+  /* The launcher's app tiles answer a tap the way a long-press already does (launcher.css .lp-lifted). */
+  .s2v2 .ln-tile .ln-sq {
+    transition: transform 0.15s var(--ease-out-motion), background 0.15s var(--ease-out-motion);
+  }
+  .s2v2 .ln-tile:active .ln-sq {
+    transform: scale(0.94);
+  }
+}
+
+/* ---------- Home: motion ----------
+   Opening Home: the greeting, the search bar, then the cards settle in, a beat apart. Workload bars fill to their
+   value. Hover answers with the card's edge and shadow (no transform: cards hold pickers that open fixed). */
+.s2v2 .home-head-text > * {
+  animation: viewIn var(--dur-in) var(--ease-out-motion) backwards;
+}
+.s2v2 .home-head-text > :nth-child(2) {
+  animation-delay: 40ms;
+}
+.s2v2 .home-head-text > :nth-child(3) {
+  animation-delay: 80ms;
+}
+.s2v2 .home-search {
+  animation: viewIn var(--dur-in) var(--ease-out-motion) 100ms backwards;
+  transition: box-shadow 0.2s var(--ease-out-motion), background 0.2s var(--ease-out-motion);
+}
+.s2v2 .home-search:hover {
+  box-shadow: 0 0 0 1.5px color-mix(in oklab, var(--accent) 45%, var(--line)), 0 6px 18px -10px rgba(11, 12, 16, 0.25);
+}
+.s2v2 .home-search:active {
+  background: var(--hover);
+}
+.s2v2 .home-top > .hsec,
+.s2v2 .home-grid.cards > .home-card {
+  animation: cardIn var(--dur-in) var(--ease-out-motion) backwards;
+  transition: box-shadow 0.2s var(--ease-out-motion), border-color 0.2s var(--ease-out-motion);
+}
+.s2v2 .home-top > .hsec:nth-child(2) {
+  animation-delay: 60ms;
+}
+.s2v2 .home-grid.cards > .home-card:nth-child(1) {
+  animation-delay: 120ms;
+}
+.s2v2 .home-grid.cards > .home-card:nth-child(2) {
+  animation-delay: 160ms;
+}
+.s2v2 .home-grid.cards > .home-card:nth-child(3) {
+  animation-delay: 200ms;
+}
+.s2v2 .home-grid.cards > .home-card:nth-child(n + 4) {
+  animation-delay: 240ms;
+}
+.s2v2 .home-top > .hsec:hover,
+.s2v2 .home-grid:not(.editing) > .home-card:hover {
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--text) 14%, var(--line)), 0 10px 28px -16px rgba(11, 12, 16, 0.28);
+}
+/* Rows inside Needs you and Today come in one after another. */
+.s2v2 .ny-list > .ny-swipe,
+.s2v2 .htd-tasks > *,
+.s2v2 .htd-events > *,
+.s2v2 .home-list > li {
+  animation: viewIn var(--dur-in) var(--ease-out-motion) backwards;
+}
+.s2v2 .ny-list > .ny-swipe:nth-child(2),
+.s2v2 .home-list > li:nth-child(2) {
+  animation-delay: 40ms;
+}
+.s2v2 .ny-list > .ny-swipe:nth-child(3),
+.s2v2 .home-list > li:nth-child(3) {
+  animation-delay: 80ms;
+}
+.s2v2 .ny-list > .ny-swipe:nth-child(n + 4),
+.s2v2 .home-list > li:nth-child(n + 4) {
+  animation-delay: 120ms;
+}
+/* Buttons answer a press. */
+.s2v2 .ny-btn,
+.s2v2 .home-card h3 .link-btn,
+.s2v2 .customise-btn {
+  transition: background 0.15s var(--ease-out-motion), color 0.15s var(--ease-out-motion), transform 0.15s var(--ease-out-motion);
+}
+.s2v2 .ny-btn:active,
+.s2v2 .customise-btn:active {
+  transform: scale(0.96);
+}
+.s2v2 .home-card h3 .link-btn svg {
+  transition: transform 0.2s var(--ease-out-motion);
+}
+.s2v2 .home-card h3 .link-btn:hover svg {
+  transform: translateX(3px);
+}
+/* Workload: each bar fills to its value when Home opens, and moves when the numbers change. */
+.s2v2 .bar > span {
+  transition: width 0.5s var(--ease-out-motion);
+}
+@starting-style {
+  .s2v2 .bar > span {
+    width: 0;
+  }
+}
+.s2v2 .load-go {
+  border-radius: var(--r-control);
+  transition: background 0.15s var(--ease-out-motion);
+}
+.s2v2 .load-go:hover {
+  background: var(--hover);
+}
+
+/* ---------- The icon rail (every app): a press you can feel, badges that pop in ---------- */
+.s2v2 .rail-icon {
+  transition: background 0.2s var(--ease-out-motion), color 0.2s var(--ease-out-motion), box-shadow 0.2s var(--ease-out-motion), transform 0.15s var(--ease-out-motion);
+}
+.s2v2 .rail-app:active .rail-icon,
+.s2v2 .rail-tool:active {
+  transform: scale(0.92);
+}
+.s2v2 .rail-icon i,
+.s2v2 .rail-tool i {
+  animation: zoomIn var(--dur-in) var(--ease-out-motion) backwards;
+}
+
+/* ---------- Reduced motion: things appear in place ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .s2v2 .home-head-text > *,
+  .s2v2 .home-search,
+  .s2v2 .home-top > .hsec,
+  .s2v2 .home-grid.cards > .home-card,
+  .s2v2 .ny-list > .ny-swipe,
+  .s2v2 .htd-tasks > *,
+  .s2v2 .htd-events > *,
+  .s2v2 .home-list > li,
+  .s2v2 .rail-icon i,
+  .s2v2 .rail-tool i {
+    animation: fadeIn 150ms ease backwards;
+    animation-delay: 0ms;
+  }
+  .s2v2 .bar > span {
+    transition: none;
+  }
+  .s2v2 .ny-btn:active,
+  .s2v2 .customise-btn:active,
+  .s2v2 .rail-app:active .rail-icon,
+  .s2v2 .rail-tool:active,
+  .s2v2 .home-card h3 .link-btn:hover svg {
+    transform: none;
+  }
+}
+
+/* Tidy, last bits from the rendered survey: bars and the ⌘K key on the pill radius, the key at 600 like every label. */
+.s2v2 .bar,
+.s2v2 .bar > span {
+  border-radius: var(--r-pill);
+}
+.s2v2 .home-search kbd {
+  font-weight: 600;
+}
+/* A narrow My tasks card (tablets, ⅓ width): the chips move under a long title instead of squeezing it to "Book di…". */
+.s2v2 .home-task {
+  flex-wrap: wrap;
+  row-gap: 4px;
+}
+.s2v2 .home-task .ht-title {
+  flex: 1 1 140px;
+}
+/* …and they line up under the title, not under the tick: the tick sits in the row's own left gutter. */
+.s2v2 .home-task {
+  position: relative;
+  padding-left: 40px;
+}
+.s2v2 .home-task .todo-check {
+  position: absolute;
+  top: 9px;
+  left: 10px;
+}

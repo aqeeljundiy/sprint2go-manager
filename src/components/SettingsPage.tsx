@@ -1,3 +1,4 @@
+import { appHome } from '../surface';
 import { useEffect, useState, type ReactNode } from 'react';
 import { primaryDomain } from '../domains';
 import { SmoothHeight, useLeaving } from './ui/Smooth';
@@ -1043,7 +1044,7 @@ async function deleteAccount(password: string): Promise<string | null> {
   const r = await fetch('/api/account/delete', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ password }) });
   const d = (await r.json().catch(() => ({}))) as { error?: string };
   if (!r.ok) return d.error ?? mark('Couldn’t delete the account.');
-  location.href = '/';
+  location.href = appHome; // / on v1, /v2 on v2 (src/surface.ts)
   return null;
 }
 
@@ -1060,7 +1061,7 @@ function DeleteAccountRow() {
     const d = (await r.json().catch(() => ({}))) as { error?: string };
     setBusy(false);
     if (!r.ok) return setMsg(d.error ?? mark('Couldn’t delete the account.')); // translated where it's shown, like the server's errors
-    location.href = '/';
+    location.href = appHome; // / on v1, /v2 on v2 (src/surface.ts)
   };
   if (!server.on) return null;
   return (

@@ -185,6 +185,9 @@ const id: Record<string, string> = {
   'Nothing on your plate. 🎉': 'Tidak ada tugas untuk Anda. 🎉',
   'Mark done': 'Tandai selesai',
   'No more meetings today.': 'Tidak ada rapat lagi hari ini.',
+  // Home v2 (/v2): the meetings card's own name, and a friendlier empty line.
+  'Meetings today': 'Rapat hari ini',
+  'No more meetings today. The rest of the day is yours.': 'Tidak ada rapat lagi hari ini. Sisa hari ini milik Anda.',
   'Inbox zero.': 'Kotak masuk kosong.',
   'You’re all caught up.': 'Anda sudah melihat semuanya.',
   'Every meeting action item has an owner.': 'Semua tindak lanjut rapat sudah ada penanggung jawabnya.',

@@ -6,6 +6,7 @@ import { startSlidingTabs } from './slidingTabs';
 import { startKeyboard } from './mobile/keyboard';
 import { diagnostics, reportCrash, startDiagnostics } from './diagnostics';
 import { startTryOut, trying } from './tryOut';
+import './surface'; // marks html.s2v2 on /v2 before the first render
 import { deviceLang, setLang, t } from './i18n';
 import { useLang } from './i18n/useLang';
 import './tokens.css'; // the one source of tokens: first
@@ -32,6 +33,7 @@ import './notes.css';
 import './unlimited.css'; // Settings, Plan & billing on Unlimited (the operators' Whitelist)
 import './system.css';
 import './appv2.css'; // app home and Settings in the A+B style (before the phone layer)
+import './v2.css'; // the v2 layer, only under html.s2v2 (/v2, src/surface.ts; docs/v1-checklist.md)
 import './mobile/index.css'; // the phone layer: always last
 
 startTryOut(); // /try: the demo in this tab, nothing sent to our server

@@ -24,6 +24,7 @@ import { needsYou, updatesOf } from '../needsYou';
 import { addDays } from '../taskDates';
 import { JoinSoon, LiveCalls, MeetingStrip, NeedsList, TodayBlock, Updates } from './home/HomeParts';
 import { SwipeRow } from './ui/SwipeRow';
+import { teamV2 } from '../surface';
 
 type CardId =
   | 'briefing'
@@ -88,7 +89,8 @@ const CARD_INFO: Record<CardId, { name: string; hint: string }> = {
   teamQueue: named(mark('Team queue'), mark('Tasks nobody has picked up yet')),
   briefs: named(mark('Briefs'), mark('Bigger jobs and their progress')),
   mytasks: named(mark('My tasks'), mark('Your queue, in order')),
-  today: named(mark('Today'), mark('Your next meetings')),
+  // v2 (src/surface.ts): "Meetings today", so it isn't a second "Today" next to the Today block above it.
+  today: teamV2 ? named(mark('Meetings today'), mark('Your next meetings')) : named(mark('Today'), mark('Your next meetings')),
   unread: named(mark('Unread mail'), mark('Mail waiting for you')),
   foryou: named(mark('For you'), mark('Mentions and assignments')),
   meetings: named(mark('From meetings'), mark('Action items without an owner')),
@@ -587,7 +589,7 @@ export function HomeView(p: Props) {
       show: p.enabled.has('calendar'),
       body: () =>
         d.todayEvents.length === 0 ? (
-          empty(t('No more meetings today.'))
+          empty(teamV2 ? t('No more meetings today. The rest of the day is yours.') : t('No more meetings today.'))
         ) : (
           <ul className="home-list">
             {d.todayEvents.map((e) => (
@@ -986,6 +988,12 @@ export function HomeView(p: Props) {
           <div className="home-head-text">
             <p className="home-date">{fmtWeekdayLong(new Date())}</p>
             <h1>{greeting}</h1>
+            {/* v2: the same one line as on phones: what needs you and what's next (words, no new numbers). */}
+            {teamV2 && (
+              <p className="home-sum">
+                {[needList.length ? tn(needList.length, '{n} thing needs you.', '{n} things need you.') : t('Nothing urgent. A good day to get ahead.'), laterToday[0] ? t('Next up: {title} at {time}.', { title: laterToday[0].title, time: fmtTime(laterToday[0].start) }) : ''].filter(Boolean).join(' ')}
+              </p>
+            )}
           </div>
           <button className={`ghost-btn sm customise-btn ${editing ? 'on' : ''}`} onClick={() => setEditing((e) => !e)}>
             {editing ? <Check size={14} /> : <Settings2 size={14} />} {editing ? t('Done') : t('Customise')}

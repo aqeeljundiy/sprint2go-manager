@@ -9,10 +9,11 @@
     document.write('<link rel="icon" href="/admin-v2/app-icons/favicon.ico" sizes="48x48"><link rel="icon" href="/admin-v2/app-icons/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/admin-v2/app-icons/apple-touch-icon.png"><link rel="manifest" href="/admin-v2/app-icons/site.webmanifest"><meta name="theme-color" content="#ffffff"><meta name="apple-mobile-web-app-title" content="Operators"><meta name="mobile-web-app-capable" content="yes">');
       document.write('<link rel="stylesheet" href="/admin-v2/kit/admin-kit.css"><link rel="stylesheet" href="/admin-v2/admin-theme.css"><scr' + 'ipt defer blocking="render" src="/admin-v2/kit/admin-kit.js"></scr' + 'ipt>');
   }
-  // The customer app and client portal v2 (/v2) on aqeel-admin-kit: its own kit copy, theme and app icon (start and
-  // scope /v2, made with make-icons.mjs from sprint2go's mark). The app at / (v1) is unchanged.
+  // The customer app and client portal v2 (/v2): since 13 Nov 2026 v1's own screens, icon and manifest with the v2
+  // layer on top (src/surface.ts, src/v2.css), so no kit here any more. The class goes on before the first paint;
+  // digits come from Google Sans Flex (a digits-only download), the text stays Plus Jakarta Sans. v1 at / is unchanged.
+  // (The kit build's files in /app-v2 stay in the repo, unused.)
   if (p === '/v2' || p.indexOf('/v2/') === 0) {
-    document.querySelectorAll('link[rel~="icon"], link[rel="apple-touch-icon"], link[rel="manifest"], meta[name="theme-color"], meta[name="apple-mobile-web-app-title"]').forEach(function (n) { n.remove(); });
-    document.write('<link rel="icon" href="/app-v2/app-icons/favicon.ico" sizes="48x48"><link rel="icon" href="/app-v2/app-icons/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/app-v2/app-icons/apple-touch-icon.png"><link rel="manifest" href="/app-v2/app-icons/site.webmanifest"><meta name="theme-color" content="#ffffff"><meta name="apple-mobile-web-app-title" content="sprint2go"><meta name="mobile-web-app-capable" content="yes">');
-    document.write('<link rel="stylesheet" href="/app-v2/kit/admin-kit.css"><link rel="stylesheet" href="/app-v2/app-theme.css"><scr' + 'ipt defer blocking="render" src="/app-v2/kit/admin-kit.js"></scr' + 'ipt>');
+    document.documentElement.classList.add('s2v2');
+    document.write('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400..800&text=0123456789&display=swap">');
   }
