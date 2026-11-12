@@ -1,0 +1,91 @@
+/*
+  Theme for: the sprint2go customer app and client portal (/v2)
+  Built on 12 Nov 2026 from: the app's own design system, src/tokens.css (the owner shaped it; the phone layer is CI-checked
+  on it), read through references/translation.md "Tidying an existing backend". Not copied from the operator console's
+  theme (public/admin-v2/admin-theme.css): both read the same tokens, and the layout choices below are chosen from this
+  app's own character, so the back office and the product never look like one screen.
+
+  Site character
+  1. Who: small agencies and companies (owner and a team of 3 to 30) all day at a desk, on the phone between meetings;
+     their clients (guests) sign in to a smaller portal a few times a week.
+  2. Mood: bright, friendly, quick (one white page, the company's own colour as the only accent, rounded Plus Jakarta Sans).
+  3. Density: hundreds of small actions a day (reply, tick off, file, approve), one at a time.
+  4. Shows most: text (mail, chat, tasks, notes) and people (avatars, names), some files and photos; few numbers.
+  5. Must not resemble: the sprint2go operator console (floating sidebar, number cards, segmented tabs, lined tables,
+     ring), the Continue admin and member app, InTRIZ Studio, Continue Lab, the P&P and aqeelOS backends.
+*/
+:root {
+  /* Type: the app's 24/17/15/13/12 scale as it is (customers read more text than operators: body stays 15) */
+  --ak-font: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ak-text-xs: 12px;            /* app --fs-caption: labels, chips */
+  --ak-text-sm: 13px;            /* app --fs-secondary: second lines */
+  --ak-text-md: 15px;            /* app --fs-body: mail, tasks and notes are read, not scanned */
+  --ak-text-lg: 17px;            /* app --fs-title: section headings */
+  --ak-text-title: 24px;         /* app --fs-display: page titles */
+  --ak-weight-normal: 400;
+  --ak-weight-medium: 600;
+  --ak-weight-bold: 700;
+  --ak-tracking-title: -0.02em;  /* app --ls-display */
+
+  /* Colour: one white page; the company's own colour is the accent (App sets --brand-ink from Settings, the shade of
+     it that reads at 4.5:1 on white), sprint2go blue until a company is open */
+  --ak-bg: #ffffff;
+  --ak-surface: #ffffff;
+  --ak-surface-2: #f5f6f8;       /* app --surface-2: quiet fills */
+  --ak-border: #e2e3e9;          /* app --border */
+  --ak-border-strong: #c9ccd6;
+  --ak-text: #0b0c10;            /* app --text */
+  --ak-text-muted: #5f6270;      /* 6.2:1 on white */
+  --ak-accent: var(--brand-ink, #2448ff);
+  --ak-accent-text: #ffffff;     /* brand-ink is chosen to hold white text at 4.5:1 */
+  --ak-success: #0e6f4b;         /* app --ok: done */
+  --ak-warn: #8c5208;            /* app --warn: waiting */
+  --ak-danger: #b42a2a;          /* app --danger: late */
+  --ak-info: #0e7490;
+
+  /* Shape: the app's radii 10 / 16 / pill */
+  --ak-radius-control: 6px;      /* crisp small controls, so the white list and its text lead (the console keeps 10) */
+  --ak-radius-card: 12px;        /* the landing page's cards (12, its most used card corner): flatter than the console's 16 */
+  --ak-radius-inner: 7px;        /* 55% of the card */
+  --ak-radius-chip: 999px;
+  --ak-radius-pop: 12px;
+
+  /* Density: the app's desk sizes */
+  --ak-space: 4px;               /* 4/8/12/16/24/32/48 */
+  --ak-control-h: 36px;          /* app --ctl */
+  --ak-row-h: 48px;              /* app row 48 */
+
+  /* Layout */
+  --ak-page-max: none;
+  --ak-page-pad: 32px;
+  --ak-page-pad-phone: 16px;     /* app --gutter */
+  --ak-sidebar-w: 232px;
+
+  /* Motion: CLAUDE.md, 240 ms in, ease-out */
+  --ak-dur-fast: 150ms;
+  --ak-dur: 240ms;
+  --ak-dur-slow: 320ms;
+  --ak-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Depth: a fine edge, almost no shadow (the work surface is the white page itself) */
+  --ak-shadow-card: 0 1px 2px rgba(11, 12, 16, 0.06); /* a hairline lift under the edge, no glow (the console's cards glow blue) */
+  --ak-shadow-pop: 0 20px 48px -20px rgba(16, 18, 24, 0.28), 0 2px 6px rgba(16, 18, 24, 0.06);
+
+  /* Sidebar: white like the work beside it, divided by one line (flush); the open app in the company colour's soft tint */
+  --ak-sidebar-bg: #fafbfc;      /* one step off the white page, so the flush rail reads as the app's rail */
+  --ak-sidebar-text: #3d404a;
+  --ak-nav-active-bg: color-mix(in oklab, var(--ak-accent) 12%, white);
+  --ak-nav-active-text: var(--ak-accent);
+  --ak-sidebar-brand: #0b0c10;
+
+  /* Layout choices, each from the character above */
+  --ak-style-nav: labels;        /* the review's grouped rail: Talk, Plan, Keep always visible with their names (12 unlabelled icons were a memory test) */
+  --ak-style-sidebar: flush;     /* the app's rail runs full height beside the work (line 3: all day at a desk), unlike the console's floating panel */
+  --ak-style-stats: cards;       /* the three Home figures each open the rows behind them (Needs you, Unread mail, Today) */
+  --ak-style-tabs: underline;    /* content-heavy pages (mail, notes, tasks) */
+  --ak-style-table: open;        /* lists of people's things read like the app's own lists: air, no row lines */
+  --ak-style-head: plain;
+  /* Who waits: a team member or guest between two small actions, many times a day. Friendly and informal, like the
+     chat-like tool it is (line 2); not the console's calm ring. */
+  --ak-style-loader: dots;
+}
