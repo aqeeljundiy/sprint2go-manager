@@ -107,7 +107,7 @@ export function Today() {
           <Group title={t('Invoices overdue')} n={q.overdue.length} tone="warn">
             {q.overdue.map((i) => (
               <Row key={i.id} title={t('{company} owes {amount}', { company: i.company ?? i.workspaceId, amount: rp(i.total) })} sub={`${i.number} · ${t('due {day}', { day: day(i.dueAt) })}`} href={`/admin/v2/companies/${i.workspaceId}/billing`}>
-                {may('billing') && <button className="ak-btn" type="button" onClick={() => void act(() => post('invoice/status', { id: i.id, status: 'sent' }), t('Reminder sent'))}>{t('Send a reminder')}</button>}
+                {may('billing') && <button className="ak-btn" type="button" onClick={async () => { if (await window.AdminKit.confirm({ title: t('Email a reminder to {company}?', { company: i.company ?? i.workspaceId }), body: t('They get invoice {number} for {amount} again by email.', { number: i.number, amount: rp(i.total) }), confirmLabel: t('Send reminder') })) void act(() => post('invoice/status', { id: i.id, status: 'sent' }), t('Reminder sent')); }}>{t('Send a reminder')}</button>}
               </Row>
             ))}
           </Group>

@@ -143,7 +143,7 @@ function Prices() {
   const ADDON: Record<string, string> = { mailboxes: t('Hosted mailbox'), storage50: t('Extra 50 GB'), meetHours10: t('Bot hours ×10'), branding: t('Branding') };
   const num = (v: number, set: (n: number) => void, label: string, disabled = !can) => <input className="ak-input s2k-num" inputMode="numeric" aria-label={label} disabled={disabled} value={String(v)} onChange={(e) => set(Number(e.target.value.replace(/\D/g, '')) || 0)} />;
   const save = async () => {
-    if (await window.AdminKit.confirm({ title: t('Change the live prices?'), body: t('The landing page and the app show the new prices at once. Companies already paying keep their price until their plan changes.'), confirmLabel: t('Save prices') })) void act(() => post('pricing', draft), t('Prices saved: the app and landing page use them now')).then(pricing.reload);
+    if (await window.AdminKit.confirm({ title: t('Change the live prices?'), body: t('The landing page and the app show the new prices at once, and every company, including those already paying, is billed the new price on its next invoice.'), confirmLabel: t('Save prices') })) void act(() => post('pricing', draft), t('Prices saved: the app and landing page use them now')).then(pricing.reload);
   };
   if (pricing.error) return <Failed error={pricing.error} retry={pricing.reload} />;
   return (
