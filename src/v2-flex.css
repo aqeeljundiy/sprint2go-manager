@@ -1,0 +1,17 @@
+/* ==========================================================================
+   v2: the owner's 13 Nov feedback (cards IN-13nov-*). Loads after v2.css, on /v2 and /admin/v2 only.
+   "Flexibility is really important ... things can either open from the side or maybe like a pop-up."
+   ========================================================================== */
+
+/* ---------- Selected menu item: one look in light and dark (IN-13nov-1) ----------
+   v1 drew the selected item as the card colour plus a shadow. In dark that reads as a soft fill (the card colour is a
+   step lighter than the sidebar); in light the card colour is the sidebar's own white, so only the shadow showed:
+   a floating pill that didn't fill its row. Now both themes use the same tinted fill, edge to edge, no shadow. */
+:root.s2v2 .nav-item.active {
+  background: color-mix(in oklab, var(--text) 6%, var(--bg));
+  box-shadow: none;
+}
+:root.s2v2 .nav-item.active:hover {
+  background: color-mix(in oklab, var(--text) 8%, var(--bg));
+}
+

@@ -94,7 +94,7 @@ function Speaking() {
 
 // v2 only (/v2, /admin/v2): its tidy scale (generated from v1's CSS by scripts/v2-scale.mjs, phone layer copied last)
 // and then its layer (motion, hand fixes), in that order, after v1's styles. v1 never downloads either.
-const v2Styles = v2 ? import('./v2-scale.css').then(() => import('./v2.css')) : Promise.resolve();
+const v2Styles = v2 ? import('./v2-scale.css').then(() => import('./v2.css')).then(() => import('./v2-flex.css')) : Promise.resolve();
 
 // The words first (only Indonesian has any to fetch), then the app: nobody sees English flash before their language.
 void Promise.all([setLang(deviceLang()), v2Styles.catch(() => {})]).finally(() =>
