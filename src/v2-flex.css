@@ -15,3 +15,222 @@
   background: color-mix(in oklab, var(--text) 8%, var(--bg));
 }
 
+/* ---------- Flexible panels (src/components/ui/FlexPanel.tsx) ----------
+   Drag an edge to resize; the header's switch moves the panel between a side panel and a pop-up window. Desktop and
+   tablet only: on phones the panels stay full screens and sheets, so the edges and the switch hide there. */
+.fp-edge,
+.fp-mode {
+  display: none;
+}
+@media (min-width: 768px) {
+  .fp-mode {
+    display: inline-flex;
+  }
+  .fp-edge {
+    display: block;
+    position: absolute;
+    z-index: 6;
+    touch-action: none;
+  }
+  .fp-l,
+  .fp-r {
+    top: 0;
+    bottom: 0;
+    width: 8px;
+    cursor: col-resize;
+  }
+  .fp-l {
+    left: 0;
+  }
+  .fp-r {
+    right: 0;
+  }
+  .fp-t,
+  .fp-b {
+    left: 0;
+    right: 0;
+    height: 8px;
+    cursor: row-resize;
+  }
+  .fp-t {
+    top: 0;
+  }
+  .fp-b {
+    bottom: 0;
+  }
+  .fp-tl,
+  .fp-bl,
+  .fp-br,
+  .fp-tr {
+    width: 16px;
+    height: 16px;
+    z-index: 7;
+  }
+  .fp-tl {
+    top: 0;
+    left: 0;
+    cursor: nwse-resize;
+  }
+  .fp-br {
+    right: 0;
+    bottom: 0;
+    cursor: nwse-resize;
+  }
+  .fp-bl {
+    left: 0;
+    bottom: 0;
+    cursor: nesw-resize;
+  }
+  .fp-tr {
+    top: 0;
+    right: 0;
+    cursor: nesw-resize;
+  }
+  /* The edge you can grab shows itself: a thin line in the company colour, like the mail list's edge. */
+  .fp-l::after,
+  .fp-r::after,
+  .fp-t::after,
+  .fp-b::after {
+    content: '';
+    position: absolute;
+    border-radius: 2px;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.15s var(--ease-out-motion);
+  }
+  .fp-l::after,
+  .fp-r::after {
+    top: 16px;
+    bottom: 16px;
+    width: 2px;
+  }
+  .fp-l::after {
+    left: 2px;
+  }
+  .fp-r::after {
+    right: 2px;
+  }
+  .fp-t::after,
+  .fp-b::after {
+    left: 16px;
+    right: 16px;
+    height: 2px;
+  }
+  .fp-t::after {
+    top: 2px;
+  }
+  .fp-b::after {
+    bottom: 2px;
+  }
+  .fp-edge:hover::after,
+  .fp-dragging .fp-edge::after {
+    opacity: 0.6;
+  }
+  body.resizing-y,
+  body.resizing-y * {
+    cursor: row-resize !important;
+  }
+
+  /* --- Side panels with a scrim (a task, a table row, a contact, a guest's task) --- */
+  .drawer.fp {
+    position: relative;
+  }
+  .drawer.fp-side {
+    width: min(var(--fp-w), 100%);
+  }
+  .drawer-scrim.fp-scrim-window {
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .drawer.fp-window {
+    width: min(var(--fp-w), 100%);
+    height: min(var(--fp-h), 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--r-card);
+    overflow: hidden;
+    animation: fpWindowIn var(--dur-in) var(--ease-out-motion) backwards;
+  }
+  .is-leaving .drawer.fp-window {
+    animation: s2gPopOut var(--dur-out) var(--ease-in-motion) forwards !important;
+  }
+
+  /* --- Ask AI: a window in the corner (as before) or docked down the right side --- */
+  .ask-drawer.fp-window {
+    width: min(var(--fp-w), calc(100vw - 32px));
+    height: min(var(--fp-h), calc(100dvh - 32px));
+  }
+  .ask-drawer.fp-side {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(var(--fp-w), calc(100vw - 120px));
+    height: 100dvh;
+    border-width: 0 0 0 1px;
+    border-radius: 0;
+    animation: fpSideIn var(--dur-in) var(--ease-out-motion) backwards;
+  }
+  .is-leaving.ask-drawer.fp-side {
+    animation: s2gPanelOut var(--dur-out) var(--ease-in-motion) forwards !important;
+  }
+
+  /* --- A chat thread: a column next to the conversation, or a window in the corner --- */
+  .chat-side.fp {
+    position: relative;
+  }
+  .chat-side.fp-side {
+    width: var(--fp-w);
+    max-width: 60%;
+  }
+  .chat-side.fp-window {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: var(--z-panel);
+    width: min(var(--fp-w), calc(100vw - 32px));
+    height: min(var(--fp-h), calc(100dvh - 32px));
+    border: 1px solid var(--border);
+    border-radius: var(--r-card);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    transform-origin: bottom right;
+    animation: fpWindowIn var(--dur-in) var(--ease-out-motion) backwards;
+  }
+  .chat-side.fp-side {
+    animation: fpSideIn var(--dur-in) var(--ease-out-motion) backwards;
+  }
+  .fp-dragging,
+  .fp-dragging * {
+    transition: none !important;
+  }
+}
+/* Switching mode replays the way in for the new place: a side panel slides from its edge, a window grows. */
+@keyframes fpSideIn {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+@keyframes fpWindowIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(8px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .drawer.fp,
+  .ask-drawer.fp,
+  .chat-side.fp {
+    animation: none !important;
+  }
+}
+
+/* Ask AI docked at the side makes room: the app narrows by its width instead of hiding under it. */
+@media (min-width: 768px) {
+  :root.s2v2 .app {
+    transition: top 0.2s ease-out, height 0.2s ease-out, padding-right var(--dur-in) var(--ease-out-motion);
+  }
+  :root.s2v2.fp-docked .app {
+    padding-right: min(var(--fp-dock), calc(100vw - 120px));
+  }
+}

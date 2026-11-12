@@ -15,6 +15,7 @@ import { useFocusedScreen } from '../../mobile/chrome';
 import { EditSheet } from './EditSheet';
 import { t, tn, tx } from '../../i18n';
 import { tj } from '../../i18n/tj';
+import { useFlexPanel } from '../ui/FlexPanel';
 
 /** What the row page can do with its fields' settings (people who may change the table's columns). */
 export interface PageEdit {
@@ -389,6 +390,9 @@ function RecordPanel({ table, row, ctx, me, onCell, onComment, onFollow, onDelet
   useOnePanel(onClose);
   useFocusedScreen();
   useRowKeys(nav, onClose);
+  // Notion's three ways to open a row: side peek, centre peek (a pop-up) and a full page. Resizable, remembered.
+  const flex = useFlexPanel('row', { width: 520, window: { width: 760, height: 800 } });
+  const fp = full ? { ...flex, className: '', style: undefined, edges: null, scrimClass: '' } : flex;
   const { page, rest, hiddenIds, pinned, main, body, sections, folded } = layoutOf(table, row, ctx, false);
   const [showFolded, setShowFolded] = useState(false);
   const [drag, setDrag] = useState<string | null>(null);
@@ -443,8 +447,9 @@ function RecordPanel({ table, row, ctx, me, onCell, onComment, onFollow, onDelet
     />
   );
   return (
-    <div className="drawer-scrim" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <aside className={`drawer tb-drawer${full ? ' full' : ''}`} role="dialog" aria-label={rowName(table, row)} onKeyDown={(e) => e.key === 'Escape' && !document.querySelector('.pop') && onClose()}>
+    <div className={`drawer-scrim ${fp.scrimClass}`} onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+      <aside className={`drawer tb-drawer${full ? ' full' : ''} ${fp.className}`} style={fp.style} role="dialog" aria-label={rowName(table, row)} onKeyDown={(e) => e.key === 'Escape' && !document.querySelector('.pop') && onClose()}>
+        {fp.edges}
         <header className="drawer-head">
           <span className="drawer-kind">
             <i className="tb-dot" style={{ background: table.color }} /> {table.name}
@@ -463,6 +468,7 @@ function RecordPanel({ table, row, ctx, me, onCell, onComment, onFollow, onDelet
             </span>
           )}
           <span className="spacer" />
+          {!full && flex.modeButton}
           {onToggleFull && (
             <button type="button" className="icon-btn sm tb-rd-full" title={full ? t('Open as a side panel') : t('Open as a page')} aria-label={full ? t('Open as a side panel') : t('Open as a page')} onClick={onToggleFull}>
               {full ? <Minimize2 size={15} /> : <Maximize2 size={15} />}

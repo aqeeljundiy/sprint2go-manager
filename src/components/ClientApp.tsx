@@ -70,6 +70,7 @@ import { PHONE } from '../mobile/media';
 import { LANGS, mark, t, textOf, tn, tx, type Lang, type Msg } from '../i18n';
 import { tj } from '../i18n/tj';
 import { useLang } from '../i18n/useLang';
+import { useFlexPanel } from './ui/FlexPanel';
 import { fmtDayLong, fmtDayWord, fmtNumber, fmtWeekday, fmtWeekdayLong } from '../i18n/format';
 
 /** The dot for a task in the guest's view: planned, in progress, waiting on them, or done. */
@@ -1051,6 +1052,7 @@ function TaskPanel({
   onClose: () => void;
 }) {
   useOnePanel(onClose);
+  const fp = useFlexPanel('guest-task', { width: 520, window: { width: 720, height: 760 } });
   const [comment, setComment] = useState('');
   const [changes, setChanges] = useState<string | null>(null);
   useEffect(() => {
@@ -1073,8 +1075,9 @@ function TaskPanel({
   const ap = task.approval;
   const apBy = nameOf(ap?.by ?? '');
   return (
-    <div className="drawer-scrim" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <aside className="drawer" role="dialog" aria-label={task.title}>
+    <div className={`drawer-scrim ${fp.scrimClass}`} onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+      <aside className={`drawer ${fp.className}`} style={fp.style} role="dialog" aria-label={task.title}>
+        {fp.edges}
         <header className="drawer-head">
           {isBrief(task) ? (
             <span className="brief-badge">
@@ -1084,6 +1087,7 @@ function TaskPanel({
             <span className="drawer-kind">{task.source === 'request' ? t('Request') : t('Task')}</span>
           )}
           <span className="spacer" />
+          {fp.modeButton}
           <button className="icon-btn sm" onClick={onClose} aria-label={t('Close')}>
             <X size={18} />
           </button>

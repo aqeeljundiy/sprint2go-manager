@@ -84,6 +84,9 @@ const id: Record<string, string> = {
   '{n} hrs ahead': '{n} jam lebih cepat',
   '{n} hrs behind': '{n} jam lebih lambat',
   '{time} ({diff})': '{time} ({diff})',
+  // Flexible panels (src/components/ui/FlexPanel.tsx)
+  'Open as a pop-up window': 'Buka sebagai jendela pop-up',
+  'Dock as a side panel': 'Tempel sebagai panel samping',
 };
 
 export default id;

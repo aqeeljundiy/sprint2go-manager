@@ -33,6 +33,7 @@ Every change has to pass this bar before it's called done. It isn't optional pol
 - Empty lists and screens: `EmptyState` (src/components/ui/EmptyState.tsx), with a compact form inside cards.
 - A dialog opened from inside a pane: `Layer` (src/components/ui/Layer.tsx) puts it at page level so nothing traps it.
 - Rows that leave: `useLeaving` (src/components/ui/Smooth.tsx). Times: `TimePicker` next to `DatePicker`.
+- A panel next to your work (Ask AI, a thread, a task, a row, a contact): `useFlexPanel` (src/components/ui/FlexPanel.tsx), on /v2. Drag the edge to resize, a header switch between side panel and pop-up window, both remembered per person. Every new side panel uses it.
 - Bottom sheet: `Sheet` (src/components/ui/Sheet.tsx). Grab handle, swipe down to close, rides above the keyboard; a centred panel on desktop.
 - Actions for one thing: `ActionSheet` and `useActionMenu` (src/components/ui/ActionSheet.tsx). One list: a sheet from long-press on phones, a menu from right-click or "…" on desktop.
 - Swipes on rows: `SwipeRow` (src/components/ui/SwipeRow.tsx). Up to two actions per side, Undo toast, folds away with `useLeaving`.

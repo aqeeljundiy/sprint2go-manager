@@ -17,6 +17,7 @@ import { TabPane } from '../ui/Smooth';
 import { Popover } from '../ui/Popover';
 import { Sheet } from '../ui/Sheet';
 import { PushScreen } from '../ui/PushScreen';
+import { useFlexPanel } from '../ui/FlexPanel';
 import { ActionSheet, type SheetAction } from '../ui/ActionSheet';
 import { Select } from '../ui/Select';
 import { personOption } from '../ui/PeopleList';
@@ -1237,6 +1238,8 @@ function ThreadView(p: {
   onEdit: (id: string, text: string) => void;
   onCancelEdit: () => void;
 }) {
+  // Next to the conversation or as a window in the corner; drag its edge to resize (remembered per person).
+  const fp = useFlexPanel('thread', { width: 360, anchor: 'corner', window: { width: 420, height: 600 } });
   const [text, setText] = useState('');
   const [also, setAlso] = useState(false);
   const end = useRef<HTMLDivElement>(null);
@@ -1304,12 +1307,14 @@ function ThreadView(p: {
       </PushScreen>
     );
   return (
-    <aside className="chat-side">
+    <aside className={`chat-side ${fp.className}`} style={fp.style}>
+      {fp.edges}
       <header className="cs-head">
         <strong>{t('Thread')}</strong>
         <span className="muted small">{p.title}</span>
         <span className="spacer" />
         {bell}
+        {fp.modeButton}
         <button className="icon-btn sm" onClick={p.onClose} aria-label={t('Close thread')}>
           <X size={16} />
         </button>

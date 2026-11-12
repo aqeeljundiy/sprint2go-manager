@@ -17,6 +17,7 @@ import { loadContacts, postJson, type Contact, type ContactsInfo, type Frequent 
 import { BusyButton, ErrorLine } from './teamsBits';
 import { t, tn } from '../../i18n';
 import { fmtDay } from '../../i18n/format';
+import { useFlexPanel } from '../ui/FlexPanel';
 import './teams.css';
 
 /*
@@ -338,6 +339,7 @@ function ContactRow({ c, leaving, on, onOpen, onEmail, onEdit, onDelete }: { c: 
 /** One contact: its details, or the form to change them. A side panel on desktop, a pushed screen on phones. */
 function ContactPanel({ phone, draft, editing, labels, onEdit, onView, onClose, onEmail, onSave, onDelete }: { phone: boolean; draft: Draft; editing: boolean; labels: string[]; onEdit: () => void; onView: () => void; onClose: () => void; onEmail: (email: string) => void; onSave: (d: Draft) => Promise<void>; onDelete?: () => void }) {
   useOnePanel(onClose);
+  const fp = useFlexPanel('contact', { width: 520, window: { width: 640, height: 720 } });
   const [d, setD] = useState<Draft>(draft);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -511,10 +513,12 @@ function ContactPanel({ phone, draft, editing, labels, onEdit, onView, onClose, 
       </PushScreen>
     );
   return (
-    <div className="drawer-scrim" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <aside className="drawer ct-drawer" role="dialog" aria-label={title} onKeyDown={(e) => e.key === 'Escape' && !document.querySelector('.pop') && onClose()}>
+    <div className={`drawer-scrim ${fp.scrimClass}`} onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+      <aside className={`drawer ct-drawer ${fp.className}`} style={fp.style} role="dialog" aria-label={title} onKeyDown={(e) => e.key === 'Escape' && !document.querySelector('.pop') && onClose()}>
+        {fp.edges}
         <header className="drawer-head">
           <span className="ct-drawer-title">{title}</span>
+          {fp.modeButton}
           <button type="button" className="icon-btn sm" aria-label={t('Close')} onClick={onClose}>
             <X size={15} />
           </button>

@@ -22,6 +22,7 @@ import type { Client, CommentFile, Repeat, TaskStatus, Team, Todo, User } from '
 import { AttachButton, dropFiles, FileCards, useCommentFiles, WaitingFiles } from './CommentFiles';
 import { copyTaskLink, doersOf } from './taskOps';
 import { t, tn, tx } from '../../i18n';
+import { useFlexPanel } from '../ui/FlexPanel';
 import { fmtTime } from '../../i18n/format';
 
 const repeats = (): { value: Repeat | ''; label: string }[] => [
@@ -80,6 +81,8 @@ export function TaskDetail({
   guest?: { visible: boolean; toggle: () => void; approval?: Todo['approval']; ask: () => void };
 }) {
   const phone = usePhone();
+  // Side panel or a pop-up in the middle; drag the edge to resize (remembered per person).
+  const fp = useFlexPanel('task', { width: 520, window: { width: 720, height: 760 } });
   const stages = stagesOf(task);
   const st = stageOf(task, stages);
   const today = localDay();
@@ -623,10 +626,12 @@ export function TaskDetail({
       </>
     );
   return (
-    <div className="drawer-scrim" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <aside className="drawer td-drawer" role="dialog" aria-label={t('Task')}>
+    <div className={`drawer-scrim ${fp.scrimClass}`} onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+      <aside className={`drawer td-drawer ${fp.className}`} style={fp.style} role="dialog" aria-label={t('Task')}>
+        {fp.edges}
         <header className="drawer-head">
           {crumbs}
+          {fp.modeButton}
           {head}
         </header>
         <div className="drawer-body">{body}</div>

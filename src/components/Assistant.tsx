@@ -4,6 +4,7 @@ import { ArrowLeft, History, Minus, Plus, Send, Sparkles, X } from 'lucide-react
 import { relative } from '../utils';
 import { Select } from './ui/Select';
 import { EmptyState } from './ui/EmptyState';
+import { useFlexPanel } from './ui/FlexPanel';
 import { t, tx } from '../i18n';
 
 /** What the assistant is looking at. */
@@ -54,6 +55,8 @@ export function Assistant(p: Props) {
   const [busy, setBusy] = useState(false);
   const [history, setHistory] = useState(false);
   const [min, setMin] = useState(false); // tucked into a pill in the corner, chat kept
+  // A window in the corner (as before) or docked down the right side; resizable, remembered per person.
+  const fp = useFlexPanel('ask', { width: 440, mode: 'window', anchor: 'corner', window: { width: 400, height: 640 }, dock: !min });
   const chat = p.chats.find((c) => c.id === chatId);
   const end = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -125,7 +128,8 @@ export function Assistant(p: Props) {
     );
 
   return (
-    <aside className="ask-drawer" role="dialog" aria-label={t('Ask AI')}>
+    <aside className={`ask-drawer ${fp.className}`} style={fp.style} role="dialog" aria-label={t('Ask AI')}>
+      {fp.edges}
       <header className="cs-head ask-head">
         {/* Phones: a full screen with Back on the left (the window controls below are desktop's). */}
         <button className="icon-btn ask-back" onClick={p.onClose} aria-label={t('Back')}>
@@ -141,6 +145,7 @@ export function Assistant(p: Props) {
         <button className="icon-btn sm" title={t('New chat')} aria-label={t('New chat')} onClick={() => (setChatId(null), setHistory(false))}>
           <Plus size={15} />
         </button>
+        {fp.modeButton}
         <button className="icon-btn sm ask-min" title={t('Minimize')} aria-label={t('Minimize')} onClick={() => setMin(true)}>
           <Minus size={15} />
         </button>

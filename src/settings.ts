@@ -206,8 +206,9 @@ export function usePersisted<T>(key: string, initial: T) {
 /* ---------- prefs that follow you between devices ---------- */
 
 // What's worth carrying to another device: your settings, saved views, tab orders and Ask AI chats.
-// Panel widths, the collapsed sidebar and "which table was open" stay with the device.
-const SYNCED = [/^pm-settings:/, /^s2g-queue-snooze:/, /^pm-blocked:/, /^s2g-ask-chats:/, /^s2g-task-views$/, /^s2g-tabs:/, /^s2g-tabbar:/, /^s2g-task-(fields|group|layout)$/, /^s2g-project-(group|card-fields|type)$/, /^s2g-briefs-open$/, /^s2g-home:/, /^s2g-chat-(views|view|starred|collapsed|drafts|typed|muted|saved|tiles):/, /^s2g-join:/, /^s2g-read:/, /^pm-drive-layout$/, /^s2g-table-view:/, /^s2g-mail-prefs$/];
+// The collapsed sidebar, list widths and "which table was open" stay with the device; side panels' size and mode
+// (s2g-panel:, src/components/ui/FlexPanel.tsx) follow the person.
+const SYNCED = [/^pm-settings:/, /^s2g-queue-snooze:/, /^pm-blocked:/, /^s2g-ask-chats:/, /^s2g-task-views$/, /^s2g-tabs:/, /^s2g-tabbar:/, /^s2g-task-(fields|group|layout)$/, /^s2g-project-(group|card-fields|type)$/, /^s2g-briefs-open$/, /^s2g-home:/, /^s2g-chat-(views|view|starred|collapsed|drafts|typed|muted|saved|tiles):/, /^s2g-join:/, /^s2g-read:/, /^pm-drive-layout$/, /^s2g-table-view:/, /^s2g-mail-prefs$/, /^s2g-panel:/];
 const isSynced = (k: string) => SYNCED.some((r) => r.test(k));
 let prefUser = '';
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
