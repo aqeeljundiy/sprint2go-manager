@@ -69,6 +69,8 @@ import * as mailFiles from './mailFiles.ts'; // mail attachments: previews, zip,
 import { isSandboxId, sandboxWsId } from '../src/sandbox.ts';
 import { companyTz, isZone } from '../src/jobTimes.ts';
 import * as connector from './connector.ts';
+// The operator console's own MCP for AI agents (server/opmcp): /admin/mcp and its tokens (Team › Agent access).
+import * as opAgents from './opmcp/routes.mjs';
 import { eventReminders, reminderWords } from './eventReminders.ts';
 import * as notesTrash from './notesTrash.ts';
 import * as mailApps from './mailApps.ts';
@@ -1827,6 +1829,8 @@ const handle = async (req: IncomingMessage, res: ServerResponse) => {
     res.writeHead(200, { 'content-type': 'image/svg+xml', 'cache-control': 'public, max-age=3600', 'x-content-type-options': 'nosniff', 'content-security-policy': "default-src 'none'; style-src 'unsafe-inline'; sandbox", 'access-control-allow-origin': '*' });
     return res.end(req.method === 'HEAD' ? undefined : data);
   }
+  // The operator console's MCP for AI agents (any model, any MCP app): a token from Team › Agent access; signed out = 401.
+  if (p === opAgents.MCP_PATH) return opAgents.mcpRoute(req, res);
   if (!p.startsWith('/api/')) return serveStatic(req, res, !!SITE_HOST && String(req.headers.host ?? '').toLowerCase() === SITE_HOST);
   if (p === '/api/health') return json(res, 200, { ok: true, at: new Date().toISOString(), build: BUILD });
   if (p === '/api/pricing' && req.method === 'GET') return json(res, 200, { pricing: platform.settings().pricing ?? null });
@@ -2148,6 +2152,7 @@ const handle = async (req: IncomingMessage, res: ServerResponse) => {
       });
       if (handled) return;
     }
+    if (p === '/api/admin/agent-tokens') return opAgents.tokensRoute(req, res, { email: String(meDoc?.email ?? ''), token: token! });
     if (p.startsWith('/api/admin/')) {
       if (!opRecord) return json(res, 403, { error: mark('Operators only.') });
       const handled = await admin.handleAdmin(p, {

@@ -225,6 +225,10 @@ ak-tabs > :where([aria-current="page"], [aria-selected="true"]) { color: var(--a
   border-radius: 2px;
   transition: transform var(--ak-dur) var(--ak-ease), width var(--ak-dur) var(--ak-ease);
 }
+/* Counts in a tab are plain numbers, never a chip in a tab (owner, 13 Nov 2026: "not friendly at all"); 0 is hidden. */
+ak-tabs .ak-count { margin-left: calc(var(--ak-space) * 1.5); padding: 0; background: none; color: var(--ak-text-muted); font-size: inherit; font-weight: var(--ak-weight-medium); transition: color var(--ak-dur-fast) var(--ak-ease); }
+ak-tabs > :where([aria-current="page"], [aria-selected="true"]) .ak-count { color: inherit; opacity: 0.7; }
+ak-tabs .ak-count[data-zero] { display: none; }
 .ak-count {
   margin-left: calc(var(--ak-space) * 1.5);
   padding: 0 calc(var(--ak-space) * 1.5);
@@ -261,6 +265,45 @@ ak-tabs > :where([aria-current="page"], [aria-selected="true"]) { color: var(--a
   gap: calc(var(--ak-space) * 2);
   padding: calc(var(--ak-space) * 3);
 }
+/* A filter that is a view ("Possible spam"): a toggle in the filter row, tinted while on. */
+.ak-list__toggle { transition: background-color var(--ak-dur-fast) var(--ak-ease), color var(--ak-dur-fast) var(--ak-ease), border-color var(--ak-dur-fast) var(--ak-ease); }
+.ak-list__toggle[aria-pressed="true"] { border-color: transparent; background: var(--ak-tab-active-bg, color-mix(in oklab, var(--ak-accent) 11%, var(--ak-surface))); color: var(--ak-tab-active-text, var(--ak-text)); }
+.ak-list__toggle .ak-count { margin-left: calc(var(--ak-space) * 1.5); padding: 0; background: none; color: inherit; opacity: 0.7; font-size: inherit; }
+/* The right end of the search and filter row: the Board / List switch, export. */
+.ak-toolbar__end { display: flex; align-items: center; gap: calc(var(--ak-space) * 2); margin-left: auto; }
+/* ---------- view switch (<ak-view-switch>): Board / List as small icon buttons, not a tab row ---------- */
+ak-view-switch { position: relative; display: inline-flex; flex: none; gap: calc(var(--ak-space) * 0.5); }
+ak-view-switch > button {
+  position: relative;
+  z-index: 1;
+  display: inline-grid;
+  place-items: center;
+  width: var(--ak-control-h);
+  height: var(--ak-control-h);
+  padding: 0;
+  border: 0;
+  border-radius: var(--ak-radius-control);
+  background: none;
+  color: var(--ak-text-muted);
+  cursor: pointer;
+  transition: color var(--ak-dur-fast) var(--ak-ease), background-color var(--ak-dur-fast) var(--ak-ease), transform var(--ak-dur-fast) var(--ak-ease);
+}
+ak-view-switch > button:hover:not([aria-pressed="true"]) { color: var(--ak-text); background: color-mix(in oklab, var(--ak-text) 5%, transparent); }
+ak-view-switch > button:active { transform: scale(0.94); }
+ak-view-switch > button[aria-pressed="true"] { color: var(--ak-tab-active-text, var(--ak-text)); }
+ak-view-switch > button:focus-visible { outline: 2px solid var(--ak-focus); outline-offset: 1px; }
+ak-view-switch:not(:defined) > button:not(:first-child) { display: none; }
+.ak-view-switch__indicator {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  border-radius: var(--ak-radius-control);
+  background: var(--ak-tab-active-bg, color-mix(in oklab, var(--ak-accent) 11%, var(--ak-surface)));
+  transition: transform var(--ak-dur) var(--ak-ease), width var(--ak-dur) var(--ak-ease);
+}
+@media (pointer: coarse) { ak-view-switch > button { width: 44px; height: 44px; } }
 .ak-toolbar > .ak-input { flex: 1 1 calc(var(--ak-space) * 60); max-width: calc(var(--ak-space) * 90); }
 .ak-muted { color: var(--ak-text-muted); }
 .ak-num { font-variant-numeric: tabular-nums; }
@@ -850,7 +893,12 @@ ak-table td[data-primary] { font-weight: var(--ak-weight-bold); }
 ak-table td[data-truncate] { max-width: calc(var(--ak-space) * 60); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* In a list, the long-text column takes whatever room is left and cuts its text with "…", so the table never grows
    wider than its card and the last column (quick actions) is never pushed out of sight. */
-.ak-list ak-table td[data-truncate] { width: 100%; max-width: 0; }
+.ak-list:not([data-fit="spread"]) ak-table td[data-truncate] { width: 100%; max-width: 0; }
+/* When the columns fit (data-fit="spread", set by the list), the spare width goes to every column in proportion,
+   never all to one (owner, 13 Nov 2026: "a lot of space isn't utilized well"). The quick actions stay tight. */
+.ak-list[data-fit="spread"] ak-table td[data-truncate] { max-width: none; }
+.ak-list[data-fit="spread"] ak-table td:has(> .ak-list__quick), .ak-list[data-fit="spread"] ak-table th[aria-label="Quick actions"] { width: 1%; }
+.ak-list ak-table td:has(> .ak-list__quick) { text-align: right; }
 .ak-list ak-table td[data-truncate] :where([data-open], .ak-list__sub) { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @keyframes ak-row { from { opacity: 0; transform: translateY(calc(var(--ak-space) * 1)); } }
 .ak-th-sort {
@@ -1340,6 +1388,27 @@ ak-board > ak-placeholder, .ak-columns > ak-placeholder { flex: 1 1 100%; grid-c
 }
 @keyframes ak-loadbar-calm { 50% { opacity: 0.35; } }
 
+/* ---------- motion for an app's own pieces (0.24.0, motion.md) ----------
+   Hand-built identity pieces (a membership card, workload bars, a greeting) get the same motion as the kit's parts. */
+:where(.ak-card):where(a, [href], [data-href], [data-open], button), [data-ak-lift] {
+  transition: transform var(--ak-dur-fast) var(--ak-ease), box-shadow var(--ak-dur-fast) var(--ak-ease), border-color var(--ak-dur-fast) var(--ak-ease);
+}
+:where(.ak-card):where(a, [href], [data-href], [data-open], button):hover, [data-ak-lift]:hover {
+  transform: translateY(calc(var(--ak-space) * -0.5));
+  box-shadow: var(--ak-shadow-pop);
+}
+[data-ak-lift]:active { transform: translateY(0) scale(0.99); }
+[data-ak-enter] > *, .ak-rows > .ak-row {
+  animation: ak-rise var(--ak-dur-slow) var(--ak-ease) both;
+  animation-delay: calc(var(--i, 0) * 40ms);
+}
+[data-ak-bar] { transform-origin: left center; transform: scaleX(var(--ak-bar, 0)); transition: transform calc(var(--ak-dur-slow) * 1.6) var(--ak-ease); }
+@media (prefers-reduced-motion: reduce) {
+  [data-ak-enter] > *, .ak-rows > .ak-row { animation: none !important; }
+  [data-ak-lift], [data-ak-lift]:hover, :where(.ak-card):where(a, [href], [data-href], [data-open], button):hover { transform: none !important; transition-duration: 0.01ms !important; }
+  [data-ak-bar] { transition: none !important; }
+}
+
 /* ---------- signed out: only the sign-in, never the menu ---------- */
 /* Put signed-out on <ak-frame> while the sign-in shows. The menu would show strangers the backend's
    structure and makes the page look half-loaded; the sign-in sits alone in the middle of the screen. */
@@ -1436,10 +1505,16 @@ html[data-ak-nav="labels"] .ak-nav-group__trigger > [slot="icon"],
 html[data-ak-nav="labels"] .ak-nav-group__chevron { display: none; }
 html[data-ak-nav="labels"] ak-nav-group[data-has-active] > .ak-nav-group__trigger { color: var(--ak-sidebar-heading, color-mix(in oklab, var(--ak-sidebar-text, var(--ak-text-muted)) 55%, var(--ak-sidebar-bg, var(--ak-surface)))); }
 html[data-ak-nav="labels"] ak-nav-group:not(:defined) > a { display: flex; }
+/* labels keeps menu icons (0.24.0). Only the heading's icon steps aside; every link shows its own icon, lined up
+   with the links outside sections. The owner: the kit's text-only menu erased the icons his apps had in v1. */
+html[data-ak-nav="labels"] .ak-nav-group__inner > a > :where(svg, img, [slot="icon"]) { display: inline-flex; }
 
 /* Sidebar. flush: full height, one line between it and the page. floating: an inset panel with its own corners. */
 @media (min-width: 901px) {
+  /* Pinned to the top of its column (0.24.0): it starts where the page starts and stays there while the page scrolls.
+     A full-page screenshot taken while scrolled drew it mid-screen; render-check now scrolls to the top first. */
   html[data-ak-sidebar="floating"] ak-sidebar {
+    align-self: start;
     top: calc(var(--ak-space) * 3);
     height: calc(100dvh - var(--ak-space) * 6);
     margin: calc(var(--ak-space) * 3) 0 calc(var(--ak-space) * 3) calc(var(--ak-space) * 3);
@@ -1462,26 +1537,38 @@ html[data-ak-nav="labels"] ak-nav-group:not(:defined) > a { display: flex; }
   html[data-ak-stats="strip"] ak-stats > ak-stat { border: 0; border-radius: 0; box-shadow: none; padding: calc(var(--ak-space) * 5); }
 }
 
-/* Tabs. underline: a line slides under the current tab. segmented: a sliding tile inside a quiet track. */
-html[data-ak-tabs="segmented"] ak-tabs {
-  display: inline-flex;
+/* Tabs. underline: a line slides under the current tab (GitHub, Stripe). pill (0.23.0; "segmented" is the old name and
+   now means the same): no track; the current tab is a soft tinted pill that glides to the tab you pick, the others
+   are plain text with a light hover (Linear's view tabs, Shopify Polaris index tabs). Never a pill inside a grey
+   track (owner, 13 Nov 2026: "so weird ... not friendly at all"). */
+html:is([data-ak-tabs="segmented"], [data-ak-tabs="pill"]) ak-tabs {
+  display: flex;
   max-width: 100%;
   gap: calc(var(--ak-space) * 1);
-  padding: calc(var(--ak-space) * 1);
+  padding: 0;
   border-bottom: 0;
-  border-radius: min(var(--ak-radius-control), var(--ak-radius-card)); /* never rounder than the card it sits in */
-  background: var(--ak-surface-2);
+  background: none;
 }
-html[data-ak-tabs="segmented"] ak-tabs > :where(a, button) { position: relative; z-index: 1; padding: calc(var(--ak-space) * 1.5) calc(var(--ak-space) * 3); border-radius: var(--ak-radius-inner); }
-html[data-ak-tabs="segmented"] .ak-tabs__indicator {
-  top: calc(var(--ak-space) * 1);
-  bottom: calc(var(--ak-space) * 1);
+html:is([data-ak-tabs="segmented"], [data-ak-tabs="pill"]) ak-tabs > :where(a, button) {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  padding: calc(var(--ak-space) * 1.75) calc(var(--ak-space) * 3.5);
+  border-radius: var(--ak-radius-control);
+  transition: color var(--ak-dur-fast) var(--ak-ease), background-color var(--ak-dur-fast) var(--ak-ease);
+}
+html:is([data-ak-tabs="segmented"], [data-ak-tabs="pill"]) ak-tabs > :where(a, button):not([aria-current="page"], [aria-selected="true"]):hover { background: color-mix(in oklab, var(--ak-text) 5%, transparent); }
+html:is([data-ak-tabs="segmented"], [data-ak-tabs="pill"]) ak-tabs > :where([aria-current="page"], [aria-selected="true"]) { color: var(--ak-tab-active-text, var(--ak-text)); }
+html:is([data-ak-tabs="segmented"], [data-ak-tabs="pill"]) .ak-tabs__indicator {
+  top: 0;
+  bottom: 0;
   height: auto;
-  border-radius: var(--ak-radius-inner);
-  background: var(--ak-surface);
-  box-shadow: 0 0 0 1px var(--ak-border);
+  border-radius: var(--ak-radius-control);
+  background: var(--ak-tab-active-bg, color-mix(in oklab, var(--ak-accent) 11%, var(--ak-surface)));
 }
-html[data-ak-tabs="segmented"] .ak-list__views > ak-tabs { flex: 0 1 auto; }
+html:is([data-ak-tabs="segmented"], [data-ak-tabs="pill"]) .ak-list__views { padding-block: calc(var(--ak-space) * 2.5); }
+html:is([data-ak-tabs="segmented"], [data-ak-tabs="pill"]) .ak-list__views > ak-tabs { flex: 0 1 auto; }
 
 /* Tables. lined: a line under every row. open: no lines between rows, more air; the hover fill marks the row. */
 html[data-ak-table="open"] ak-table td { border-bottom: 0; padding-block: calc(var(--ak-space) * 2.5); }
@@ -1490,7 +1577,7 @@ html[data-ak-table="open"] ak-table th { border-bottom-color: var(--ak-border-st
 /* Page title. plain: title and actions on the page. ruled: a hairline under the title, like a document heading. */
 html[data-ak-head="ruled"] .ak-page-head { padding-bottom: calc(var(--ak-space) * 5); border-bottom: 1px solid var(--ak-border); }
 @media (max-width: 900px), (pointer: coarse) {
-  html[data-ak-tabs="segmented"] ak-tabs > :where(a, button) { min-height: 44px; }
+  html:is([data-ak-tabs="segmented"], [data-ak-tabs="pill"]) ak-tabs > :where(a, button) { min-height: 44px; }
 }
 
 /* ---------- list pages: one scroll (0.15.0) ----------
@@ -1525,3 +1612,50 @@ html[data-ak-head="ruled"] .ak-page-head { padding-bottom: calc(var(--ak-space) 
 .ak-columns { columns: calc(var(--ak-space) * 130) 3; column-gap: calc(var(--ak-space) * 5); }
 .ak-columns > * { break-inside: avoid; margin-bottom: calc(var(--ak-space) * 5); }
 .ak-columns > :last-child { margin-bottom: 0; }
+
+/* ---------- <ak-splash>: first-load / long-wait screen (0.24.0) ----------
+   Liked by the owner in another app (references/taste.md): the site's mark glowing softly in the brand colour, a
+   thin short line, an optional tip. Every value is the theme's, so each site's splash looks like that site. */
+ak-splash:not(:defined), ak-splash[hidden] { display: none; }
+ak-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: calc(var(--ak-space) * 6);
+  background:
+    radial-gradient(closest-side, color-mix(in oklab, var(--ak-accent) 14%, transparent), transparent) center / min(90vw, calc(var(--ak-space) * 180)) min(90vw, calc(var(--ak-space) * 180)) no-repeat,
+    var(--ak-splash-bg, var(--ak-bg));
+  color: var(--ak-text);
+  font-family: var(--ak-font);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--ak-dur-slow) var(--ak-ease);
+}
+ak-splash[data-on] { opacity: 1; pointer-events: auto; }
+ak-splash[data-out] { opacity: 0; pointer-events: none; }
+.ak-splash__inner { display: flex; flex-direction: column; align-items: center; gap: calc(var(--ak-space) * 3); max-width: calc(var(--ak-space) * 110); text-align: center; }
+.ak-splash__mark {
+  width: calc(var(--ak-space) * 10);
+  height: calc(var(--ak-space) * 10);
+  object-fit: contain;
+  filter: drop-shadow(0 0 calc(var(--ak-space) * 3) color-mix(in oklab, var(--ak-accent) 55%, transparent));
+  animation: ak-splash-glow 2.4s ease-in-out infinite;
+}
+@keyframes ak-splash-glow { 50% { filter: drop-shadow(0 0 calc(var(--ak-space) * 1.5) color-mix(in oklab, var(--ak-accent) 30%, transparent)); } }
+.ak-splash__track { position: relative; overflow: hidden; width: calc(var(--ak-space) * 24); height: 2px; border-radius: 2px; background: color-mix(in oklab, var(--ak-text) 12%, transparent); }
+.ak-splash__line { position: absolute; inset: 0; transform-origin: left center; border-radius: inherit; background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--ak-text) 70%, var(--ak-accent))); animation: ak-slide 1.6s var(--ak-ease) infinite; width: 45%; }
+ak-splash[data-known] .ak-splash__line { width: 100%; animation: none; background: color-mix(in oklab, var(--ak-text) 70%, var(--ak-accent)); transition: transform var(--ak-dur) var(--ak-ease); }
+.ak-splash__words { min-height: 1em; color: var(--ak-text-muted); font-size: var(--ak-text-xs); }
+.ak-splash__words:empty { display: none; }
+.ak-splash__tip { display: flex; flex-direction: column; gap: calc(var(--ak-space) * 1); margin-top: calc(var(--ak-space) * 2); opacity: 0; }
+.ak-splash__tip[data-in] { animation: ak-rise var(--ak-dur-slow) var(--ak-ease) both; opacity: 1; }
+.ak-splash__label { color: var(--ak-accent); font-size: var(--ak-text-xs); font-weight: var(--ak-weight-bold); letter-spacing: 0.08em; text-transform: uppercase; }
+.ak-splash__title { color: var(--ak-text); font-size: var(--ak-text-md); font-weight: var(--ak-weight-bold); }
+.ak-splash__text { color: var(--ak-text-muted); font-size: var(--ak-text-sm); }
+@media (prefers-reduced-motion: reduce) {
+  .ak-splash__mark, .ak-splash__line, .ak-splash__tip[data-in] { animation: none !important; }
+  .ak-splash__line { width: 100%; opacity: 0.6; }
+  ak-splash { transition-duration: 0.01ms; }
+}

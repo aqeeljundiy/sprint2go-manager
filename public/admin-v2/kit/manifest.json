@@ -1,8 +1,12 @@
 {
-  "version": "0.22.0",
+  "version": "0.25.0",
   "files": {
-    "admin-kit.js": "d6fc93032675e663447429476984cc8a822538d2e8fac0c4e12a0aa6b61b1230",
-    "admin-kit-editor.js": "6589831099ca0f4f909f8331baaafa2ad6d7fa12fbb4ec9f67eb7d3af9b109f7",
-    "admin-kit.css": "8e27ba6a1e600f2dca362ade9bab3c104c60e6163c5e0e43c293a9a717b20975"
+    "admin-kit.js": "b3b637d8d39e5e0df34d64d0e0394fd29ee7ee18c4dda71495374736a15c638b",
+    "admin-kit-editor.js": "e041789a1738a72c8075b395edb814368d00c6d307a6f28a587f9ba2da09a1f1",
+    "admin-kit.css": "3f339b4c7c5095719cfdc51f4f5661e2b6f3e0e2480392bcd87d9fad511406b3",
+    "admin-kit-agents.js": "bfa5a35906f0b1c4582eb91f635af0d765fd9b4b4607cf072adde891d84567f5"
+  },
+  "mcp": {
+    "ak-mcp.mjs": "6593d20b8e3f926868e5144fb2434734cf9227b43ff6ea858070096601789a1e"
   }
 }

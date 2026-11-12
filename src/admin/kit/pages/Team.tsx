@@ -1,6 +1,6 @@
 // Team: who runs sprint2go and what each may do, and what operators did (the audit log). Without the old settings
 // grab bag: support settings moved to Tickets, invoice details and the unpaid rule to Money.
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { dateTime, post, rel, ROLE_HINT, ROLE_LABEL, type OpRole } from '../../api';
 import { useAct, useAdmin, useApi } from '../../ui';
 import { Card, Chip, Dropdown, Failed, Page, Tabs, esc, useKitList } from '../parts';
@@ -11,11 +11,13 @@ interface AuditEntry { id: number; at: string; operator: string; action: string;
 const ROLES: OpRole[] = ['owner', 'admin', 'support', 'finance', 'readonly'];
 
 export function Team({ tab }: { tab?: string }) {
-  const [view, setView] = useState(tab === 'audit' ? 'audit' : 'operators');
+  const { me } = useAdmin();
+  const owner = me.role === 'owner';
+  const [view, setView] = useState(tab === 'audit' ? 'audit' : tab === 'agents' && owner ? 'agents' : 'operators');
   return (
     <Page title={t('Team')} sub={t('The people who run sprint2go, and what each of them did.')}>
-      <Tabs id="team-tabs" value={view} onChange={(v) => (history.replaceState(null, '', `/admin/v2/team/${v}`), setView(v))} items={[{ id: 'operators', label: t('Operators') }, { id: 'audit', label: t('Audit log') }]} />
-      {view === 'audit' ? <Audit /> : <Operators />}
+      <Tabs id="team-tabs" value={view} onChange={(v) => (history.replaceState(null, '', `/admin/v2/team/${v}`), setView(v))} items={[{ id: 'operators', label: t('Operators') }, { id: 'audit', label: t('Audit log') }, ...(owner ? [{ id: 'agents', label: t('Agent access') }] : [])]} />
+      {view === 'audit' ? <Audit /> : view === 'agents' ? <Agents /> : <Operators />}
     </Page>
   );
 }
@@ -91,4 +93,32 @@ function Audit() {
       {el}
     </>
   );
+}
+
+// Agent access: tokens for AI agents (any model, any MCP app) that read or work in the console through /admin/mcp.
+// The page part is the kit's (public/admin-v2/kit/admin-kit-agents.js); the tools are in server/opmcp/tools.mjs.
+// Only owners see this tab, and the server answers 401/403 to anyone else.
+function Agents() {
+  const host = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = host.current;
+    if (!el) return;
+    let gone = false;
+    const start = () => {
+      const kit = window.AdminKit as unknown as { agentAccess?: (el: HTMLElement, o: { api: string; mcpUrl: string; site: string }) => void };
+      if (gone) return;
+      if (kit?.agentAccess) kit.agentAccess(el, { api: '/api/admin/agent-tokens', mcpUrl: location.origin + '/admin/mcp', site: 'sprint2go operators' });
+      else setTimeout(start, 50);
+    };
+    if (!document.querySelector('script[data-ak-agents]')) {
+      const sc = document.createElement('script');
+      sc.src = '/admin-v2/kit/admin-kit-agents.js';
+      sc.defer = true;
+      sc.dataset.akAgents = '';
+      document.head.appendChild(sc);
+    }
+    start();
+    return () => { gone = true; el.replaceChildren(); };
+  }, []);
+  return <div ref={host}><ak-placeholder kind="list" rows="3" /></div>;
 }

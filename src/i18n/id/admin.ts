@@ -189,6 +189,7 @@ const id: Record<string, string> = {
   "at the pace so far": "dengan laju sejauh ini",
   "At the pace so far this month": "Menurut laju bulan ini",
   "Audit log": "Log audit",
+  "Agent access": "Akses agen",
   "Back to automatic": "Kembali ke otomatis",
   "Back to list prices and {rate}": "Kembali ke harga resmi dan {rate}",
   "Back to the app": "Kembali ke aplikasi",

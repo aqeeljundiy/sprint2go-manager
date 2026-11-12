@@ -108,7 +108,8 @@ function healthOf(c: { lastActive: string | null; people: number; state: State; 
   return { score, label: score >= 70 ? 'healthy' : score >= 40 ? 'watch' : 'risk', parts } as const;
 }
 
-function companyRows(ctx: AdminCtx) {
+/** Also read by the agent tools (server/opmcp/tools.mjs). */
+export function companyRows(ctx: Pick<AdminCtx, 'spendRp'>) {
   const users = db.allDocs('users') as any[];
   const byId = new Map(users.map((u) => [u.id, u]));
   const seen = db.lastSeen();
