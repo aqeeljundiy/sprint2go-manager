@@ -137,6 +137,7 @@ const id: Record<string, string> = {
   'Sent to {name} for review': 'Dikirim ke {name} untuk direview',
   'Done. The next one is due {day}': 'Selesai. Berikutnya tenggat {day}',
   'Done: {title}': 'Selesai: {title}',
+  '{n} repeat or need review: finish them in the full task view': '{n} tugas berulang atau perlu ditinjau: selesaikan di tampilan tugas lengkap',
   'Moved to {where}, still in “{stage}”.': 'Dipindah ke {where}, tetap di “{stage}”.',
   'Moved to {where}, which has no “{from}” stage, so the task is in “{stage}” now.': 'Dipindah ke {where}, yang tidak punya tahap “{from}”, jadi tugasnya sekarang di “{stage}”.',
   'Assigned to {name}': 'Ditugaskan ke {name}',

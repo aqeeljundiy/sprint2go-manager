@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Todo } from '../../types';
 import { useStored } from '../../store';
-import { t } from '../../i18n';
-import { kindOf } from '../../stages';
+import { msg, t } from '../../i18n';
+import { kindOf, stageIdFor, stagesForTask } from '../../stages';
 import { Chip, DateField, Drawer, Dropdown, Page, esc, todayKey, uid, useKitList, useV2 } from '../ui';
 import { doers, inWs, isMine, nameOf, useTeam } from '../team';
 import { ICON } from '../Shell';
@@ -23,11 +23,23 @@ export function Tasks() {
   const projects = useMemo(() => clients.filter((c) => c.workspaceId === ws.id), [clients, ws.id]);
   const rows = useMemo(() => todos.filter(inWs(ws)).filter((tk) => tk.kind !== 'brief' && (isMine(me)(tk) || tk.createdBy === me.id)), [todos, ws, me]);
   const projectName = (id?: string) => projects.find((c) => c.id === id)?.name ?? '';
+  // Same rules as v1's setTaskStatus for the common case: the task's own done stage, a history line, and Undo
+  // that puts back exactly what was there. A repeating task (makes its next copy) or one someone reviews
+  // (goes to the supervisor first) is finished in the full task view, where those rules live.
+  const needsFullView = (tk: Todo) => !!tk.repeat || (!!tk.supervisorId && tk.supervisorId !== me.id);
   const finish = useCallback(
     (tk: Todo, done = true) => {
-      setTodos((list) => list.map((x) => (x.id === tk.id ? { ...x, done, status: done ? 'done' : 'todo', doneAt: done ? new Date().toISOString() : undefined, doneBy: done ? me.id : undefined } : x)));
-      toast(done ? t('Done: {title}', { title: tk.title }) : t('Opened again'), done ? { action: { label: t('Undo'), onClick: () => finish(tk, false) } } : undefined);
+      if (done && needsFullView(tk)) { location.href = `/tasks/${tk.id}`; return; }
+      const list = stagesForTask(tk);
+      const before = { status: tk.status, done: tk.done, doneAt: tk.doneAt, doneBy: tk.doneBy, history: tk.history };
+      const status = stageIdFor(tk, done ? 'done' : 'open', list);
+      const at = new Date().toISOString();
+      const line = done ? msg('marked it done') : msg('reopened it');
+      setTodos((all) => all.map((x) => (x.id === tk.id ? { ...x, status, done, doneAt: done ? at : undefined, doneBy: done ? me.id : undefined, history: [...(x.history ?? []), { id: uid(), at, by: me.id, kind: 'status' as const, ...line }] } : x)));
+      const undo = () => setTodos((all) => all.map((x) => (x.id === tk.id ? { ...x, ...before } : x)));
+      toast(done ? t('Done: {title}', { title: tk.title }) : t('Opened again'), { action: { label: t('Undo'), onClick: undo } });
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [setTodos, me.id, toast],
   );
   const { el } = useKitList<Todo>(
@@ -51,7 +63,7 @@ export function Tasks() {
         { key: 'stage', label: t('Stage'), value: (r) => kindOf(r), cell: (r) => { const [l, tone] = STAGE[kindOf(r)] ?? STAGE.open; return `<ak-chip tone="${tone}">${esc(t(l))}</ak-chip>`; } },
       ],
       actions: [{ key: 'done', label: t('Mark done'), icon: ICON.done, show: (r) => !r.done, run: (r) => finish(r) }],
-      bulk: [{ key: 'done', label: t('Mark done'), run: (list) => list.forEach((r) => finish(r)) }],
+      bulk: [{ key: 'done', label: t('Mark done'), run: (list) => { const simple = list.filter((r) => !needsFullView(r)); simple.forEach((r) => finish(r)); if (simple.length < list.length) toast(t('{n} repeat or need review: finish them in the full task view', { n: list.length - simple.length })); } }],
       onOpen: (r) => setOpen(r.id),
       summary: (list) => t('{n} tasks', { n: list.length }),
       empty: { none: t('No tasks yet. New task adds one.'), views: { today: t('Nothing due today. Upcoming shows what comes next.') } },
