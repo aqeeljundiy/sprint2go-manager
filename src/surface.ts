@@ -18,5 +18,13 @@ export const adminHome = v2 ? '/admin/v2' : '/admin';
 /** A console address written the v1 way (/admin/tickets) for this surface (/admin/v2/tickets on v2). */
 export const adminPath = (to: string) => (adminV2 && /^\/admin(\/|$)/.test(to) && !/^\/admin\/v2(\/|$)/.test(to) ? to.replace(/^\/admin/, '/admin/v2') : to);
 
-// The v2 layer's styles all sit under html.s2v2, so they never touch v1.
-if (v2 && typeof document !== 'undefined') document.documentElement.classList.add('s2v2');
+// The v2 layer's styles all sit under html.s2v2 (html.s2v2-admin on the console), so they never touch v1.
+if (v2 && typeof document !== 'undefined') {
+  document.documentElement.classList.add('s2v2');
+  if (adminV2) document.documentElement.classList.add('s2v2-admin');
+  // Going from one page to another fades instead of snapping (full page loads; inside the app each screen already
+  // rises in). Only on v2, so v1's pages stay as they were; reduced motion turns it off.
+  const vt = document.createElement('style');
+  vt.textContent = '@view-transition{navigation:auto}::view-transition-old(root){animation-duration:180ms}::view-transition-new(root){animation-duration:240ms}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none}}';
+  document.head.appendChild(vt);
+}

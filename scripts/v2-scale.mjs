@@ -25,9 +25,12 @@ const ORDER = ['tokens', 'styles', 'calendar', 'shell', 'brand', 'apps', 'ui', '
 const EXTRA = ['connector.css', 'mailFiles.css', 'phoneMailApps.css', 'settingsSearch.css', 'components/chat/chat.css', 'components/imports/imports.css', 'components/mail/organize.css', 'components/mail/teams.css', 'components/meetExtras.css', 'components/projectPulse.css', 'components/ui/personCard.css', 'components/vault.css'];
 const FILES = [...ORDER, ...EXTRA].filter((f) => existsSync(join(SRC, f)));
 
-// The scale: tokens.css (type 24/17/15/13/12, radii 10/16/pill/round, 4/8 spacing), plus 14 for desktop body text and
-// v1's display sizes. A value folds to the nearest step.
-const SIZES = [12, 13, 14, 15, 17, 20, 24, 28, 32, 36, 44];
+// The scale: tokens.css (type 24/17/15/13/12, radii 10/16/pill/round, 4/8 spacing). Six text sizes per surface (the
+// --ak-text-* steps in src/v2.css): the team app and portal 12/13/15/17/24 + the 36 greeting (desktop's 14 joins the
+// phone's 15 body); the console keeps its 14 body: 12/13/14/15/17/24.
+const TEAM = (n) => (n <= 12.5 ? 12 : n <= 13.5 ? 13 : n <= 16 ? 15 : n <= 20 ? 17 : n <= 30 ? 24 : 36);
+const CONSOLE = (n) => (n <= 12.5 ? 12 : n < 13.5 ? 13 : n < 14.5 ? 14 : n <= 16 ? 15 : n <= 20 ? 17 : 24);
+const SIZES = ['12/13/15/17/24/36 (app)', '12/13/14/15/17/24 (console)'];
 const RADII = [6, 8, 10, 12, 16, 24]; // rounded up: a corner never gets smaller, so circles and pills stay round
 const SPACE = [4, 8, 12, 16, 20, 24, 32, 40, 48, 56, 64];
 const nearest = (v, list) => list.reduce((b, x) => (Math.abs(x - v) < Math.abs(b - v) ? x : b), list[0]);
@@ -40,7 +43,8 @@ const px = (fold) => (value) =>
         return f === null ? m : `${f === 0 ? '' : sign}${f}px`;
       });
 const FOLD = {
-  'font-size': px((n) => (n < 11 ? null : n > 48 ? null : nearest(n, SIZES))),
+  'font-size': px((n) => (n < 10 || n > 48 ? null : TEAM(n))),
+  'font-size@console': px((n) => (n < 10 || n > 48 ? null : CONSOLE(n))),
   'font-weight': (v) => ({ 500: '500', 550: '600', 650: '600', 750: '700', 900: '800', bold: '700' })[v.trim()] ?? (/^\d+$/.test(v.trim()) ? v.trim() : null),
   'border-radius': (v) => (/var\(|calc\(/.test(v) ? null : v.replace(/(\d*\.?\d+)px\b/g, (m, n) => (Number(n) >= 40 ? '999px' : Number(n) === 0 ? '0' : `${RADII.find((r) => r >= Number(n)) ?? Number(n)}px`))),
   // spacing: hairlines (1, 2 px) stay; the rest folds onto the 4/8 scale
@@ -52,15 +56,15 @@ const phoneMedia = (node) => {
   for (let p = node.parent; p; p = p.parent) if (p.type === 'atrule' && p.name === 'media' && /max-width:\s*(767|599|359|480|540|640|700|720)px/.test(p.params)) return true;
   return false;
 };
-const scope = (sel) =>
+const scope = (sel, cls = '.s2v2') =>
   sel
     .split(/,(?![^(]*\))/)
     .map((s) => {
       s = s.trim();
       // :where() adds no weight, so each copy has exactly its v1 rule's specificity and wins only by coming later
-      if (/^:root\b/.test(s)) return s.replace(/^:root/, ':root:where(.s2v2)');
-      if (/^html\b/.test(s)) return s.replace(/^html/, 'html:where(.s2v2)');
-      return `:where(:root.s2v2) ${s}`;
+      if (/^:root\b/.test(s)) return s.replace(/^:root/, `:root:where(${cls})`);
+      if (/^html\b/.test(s)) return s.replace(/^html/, `html:where(${cls})`);
+      return `:where(:root${cls}) ${s}`;
     })
     .join(',\n');
 
@@ -74,18 +78,29 @@ for (const f of FILES) {
     const decls = rule.nodes.filter((d) => d.type === 'decl' && FOLD[d.prop]);
     if (!decls.length) return;
     const copy = postcss.rule({ selector: scope(rule.selector) });
+    // text sizes differ per surface: one copy for the app and portal, one for the console (both weightless)
+    const app = postcss.rule({ selector: scope(rule.selector, '.s2v2:not(.s2v2-admin)') });
+    const con = postcss.rule({ selector: scope(rule.selector, '.s2v2-admin') });
     for (const d of decls) {
+      if (d.prop === 'font-size' && !phone) {
+        const a = FOLD['font-size'](d.value), c = FOLD['font-size@console'](d.value);
+        if (a !== null) (app.append(postcss.decl({ prop: d.prop, value: a, important: d.important })), a !== d.value && folded++);
+        if (c !== null) con.append(postcss.decl({ prop: d.prop, value: c, important: d.important }));
+        continue;
+      }
       const v = phone ? d.value : FOLD[d.prop](d.value);
       if (v === null) continue;
       if (v !== d.value) folded++;
       copy.append(postcss.decl({ prop: d.prop, value: v, important: d.important }));
     }
-    if (!copy.nodes.length) return;
-    rules++;
-    // keep the media / supports / container wrapper the rule sat in
-    let node = copy;
-    for (let p = rule.parent; p && p.type === 'atrule'; p = p.parent) node = postcss.atRule({ name: p.name, params: p.params }).append(node);
-    out.append(node);
+    for (const r of [copy, app, con]) {
+      if (!r.nodes?.length) continue;
+      rules++;
+      // keep the media / supports / container wrapper the rule sat in
+      let node = r;
+      for (let p = rule.parent; p && p.type === 'atrule'; p = p.parent) node = postcss.atRule({ name: p.name, params: p.params }).append(node);
+      out.append(node);
+    }
   });
 }
 const head = `/* GENERATED by scripts/v2-scale.mjs from v1's own CSS: do not edit by hand. ${rules} rules, ${folded} values folded onto the

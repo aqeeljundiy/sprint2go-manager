@@ -418,3 +418,55 @@
 .s2v2 :is(.link-btn, .signin a, .adm-link):hover {
   color: var(--accent-text, var(--accent));
 }
+
+/* Figures that count up (console stat tiles): the real figure stays in place, invisible while the counting one is
+   drawn over it, so the tile never changes width and copy or search always get the real number. */
+.s2v2 .count-up {
+  position: relative;
+  display: inline-block;
+}
+.s2v2 .count-up[data-shown] .count-final {
+  color: transparent;
+}
+.s2v2 .count-up[data-shown]::after {
+  content: attr(data-shown);
+  position: absolute;
+  top: 0;
+  left: 0;
+  white-space: nowrap;
+}
+
+/* The type scale, named the way the kit's render-check reads it (--ak-text-*): six sizes per surface, from v1's own
+   system (tokens.css: 24/17/15/13/12) plus the big greeting. */
+:root.s2v2 {
+  --ak-text-xs: 12px;
+  --ak-text-sm: 13px;
+  --ak-text-md: 15px;
+  --ak-text-lg: 17px;
+  --ak-text-xl: 24px;
+  --ak-text-title: 36px;
+}
+:root.s2v2-admin {
+  --ak-text-xs: 12px;
+  --ak-text-sm: 13px;
+  --ak-text-md: 14px;
+  --ak-text-lg: 15px;
+  --ak-text-xl: 17px;
+  --ak-text-title: 24px;
+}
+
+/* Console on phones: the search button and the list views are proper tap targets, and the views scroll sideways in
+   one row instead of wrapping into four. */
+@media (max-width: 767px) {
+  .s2v2 .adm-searchbtn,
+  .s2v2 .adm-views > button,
+  .s2v2 .adm-tabs > button,
+  .s2v2 .adm .segmented > button {
+    min-height: var(--tap);
+  }
+  .s2v2 .adm-views {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+}
