@@ -47,5 +47,8 @@ export const BlockDialog = split(() => import('./components/BlockDialog').then((
 export const AdminApp = split(() => import('./admin/AdminApp').then((m) => m.AdminApp));
 // The console v2 at /admin/v2, on aqeel-admin-kit: its own root and styles, loaded only there (v1 at /admin is unchanged).
 export const AdminV2 = split(() => import('./admin/kit/KitAdmin').then((m) => m.KitAdmin));
+// The customer app and client portal v2 at /v2, on aqeel-admin-kit: their own root and styles, loaded only there (v1 at / is unchanged).
+export const AppV2 = split(() => import('./app-v2/AppV2').then((m) => m.AppV2));
+export const PortalV2 = split(() => import('./app-v2/Portal').then((m) => m.PortalV2));
 export const ActingBanner = split(() => import('./admin/AdminApp').then((m) => m.ActingBanner));
 export const ConnectApp = split(() => import('./components/ConnectApp').then((m) => m.ConnectApp));

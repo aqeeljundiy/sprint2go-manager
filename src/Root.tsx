@@ -12,7 +12,10 @@ import App from './App';
 import { clientActions } from './clientActions';
 import { accessFor, afterEnd, clientInbox, portalsFor } from './clientView';
 import { WorkspaceSwitcher } from './components/WorkspaceSwitcher';
-import { ActingBanner, AdminApp, AdminV2, ClientApp, ConnectApp, Onboarding, SharedHome } from './lazy';
+import { ActingBanner, AdminApp, AdminV2, AppV2, ClientApp, ConnectApp, Onboarding, PortalV2, SharedHome } from './lazy';
+
+/** /v2 and below: the customer app and client portal rebuilt on aqeel-admin-kit. */
+const isV2 = () => /^\/v2(\/|$)/.test(location.pathname);
 import { setPhotos } from './photos';
 import { Wordmark } from './components/Logo';
 import { AcceptInvite, SignIn, SignUp } from './components/SignIn';
@@ -153,6 +156,7 @@ function ServerRoot({ me }: { me: string }) {
   // Only a client somewhere (no workspace of their own): straight to their portal.
   if (user && !workspaces.some((w) => w.members.some((m) => m.userId === me))) return <ClientRoot me={user} />;
   if (!user) return <NoWorkspace email="" onBack={() => void signOut()} />;
+  if (isV2()) return <AppV2 user={user} users={users} workspaces={workspaces} />; // the kit build at /v2; v1 below stays the backup
   return (
     <>
     <PausedBanner workspaces={workspaces} me={me} />
@@ -463,9 +467,11 @@ function ClientRoot({ me }: { me: User }) {
     },
   });
   const inbox = [me.id, clientInbox(me.email)];
+  // The client portal v2 at /v2 takes the same props as v1's; v1 at / is unchanged.
+  const Portal = isV2() ? PortalV2 : ClientApp;
   return (
     <>
-    <ClientApp
+    <Portal
       ws={ws}
       client={client}
       person={person}

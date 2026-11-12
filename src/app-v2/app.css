@@ -1,0 +1,246 @@
+/* The customer app and client portal v2's own few pieces. Theme values only: every colour, size, corner and timing
+   comes from public/app-v2/app-theme.css. */
+
+.s2a-brand {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--ak-space) * 2);
+  min-width: 0;
+}
+.s2a-brand img,
+.s2a-logo {
+  width: calc(var(--ak-space) * 7);
+  height: calc(var(--ak-space) * 7);
+  border-radius: var(--ak-radius-inner);
+  flex: none;
+  object-fit: cover;
+}
+.s2a-logo {
+  display: grid;
+  place-items: center;
+  background: var(--ak-accent);
+  color: var(--ak-accent-text);
+  font-weight: var(--ak-weight-bold);
+  font-size: var(--ak-text-sm);
+}
+.s2a-brand__name {
+  font-weight: var(--ak-weight-bold);
+  font-size: var(--ak-text-md);
+  color: var(--ak-sidebar-brand);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.s2a-brand__tag {
+  font-size: var(--ak-text-xs);
+  color: var(--ak-text-muted);
+}
+.s2a-side-foot {
+  margin-top: auto;
+  display: grid;
+  gap: var(--ak-space);
+  padding-top: calc(var(--ak-space) * 3);
+}
+.s2a-search {
+  justify-content: flex-start;
+  gap: calc(var(--ak-space) * 2);
+}
+.s2a-search svg {
+  width: calc(var(--ak-space) * 4);
+  height: calc(var(--ak-space) * 4);
+}
+.s2a-search .ak-kbd {
+  margin-left: auto;
+}
+
+/* Home and the portal's Home: cards in as many columns as fit, each at least 320px wide (one column on a phone).
+   The v1 portal put its cards on a 12-column grid without saying how many columns each takes, so each got 1/12. */
+.s2a-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(var(--ak-space) * 80)), 1fr));
+  gap: calc(var(--ak-space) * 4);
+  align-items: start;
+}
+.s2a-cards > .ak-card {
+  min-width: 0;
+}
+.s2a-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+}
+.s2a-row {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--ak-space) * 3);
+  min-height: var(--ak-row-h);
+  padding: calc(var(--ak-space) * 2) 0;
+  border-bottom: 1px solid var(--ak-border);
+  min-width: 0;
+}
+.s2a-row:last-child {
+  border-bottom: 0;
+}
+.s2a-row__main {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: calc(var(--ak-space) / 2);
+}
+.s2a-row__main > * {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.s2a-row__title {
+  font-weight: var(--ak-weight-medium);
+  color: var(--ak-text);
+  white-space: nowrap;
+}
+.s2a-row__sub {
+  font-size: var(--ak-text-sm);
+  color: var(--ak-text-muted);
+  white-space: nowrap;
+}
+button.s2a-row {
+  width: 100%;
+  background: none;
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  transition: background var(--ak-dur-fast) var(--ak-ease);
+}
+button.s2a-row:hover {
+  background: var(--ak-surface-2);
+}
+.s2a-empty {
+  display: grid;
+  gap: calc(var(--ak-space) * 2);
+  justify-items: start;
+  padding: calc(var(--ak-space) * 2) 0;
+}
+.s2a-empty p {
+  margin: 0;
+}
+.s2a-open {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-weight: var(--ak-weight-medium);
+  color: var(--ak-text);
+  cursor: pointer;
+  text-align: left;
+}
+.s2a-sub {
+  display: block;
+  font-size: var(--ak-text-sm);
+  color: var(--ak-text-muted);
+  white-space: normal;
+}
+.s2a-read {
+  white-space: pre-wrap;
+  line-height: 1.6;
+  max-width: 70ch;
+  overflow-wrap: anywhere;
+}
+.s2a-read p {
+  margin: 0 0 calc(var(--ak-space) * 3);
+}
+.s2a-form {
+  display: grid;
+  gap: calc(var(--ak-space) * 4);
+}
+.s2a-facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: calc(var(--ak-space) * 2) calc(var(--ak-space) * 4);
+  margin: 0;
+}
+.s2a-facts dt {
+  color: var(--ak-text-muted);
+  font-size: var(--ak-text-sm);
+}
+.s2a-facts dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.s2a-msgs {
+  display: grid;
+  gap: calc(var(--ak-space) * 3);
+}
+.s2a-msg {
+  display: grid;
+  gap: var(--ak-space);
+}
+.s2a-msg b {
+  font-size: var(--ak-text-sm);
+}
+.s2a-msg span {
+  font-size: var(--ak-text-xs);
+  color: var(--ak-text-muted);
+  font-weight: var(--ak-weight-normal);
+  margin-left: calc(var(--ak-space) * 2);
+}
+.s2a-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--ak-space) * 2);
+}
+/* Settings: one list of groups, the same order on a phone and a computer. */
+.s2a-set-group h2 {
+  margin: 0;
+}
+.s2a-note {
+  margin: 0;
+  font-size: var(--ak-text-sm);
+  color: var(--ak-text-muted);
+}
+/* Notes: the list and the open note side by side (main thing wider), stacked on narrow screens. */
+.s2a-split {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--ak-space) * 80)), 1fr));
+  gap: calc(var(--ak-space) * 4);
+  align-items: start;
+}
+@media (min-width: 1100px) {
+  .s2a-split {
+    grid-template-columns: minmax(calc(var(--ak-space) * 72), 1fr) 2fr;
+  }
+}
+.s2a-pad {
+  padding: calc(var(--ak-space) * 2) calc(var(--ak-space) * 4);
+}
+a.s2a-link {
+  text-decoration: none;
+  color: inherit;
+  border-radius: var(--ak-radius-inner);
+  padding-left: calc(var(--ak-space) * 2);
+  padding-right: calc(var(--ak-space) * 2);
+  transition: background var(--ak-dur-fast) var(--ak-ease);
+}
+a.s2a-link:hover,
+a.s2a-link[aria-current] {
+  background: var(--ak-surface-2);
+}
+.s2a-html {
+  white-space: normal;
+}
+.s2a-html img {
+  max-width: 100%;
+  height: auto;
+}
+a.s2a-open {
+  text-decoration: none;
+}
+/* The v1 phone layer pins html and body (overflow hidden) for its own shell; the kit page scrolls the window. */
+html[data-s2a],
+html[data-s2a] body {
+  overflow: visible;
+  overscroll-behavior: auto;
+}
