@@ -13,8 +13,9 @@ const BASE = 'http://localhost:5173';
 const app = route.replace(/\W+/g, '') || 'root';
 const dir = join(out, app);
 mkdirSync(dir, { recursive: true });
-const env = existsSync('.env') ? readFileSync('.env', 'utf8') : readFileSync('.env.example', 'utf8');
-const PASSWORD = /SEED_PASSWORD=(.*)/.exec(env)?.[1]?.trim() || /SEED_PASSWORD=(.*)/.exec(readFileSync('.env.example', 'utf8'))[1].trim();
+const env = existsSync('.env') ? readFileSync('.env', 'utf8') : '';
+const PASSWORD = process.env.SEED_PASSWORD || /^SEED_PASSWORD=(.+)$/m.exec(env)?.[1]?.trim();
+if (!PASSWORD) throw new Error('Set SEED_PASSWORD (in .env or the environment) to the demo password your local server uses.');
 
 const SIZES = process.env.ONLY ? [{ id: 'phone375', width: 375, height: 812, mobile: true }] : [
   { id: 'phone375', width: 375, height: 812, mobile: true },

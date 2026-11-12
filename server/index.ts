@@ -14,6 +14,7 @@ import * as aiplan from './aiplan.ts';
 import * as models from './models.ts';
 import { defaultModelOf } from '../src/data/aiModels.ts';
 import { seed, RECORD_KEYS, type CollectionKey } from '../src/seed.ts';
+import { seedPassword, sweepPublishedPasswords } from './seedPassword.ts';
 import { DEFAULT_PERMISSIONS, type CalEvent } from '../src/types.ts';
 import { answerSeries } from '../src/repeat.ts';
 import { JOBS, PROVIDERS } from '../src/data/aiCatalog.ts';
@@ -113,8 +114,8 @@ const toDocs = (key: CollectionKey, value: unknown): db.Doc[] =>
 
 if (db.isEmpty() && (process.env.S2G_DEMO === '1' || process.env.NODE_ENV !== 'production')) {
   const s = seed();
-  const pw = process.env.SEED_PASSWORD;
-  if (!pw) throw new Error('Set SEED_PASSWORD in .env (see .env.example) before the first run.');
+  // No shared starter password (server/seedPassword.ts): your own SEED_PASSWORD, or a random one printed below.
+  const { password: pw, generated } = seedPassword(process.env);
   // Client people who already joined can sign in to their portal (same demo password).
   const known = new Set(s.users.map((u) => u.email.toLowerCase()));
   // People who already have a sign-in (e.g. Ethan at Rimba) just get the portal on their existing account.
@@ -129,7 +130,18 @@ if (db.isEmpty() && (process.env.S2G_DEMO === '1' || process.env.NODE_ENV !== 'p
   for (const k of COLLS) db.writeDocs(k, toDocs(k, s[k]), [], null);
   db.writeDocs('users', clientUsers as unknown as db.Doc[], [], null);
   db.setLoginHashes(people.map((u, i) => ({ userId: u.id, email: u.email, hash: hashes[i] })));
-  console.log(`Seeded the demo company: ${s.users.length} people and ${clientUsers.length} client people can sign in with the password in .env / .env.example.`);
+  console.log(`Seeded the demo company: ${s.users.length} people and ${clientUsers.length} client people can sign in with ${generated ? `this password, made for this database only (shown once): ${pw}` : 'SEED_PASSWORD from .env'}.`);
+}
+
+// On a production server, demo sign-ins that still use a starter password this public repository once published get
+// a new random one (the person uses "Forgot password"). Nobody and nothing is removed.
+if (process.env.NODE_ENV === 'production') {
+  const s0 = seed();
+  const emails = [...s0.users.map((u) => u.email), ...s0.clients.flatMap((c) => (c.people ?? []).map((x) => x.email))];
+  const logins = [...new Set(emails.map((e) => e.toLowerCase()))].map((e) => db.findLogin(e)).filter((l): l is NonNullable<typeof l> => !!l);
+  void sweepPublishedPasswords([...new Map(logins.map((l) => [l.user_id, l])).values()], db.checkPassword, db.setLogin)
+    .then((ids) => ids.length && console.log(`Starter passwords: ${ids.length} demo sign-in(s) still used a published password and got a new random one.`))
+    .catch((e) => console.error('Starter password check failed:', e));
 }
 
 // An app added after a company chose its apps (Tables) starts switched on, once; they can turn it off after.

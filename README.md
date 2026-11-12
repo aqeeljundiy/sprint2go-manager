@@ -10,7 +10,7 @@ npm run build
 npm run server
 ```
 
-Open http://localhost:8787 and sign in with any demo person's email (for example james@demo.sprint2go.com). The first-run password is `SEED_PASSWORD` in `.env.example`; copy it to `.env` to change it before the first run, and change your own password in Settings, Account.
+Open http://localhost:8787 and sign in with any demo person's email (for example james@demo.sprint2go.com). The first run prints a random password for the demo people in the server log (or uses `SEED_PASSWORD` from your own `.env`, 12+ characters); change your own password in Settings, Account.
 
 - Everything is saved in `data/sprint2go.db` (SQLite). Delete the `data` folder to start again from the demo company.
 - Open the app in two windows (or two browsers as two people) and changes show up live in both.
