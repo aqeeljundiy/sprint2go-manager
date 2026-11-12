@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
-import { ArrowDown, ArrowUp, AtSign, Bold, CalendarDays, Code, FileText, Heading1, Heading2, Heading3, Megaphone, Minus, Pilcrow, SquareCode, Check, ChevronDown, Cloud, CloudOff, Copy, Eye, Highlighter, Italic, Link2, List, ListChecks, ListOrdered, ListTodo, MoreHorizontal, NotebookPen, Quote, Redo2, RotateCcw, SquareCheck, Strikethrough, Trash2, Type, Underline, Undo2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, AtSign, Bold, CopyPlus, ImagePlus, MoveHorizontal, CalendarDays, Code, FileText, Heading1, Heading2, Heading3, Megaphone, Minus, Pilcrow, SquareCode, Check, ChevronDown, Cloud, CloudOff, Copy, Eye, Highlighter, Italic, Link2, List, ListChecks, ListOrdered, ListTodo, MoreHorizontal, NotebookPen, Quote, Redo2, RotateCcw, SquareCheck, Strikethrough, Trash2, Type, Underline, Undo2 } from 'lucide-react';
 import type { Note, Todo } from '../../types';
 import { relative } from '../../utils';
 import { toast } from '../../toast';
@@ -20,6 +20,7 @@ import { htmlToText } from '../../sanitize';
 import { lineText, linkedFrom, noteLink } from './noteHtml';
 import { noteActions } from './noteMenu';
 import { canEditNote, useNoteMenu, type NotesApi } from './useNoteMenu';
+import { addAfter, blockFor, BlockGutter, blocksOf, caretTo, duplicate, enter, kindOf, leave, moveBy, normalize, turnInto, type BlockKind } from './NoteBlocks';
 import { KEEP_DAYS, keepDraft, useNoteDraft, useSaveState } from './noteDraft';
 import { t, tx } from '../../i18n';
 import { fmtDate } from '../../i18n/format';
@@ -190,10 +191,86 @@ function Open(p: NoteEditorProps & { note: Note }) {
     ];
   };
 
+  /* ---------- v2: every line is a block (the handle's menu, and a held line on phones) ---------- */
+  const blocks = teamV2 && !phone && canEdit && editing;
+  const BLOCK_TYPES: [BlockKind, string, typeof Pilcrow][] = [
+    ['p', t('Body'), Pilcrow],
+    ['h1', tx('style', 'Title'), Heading1],
+    ['h2', t('Heading'), Heading2],
+    ['h3', t('Subheading'), Heading3],
+    ['ul', t('Bulleted list'), List],
+    ['ol', t('Numbered list'), ListOrdered],
+    ['check', t('Checklist'), ListChecks],
+    ['quote', t('Quote'), Quote],
+    ['callout', t('Callout'), Megaphone],
+    ['pre', t('Code block'), SquareCode],
+  ];
+  const blockActions = (line: HTMLElement): SheetAction[] => {
+    const r = text.current?.root();
+    const b = r ? blockFor(line, r) ?? line : line;
+    if (!r || !canEdit) return lineActions(b);
+    const kind = kindOf(b);
+    const tid = b.querySelector<HTMLElement>('.note-task')?.dataset.task;
+    const words = lineText(b);
+    const all = blocksOf(r);
+    const i = all.indexOf(b);
+    const saved = () => text.current?.changed();
+    return [
+      ...(kind === 'hr' || kind === 'img'
+        ? []
+        : BLOCK_TYPES.map(([k, label, icon]) => ({
+            label,
+            icon,
+            group: 'turn',
+            heading: t('Turn into'),
+            checked: kind === k,
+            run: () => {
+              if (kind === k) return;
+              const el = turnInto(r, b, k);
+              enter(el);
+              if (!phone) (r.focus({ preventScroll: true }), caretTo(el, true));
+              saved();
+            },
+          }))),
+      ...(tid && tasks.has(tid) ? [{ label: t('Open its task'), icon: ListTodo, group: 'do', run: () => p.onOpenTask(tid) }] : words ? [{ label: tx('mail', 'Make a task'), icon: ListTodo, group: 'do', run: () => makeTask(b) }] : []),
+      ...(kind === 'check' ? [{ label: b.classList.contains('done') ? t('Untick') : t('Tick'), icon: SquareCheck, group: 'do', run: () => (b.classList.toggle('done'), saved()) }] : []),
+      { label: t('Duplicate'), icon: CopyPlus, group: 'move', run: () => (enter(duplicate(r, b)), saved()) },
+      ...(i > 0 ? [{ label: t('Move up'), icon: ArrowUp, group: 'move', hint: phone ? undefined : 'Alt+Shift+↑', run: () => moveBy(r, b, -1) && saved() }] : []),
+      ...(i < all.length - 1 ? [{ label: t('Move down'), icon: ArrowDown, group: 'move', hint: phone ? undefined : 'Alt+Shift+↓', run: () => moveBy(r, b, 1) && saved() }] : []),
+      ...(words ? [{ label: t('Copy the line'), icon: Copy, group: 'copy', run: () => void navigator.clipboard?.writeText(words).then(() => toast({ text: t('Copied') })) }] : []),
+      { label: t('Delete the line'), icon: Trash2, danger: true, group: 'end', run: () => leave(b, () => (normalize(r), saved())) },
+    ];
+  };
+
+  /* ---------- an image block: a picture as its own line ---------- */
+  const imgFile = useRef<HTMLInputElement>(null);
+  const addImage = () => (text.current?.save(), imgFile.current?.click());
+  const placeImage = (url: string, name: string) => {
+    const r = text.current?.root();
+    if (!r) return;
+    const line = text.current?.line().block ?? null;
+    const at = (line && blockFor(line, r)) ?? blocksOf(r).at(-1) ?? null;
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = name;
+    let holder: HTMLElement;
+    if (at && kindOf(at) === 'p' && !lineText(at) && !at.querySelector('img')) {
+      holder = at;
+      holder.replaceChildren(img);
+    } else {
+      holder = at ? addAfter(r, at, '') : r.appendChild(document.createElement('p'));
+      holder.appendChild(img);
+    }
+    // A line to keep writing on after the picture.
+    if (!holder.nextElementSibling) addAfter(r, holder);
+    enter(holder);
+    text.current?.changed();
+  };
+
   // A checklist line's "…": by the line the caret is in (or the pointer is over).
   const [dotsAt, setDotsAt] = useState<{ li: HTMLElement; top: number } | null>(null);
   const placeDots = (li: HTMLElement | null) => {
-    if (!li || !doc.current || !canEdit) return setDotsAt(null);
+    if (!li || !doc.current || !canEdit || (teamV2 && !phone)) return setDotsAt(null);
     const top = li.getBoundingClientRect().top - doc.current.getBoundingClientRect().top;
     setDotsAt((d) => (d && d.li === li && Math.abs(d.top - top) < 1 ? d : { li, top }));
   };
@@ -281,7 +358,7 @@ function Open(p: NoteEditorProps & { note: Note }) {
   const body = (
     <div className="note-wrap">
       <div className="note-scroll" ref={scroller}>
-        <div className="note-doc" ref={doc} onMouseMove={(e) => !phone && placeDots((e.target as HTMLElement).closest<HTMLElement>('ul.checklist > li'))}>
+        <div className={`note-doc${teamV2 && !phone ? ' blk' : ''}${teamV2 && !phone && note.wide ? ' wide' : ''}`} ref={doc} onMouseMove={(e) => !phone && placeDots((e.target as HTMLElement).closest<HTMLElement>('ul.checklist > li'))}>
           {note.deletedAt && (
             <div className="note-banner">
               <Trash2 size={15} />
@@ -366,11 +443,29 @@ function Open(p: NoteEditorProps & { note: Note }) {
               <MoreHorizontal size={16} />
             </button>
           )}
+          <BlockGutter doc={doc} root={() => text.current?.root() ?? null} active={blocks} onChanged={() => text.current?.changed()} onMenu={(b, x, y) => setLineMenu({ block: b, x, y })} />
           {phone && linked}
 
         </div>
         {!phone && linked && <aside className="note-side">{linked}</aside>}
       </div>
+      <input
+        ref={imgFile}
+        type="file"
+        accept="image/png,image/jpeg,image/gif,image/webp"
+        hidden
+        onChange={async (e) => {
+          const f = e.target.files?.[0];
+          e.target.value = '';
+          if (!f) return;
+          try {
+            const up = await p.onUpload(f);
+            placeImage(up.url, up.name);
+          } catch (err) {
+            toast({ text: err instanceof Error ? t(err.message) : t('The file couldn’t be added.') });
+          }
+        }}
+      />
       <input
         ref={file}
         type="file"
@@ -447,6 +542,7 @@ function Open(p: NoteEditorProps & { note: Note }) {
             { key: 'pre', label: t('Code block'), icon: <SquareCode size={18} />, run: () => fmt.block('PRE') },
             { key: 'code', label: t('Inline code'), icon: <Code size={18} />, run: fmt.code },
             { key: 'hr', label: t('Divider'), icon: <Minus size={18} />, run: () => fmt.cmd('insertHorizontalRule') },
+            ...(teamV2 ? [{ key: 'image', label: t('Image'), hint: t('A picture as its own line'), icon: <ImagePlus size={18} />, run: addImage }] : []),
             { key: 'task', label: tx('mail', 'Make a task'), hint: t('From this line'), icon: <ListTodo size={18} />, run: () => makeTask() },
             { key: 'mention', label: t('Mention'), hint: t('A person or a note'), icon: <AtSign size={18} />, run: () => openPanel('mention') },
             { key: 'date', label: t('Today’s date'), hint: today, icon: <CalendarDays size={18} />, run: () => text.current?.insertHtml(`${today}&nbsp;`) },
@@ -454,7 +550,7 @@ function Open(p: NoteEditorProps & { note: Note }) {
           return blocks.filter((b) => has(b.label) || has(b.key));
         }}
       />
-      {lineMenu && <ActionSheet open onClose={() => setLineMenu(null)} title={lineText(lineMenu.block).slice(0, 60) || t('This line')} actions={lineActions(lineMenu.block)} at={phone ? null : { x: lineMenu.x, y: lineMenu.y }} />}
+      {lineMenu && <ActionSheet open onClose={() => setLineMenu(null)} title={lineText(lineMenu.block).slice(0, 60) || t('This line')} actions={teamV2 ? blockActions(lineMenu.block) : lineActions(lineMenu.block)} at={phone ? null : { x: lineMenu.x, y: lineMenu.y }} />}
       {hlSheet && (
         <ActionSheet
           open
@@ -535,6 +631,18 @@ function Open(p: NoteEditorProps & { note: Note }) {
         {whoBtn}
         {canEdit && <ProjectPicker value={note.clientId ?? ''} onChange={(v) => change({ clientId: v || undefined })} projects={api.clients} none={t('No {project}', { project: term.one })} className="sel-flat" />}
         <span className="spacer" />
+        {teamV2 && (
+          <button
+            type="button"
+            className={`ghost-btn sm note-width${note.wide ? ' on' : ''}`}
+            onClick={() => (canEdit ? change({ wide: !note.wide }) : undefined)}
+            disabled={!canEdit}
+            aria-pressed={!!note.wide}
+            title={note.wide ? t('Back to a readable column') : t('Let the text use the full width')}
+          >
+            <MoveHorizontal size={14} /> {t('Full width')}
+          </button>
+        )}
         <button ref={dots} className="icon-btn sm" onClick={() => menu.openFrom(dots)} aria-label={t('Note actions')} title={t('More')}>
           <MoreHorizontal size={16} />
         </button>

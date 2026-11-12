@@ -207,6 +207,18 @@ const id: Record<string, string> = {
   'Today’s date': 'Tanggal hari ini',
   // Notes v2 (/v2): the empty Notes pane
   "Start one with New note: meeting notes, briefs, ideas.": "Mulai dengan Catatan baru: catatan rapat, brief, ide.",
+  // Notes v2: every line is a block (notes/NoteBlocks.tsx), the page width
+  'Turn into': 'Ubah menjadi',
+  Image: 'Gambar',
+  'A picture as its own line': 'Gambar sebagai baris sendiri',
+  'Add a line below': 'Tambah baris di bawah',
+  'Drag to move, click for options': 'Seret untuk memindahkan, klik untuk opsi',
+  'Drag to move, click for the line’s options': 'Seret untuk memindahkan, klik untuk opsi baris ini',
+  Line: 'Baris',
+  'Type / for blocks': 'Ketik / untuk jenis baris',
+  'Full width': 'Lebar penuh',
+  'Back to a readable column': 'Kembali ke kolom yang nyaman dibaca',
+  'Let the text use the full width': 'Biarkan teks memakai lebar penuh',
 };
 
 export default id;

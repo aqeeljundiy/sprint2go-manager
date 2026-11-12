@@ -10851,9 +10851,9 @@
       "round": "Inbox",
       "area": "notes",
       "title": "Notes: width unclear; should work like Notion blocks",
-      "detail": "Cannot tell the width etc. Could be better. In Notion you can move lines; every line is its own layer/block of data. That is how Notion works. Screenshots: admin-kit-reviews/sprint2go-manager/feedback-13nov/09",
+      "detail": "Cannot tell the width etc. Could be better. In Notion you can move lines; every line is its own layer/block of data. That is how Notion works. Screenshots: admin-kit-reviews/sprint2go-manager/feedback-13nov/09. Done 13 Nov (/v2): every line is a block with a handle on hover (drag to move, click for Turn into, Duplicate, Move, Delete), + and / add any block type (now with images), Alt+Shift+Up/Down moves the line, Backspace turns a heading, quote or list item back into text; a centred 720 px reading column with a Full width switch per note. Saved as the same HTML, so v1 reads every note unchanged.",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "IN-13nov-11",

@@ -924,6 +924,7 @@ export interface Note {
   ownerId: string;
   visibility: 'private' | 'team';
   teamCan?: 'edit' | 'view'; // shared notes: whether the others can change it (edit when missing)
+  wide?: boolean; // Notes v2: the text runs the pane's full width instead of a readable column (v1 ignores it)
   clientId?: string;
   pinned?: boolean;
   createdAt: string;

@@ -47,7 +47,7 @@ const exec = (cmd: string, value?: string) => document.execCommand(cmd, false, v
 
 /** Shows the placeholder while there's nothing written (only touching the class when it changes). */
 function markEmpty(root: HTMLElement) {
-  const empty = !(root.textContent ?? '').trim() && !root.querySelector('ul, ol, hr, blockquote, .note-task');
+  const empty = !(root.textContent ?? '').trim() && !root.querySelector('ul, ol, hr, blockquote, img, .note-task');
   if (root.classList.contains('is-empty') !== empty) root.classList.toggle('is-empty', empty);
 }
 

@@ -900,3 +900,134 @@
   .note-inline, .note-inline.leaving { animation-name: fadeIn; }
   .note-inline.leaving { animation: none; opacity: 0; }
 }
+
+/* ---------- v2: Notes as blocks (NoteBlocks.tsx) ---------- */
+/* A readable column (720 px of text), or the pane's full width per note ("Full width" in the header). The margin on
+   the left holds each line's handle. */
+.note-doc.blk {
+  max-width: 816px;
+  padding: 24px 48px 96px;
+  transition: max-width 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), padding 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.note-doc.blk.wide {
+  max-width: 100%;
+  padding-inline: 72px;
+}
+@container (max-width: 640px) {
+  .note-doc.blk,
+  .note-doc.blk.wide {
+    padding-inline: 48px 24px;
+  }
+}
+.note-width.on {
+  background: var(--accent-soft);
+  color: var(--accent-text, var(--accent));
+}
+.note-text img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 4px 0;
+  border-radius: 10px;
+}
+/* The empty line the caret is on says what "/" does (Notion). */
+.note-text.blocks .is-caret {
+  position: relative;
+}
+.note-text.blocks :is(p, h1, h2, h3).is-caret:has(> br:only-child)::before {
+  content: var(--blk-hint);
+  position: absolute;
+  left: 0;
+  color: var(--text-3);
+  pointer-events: none;
+  font-weight: 400;
+}
+.note-text.blocks .blk-dragging {
+  opacity: 0.35;
+  transition: opacity 0.15s;
+}
+body.blk-drag-on,
+body.blk-drag-on * {
+  cursor: grabbing !important;
+  user-select: none;
+}
+
+/* The handle: "+" and the dots, next to the line under the pointer. Slides from line to line. */
+.blk-gutter {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  gap: 2px;
+  animation: fade 0.15s ease-out backwards;
+  transition: top 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), left 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.blk-btn {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 28px;
+  border-radius: 6px;
+  color: var(--text-3);
+  transition: background 0.15s, color 0.15s;
+}
+.blk-btn:hover,
+.blk-btn:focus-visible {
+  background: var(--hover);
+  color: var(--text);
+}
+.blk-grip {
+  cursor: grab;
+  touch-action: none;
+}
+/* Where the line lands while dragging. */
+.blk-drop {
+  position: absolute;
+  z-index: 2;
+  height: 3px;
+  margin-top: -1.5px;
+  border-radius: 2px;
+  background: var(--accent);
+  opacity: 0.8;
+  pointer-events: none;
+  transition: top 0.12s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.blk-ghost {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: var(--z-pop);
+  max-width: 320px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  opacity: 0.92;
+}
+@media (prefers-reduced-motion: reduce) {
+  .note-doc.blk,
+  .blk-gutter,
+  .blk-drop,
+  .blk-btn,
+  .note-text.blocks .blk-dragging {
+    animation: none;
+    transition: none;
+  }
+}
+/* Without a "Linked from" column, the column sits in the middle of the pane (and Full width really is the pane's width). */
+@container (min-width: 1040px) {
+  .note-scroll:has(> .note-doc.blk):not(:has(> .note-side)) {
+    display: block;
+  }
+}
+/* A to-do reads like the other lines (the app's generic .checklist rows are a smaller size). */
+.note-text ul.checklist > li {
+  font-size: inherit;
+  padding: 0;
+}

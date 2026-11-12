@@ -6,19 +6,27 @@ import { t } from '../../i18n';
 /*
  * A note's text is simple HTML: paragraphs, headings, lists (a checklist is <ul class="checklist">, a ticked line
  * <li class="done">), quotes, dividers, links, bold and friends, highlights (a background colour), and the small pill
- * of a task made from a line (<span class="note-task" data-task="…">, empty: the pill is drawn by CSS).
+ * of a task made from a line (<span class="note-task" data-task="…">, empty: the pill is drawn by CSS), and images (a
+ * paragraph holding one <img>: an image block).
  */
 
-const TAGS = ['p', 'br', 'div', 'span', 'b', 'strong', 'i', 'em', 'u', 's', 'strike', 'a', 'ul', 'ol', 'li', 'blockquote', 'h1', 'h2', 'h3', 'code', 'pre', 'hr', 'font'];
-const ATTRS = ['href', 'style', 'color', 'class', 'data-task'];
+const TAGS = ['p', 'br', 'div', 'span', 'b', 'strong', 'i', 'em', 'u', 's', 'strike', 'a', 'ul', 'ol', 'li', 'blockquote', 'h1', 'h2', 'h3', 'code', 'pre', 'hr', 'font', 'img'];
+const ATTRS = ['href', 'style', 'color', 'class', 'data-task', 'src', 'alt'];
+// Only these classes are saved: never the editor's own marks (is-caret, blk-dragging).
 const CLASSES = new Set(['checklist', 'done', 'note-task', 'callout']);
+// An image block's picture: our own files (a path), https, or a picture kept in the note while offline.
+const IMG_SRC = /^(\/(?!\/)|https:\/\/|data:image\/(png|jpe?g|gif|webp);base64,)/i;
 
 /** What a note may hold (also what's saved): our own classes only, a task id only on a task pill. */
 export function sanitizeNote(html: string) {
   const clean = DOMPurify.sanitize(html.replace(/url\s*\(/gi, 'url-off('), { ALLOWED_TAGS: TAGS, ALLOWED_ATTR: ATTRS }) as string;
-  if (!/class=|data-task=|style=/.test(clean)) return clean;
+  if (!/class=|data-task=|style=|src=/.test(clean)) return clean;
   const box = document.createElement('div');
   box.innerHTML = clean;
+  box.querySelectorAll('[src]').forEach((el) => {
+    if (el.tagName !== 'IMG') el.removeAttribute('src');
+    else if (!IMG_SRC.test(el.getAttribute('src') ?? '')) el.remove();
+  });
   cleanStyles(box);
   box.querySelectorAll('[class]').forEach((el) => {
     const keep = [...el.classList].filter((c) => CLASSES.has(c));
