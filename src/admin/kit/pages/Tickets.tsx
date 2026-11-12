@@ -48,7 +48,7 @@ export function Tickets() {
       sort: { key: 'due', dir: 1 },
       columns: [
         { key: 'subject', label: t('Ticket'), primary: true, truncate: true, value: (tk) => tk.number, sort: 'number', cell: (tk) => `<a class="s2k-link" href="/admin/v2/tickets/${esc(tk.id)}">#${tk.number} ${esc(tk.subject)}</a><br><span class="ak-muted">${esc(tk.requester.name ?? tk.requester.email)}</span>` },
-        { key: 'company', label: t('Company'), hidePhone: true, truncate: true, value: (tk) => tk.company ?? '', cell: (tk) => (tk.company ? esc(tk.company) : `<span class="ak-muted">${esc(t('no company'))}</span>`) },
+        { key: 'company', label: t('Company'), hidePhone: true, value: (tk) => tk.company ?? '', cell: (tk) => (tk.company ? esc(tk.company) : `<span class="ak-muted">${esc(t('no company'))}</span>`) },
         { key: 'status', label: t('State'), value: (tk) => ['new', 'open', 'waiting', 'resolved', 'closed'].indexOf(tk.status), sort: 'number', cell: (tk) => chip(tk.status) + (tk.priority === 'urgent' || tk.priority === 'high' ? ` <ak-chip tone="danger" plain>${esc(PRIORITY_LABEL[tk.priority])}</ak-chip>` : '') },
         { key: 'assignee', label: t('On it'), hidePhone: true, value: (tk) => tk.assignee ?? '', cell: (tk) => (tk.assignee ? esc(tk.assignee === me.email ? t('You') : tk.assignee.split('@')[0]) : `<span class="ak-muted">${esc(t('nobody'))}</span>`) },
         { key: 'due', label: t('Reply due'), align: 'end', sort: 'date', value: (tk) => dueOf(tk), cell: (tk) => (!live(tk) ? `<span class="ak-muted">${esc(rel(tk.updatedAt))}</span>` : tk.breaching ? `<ak-chip tone="danger">${esc(t('was due {ago}', { ago: rel(dueOf(tk)) }))}</ak-chip>` : esc(tk.dueAt ? rel(tk.dueAt) : t('opened {ago}', { ago: rel(tk.createdAt) }))) },

@@ -790,6 +790,34 @@ ak-chart[data-hover] .ak-chart__bar:not([data-on]) { opacity: 0.45; }
 @keyframes ak-grow { from { transform: scaleY(0); } }
 @keyframes ak-rise { from { opacity: 0; transform: translateY(calc(var(--ak-space) * 2)); } }
 
+/* ---------- rows: a short list inside a card that is not a table (people, files, recent items) ----------
+   The highlight reaches past the text by the same amount the text is indented, so words stay lined up with
+   the card's other content and never touch the highlight's edge (decisions.md "Highlights"). */
+.ak-rows { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
+.ak-row {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--ak-space) * 3);
+  min-width: 0;
+  margin-inline: calc(var(--ak-space) * -3);
+  padding: calc(var(--ak-space) * 2.5) calc(var(--ak-space) * 3);
+  border: 0;
+  border-radius: var(--ak-radius-inner, var(--ak-radius-control));
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  transition: background-color var(--ak-dur-fast) var(--ak-ease);
+}
+.ak-row:where(a, button, [href], [data-open], [tabindex]) { cursor: pointer; }
+.ak-row:where(a, button, [href], [data-open], [tabindex]):hover,
+.ak-row:where([aria-selected="true"], [data-selected], [aria-current="page"]) { background: var(--ak-surface-hover, color-mix(in oklab, var(--ak-text) 6%, transparent)); }
+.ak-row__main { display: flex; flex: 1; flex-direction: column; min-width: 0; }
+.ak-row__main > :first-child { overflow: hidden; color: var(--ak-text); font-weight: var(--ak-weight-medium); text-overflow: ellipsis; white-space: nowrap; }
+.ak-row__sub { overflow: hidden; color: var(--ak-text-muted); font-size: var(--ak-text-sm); text-overflow: ellipsis; white-space: nowrap; }
+.ak-row__end { flex: none; color: var(--ak-text-muted); font-size: var(--ak-text-sm); font-variant-numeric: tabular-nums; }
+
 /* ---------- table ---------- */
 ak-table { display: block; overflow-x: auto; overflow-y: hidden; }
 ak-table table { width: 100%; border-collapse: collapse; font-size: var(--ak-text-md); }
@@ -1397,7 +1425,8 @@ html[data-ak-nav="labels"] .ak-nav-group__trigger {
   min-height: 0;
   margin-top: calc(var(--ak-space) * 4);
   padding-block: calc(var(--ak-space) * 1);
-  color: var(--ak-text-muted);
+  /* Quieter than the links under it (owner, Nov 2026: "hard to read what's a title and what's a menu"). */
+  color: var(--ak-sidebar-heading, color-mix(in oklab, var(--ak-sidebar-text, var(--ak-text-muted)) 55%, var(--ak-sidebar-bg, var(--ak-surface))));
   font-size: var(--ak-text-xs);
   font-weight: var(--ak-weight-medium);
   letter-spacing: 0.08em;
@@ -1405,7 +1434,7 @@ html[data-ak-nav="labels"] .ak-nav-group__trigger {
 }
 html[data-ak-nav="labels"] .ak-nav-group__trigger > [slot="icon"],
 html[data-ak-nav="labels"] .ak-nav-group__chevron { display: none; }
-html[data-ak-nav="labels"] ak-nav-group[data-has-active] > .ak-nav-group__trigger { color: var(--ak-text-muted); }
+html[data-ak-nav="labels"] ak-nav-group[data-has-active] > .ak-nav-group__trigger { color: var(--ak-sidebar-heading, color-mix(in oklab, var(--ak-sidebar-text, var(--ak-text-muted)) 55%, var(--ak-sidebar-bg, var(--ak-surface)))); }
 html[data-ak-nav="labels"] ak-nav-group:not(:defined) > a { display: flex; }
 
 /* Sidebar. flush: full height, one line between it and the page. floating: an inset panel with its own corners. */

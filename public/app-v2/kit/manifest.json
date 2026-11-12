@@ -1,8 +1,8 @@
 {
-  "version": "0.20.0",
+  "version": "0.22.0",
   "files": {
-    "admin-kit.js": "cf9d7d9f023401cbdd26a6934123febd90b61495d7ae082e17cf831a8db31956",
-    "admin-kit-editor.js": "b1f3347afc0338e2bd1e9e33c169a54d338e8aea075e8ce7665f145e415b1712",
-    "admin-kit.css": "7f6a7931930e4a33af0390de71b266a4470107cd8322ac4ba7101505783065a5"
+    "admin-kit.js": "d6fc93032675e663447429476984cc8a822538d2e8fac0c4e12a0aa6b61b1230",
+    "admin-kit-editor.js": "6589831099ca0f4f909f8331baaafa2ad6d7fa12fbb4ec9f67eb7d3af9b109f7",
+    "admin-kit.css": "8e27ba6a1e600f2dca362ade9bab3c104c60e6163c5e0e43c293a9a717b20975"
   }
 }

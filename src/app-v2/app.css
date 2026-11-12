@@ -216,16 +216,23 @@ button.s2a-row:hover {
 .s2a-pad {
   padding: calc(var(--ak-space) * 2) calc(var(--ak-space) * 4);
 }
-a.s2a-link {
+/* A row that opens something (link or button): the highlight reaches past the text by the same amount the text is
+   indented, so words keep 12px of room inside it and stay lined up with the card's title (kit decisions.md "Highlights"). */
+.s2a-link {
   text-decoration: none;
   color: inherit;
   border-radius: var(--ak-radius-inner);
-  padding-left: calc(var(--ak-space) * 2);
-  padding-right: calc(var(--ak-space) * 2);
+  margin-left: calc(var(--ak-space) * -3);
+  margin-right: calc(var(--ak-space) * -3);
+  padding-left: calc(var(--ak-space) * 3);
+  padding-right: calc(var(--ak-space) * 3);
   transition: background var(--ak-dur-fast) var(--ak-ease);
 }
-a.s2a-link:hover,
-a.s2a-link[aria-current] {
+button.s2a-link {
+  width: calc(100% + var(--ak-space) * 6);
+}
+.s2a-link:hover,
+.s2a-link[aria-current] {
   background: var(--ak-surface-2);
 }
 .s2a-html {

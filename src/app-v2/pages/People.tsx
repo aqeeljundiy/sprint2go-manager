@@ -28,7 +28,7 @@ export function People() {
         { key: 'name', label: t('Name'), primary: true, truncate: true, value: (r) => r.name, cell: (r) => `<span class="s2a-open">${esc(r.name)}</span><span class="s2a-sub">${esc(r.title || r.email)}</span>` },
         { key: 'role', label: t('Role'), value: (r) => roleOf(r), cell: (r) => `<ak-chip tone="neutral" plain>${esc(t(ROLE[roleOf(r)] ?? roleOf(r)))}</ak-chip>` },
         { key: 'teams', label: t('Teams'), hidePhone: true, value: (r) => teamsOf(r).join(', '), cell: (r) => esc(teamsOf(r).join(', ')) },
-        { key: 'email', label: t('Email'), hidePhone: true, truncate: true, value: (r) => r.email, cell: (r) => `<a href="mailto:${esc(r.email)}">${esc(r.email)}</a>` },
+        { key: 'email', label: t('Email'), hidePhone: true, value: (r) => r.email, cell: (r) => `<a href="mailto:${esc(r.email)}">${esc(r.email)}</a>` },
       ],
       summary: (list) => t('{n} people', { n: list.length }),
     }),

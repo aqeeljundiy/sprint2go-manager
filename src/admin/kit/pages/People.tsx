@@ -29,7 +29,7 @@ export function People() {
       sort: { key: 'name', dir: 1 },
       columns: [
         { key: 'name', label: t('Person'), primary: true, truncate: true, sort: 'text', value: (p) => p.name.toLowerCase(), cell: (p) => `<a class="s2k-link" href="/admin/v2/people/${esc(p.id)}">${esc(p.name)}</a>${p.operator ? ` <ak-chip tone="info" plain>${esc(t('Operator'))}</ak-chip>` : ''}${p.suspended ? ` <ak-chip tone="danger" plain>${esc(t('Suspended'))}</ak-chip>` : ''}<br><span class="ak-muted">${esc(p.email)}</span>` },
-        { key: 'co', label: t('Companies'), hidePhone: true, truncate: true, sort: 'text', value: (p) => p.companies[0]?.name ?? '', cell: (p) => (p.companies.length ? p.companies.map((c) => `${esc(c.name)}${c.role === 'owner' ? ` <span class="ak-muted">(${esc(t('company owner'))})</span>` : ''}`).join(', ') : p.guestOf.length ? `<span class="ak-muted">${esc(t('guest'))}</span>` : `<span class="ak-muted">${esc(t('none'))}</span>`) },
+        { key: 'co', label: t('Companies'), hidePhone: true, sort: 'text', value: (p) => p.companies[0]?.name ?? '', cell: (p) => (p.companies.length ? p.companies.map((c) => `${esc(c.name)}${c.role === 'owner' ? ` <span class="ak-muted">(${esc(t('company owner'))})</span>` : ''}`).join(', ') : p.guestOf.length ? `<span class="ak-muted">${esc(t('guest'))}</span>` : `<span class="ak-muted">${esc(t('none'))}</span>`) },
         { key: 'seen', label: t('Last here'), align: 'end', sort: 'date', value: (p) => p.lastSeen ?? '', cell: (p) => (p.lastSeen ? esc(seen(p)) : `<span class="ak-muted">${esc(seen(p))}</span>`) },
       ],
       onOpen: (p) => go(`/admin/v2/people/${p.id}`),
