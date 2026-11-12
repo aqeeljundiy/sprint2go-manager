@@ -135,16 +135,18 @@
   .drawer.fp {
     position: relative;
   }
+  /* !important: a table row's panel had a fixed width with !important (tables.css). */
   .drawer.fp-side {
-    width: min(var(--fp-w), 100%);
+    width: min(var(--fp-w), 100%) !important;
   }
   .drawer-scrim.fp-scrim-window {
+    background: rgba(10, 12, 20, 0.18);
     align-items: center;
     justify-content: center;
     padding: 16px;
   }
   .drawer.fp-window {
-    width: min(var(--fp-w), 100%);
+    width: min(var(--fp-w), 100%) !important;
     height: min(var(--fp-h), 100%);
     border: 1px solid var(--border);
     border-radius: var(--r-card);

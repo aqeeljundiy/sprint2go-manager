@@ -391,7 +391,7 @@ function RecordPanel({ table, row, ctx, me, onCell, onComment, onFollow, onDelet
   useFocusedScreen();
   useRowKeys(nav, onClose);
   // Notion's three ways to open a row: side peek, centre peek (a pop-up) and a full page. Resizable, remembered.
-  const flex = useFlexPanel('row', { width: 520, window: { width: 760, height: 800 } });
+  const flex = useFlexPanel('row', { width: 500, window: { width: 760, height: 800 } });
   const fp = full ? { ...flex, className: '', style: undefined, edges: null, scrimClass: '' } : flex;
   const { page, rest, hiddenIds, pinned, main, body, sections, folded } = layoutOf(table, row, ctx, false);
   const [showFolded, setShowFolded] = useState(false);
