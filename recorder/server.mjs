@@ -16,6 +16,7 @@ import { fork } from 'node:child_process';
 import { createReadStream, existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { timingSafeEqual } from 'node:crypto';
 import { transcribeRecording } from './transcribe.mjs';
 
@@ -47,7 +48,7 @@ function startBot(job) {
   // The job holds an API key, so it goes in a private file the bot deletes on start, not in argv or env.
   const file = join(tmpdir(), `s2g-job-${job.id}.json`);
   writeFileSync(file, JSON.stringify({ ...job, secret: SECRET, recDir: REC_DIR }), { mode: 0o600 });
-  const child = fork(new URL('./bot.mjs', import.meta.url).pathname, [file], { stdio: 'inherit' });
+  const child = fork(fileURLToPath(new URL('./bot.mjs', import.meta.url)), [file], { stdio: 'inherit' });
   bots.set(job.id, child);
   child.on('exit', () => bots.delete(job.id));
 }
@@ -55,7 +56,8 @@ function startBot(job) {
 createServer(async (req, res) => {
   try {
     const { pathname } = new URL(req.url, 'http://x');
-    if (pathname === '/health') return json(res, 200, { ok: true, bots: bots.size });
+    // With sprint2go's Authorization header, also says whether the secret matches (a wrong one only shows up here).
+    if (pathname === '/health') return json(res, 200, { ok: true, bots: bots.size, ...(req.headers.authorization ? { authed: authed(req) } : {}) });
     if (!authed(req)) return json(res, 401, { error: 'Not allowed' });
 
     if (pathname === '/bots' && req.method === 'POST') {

@@ -1025,6 +1025,9 @@ const STT = ['groq', 'deepgram', 'sumopod', 'openai'];
 const recorder = (path: string, init: RequestInit = {}) =>
   fetch(`${RECORDER_URL}${path}`, { ...init, headers: { ...(init.headers as Record<string, string>), authorization: `Bearer ${RECORDER_SECRET}` }, signal: AbortSignal.timeout(15_000) });
 
+/** The recorder answers and takes our secret (an older recorder that doesn't say counts as yes). */
+const recorderHealthy = (r: Response) => (r.ok ? r.json().then((j: any) => j?.authed !== false, () => true) : false);
+
 const sameSecret = (got: string) => {
   const a = Buffer.from(got), b = Buffer.from(RECORDER_SECRET);
   return !!RECORDER_SECRET && a.length === b.length && timingSafeEqual(a, b);
@@ -1069,7 +1072,7 @@ async function dispatchBot(ws: any, doc: any): Promise<string | null> {
     headers: { 'content-type': 'application/json' },
     // Video when this kind of meeting keeps video (or might: it's filed after the meeting, and an unneeded video is deleted then).
     body: JSON.stringify({ id: doc.id, url: doc.url, botName: doc.botName, callback: `${PUBLIC_URL}/api/meet/recorder`, stt: sttFor(ws, doc.language), names, announce: ws.meetings?.announce !== false, video: (doc.clientId ? [ws.meetings?.clientMeetings] : [ws.meetings?.clientMeetings, ws.meetings?.internalMeetings]).includes('video'), ...(hours.left !== Infinity ? { maxMinutes: Math.floor(hours.left) } : {}) }),
-  }).then(async (r) => (r.ok ? null : ((await r.json().catch(() => ({}))) as any).error ?? `Recorder said ${r.status}`), () => 'The recorder didn’t answer');
+  }).then(async (r) => (r.ok ? null : r.status === 401 ? 'The recorder turned sprint2go away: RECORDER_SECRET is not the same on the app and the recorder' : ((await r.json().catch(() => ({}))) as any).error ?? `Recorder said ${r.status}`), () => 'The recorder didn’t answer');
   if (sent) saveMeeting({ ...doc, status: 'failed', error: sent, log: [...(doc.log ?? []), meetLine(`Couldn’t send the bot: ${sent}`)] });
   return sent;
 }
@@ -3070,7 +3073,7 @@ const handle = async (req: IncomingMessage, res: ServerResponse) => {
     if (p === '/api/meet/status') {
       const configured = !!RECORDER_URL && !!RECORDER_SECRET;
       // "reachable" says whether the recorder service answers right now, not just whether it's configured.
-      const reachable = configured ? await recorder('/health', { signal: AbortSignal.timeout(3000) }).then((r) => r.ok, () => false) : false;
+      const reachable = configured ? await recorder('/health', { signal: AbortSignal.timeout(3000) }).then(recorderHealthy, () => false) : false;
       // With ?ws=: the company's meeting-bot minutes this month (the plan's hours plus add-ons), for the send dialog.
       const hw = memberOf(me).find((w) => w.id === url.searchParams.get('ws')) as any;
       const m = hw ? billing.meetMinutes(hw) : null;
@@ -3741,7 +3744,7 @@ createServer((req, res) => {
 
 /** Whether the meeting recorder answers, checked every few minutes (the app asks often). */
 let recorderUp = false;
-const pollRecorder = () => (RECORDER_URL && RECORDER_SECRET ? recorder('/health').then((r) => (recorderUp = r.ok), () => (recorderUp = false)) : Promise.resolve((recorderUp = false)));
+const pollRecorder = () => (RECORDER_URL && RECORDER_SECRET ? recorder('/health').then(async (r) => (recorderUp = await recorderHealthy(r)), () => (recorderUp = false)) : Promise.resolve((recorderUp = false)));
 setTimeout(() => void pollRecorder(), 5_000);
 setInterval(() => void pollRecorder(), 3 * 60_000);
 const DEMO = process.env.S2G_DEMO === '1' || process.env.NODE_ENV !== 'production';
@@ -3812,7 +3815,7 @@ function soonReadiness(wsId: string) {
   clearTimeout(refreshTimers.get(wsId));
   refreshTimers.set(wsId, setTimeout(() => (refreshTimers.delete(wsId), void mailer.refreshReadiness(wsId).catch(() => {})), 3000));
 }
-const recorderInfo = { configured: !!RECORDER_URL && !!RECORDER_SECRET, health: () => recorder('/health').then((r) => (r.ok ? (r.json() as Promise<{ ok: boolean; bots?: number }>) : null), () => null) };
+const recorderInfo = { configured: !!RECORDER_URL && !!RECORDER_SECRET, health: () => recorder('/health').then((r) => (r.ok ? (r.json() as Promise<{ ok: boolean; bots?: number; authed?: boolean }>).then((j) => ({ ...j, ok: j.ok && j.authed !== false })) : null), () => null) };
 
 /** Which feature flags are on for any of these companies. */
 function flagsFor(wsIds: string[], flags: platform.PlatformSettings['flags']) {

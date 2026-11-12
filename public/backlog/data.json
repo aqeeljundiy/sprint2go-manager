@@ -10860,9 +10860,9 @@
       "round": "Inbox",
       "area": "meetings",
       "title": "Meetings must actually work",
-      "detail": "Meetings: I really want it to function, but for now it is not working yet.",
+      "detail": "Meetings: I really want it to function, but for now it is not working yet. Findings 13 Nov: the whole chain works in code (send, join, live status, transcript, notes, tasks; tested locally end to end with a made-up Meet link) and the recorder runs live. Fixed: a different RECORDER_SECRET on the app and the recorder was invisible (button looked ready, every bot failed with Not allowed); now the app checks it and says so. Fixed: the recorder runs on Windows for testing. Owner to do: check RECORDER_SECRET is the same on both Dokploy services and redeploy the recorder; one real test meeting; a Google account for the bot if Meet keeps it out (anonymous guests from a server are often refused); Google Calendar app (GOOGLE_CLIENT_ID/SECRET) for joining by itself; AI + speech keys for notes. Full write-up: admin-kit-reviews/sprint2go-manager/meetings-diagnosis.md.",
       "priority": "high",
-      "status": "todo"
+      "status": "doing"
     },
     {
       "id": "IN-13nov-12",
