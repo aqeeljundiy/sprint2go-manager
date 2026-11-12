@@ -234,3 +234,31 @@
     padding-right: min(var(--fp-dock), calc(100vw - 120px));
   }
 }
+
+/* ---------- Brain dump: the typing area is a field (IN-13nov-3) ----------
+   v1 drew the textarea with no edge or fill, so it read as more of the dialog's text. Now it is a field: a quiet fill
+   and an edge, the company colour on focus, the mic inside it, and the examples under it, outside. */
+:root.s2v2 .dump-input {
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  background: var(--surface-2);
+  transition: border-color 0.2s var(--ease-out-motion), box-shadow 0.2s var(--ease-out-motion), background-color 0.2s var(--ease-out-motion);
+}
+:root.s2v2 .dump-input:hover {
+  border-color: color-mix(in oklab, var(--text) 22%, var(--border));
+}
+:root.s2v2 .dump-input:focus-within {
+  border-color: var(--ai);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--ai) 16%, transparent);
+}
+:root.s2v2 .dump-input textarea {
+  display: block;
+  width: 100%;
+  min-height: 168px;
+  padding: 12px 52px 12px 14px !important;
+}
+:root.s2v2 .dump-examples {
+  margin-top: 8px;
+  align-items: center;
+}
