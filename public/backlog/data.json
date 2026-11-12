@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-12T19:18:03.422Z",
+  "updated": "2026-11-12T19:40:01.587Z",
   "items": [
     {
       "id": "G1",
@@ -10797,27 +10797,27 @@
       "round": "Inbox",
       "area": "admin",
       "title": "app.sprint2go.com = my personal workspaces only (internal)",
-      "detail": "After thinking about it, app.sprint2go.com is only for my personal workspaces. Make it internal.",
+      "detail": "After thinking about it, app.sprint2go.com is only for my personal workspaces. Make it internal. Done 13 Nov: public sign-up is closed by default (no sign-up page, no Start free on the website, nobody new can make a company from the app). Every existing company, member, guest and invite keeps working; new companies are made in /admin, Companies. Switch: /admin, Team & settings, Settings, Who can join (owners only, in the audit log).",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "IN-13nov-5",
       "round": "Inbox",
       "area": "admin",
       "title": "/admin: AI subscriptions via OAuth (Claude, GPT...) with priority, per workspace",
-      "detail": "On /admin: use OAuth of Claude, GPT or whatever, similar to aqeelOS, with priority mode like aqeelOS. Choose which workspace gets which subscription for AI and TTS, so I can use many Claude/GPT subscriptions across many workspaces.",
+      "detail": "On /admin: use OAuth of Claude, GPT or whatever, similar to aqeelOS, with priority mode like aqeelOS. Choose which workspace gets which subscription for AI and TTS. Done 13 Nov: /admin, AI, Subscriptions (owners only). Sign in with Claude (paste the code) or ChatGPT (device code), or add an API key for any provider; usage bars per account; one priority list with auto-switch at a limit you pick; per company: its own setup, all accounts in order, or one account for AI, and a speech key for meeting transcripts. Logins sealed on the server, never shown, every change in the audit log; each company's own setup stays the fallback. Owner to do: sign in to each subscription there, then pick the companies.",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "IN-13nov-6",
       "round": "Inbox",
       "area": "ai",
       "title": "TTS: maybe Parakeet on the VPS?",
-      "detail": "For TTS maybe Parakeet, if the VPS is strong enough; an option, or maybe not.",
+      "detail": "For TTS maybe Parakeet, if the VPS is strong enough. Measured 13 Nov on the AI server (parakeet-tdt-0.6b-v2, CPU): about 0.25x real time (1 hour of audio in 13 to 25 minutes), about 2 GB memory, 0.6 GB disk. But it understands English only (v3 adds European languages, not Indonesian), so it was not added as an engine. Numbers and the recommendation: admin-kit-reviews/sprint2go-manager/tts-parakeet.md. Meeting transcripts use the speech key picked per company in /admin, AI, Subscriptions.",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "IN-13nov-7",

@@ -1022,7 +1022,8 @@ function siteRedirect(req: IncomingMessage, res: ServerResponse, p: string) {
   if (host === `www.${SITE_HOST}`) return to(`${SITE_URL}${req.url ?? '/'}`);
   if (host !== SITE_HOST) return false;
   const landingFile = /^\/(assets\/|favicon|apple-touch-icon|icon-|manifest\.webmanifest|robots\.txt|sw\.js$)/.test(p);
-  if (p === '/' || p === '/welcome' || landingFile || p === '/api/pricing' || p === '/api/health') return false;
+  // /api/caps too: the landing page reads it (invite-only hides "Start free"; the desktop download links).
+  if (p === '/' || p === '/welcome' || landingFile || p === '/api/pricing' || p === '/api/health' || p === '/api/caps') return false;
   return to(`${PUBLIC_URL}${req.url ?? '/'}`);
 }
 const BOT_LIVE = new Set(['queued', 'joining', 'waiting_room', 'recording', 'stopping', 'processing']);
