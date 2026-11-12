@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-15T08:56:32.302Z",
+  "updated": "2026-11-12T19:18:03.422Z",
   "items": [
     {
       "id": "G1",
@@ -10770,27 +10770,27 @@
       "round": "Inbox",
       "area": "ui",
       "title": "Selected menu item: light mode should match dark",
-      "detail": "The selector in dark mode is better. In light mode the selected menu has a drop shadow but does not fill everything out. Light and dark mode need consistency. Screenshots: admin-kit-reviews/sprint2go-manager/feedback-13nov/01 (dark) vs 02 (light)",
+      "detail": "The selector in dark mode is better. In light mode the selected menu has a drop shadow but does not fill everything out. Light and dark mode need consistency. Screenshots: admin-kit-reviews/sprint2go-manager/feedback-13nov/01 (dark) vs 02 (light) | Done 13 Nov on /v2: the selected item is one tinted fill, edge to edge, no shadow, in both themes. Proof: admin-kit-reviews/sprint2go-manager/feedback-13nov/after/before-menu-1440-light.png vs after-menu-1440-light.png and after-menu-1440-dark.png. Files: src/v2-flex.css",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "IN-13nov-2",
       "round": "Inbox",
       "area": "ai",
       "title": "Ask AI panel cannot be resized",
-      "detail": "Ask AI, I could not resize it. Things must be flexible: open from the side, or as a pop-up. Screenshots: admin-kit-reviews/sprint2go-manager/feedback-13nov/03",
+      "detail": "Ask AI, I could not resize it. Things must be flexible: open from the side, or as a pop-up. Screenshots: admin-kit-reviews/sprint2go-manager/feedback-13nov/03 | Done 13 Nov on /v2: drag Ask AI's left or top edge to resize; the new button in its header docks it down the right side (the app makes room) or back to a window in the corner. Size and choice are remembered for you on every device. Proof: after-ask-window-1440-light.png, after-ask-side-1440-light.png. Files: src/components/ui/FlexPanel.tsx, src/components/Assistant.tsx, src/v2-flex.css",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "IN-13nov-3",
       "round": "Inbox",
       "area": "tasks",
       "title": "Brain dump: typing area does not feel like a field",
-      "detail": "The part where I type does not feel like a field because there is other text around it; it does not feel perfect. Nice that I can scale it. Screenshots: admin-kit-reviews/sprint2go-manager/feedback-13nov/04",
+      "detail": "The part where I type does not feel like a field because there is other text around it; it does not feel perfect. Nice that I can scale it. Screenshots: admin-kit-reviews/sprint2go-manager/feedback-13nov/04 | Done 13 Nov on /v2: the typing area has its own edge and fill, lights up when you type, the mic sits inside it and the examples sit under it. You can still drag it taller. Proof: before-dump-1440-light.png vs after-dump-1440-light.png (also 375 and dark). Files: src/v2-flex.css",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "IN-13nov-4",
@@ -10824,27 +10824,27 @@
       "round": "Inbox",
       "area": "chat",
       "title": "Chat thread panel cannot be resized",
-      "detail": "In chat, open a topic, go to the thread menu: I could not resize it. That is a bummer. It has to be flexible. Screenshots: admin-kit-reviews/sprint2go-manager/feedback-13nov/05",
+      "detail": "In chat, open a topic, go to the thread menu: I could not resize it. That is a bummer. It has to be flexible. Screenshots: admin-kit-reviews/sprint2go-manager/feedback-13nov/05 | Done 13 Nov on /v2: drag the thread's left edge to make it wider, or pop it out as a window in the corner so the channel stays usable. Remembered for you. The same piece is on every side panel: tasks, table rows, contacts, guests' tasks. Proof: after-thread-side-1440-light.png, after-thread-window-1440-light.png, after-task-window-1440-light.png, after-row-window-1440-light.png. Files: src/components/ui/FlexPanel.tsx, src/components/chat/Conversation.tsx",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "IN-13nov-8",
       "round": "Inbox",
       "area": "tables",
       "title": "Tables: square inside a square when editing a cell",
-      "detail": "On the Title cell there is a square inside a square. The Stage picker is good. Take a lot from Notion and how it works. Screenshots: admin-kit-reviews/sprint2go-manager/feedback-13nov/06 (bad) and 07 (good)",
+      "detail": "On the Title cell there is a square inside a square. The Stage picker is good. Take a lot from Notion and how it works. Screenshots: admin-kit-reviews/sprint2go-manager/feedback-13nov/06 (bad) and 07 (good) | Done 13 Nov on /v2: editing a cell shows one box only (the cell's), like Notion and the Stage picker; in the first column the box goes round the whole cell. Proof: before-table-1440-light.png vs after-table-1440-light.png. Files: src/v2-flex.css",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "IN-13nov-9",
       "round": "Inbox",
       "area": "calendar",
       "title": "Event / Task switch: small gap in the label",
-      "detail": "There is a menu label thing with a small gap. Not sure if intended. Screenshots: admin-kit-reviews/sprint2go-manager/feedback-13nov/08",
+      "detail": "There is a menu label thing with a small gap. Not sure if intended. Screenshots: admin-kit-reviews/sprint2go-manager/feedback-13nov/08 | Done 13 Nov on /v2: the grey ring round the chosen side is gone; the chosen side is a tinted pill like the tabs in Chat and Tables, and still slides. Proof: before-cal-1440-light.png vs after-cal-1440-light.png. Files: src/v2-flex.css",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "IN-13nov-10",
@@ -10869,27 +10869,27 @@
       "round": "Inbox",
       "area": "mail",
       "title": "Inbox: Primary / Promotions / Social / Updates too wide",
-      "detail": "The category tabs are too wide. Screenshots: admin-kit-reviews/sprint2go-manager/feedback-13nov/10",
+      "detail": "The category tabs are too wide. Screenshots: admin-kit-reviews/sprint2go-manager/feedback-13nov/10 | Done 13 Nov on /v2: each tab is as wide as its words; a narrow list fits all five names. Proof: before-menu-1440-light.png vs after-menu-1440-light.png (tab row). Files: src/v2-flex.css",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "IN-13nov-13",
       "round": "Inbox",
       "area": "mail",
       "title": "Inbox should feel like Gmail: not full width, easier to digest",
-      "detail": "When I open email, Gmail feels easier to digest, I guess because it does not force the whole width. Screenshots: admin-kit-reviews/sprint2go-manager/feedback-13nov/11 (Gmail)",
+      "detail": "When I open email, Gmail feels easier to digest, I guess because it does not force the whole width. Screenshots: admin-kit-reviews/sprint2go-manager/feedback-13nov/11 (Gmail) | Done 13 Nov on /v2: an open email reads in an 860 px column instead of the full screen, and a wide list with nothing open is one line per email like Gmail (sender, subject, start of the email, date). Proof: after-menu-1440-light.png (list), after-mailopen-2000-light.png (open email on a wide screen). Files: src/v2-flex.css",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "IN-13nov-14",
       "round": "Inbox",
       "area": "mail",
       "title": "Mail: an \"All inboxes\" view without any filter",
-      "detail": "I have a lot of emails and inboxes. It is already filtered by primary, promotion, social, update, but what about all inboxes without any filters? That is important.",
+      "detail": "I have a lot of emails and inboxes. It is already filtered by primary, promotion, social, update, but what about all inboxes without any filters? That is important. | Done 13 Nov on /v2: a new All tab (first in the row, and a row in the phone menu) shows the whole inbox with no category filter. Primary stays and stays the default. Proof: after-alltab-1440-light.png. Files: src/components/mail/Sorting.tsx, src/App.tsx",
       "priority": "high",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "IN-13nov-15",
