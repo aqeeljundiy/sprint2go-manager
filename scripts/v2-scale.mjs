@@ -23,7 +23,10 @@ const OUT = join(SRC, 'v2-scale.css');
 // v1's CSS in the order main.tsx loads it, then the files components import themselves.
 const ORDER = ['tokens', 'styles', 'calendar', 'shell', 'brand', 'apps', 'ui', 'round2', 'tables', 'teams', 'polish', 'tasks', 'home', 'mail', 'mailExtras', 'mailSorting', 'admin', 'notify', 'security', 'jobs', 'notes', 'unlimited', 'system', 'appv2'].map((n) => `${n}.css`);
 const EXTRA = ['connector.css', 'mailFiles.css', 'phoneMailApps.css', 'settingsSearch.css', 'components/chat/chat.css', 'components/imports/imports.css', 'components/mail/organize.css', 'components/mail/teams.css', 'components/meetExtras.css', 'components/projectPulse.css', 'components/ui/personCard.css', 'components/vault.css'];
-const FILES = [...ORDER, ...EXTRA].filter((f) => existsSync(join(SRC, f)));
+// The phone layer (src/mobile, in index.css's order) is copied last and unchanged: this file loads after it on v2 only
+// (main.tsx imports it there, so v1 never downloads it), and the phone rules must still win over the desktop copies.
+const MOBILE = [...readFileSync(join(SRC, 'mobile/index.css'), 'utf8').matchAll(/@import '\.\/([\w.-]+)'/g)].map((m) => 'mobile/' + m[1]);
+const FILES = [...ORDER, ...EXTRA, ...MOBILE].filter((f) => existsSync(join(SRC, f)));
 
 // The scale: tokens.css (type 24/17/15/13/12, radii 10/16/pill/round, 4/8 spacing). Six text sizes per surface (the
 // --ak-text-* steps in src/v2.css): the team app and portal 12/13/15/17/24 + the 36 greeting (desktop's 14 joins the
@@ -74,7 +77,7 @@ for (const f of FILES) {
   const css = postcss.parse(readFileSync(join(SRC, f), 'utf8'), { from: f });
   css.walkRules((rule) => {
     if (rule.parent?.type === 'atrule' && /keyframes/.test(rule.parent.name)) return;
-    const phone = phoneMedia(rule); // copied unchanged, so it still comes after the desktop rule it overrides
+    const phone = f.startsWith('mobile/') || phoneMedia(rule); // copied unchanged, so it still comes after the desktop rule it overrides
     const decls = rule.nodes.filter((d) => d.type === 'decl' && FOLD[d.prop]);
     if (!decls.length) return;
     const copy = postcss.rule({ selector: scope(rule.selector) });
