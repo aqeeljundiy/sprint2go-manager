@@ -249,9 +249,13 @@ html[data-s2a] body {
   width: 100%;
   max-width: calc(var(--ak-space) * 120);
 }
-/* Phones: the kit gives segmented tabs a 44px tap height but not underline tabs (kit-requests.md); this theme uses underline. */
-@media (max-width: 640px) {
+/* Phones and tablets (touch): the kit gives segmented tabs a 44px tap height but not underline tabs (kit-requests.md). */
+@media (max-width: 1024px) {
   html[data-ak-tabs="underline"] ak-tabs > :where(a, button) {
     min-height: 44px;
   }
+}
+/* A linked row inside a card body keeps its text on the card's edge; only the hover tint reaches past it. */
+.ak-card__body a.s2a-link {
+  margin-inline: calc(var(--ak-space) * -2);
 }
