@@ -189,13 +189,7 @@
     width: 0;
   }
 }
-.s2v2 .load-go {
-  border-radius: var(--r-control);
-  transition: background 0.15s var(--ease-out-motion);
-}
-.s2v2 .load-go:hover {
-  background: var(--hover);
-}
+/* Workload rows keep v1's own highlight: the whole row (face and text) lights up, with room around the text. */
 
 /* ---------- The icon rail (every app): a press you can feel, badges that pop in ---------- */
 .s2v2 .rail-icon {
@@ -468,5 +462,23 @@
     flex-wrap: nowrap;
     overflow-x: auto;
     scrollbar-width: none;
+  }
+}
+
+/* Phones: things you tap are 44 px to the touch without moving anything (the extra room is padding with a matching
+   negative margin): a mail row's face, a task's title, the Settings search field. */
+@media (max-width: 767px) {
+  .s2v2 .gm-row .row-av {
+    width: var(--tap);
+    height: var(--tap);
+    margin: calc((var(--av-m) - var(--tap)) / 2);
+  }
+  .s2v2 .trow-title {
+    padding-block: var(--sp-3);
+    margin-block: calc(var(--sp-3) * -1);
+  }
+  .s2v2 .set-search-field input {
+    padding-block: var(--sp-3);
+    margin-block: calc(var(--sp-3) * -1);
   }
 }

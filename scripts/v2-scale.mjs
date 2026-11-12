@@ -8,8 +8,8 @@
 // How: every rule in v1's desktop CSS that sets one of these properties is repeated under html.s2v2 with the value
 // folded onto the scale. Every such declaration is repeated (also the ones already on the scale), so the order and
 // specificity between v1's own rules stay exactly as they were (:where(:root.s2v2) adds no weight; the copies load
-// after v1's CSS and before src/v2.css and the phone layer). Not folded: the phone layer (src/mobile is not copied;
-// max-width blocks are copied unchanged: already on the system and checked by ui-tokens-check), the landing page, the
+// after all of v1's CSS, on /v2 and /admin/v2 only, then src/v2.css; main.tsx). Not folded: the phone layer (src/mobile
+// and max-width blocks are copied unchanged and last-in-order: already on the system and checked by ui-tokens-check), the landing page, the
 // old kit builds, var()/calc()/clamp() values and em/rem/% sizes.
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join, relative } from 'node:path';
@@ -78,7 +78,16 @@ for (const f of FILES) {
   css.walkRules((rule) => {
     if (rule.parent?.type === 'atrule' && /keyframes/.test(rule.parent.name)) return;
     const phone = f.startsWith('mobile/') || phoneMedia(rule); // copied unchanged, so it still comes after the desktop rule it overrides
-    const decls = rule.nodes.filter((d) => d.type === 'decl' && FOLD[d.prop]);
+    // A `font` shorthand's size counts as a font-size (copied as the longhand only, so the family it names never comes
+    // back over a later v1 rule that changed the family).
+    const decls = rule.nodes
+      .filter((d) => d.type === 'decl' && (FOLD[d.prop] || (d.prop === 'font' && !phone)))
+      .map((d) => {
+        if (d.prop !== 'font') return d;
+        const size = d.value.match(/(?:^|\s)(\d*\.?\d+px)(?=[\s/])/)?.[1];
+        return size ? postcss.decl({ prop: 'font-size', value: size, important: d.important }) : null;
+      })
+      .filter(Boolean);
     if (!decls.length) return;
     const copy = postcss.rule({ selector: scope(rule.selector) });
     // text sizes differ per surface: one copy for the app and portal, one for the console (both weightless)

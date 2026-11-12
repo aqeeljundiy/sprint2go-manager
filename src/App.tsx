@@ -57,7 +57,7 @@ import { isPersonalHoliday, personalHolidayId, regionsToSave, useHolidayRegions 
 import { OutOfOffice } from './components/OutOfOffice';
 import { caps } from './caps';
 import { EmailDeliverySection } from './components/admin/EmailDelivery';
-import { ai, aiLive } from './ai';
+import { ai, aiLive, aiStatus } from './ai';
 import type { AskChat } from './components/Assistant';
 import { WorkspaceSwitcher } from './components/WorkspaceSwitcher';
 import { InviteMember, NewAccount, RemoveMailbox } from './components/WorkspaceForms';
@@ -376,9 +376,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
   useEffect(() => {
     if (!server.on || inSandbox) return (setAiOn(true), setAiWhy(null)); // the demo company answers with samples
     let on = true;
-    fetch(`/api/ai/status?ws=${encodeURIComponent(ws.id)}`)
-      .then((r) => (r.ok ? r.json() : { live: false }))
-      .then((d: { live: boolean; why?: 'no-key' | 'down' | 'used-up' | 'off' | null }) => on && (setAiOn(d.live || caps.demo), setAiWhy(d.why ?? null)), () => on && setAiOn(caps.demo));
+    aiStatus(ws.id).then((d) => on && (setAiOn(d.live || caps.demo), setAiWhy(d.why ?? null)), () => on && setAiOn(caps.demo));
     return () => {
       on = false;
     };

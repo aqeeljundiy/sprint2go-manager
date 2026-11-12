@@ -8,6 +8,21 @@ export type { DumpTask, DumpPerson, DumpClient, DumpTeam, DumpBrief, DumpPlan, D
 import { server } from '../sync';
 import { caps } from '../caps';
 import { isSandboxId } from '../sandbox';
+import { v2 } from '../surface';
+
+export type AIStatus = { live: boolean; why?: 'no-key' | 'down' | 'used-up' | 'off' | null };
+// v2: the app shell and the AI client ask at the same moment when a company opens; they share one request.
+const asking = new Map<string, Promise<AIStatus>>();
+/** Whether a company's AI works right now (the server's /api/ai/status). Rejects when the request fails. */
+export function aiStatus(id: string): Promise<AIStatus> {
+  const ask = () => fetch(`/api/ai/status?ws=${encodeURIComponent(id)}`).then((r) => (r.ok ? (r.json() as Promise<AIStatus>) : { live: false }));
+  if (!v2) return ask();
+  const running = asking.get(id);
+  if (running) return running;
+  const p = ask().finally(() => asking.delete(id));
+  asking.set(id, p);
+  return p;
+}
 
 const ENV_URL = (import.meta.env.VITE_AI_URL as string | undefined)?.replace(/\/$/, '');
 const state = { workspaceId: '', live: !!ENV_URL };
@@ -19,9 +34,7 @@ export function setAIWorkspace(id: string) {
   // The demo company never uses a real AI (ours or anyone's keys): its answers are the samples, labelled as such.
   if (isSandboxId(id)) return void (state.live = false);
   if (!server.on) return;
-  void fetch(`/api/ai/status?ws=${encodeURIComponent(id)}`)
-    .then((r) => (r.ok ? r.json() : { live: false }))
-    .then((d: { live: boolean }) => (state.live = d.live));
+  void aiStatus(id).then((d) => (state.live = d.live), () => {});
 }
 const URL = () => (server.on ? '' : ENV_URL);
 const useServer = () => server.on || !!ENV_URL;
