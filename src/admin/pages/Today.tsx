@@ -67,6 +67,7 @@ export function Today() {
   if (!data) return <Page title={t('Today')}><Loading rows={6} /></Page>;
   const { kpis: k, queue: raw } = data;
   const fresh = new Set((companies.data?.companies ?? []).filter(isNewCompany).map((c) => c.id));
+  const newCos = (companies.data?.companies ?? []).filter((c) => !c.internal && isNewCompany(c));
   const q = adminV2 ? { ...raw, atRisk: raw.atRisk.filter((c) => !fresh.has(c.id)) } : raw;
   const hour = new Date().getHours();
   const name = (me.name || me.email).split(/[ @]/)[0];
@@ -143,9 +144,11 @@ export function Today() {
         </Group>
         {/* v2: the companies in their first week, under their own name and with a welcome, not an alarm */}
         {adminV2 && (
-          <Group title={t('Not started yet')} n={raw.atRisk.length - q.atRisk.length}>
-            {raw.atRisk.filter((c) => fresh.has(c.id)).map((c) => (
-              <Row key={c.id} icon={<Sprout size={15} />} tone="info" title={c.name} sub={[t('new this week'), c.lastActive ? t('last seen {ago}', { ago: rel(c.lastActive) }) : t('not signed in yet'), t('{amount}/month', { amount: rpShort(c.mrr) })].join(' · ')} onOpen={() => go(`/admin/companies/${c.id}`)}>
+          // The same companies as Companies › Not started yet: every customer in its first week, not only the ones whose
+          // health would have read "At risk".
+          <Group title={t('Not started yet')} n={newCos.length}>
+            {newCos.map((c) => (
+              <Row key={c.id} icon={<Sprout size={15} />} tone="info" title={c.name} sub={[t('new this week'), c.lastActive ? t('last seen {ago}', { ago: rel(c.lastActive) }) : t('not signed in yet'), t('{amount}/month', { amount: rpShort(c.mrr || c.after || 0) })].join(' · ')} onOpen={() => go(`/admin/companies/${c.id}`)}>
                 <button className="ghost-btn sm" onClick={() => go(`/admin/companies/${c.id}`)}>
                   {t('Open company')}
                 </button>
