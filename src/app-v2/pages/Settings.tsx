@@ -80,7 +80,7 @@ export function Settings() {
   }, [q, admin]);
   return (
     <Page title={t('Settings')} sub={t('Your own setup and {company}’s, in four groups.', { company: ws.name })}>
-      <div className="ak-toolbar">
+      <div className="s2a-find">
         <input className="ak-input" type="search" aria-label={t('Search settings')} placeholder={t('Search settings, for example signature')} value={q} onChange={(e) => setQ(e.target.value)} />
       </div>
       {groups.length ? (

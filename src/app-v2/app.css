@@ -244,3 +244,14 @@ html[data-s2a] body {
   overflow: visible;
   overscroll-behavior: auto;
 }
+/* Settings search: on the page's left edge, as wide as one settings column at most. */
+.s2a-find .ak-input {
+  width: 100%;
+  max-width: calc(var(--ak-space) * 120);
+}
+/* Phones: the kit gives segmented tabs a 44px tap height but not underline tabs (kit-requests.md); this theme uses underline. */
+@media (max-width: 640px) {
+  html[data-ak-tabs="underline"] ak-tabs > :where(a, button) {
+    min-height: 44px;
+  }
+}
