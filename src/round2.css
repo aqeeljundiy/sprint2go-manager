@@ -4639,3 +4639,15 @@ button.tl:hover,
 .set-block > .row:last-child {
   border-bottom: 0;
 }
+
+/* Guest portal Home (ClientApp.tsx) shares the 12-column grid but its cards set no width, so each took 1 of 12
+   (a 37-93 px strip) on tablets and computers. Two per row there; "wide" cards take the full row. Phones keep
+   the one-column rule in src/mobile/misc.css. */
+@media (min-width: 768px) {
+  .client-app .home-grid.cards > .home-card {
+    grid-column: span 6;
+  }
+  .client-app .home-grid.cards > .home-card.wide {
+    grid-column: 1 / -1;
+  }
+}
