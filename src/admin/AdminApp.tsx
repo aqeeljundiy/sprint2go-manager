@@ -327,12 +327,13 @@ export function AdminApp() {
           <Confirm
             title={t('Sign in as this person?')}
             text={asking.ticket ? t('You will see and act as them for up to 12 hours. It is logged with your name and ticket #{n}, and they can see it.', { n: asking.ticket }) : t('You will see and act as them for up to 12 hours. It is logged with your name and the ticket number, and they can see it.')}
-            reason={asking.ticket ? undefined : t('Ticket number this is for (the server asks for it)')}
+            reason={asking.ticket ? undefined : t('Ticket number this is for')}
+            reasonOk={(s) => /^\s*#?\d+\s*$/.test(s)}
             action={t('Sign in as them')}
             danger
             onClose={() => setAsking(null)}
             onConfirm={({ reason }) =>
-              post('person/signin-as', { userId: asking.userId, ticket: asking.ticket ?? (Number(reason.replace(/\D/g, '')) || reason) })
+              post('person/signin-as', { userId: asking.userId, ticket: asking.ticket ?? Number(reason.replace(/\D/g, '')) })
                 .then(() => location.assign(appHome))
                 .catch((e: Error) => (setAsking(null), toast(e.message)))
             }

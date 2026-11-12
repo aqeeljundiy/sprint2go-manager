@@ -393,12 +393,12 @@ export const WHY = [
 ];
 
 /** Asks before something that matters: a reason (with why, for churn), or a typed word for what can't be undone. */
-export function Confirm({ title, text, action, danger, word, reason, why, onClose, onConfirm }: { title: string; text: ReactNode; action: string; danger?: boolean; word?: string; reason?: string; why?: boolean; onClose: () => void; onConfirm: (v: { reason: string; why: string }) => Promise<unknown> }) {
+export function Confirm({ title, text, action, danger, word, reason, reasonOk, why, onClose, onConfirm }: { title: string; text: ReactNode; action: string; danger?: boolean; word?: string; reason?: string; /** v2: the reason must pass this before the button works (a ticket number, say). */ reasonOk?: (s: string) => boolean; why?: boolean; onClose: () => void; onConfirm: (v: { reason: string; why: string }) => Promise<unknown> }) {
   const [typed, setTyped] = useState('');
   const [note, setNote] = useState('');
   const [w, setW] = useState(why ? '' : 'other');
   const [busy, setBusy] = useState(false);
-  const ok = (!word || typed === word) && (!why || !!w);
+  const ok = (!word || typed === word) && (!why || !!w) && (!reason || !reasonOk || reasonOk(note));
   return (
     <Dialog
       title={title}

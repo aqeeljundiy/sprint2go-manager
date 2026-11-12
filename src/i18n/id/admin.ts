@@ -1313,6 +1313,7 @@ const id: Record<string, string> = {
   "This month: booked today": "Bulan ini: tercatat hari ini",
   "Throwaway sign-up: {name}": "Pendaftaran email sekali pakai: {name}",
   "Ticket #{n}": "Tiket #{n}",
+  "Ticket number this is for": "Nomor tiket untuk ini",
   "Ticket number this is for (the server asks for it)": "Nomor tiket untuk ini (diminta server)",
   "Ticket number": "Nomor tiket",
   "Tickets waiting": "Tiket menunggu",

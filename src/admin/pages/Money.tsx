@@ -11,10 +11,15 @@ import { adminV2 } from '../../surface';
 
 /** v2: the invoice list as a CSV (number, company, month, total, status, due, paid). */
 function invoicesCsv(rows: InvoiceRow[]) {
-  const q = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  // A cell that starts like a formula (= + - @, tab, return) gets a leading ' so Excel and Sheets show it as text.
+  const q = (v: unknown) => {
+    let s = String(v ?? '');
+    if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`;
+    return `"${s.replace(/"/g, '""')}"`;
+  };
   const lines = [['Invoice', 'Company', 'Month', 'Total', 'Status', 'Due', 'Paid'].join(','), ...rows.map((i) => [i.number, i.company, i.period, i.total, i.overdue ? 'overdue' : i.status, i.dueAt?.slice(0, 10), i.paidAt?.slice(0, 10) ?? ''].map(q).join(','))];
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([lines.join('\n')], { type: 'text/csv' }));
+  a.href = URL.createObjectURL(new Blob(['﻿' + lines.join('\n')], { type: 'text/csv;charset=utf-8' }));
   a.download = 'sprint2go-invoices.csv';
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
@@ -168,7 +173,7 @@ interface InvoiceRow {
   overdue: boolean;
 }
 function Invoices() {
-  const { go, may } = useAdmin();
+  const { go, may, toast } = useAdmin();
   const { data, error, reload } = useApi<{ invoices: InvoiceRow[] }>('invoices');
   const act = useAct();
   // v2: emailing invoices to customers asks first, naming how many and the total (the why review).
@@ -225,7 +230,7 @@ function Invoices() {
           may('billing')
             ? (sel, clear) => (
                 <>
-                  <button className="ghost-btn sm" onClick={() => { const list = sel.filter((i) => i.status === 'draft' || i.status === 'sent'); if (adminV2) setSending({ list, clear }); else void send(list, clear); }}>
+                  <button className="ghost-btn sm" onClick={() => { const list = sel.filter((i) => i.status === 'draft' || i.status === 'sent'); if (adminV2) { if (list.length) setSending({ list, clear }); else toast(t('Nothing to send in what you ticked.')); } else void send(list, clear); }}>
                     {t('Send')}
                   </button>
                   <button className="ghost-btn sm" onClick={() => void Promise.all(sel.filter((i) => i.status !== 'paid' && i.status !== 'void').map((i) => post('invoice/status', { id: i.id, status: 'paid', method: 'bank transfer' }))).then(() => (clear(), reload()))}>

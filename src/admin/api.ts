@@ -28,7 +28,8 @@ export const get = <T = any>(path: string): Promise<T> => {
   inflight.set(path, p);
   return p;
 };
-export const post = <T = any>(path: string, body: unknown = {}): Promise<T> => fetch(`/api/admin/${path}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }).then(read);
+// A change empties the shared list first, so the reload after it never joins a load that started before it.
+export const post = <T = any>(path: string, body: unknown = {}): Promise<T> => (inflight.clear(), fetch(`/api/admin/${path}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }).then(read));
 
 export const rp = (n: number) => 'Rp ' + Math.round(n).toLocaleString('id-ID');
 /** Short money: Rp 1,2 jt, Rp 340 rb. */
