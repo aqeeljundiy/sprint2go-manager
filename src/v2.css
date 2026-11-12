@@ -263,3 +263,158 @@
   top: 9px;
   left: 10px;
 }
+
+/* ==========================================================================
+   Every screen (team app, guest portal, console)
+   ========================================================================== */
+
+/* Everything you can click answers with colour (150 ms). :where() has no weight, so any transition v1 already set wins. */
+:where(.s2v2) :where(button, a, [role='tab'], [role='menuitem'], [role='option'], summary, .nav-item, .adm-nav-item, .adm-tr.click, .row, .task, .home-notice) {
+  transition: color 0.15s var(--ease-out-motion), background-color 0.15s var(--ease-out-motion), border-color 0.15s var(--ease-out-motion), box-shadow 0.15s var(--ease-out-motion), opacity 0.15s var(--ease-out-motion);
+}
+/* Primary buttons answer a press everywhere. */
+.s2v2 :is(.primary-btn, .compose-btn, .ny-btn):active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* Switching apps: the app's work area rises in (main.main is keyed by app, so it is new on every switch). */
+.s2v2 .app > main.main {
+  animation: viewIn var(--dur-in) var(--ease-out-motion) backwards; /* backwards: no transform left to trap dialogs */
+}
+
+/* ---------- Guest portal Home: one text edge in every card ----------
+   v1 had three: list rows at 8 px from the card, the project at 2 px left of it, the meeting 10 px left of its
+   heading. Now every row's text lines up with the card heading's icon, with 8 px of room inside each highlight. */
+.s2v2 .client-app .home-card .card-body {
+  padding: 4px 0 12px;
+}
+.s2v2 .client-app .home-card .home-list {
+  padding: 0;
+}
+.s2v2 .client-app .home-card :is(.home-notice, .home-brief, .home-meeting) {
+  width: calc(100% - 16px);
+  margin: 0 8px;
+  padding: 8px;
+  border-radius: var(--r-control);
+}
+.s2v2 .client-app .home-card .empty-state.compact {
+  padding: 8px 16px;
+  justify-items: start;
+  text-align: left;
+}
+.s2v2 .client-app .home-card .empty-state.compact .empty-sub {
+  margin: 0;
+}
+
+/* ---------- The operator console ---------- */
+/* Pages and tabs rise in (v1: the page only); queue rows and table rows come in one after another. */
+.s2v2 .adm-tab-body {
+  animation: viewIn var(--dur-in) var(--ease-out-motion) backwards;
+}
+.s2v2 .adm-q-list > * {
+  animation: viewIn var(--dur-in) var(--ease-out-motion) backwards;
+}
+.s2v2 .adm-q-list > :nth-child(2) { animation-delay: 30ms; }
+.s2v2 .adm-q-list > :nth-child(3) { animation-delay: 60ms; }
+.s2v2 .adm-q-list > :nth-child(4) { animation-delay: 90ms; }
+.s2v2 .adm-q-list > :nth-child(n + 5) { animation-delay: 120ms; }
+.s2v2 .adm-tr:not(.head) {
+  animation: fadeIn var(--dur-in) var(--ease-out-motion) backwards;
+  animation-delay: calc(var(--i, 0) * 20ms);
+}
+.s2v2 .adm-stat.click {
+  transition: box-shadow 0.2s var(--ease-out-motion), background-color 0.2s var(--ease-out-motion);
+}
+.s2v2 .adm-stat.click:hover {
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--text) 12%, transparent), 0 10px 24px -16px rgba(11, 12, 16, 0.3);
+}
+.s2v2 .adm-nav-item svg {
+  transition: transform 0.2s var(--ease-out-motion);
+}
+.s2v2 .adm-nav-item:hover svg {
+  transform: translateX(1px) scale(1.06);
+}
+/* Small things the v2 pages added: notes, a save row under the prices, Agent access. */
+.s2v2 .adm-note {
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+.s2v2 .adm-save-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 16px;
+}
+.s2v2 .adm-code {
+  margin: 4px 0 0;
+  padding: 12px;
+  border-radius: var(--r-control);
+  background: var(--hover);
+  font: 13px/1.5 var(--mono, ui-monospace, monospace);
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.s2v2 .adm-snippets {
+  display: grid;
+  gap: 12px;
+}
+.s2v2 .adm-agent-group {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.s2v2 .adm-agent-group legend {
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+.s2v2 .adm-check-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 12px;
+  align-items: start;
+  cursor: pointer;
+}
+.s2v2 .adm-check-row span {
+  display: grid;
+}
+.s2v2 .adm-revoked {
+  margin-top: 12px;
+}
+.s2v2 .adm-revoked summary {
+  cursor: pointer;
+}
+/* Phones: queue titles wrap to two lines instead of "#1005 How do I share a dri…". */
+@media (max-width: 767px) {
+  .s2v2 .adm-q-text strong {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    white-space: normal;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .s2v2 .app > main.main,
+  .s2v2 .adm-tab-body,
+  .s2v2 .adm-q-list > *,
+  .s2v2 .adm-tr:not(.head) {
+    animation: fadeIn 150ms ease backwards;
+    animation-delay: 0ms;
+  }
+  .s2v2 :is(.primary-btn, .compose-btn, .ny-btn):active,
+  .s2v2 .adm-nav-item:hover svg {
+    transform: none;
+  }
+}
+
+/* No underlined buttons or links in the app's own UI (owner's pet peeve): colour shows they can be pressed. Text
+   people wrote (mail, notes, chat) keeps its links underlined. */
+.s2v2 :is(.link-btn, .signin a, .signin .link-btn, .adm-link, .hsec-all, .see-all) {
+  text-decoration: none;
+}
+.s2v2 :is(.link-btn, .signin a, .adm-link):hover {
+  color: var(--accent-text, var(--accent));
+}

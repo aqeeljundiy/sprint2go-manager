@@ -1,4 +1,5 @@
 import { ProjectBadge } from './ProjectBadge';
+import { teamV2 } from '../surface';
 import { Fragment, useEffect, useReducer, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { ProjectPicker } from './ProjectPicker';
 import { SmoothHeight } from './ui/Smooth';
@@ -91,10 +92,13 @@ export function VaultSidebar({ items, clients, filter, onFilter, onNew, workspac
   const h = useHealth();
   return (
     <>
+      {/* v2: before the Vault is open, no faded button that looks broken; it appears once the Vault is unlocked. */}
+      {!(teamV2 && locked) && (
       <button className="compose-btn" onClick={onNew} disabled={!server.on || isSandboxId(workspaceId) || locked} title={locked ? t('Unlock the Vault first.') : t('Add a login')}>
         <Plus size={16} />
         <span className="sb-label">{t('Add a login')}</span>
       </button>
+      )}
       <nav className="nav">
         <button className={`nav-item ${filter === '' ? 'active' : ''}`} onClick={() => onFilter('')}>
           <KeyRound size={16} />

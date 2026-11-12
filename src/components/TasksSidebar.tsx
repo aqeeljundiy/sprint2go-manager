@@ -1,4 +1,5 @@
 import { ProjectBadge } from './ProjectBadge';
+import { teamV2 } from '../surface';
 import { useState } from 'react';
 import { PROJECT_TYPES, term } from '../terms';
 import { Archive, CalendarRange, Eye, FileText, CircleCheck, LayoutGrid, Layers, Plus, Send, Sparkles, Building2, Sun, Users, ChevronRight } from 'lucide-react';
@@ -89,9 +90,10 @@ export function TasksSidebar({ scope, tasks, clients: allClients, teams: allTeam
   return (
     <>
       {/* Todoist's top action: add one task. Brain dump (notes in, tasks out) sits just under it. */}
-      <button className="compose-btn" onClick={onAddTask} title={t('Add task')}>
+      {/* v2: one name for making a task everywhere (the header and empty state already say New task). */}
+      <button className="compose-btn" onClick={onAddTask} title={teamV2 ? t('New task') : t('Add task')}>
         <Plus size={16} />
-        <span className="sb-label">{t('Add task')}</span>
+        <span className="sb-label">{teamV2 ? t('New task') : t('Add task')}</span>
       </button>
       <nav className="nav">
         <button className="nav-item" onClick={onBrainDump} title={t('Brain dump: paste notes, get tasks')}>

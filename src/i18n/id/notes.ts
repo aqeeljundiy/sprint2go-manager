@@ -205,6 +205,8 @@ const id: Record<string, string> = {
   'Nothing matches “{query}”': 'Tidak ada yang cocok dengan “{query}”',
   'From this line': 'Dari baris ini',
   'Today’s date': 'Tanggal hari ini',
+  // Notes v2 (/v2): the empty Notes pane
+  "Start one with New note: meeting notes, briefs, ideas.": "Mulai dengan Catatan baru: catatan rapat, brief, ide.",
 };
 
 export default id;

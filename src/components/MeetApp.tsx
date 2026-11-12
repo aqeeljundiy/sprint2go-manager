@@ -1,4 +1,5 @@
 import { TabBar } from './ui/TabBar';
+import { teamV2 } from '../surface';
 import { PersonName, usePersonCard } from './ui/PersonCard';
 import { ProjectBadge } from './ProjectBadge';
 import { MEETING_LANGUAGES, languageLabel, languagesLabel } from '../data/languages';
@@ -250,7 +251,7 @@ export function MeetView(p: MeetProps & { part?: 'meetings' | 'notes'; embedded?
       actions={pg.kind === 'folder' ? <TopBarButton icon={Sparkles} label={t('Ask AI')} onClick={() => p.onAsk({ kind: 'client', id: pg.clientId })} /> : undefined}
       title={
         <h1 className={`mt-title plain${sub ? ' small' : ''}`}>
-          <span className="mt-title-text">{pg.kind === 'folder' ? (p.clients.find((c) => c.id === pg.clientId)?.name ?? t('Folder')) : pg.kind === 'unfiled' ? t('Unfiled') : pg.kind === 'tasks' ? t('Tasks from meetings') : t('Meet')}</span>
+          <span className="mt-title-text">{pg.kind === 'folder' ? (p.clients.find((c) => c.id === pg.clientId)?.name ?? t('Folder')) : pg.kind === 'unfiled' ? t('Unfiled') : pg.kind === 'tasks' ? t('Tasks from meetings') : teamV2 ? t('Meetings') : t('Meet')}</span>
         </h1>
       }
     />

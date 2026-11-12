@@ -1,4 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react';
+import { teamV2 } from '../surface';
 import { Bot, Clock, ChevronRight, Folder, Inbox, ListChecks, Search, Settings, Users, Video, X } from 'lucide-react';
 import type { CalEvent, Client, Meeting, MeetingSettings, Role, Todo, Workspace } from '../types';
 import { JOIN_MODES, MEETING_NAME, joinsByRule, meetingLinkOf, notetakerJoins, type MeetingKind } from '../meetingLinks';
@@ -46,7 +47,7 @@ export function MeetDrawer({ page, clients, meetings, company, onPage, onClose, 
   const go = (p: MeetPage) => (onPage(p), onClose());
   const unfiled = meetings.filter((m) => !m.clientId).length;
   return (
-    <AppDrawer label={t('Meet')} company={company} onClose={onClose}>
+    <AppDrawer label={teamV2 ? t('Meetings') : t('Meet')} company={company} onClose={onClose}>
       <DrawerRow icon={<Video size={20} />} label={t('Meetings')} on={page.kind === 'list'} onClick={() => go({ kind: 'list' })} />
       <DrawerRow icon={<ListChecks size={20} />} label={t('Tasks from meetings')} on={page.kind === 'tasks'} onClick={() => go({ kind: 'tasks' })} />
       <DrawerRow icon={<Inbox size={20} />} label={t('Unfiled')} sub={unfiled ? tn(unfiled, '{n} to file', '{n} to file') : undefined} on={page.kind === 'unfiled'} onClick={() => go({ kind: 'unfiled' })} />

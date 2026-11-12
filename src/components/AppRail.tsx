@@ -1,4 +1,5 @@
 import { Fragment, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
+import { teamV2 } from '../surface';
 import { useActionMenu } from './ui/ActionSheet';
 import { usePersisted } from '../settings';
 import { TabDefaultsCtx, arrange, type TabPrefs } from './ui/TabBar';
@@ -26,7 +27,7 @@ export const APPS: { id: AppId; readonly name: string; icon: LucideIcon; path: s
   { id: 'calendar', get name() { return t('Calendar'); }, icon: CalendarDays, path: '/calendar' },
   { id: 'notes', get name() { return t('Notes'); }, icon: NotebookPen, path: '/notes' },
   { id: 'drive', get name() { return t('Drive'); }, icon: HardDrive, path: '/drive' },
-  { id: 'meet', get name() { return t('Meet'); }, icon: Video, path: '/meet' },
+  { id: 'meet', get name() { return teamV2 ? t('Meetings') : t('Meet'); }, icon: Video, path: '/meet' }, // v2: the app is called what its page says
   { id: 'vault', get name() { return t('Vault'); }, icon: KeyRound, path: '/vault' },
 ];
 

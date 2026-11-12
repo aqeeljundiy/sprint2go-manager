@@ -10,6 +10,7 @@ import { ActionSheet, useActionMenu, type SheetAction } from '../ui/ActionSheet'
 import { ProjectPicker } from '../ProjectPicker';
 import { term } from '../../terms';
 import { NoteBar } from './NoteBar';
+import { teamV2 } from '../../surface';
 import { InlineMenu, type InlineItem } from './InlineMenu';
 import { Avatar } from '../Avatar';
 import { fmtDayLong } from '../../i18n/format';
@@ -50,10 +51,16 @@ export interface NoteEditorProps {
 export function NoteEditor(p: NoteEditorProps) {
   const { note, api } = p;
   useNoteDraft(note, api.patch);
+  // v2 (src/surface.ts): Notes opens on your latest note instead of an empty "No note open" pane (the why review).
+  const latest = teamV2 && !p.phone ? p.notes.filter((n) => !n.deletedAt).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0] : undefined;
+  const opened = useRef(false);
+  useEffect(() => {
+    if (!note && latest && !opened.current) (opened.current = true), p.onOpenNote(latest.id);
+  }, [note, latest?.id]); // eslint-disable-line react-hooks/exhaustive-deps
   if (!note)
     return (
       <section className="notes-pane view-enter">
-        <EmptyState icon={<NotebookPen size={22} />} title={t('No note open')} />
+        <EmptyState icon={<NotebookPen size={22} />} title={teamV2 ? t('No notes yet') : t('No note open')} text={teamV2 && !latest ? t('Start one with New note: meeting notes, briefs, ideas.') : undefined} />
       </section>
     );
   return <Open key={note.id} {...p} note={note} />;

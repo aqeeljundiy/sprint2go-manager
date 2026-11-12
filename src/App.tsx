@@ -1,4 +1,5 @@
 import { TabDefaultsCtx } from './components/ui/TabBar';
+import { teamV2 } from './surface';
 import { Assistant, BlockDialog, BrainDump, CalendarView, ClientApp, ConnectCalendar, DriveView, EndClientDialog, EventEditor, MeetSidebar, MeetView, NewTeamDialog, NoteEditor, NotesList, QuickNote, Onboarding, SendBotDialog, SettingsPage, ShareDialog, SharedHome, SharedPage, TableScreen, TeamPage, TeamsHome, TeamsSidebar, TemplateDialog, TrackingDashboard, VaultSidebar, VaultView } from './lazy';
 import { NewTableDialog, TablesHome, TablesSidebar, makeTable } from './components/tables/TablesApp';
 import type { TeamActions } from './components/teams/TeamsApp';
@@ -4372,7 +4373,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
     return setItemFor(m, r.id, clear);
   };
   // Meet's title is a menu like every other app's: its three sections (views only, no settings).
-  useTitleMenu('meet', mobile && mode === 'meet' && meetPage.kind !== 'meeting' && { label: t('Meet'), value: sectionNow('meet') ?? 'meetings', options: [{ value: 'meetings', label: t('Meetings') }, { value: 'notes', label: t('Notes') }, { value: 'folders', label: t('Folders') }], onChange: (v) => setSectionFor('meet', v) });
+  useTitleMenu('meet', mobile && mode === 'meet' && meetPage.kind !== 'meeting' && { label: teamV2 ? t('Meetings') : t('Meet'), value: sectionNow('meet') ?? 'meetings', options: [{ value: 'meetings', label: t('Meetings') }, { value: 'notes', label: t('Notes') }, { value: 'folders', label: t('Folders') }], onChange: (v) => setSectionFor('meet', v) });
   const appBar: AppSections | null = (() => {
     const cur = sectionNow(mode) ?? '';
     const bar = (sections: AppSection[]): AppSections => ({ sections, current: cur, onChange: (id) => setSectionFor(mode, id), onReselect: (id) => setSectionFor(mode, id) });
@@ -4870,7 +4871,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
       />
       <Sidebar
         mode={appMode}
-        title={({ home: t('Home'), mail: t('Mail'), chat: t('Chat'), tasks: t('Tasks'), calendar: t('Calendar'), notes: t('Notes'), drive: t('Drive'), meet: t('Meet'), vault: t('Vault'), settings: t('Settings'), projects: term.Many, tables: t('Tables'), teams: t('Teams') } as Record<string, string>)[appMode]}
+        title={({ home: t('Home'), mail: t('Mail'), chat: t('Chat'), tasks: t('Tasks'), calendar: t('Calendar'), notes: t('Notes'), drive: t('Drive'), meet: teamV2 ? t('Meetings') : t('Meet'), vault: t('Vault'), settings: t('Settings'), projects: term.Many, tables: t('Tables'), teams: t('Teams') } as Record<string, string>)[appMode]}
         collapsed={collapsed && !mobile}
         onCollapse={setCollapsed}
         settings={appSettings(appMode, 'sidebar')}
