@@ -1478,6 +1478,8 @@ const id: Record<string, string> = {
   "new this week": "baru minggu ini",
   "not signed in yet": "belum pernah masuk",
   "{number} marked paid": "{number} ditandai lunas",
+  // /admin/v2 Invoices: bank details shortcut
+  "Bank details": "Detail bank",
 };
 
 export default id;

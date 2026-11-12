@@ -202,6 +202,12 @@ function Invoices() {
               <Download size={13} /> {t('Download CSV')}
             </button>
           )}
+          {/* v2: the invoice header and bank details the hint mentions, one click away */}
+          {adminV2 && (
+            <button className="ghost-btn sm" onClick={() => go('/admin/team/settings')}>
+              {t('Bank details')}
+            </button>
+          )}
           {may('billing') && (
             <button className="primary-btn sm" onClick={() => void act(() => post<{ made: number }>('invoice/generate').then((r) => r), t('Drafts made for every paying company without one this month')).then(reload)}>
               <FileText size={13} /> {t('Make this month’s invoices')}
