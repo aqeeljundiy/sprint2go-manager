@@ -262,3 +262,29 @@
   margin-top: 8px;
   align-items: center;
 }
+
+/* ---------- Table cells: one box while you edit (IN-13nov-8) ----------
+   Editing a cell drew the cell's ring and, inside it, the field's own focus ring: a square inside a square. Like
+   Notion (and like the Stage picker, which the owner liked), the cell's ring is the only box; the text field inside
+   is bare. The first column's ring goes round the whole cell, open and menu buttons included, not just the text. */
+:root.s2v2 .tb-cell input,
+:root.s2v2 .tb-cell textarea,
+:root.s2v2 .tb-cell input:focus,
+:root.s2v2 .tb-cell textarea:focus,
+:root.s2v2 .tb-cell input:focus-visible,
+:root.s2v2 .tb-cell textarea:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+:root.s2v2 .tb-first:has(> .tb-cell.active, > .tb-cell.editing, > .tb-cell:focus-visible) {
+  box-shadow: inset 0 0 0 2px var(--accent);
+  background: var(--surface);
+  transition: box-shadow 0.15s var(--ease-out-motion);
+}
+:root.s2v2 .tb-first > .tb-cell.active,
+:root.s2v2 .tb-first > .tb-cell.editing,
+:root.s2v2 .tb-first > .tb-cell:focus-visible {
+  box-shadow: none;
+  background: transparent;
+}
