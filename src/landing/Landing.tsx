@@ -33,6 +33,8 @@ import { LangCtx, STR, startLang, useT, type Lang } from './i18n';
 
 const APP = '/signin';
 const SIGNUP = '/signup';
+/** Sign-up open on this server (caps.signups)? Invite-only: no "Start free"; the main buttons sign in instead. */
+const signupsOpen = () => caps.signups;
 /** The demo in the browser, on the app's address (the site sends /try there): nothing to sign up for, nothing saved. */
 const TRY = '/try';
 const GITHUB = 'https://github.com/aqeeljundiy';
@@ -141,9 +143,11 @@ function Nav() {
           <a href={APP} className="ln-btn ghost">
             {t.nav.signin}
           </a>
-          <a href={SIGNUP} className="ln-btn primary">
-            {t.nav.start}
-          </a>
+          {signupsOpen() && (
+            <a href={SIGNUP} className="ln-btn primary">
+              {t.nav.start}
+            </a>
+          )}
         </div>
         <button className="ln-burger" aria-label={open ? t.nav.close : t.nav.open} aria-expanded={open} onClick={() => setOpen((o) => !o)}>
           <span />
@@ -162,9 +166,11 @@ function Nav() {
           <div className="ln-drawer-lang" style={{ ['--i' as string]: SECTIONS.length }}>
             <LangSwitch />
           </div>
-          <a href={SIGNUP} className="ln-btn primary lg block" style={{ ['--i' as string]: SECTIONS.length + 1 }} tabIndex={open ? 0 : -1}>
-            {t.nav.start}
-          </a>
+          {signupsOpen() && (
+            <a href={SIGNUP} className="ln-btn primary lg block" style={{ ['--i' as string]: SECTIONS.length + 1 }} tabIndex={open ? 0 : -1}>
+              {t.nav.start}
+            </a>
+          )}
           <a href={APP} className="ln-btn outline lg block" style={{ ['--i' as string]: SECTIONS.length + 2 }} tabIndex={open ? 0 : -1}>
             {t.nav.signin}
           </a>
@@ -436,9 +442,11 @@ function Pricing() {
                     </li>
                   )}
                 </ul>
-                <a href={SIGNUP} className={`ln-btn ${tier === 'studio' ? 'primary' : 'outline'} block`}>
-                  {free ? p.start : p.tryIt}
-                </a>
+                {signupsOpen() && (
+                  <a href={SIGNUP} className={`ln-btn ${tier === 'studio' ? 'primary' : 'outline'} block`}>
+                    {free ? p.start : p.tryIt}
+                  </a>
+                )}
               </div>
             );
           })}
@@ -479,8 +487,8 @@ function Page() {
               {t.hero.lead}
             </p>
             <div className="ln-cta a" style={{ ['--d' as string]: '.44s' }}>
-              <a href={SIGNUP} className="ln-btn primary lg">
-                {t.nav.start} <ArrowRight size={16} />
+              <a href={signupsOpen() ? SIGNUP : APP} className="ln-btn primary lg">
+                {signupsOpen() ? t.nav.start : t.nav.signin} <ArrowRight size={16} />
               </a>
               <a href={TRY} className="ln-btn outline lg">
                 {t.hero.try}
@@ -764,8 +772,8 @@ function Page() {
           <h2>{t.final.h}</h2>
           <p>{t.final.p}</p>
           <div className="ln-final-cta">
-            <a href={SIGNUP} className="ln-btn white lg">
-              {t.nav.start} <ArrowRight size={16} />
+            <a href={signupsOpen() ? SIGNUP : APP} className="ln-btn white lg">
+              {signupsOpen() ? t.nav.start : t.nav.signin} <ArrowRight size={16} />
             </a>
             <a href={TRY} className="ln-btn on-blue lg">
               {t.hero.try}

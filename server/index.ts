@@ -82,6 +82,7 @@ import * as compliance from './mailCompliance.ts';
 import * as mailAudit from './mailAudit.ts';
 import * as forwarding from './mailForwarding.ts';
 import * as lang from './lang.ts';
+import * as aiAccounts from './aiAccounts.ts';
 import { mark, msg, phrase, t, textOf } from '../src/i18n/index.ts';
 import { fmtDayLong, fmtMonth } from '../src/i18n/format.ts';
 
@@ -835,6 +836,13 @@ const onOurAI = (ws: any) => !!ws && ws.ai?.payer !== 'own' && aiplan.planAI(ws)
  * fallback (AI-plan companies only), else any key the company saved. Each one takes over when the one before fails.
  */
 function aiFor(wsId: string, job: string): AIConfig[] {
+  // The owner's own subscriptions and keys first, when /admin assigns them to this company (server/aiAccounts.ts);
+  // the company's own setup follows as the fallback, exactly as before.
+  const r = JOBS.find((j) => j.id === job)?.rec;
+  const mine = aiAccounts.chainFor(wsId, r ? [r.balanced, r.best, r.cheap].filter((m): m is string => !!m) : undefined);
+  return [...mine, ...companyAIFor(wsId, job)];
+}
+function companyAIFor(wsId: string, job: string): AIConfig[] {
   const ws = workspaces().find((w) => w.id === wsId);
   const pick = ws?.ai?.jobs?.[job];
   const chain: AIConfig[] = [];
@@ -1040,6 +1048,9 @@ const sameSecret = (got: string) => {
  */
 function sttFor(ws: Ws & { meetings?: { languages?: string[] } }, only?: string) {
   const languages = only ? [only] : (ws.meetings?.languages ?? []).slice(0, 4);
+  // The speech key /admin assigned to this company, when there is one (server/aiAccounts.ts).
+  const assigned = aiAccounts.speechFor(ws.id);
+  if (assigned) return { ...assigned, languages, language: languages[0] ?? 'auto' };
   const pick = ws.ai?.jobs?.speech?.provider;
   const may = aiLimits.allowed(ws as any);
   for (const p of [languages.length > 1 ? 'sumopod' : null, pick, ...STT]) {
@@ -1567,6 +1578,8 @@ function applySync(me: string, incoming: any, from: { conn?: string; operator?: 
         const { brands: _brands, ...dd } = d as any;
         return { ...dd, ...own, domains: doms.domains, primaryDomain: doms.primaryDomain, domainLooks: looksOnSave((d as any).domainLooks, before.domainLooks as any, doms.domains), domainChecks: before.domainChecks, timeZone, accounts: boxes.accounts, plan, taskStages, chat: chat.chat, whiteLabel: ownAddress((d as any).whiteLabel, before.whiteLabel), security: sec.security } as db.Doc;
       }
+      // Invite-only: a new company from the app only by an operator (the rest come from /admin).
+      if (!platform.mayStartCompany(String(person.email ?? ''))) return (say(mark('New companies are made by the sprint2go team right now.')), null);
       const { mailReady: _r, mailCredits: _c, mailCreditsNotified: _n, suspended: _s, whatsapp: _wa, mailAliases: _al, bimi: _bimi, mailGroups: _mg, mailPolicy: _mp, ...fresh } = d as any;
       if (Array.isArray(fresh.accounts)) fresh.accounts = delegation.keepServerFields(fresh.accounts, []);
       {
@@ -1901,6 +1914,8 @@ const handle = async (req: IncomingMessage, res: ServerResponse) => {
     }
     // Sign-up: name, email and password, then a 6-digit code sent to the email. Until real email is wired up, the code
     // is printed in the server log and (outside production) shown on screen so the flow can be tried.
+    // Sign-up closed (the owner's switch in /admin): nobody new can make an account; invites still work.
+    if ((p === '/api/signup' || p === '/api/signup/verify') && req.method === 'POST' && !platform.signupsOpen()) return json(res, 403, { error: mark('sprint2go is invite-only right now. Ask the company that uses it for an invite.'), reason: 'closed' });
     if (p === '/api/signup' && req.method === 'POST') {
       const { name, email, password } = await body(req);
       const mail = String(email ?? '').trim().toLowerCase();
@@ -2977,6 +2992,7 @@ const handle = async (req: IncomingMessage, res: ServerResponse) => {
     // Anyone signed in (a guest too) can start their own company, free: they're its owner. Guests can't write
     // workspaces through sync (they're in no company yet), so it's made here.
     if (p === '/api/workspace' && req.method === 'POST') {
+      if (!platform.mayStartCompany((db.getDoc('users', me) as any)?.email)) return json(res, 403, { error: mark('New companies are made by the sprint2go team right now.'), reason: 'closed' });
       const { workspace: w, users: invited = [] } = await body(req);
       if (!w || typeof w.id !== 'string' || typeof w.name !== 'string' || !w.name.trim()) return json(res, 400, { error: mark('Give the company a name.') });
       if (db.getDoc('workspaces', w.id) || isSandboxId(w.id)) return json(res, 409, { error: mark('That workspace already exists.') });
@@ -3724,6 +3740,7 @@ createServer((req, res) => {
   const mailPath = mailer.systemMailPath();
   console.log(`sprint2go on http://localhost:${PORT}${mailPath === 'ses' ? ' (email through Amazon SES)' : mailPath === 'own' ? ` (email from ${mailer.NOREPLY} through our mail server)` : ' (no email: codes go to this log)'}`);
   mailer.startMailer({ publicUrl: PUBLIC_URL, broadcast, log: (line) => console.log(line), notify: notifyPeople });
+  aiAccounts.startUsageLoop(); // the AI subscriptions' usage, for auto-switch (server/aiAccounts.ts)
   mailFilters.initFilters({ broadcast, notify: notifyPeople, send: mailer.queueSend, sendNote: mailer.sendNote, publicUrl: () => PUBLIC_URL || `http://localhost:${PORT}`, log: (line) => console.log(line) });
   // A company's tracked mail points at its own live address when it has one, so its clients never see ours.
   readTracking.initTracking({ broadcast: (c, u, d) => broadcast(c, u, d), origin: (wsId) => { const w = db.getDoc('workspaces', wsId) as any; return customDomains.isLive(w) ? `https://${w.whiteLabel.domain}` : PUBLIC_URL || `http://localhost:${PORT}`; } });
@@ -3750,6 +3767,7 @@ setInterval(() => void pollRecorder(), 3 * 60_000);
 const DEMO = process.env.S2G_DEMO === '1' || process.env.NODE_ENV !== 'production';
 function caps() {
   return {
+    signups: platform.signupsOpen(), // anyone may sign up (else invite-only: no sign-up page, no "Start free")
     demo: DEMO, // demo stand-ins (AI answers, a pretend notetaker, pretend calendar connections) are allowed
     recorder: recorderUp,
     boosted: mailer.boostedAvailable(),

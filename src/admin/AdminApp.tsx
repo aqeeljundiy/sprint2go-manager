@@ -381,6 +381,7 @@ const jumps = () => [
   { title: t('Our AI keys'), to: '/admin/ai/keys' },
   { title: t('AI models per job'), to: '/admin/ai/models' },
   { title: t('AI prices'), to: '/admin/ai/prices' },
+  { title: t('AI subscriptions'), to: '/admin/ai/accounts' },
   { title: t('Growth'), to: '/admin/growth' },
   { title: t('Announcements'), to: '/admin/product/announcements' },
   { title: t('Feature flags'), to: '/admin/product/flags' },

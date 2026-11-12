@@ -395,7 +395,10 @@ export function ourSpeech(may: (provider: string) => boolean = () => true) {
 export async function runChain<T>(chain: AIConfig[], log: (cfg: AIConfig, inTokens: number, outTokens: number) => void, fn: () => Promise<T>): Promise<T> {
   let last: unknown = new AIError('No AI is set up for this job.', 409);
   for (const cfg of chain) {
-    cfg.onUsage = (i, o) => log(cfg, i, o);
+    cfg.onUsage = (i, o) => {
+      log(cfg, i, o);
+      cfg.onTokens?.(i, o);
+    };
     try {
       const out = await withAI(cfg, fn);
       if (cfg.included) noteResult(cfg.provider, null);

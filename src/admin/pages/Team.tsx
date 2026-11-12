@@ -294,12 +294,12 @@ function Replies() {
 }
 
 interface SettingsData {
-  settings: { homeWorkspace: string | null; internal: string[]; slaHours: { urgent: number; paid: number; other: number }; autoSuspendDays: number; supportName: string; billing: { name: string; address: string; npwp: string; bank: string; email: string } };
+  settings: { homeWorkspace: string | null; internal: string[]; slaHours: { urgent: number; paid: number; other: number }; autoSuspendDays: number; supportName: string; billing: { name: string; address: string; npwp: string; bank: string; email: string }; signups: 'open' | 'closed' };
   companies: { id: string; name: string }[];
   supportEmail: string;
 }
 function Settings() {
-  const { may } = useAdmin();
+  const { may, me } = useAdmin();
   const { data, error, reload } = useApi<SettingsData>('settings');
   const act = useAct();
   const [s, setS] = useState<SettingsData['settings'] | null>(null);
@@ -312,6 +312,18 @@ function Settings() {
   const changed = JSON.stringify(s) !== JSON.stringify(data.settings);
   return (
     <div className="adm-settings">
+      <Section title={t('Who can join')}>
+        <div className="adm-form">
+          <Switch
+            label={t('Anyone can sign up and start a company')}
+            hint={s.signups === 'open' ? t('On: the website shows Start free and anyone can make an account.') : t('Off: invite-only. Existing companies, members, guests and invites keep working; new companies are made here, in Companies.')}
+            on={s.signups === 'open'}
+            disabled={!can || me.role !== 'owner'}
+            onChange={(v) => setS({ ...s, signups: v ? 'open' : 'closed' })}
+          />
+          {me.role !== 'owner' && <p className="adm-note">{t('Only an owner can change this.')}</p>}
+        </div>
+      </Section>
       <Section title={t('Our own company')} hint={t('We use sprint2go too')}>
         <div className="adm-form">
           <Field label={t('sprint2go’s workspace')} hint={t('Left out of revenue and growth; operators get tickets and alerts in its bell')}>

@@ -14,6 +14,8 @@ export interface AIConfig {
   included?: boolean; // sprint2go's own key (the plan's allowance), not the company's
   onUsage?: (inTokens: number, outTokens: number) => void; // every call reports its tokens (for the cost estimate)
   onFail?: (e: unknown) => void; // told when this provider failed (e.g. to check whether it still offers the model)
+  account?: string; // one of the owner's AI subscriptions or keys (server/aiAccounts.ts)
+  onTokens?: (inTokens: number, outTokens: number) => void; // that account's own counter (runChain calls it next to the log)
 }
 
 /** OpenAI-compatible endpoints. Claude goes through the Anthropic SDK instead. */
@@ -67,10 +69,16 @@ const current = new AsyncLocalStorage<AIConfig>();
 export const withAI = <T>(cfg: AIConfig, fn: () => Promise<T>) => current.run(cfg, fn);
 
 type Opts = { system: string; schema?: Record<string, unknown>; effort?: 'low' | 'medium' | 'high'; maxTokens?: number };
+export type RunOpts = Opts;
+/** Providers run by something other than an HTTP API here (the owner's subscriptions, through their own tools). */
+const runners = new Map<string, (ai: AIConfig, prompt: string, opts: Opts) => Promise<string>>();
+export const registerRunner = (provider: string, run: (ai: AIConfig, prompt: string, opts: Opts) => Promise<string>) => void runners.set(provider, run);
 
 export async function complete(prompt: string, opts: Opts): Promise<string> {
   const ai = current.getStore();
   if (!ai) throw new AIError('No AI is set up for this job.', 409);
+  const runner = runners.get(ai.provider);
+  if (runner) return runner(ai, prompt, { ...opts, system: schemaInSystem(opts) });
   if (ai.provider === 'anthropic') return anthropic(ai, prompt, opts);
   if (ai.provider === 'bedrock') return bedrock(ai, prompt, opts);
   if (ai.provider === 'vertex') return vertex(ai, prompt, opts);

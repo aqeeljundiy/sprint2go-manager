@@ -17,6 +17,8 @@ import * as turn from './turn.ts';
 import * as twostep from './twostep.ts';
 import * as sandbox from './sandbox.ts';
 import * as whitelist from './whitelist.ts';
+import * as aiAccounts from './aiAccounts.ts';
+import { isSandboxId } from '../src/sandbox.ts';
 import { applyPricing, DEFAULT_PRICES, discountOf, monthlyTotal, planName, PRICES, ADDONS, TOP_UP } from '../src/data/pricing.ts';
 import type { Plan, PlanAdjustment, Tier, Track } from '../src/types.ts';
 import { isZone } from '../src/jobTimes.ts';
@@ -530,6 +532,9 @@ export async function handleAdmin(p: string, ctx: AdminCtx): Promise<boolean> {
   if (!verified) return (json(res, 401, { error: mark('Enter your 2FA code.'), verify: true }), true);
 
   /* ----- AI: our keys, the model for each job, prices, and whether the AI plan pays (server/aiplan.ts) ----- */
+  /* ----- AI subscriptions: the owner's own Claude, ChatGPT and API-key accounts, per company (server/aiAccounts.ts) ----- */
+  if (sub === 'ai-accounts' || sub.startsWith('ai-accounts/'))
+    return aiAccounts.handleAdmin(sub, { req, res, json, body, owner: op.role === 'owner', email, log, workspaces: () => (db.allDocs('workspaces') as any[]).filter((w) => !w.deletedAt && !isSandboxId(String(w.id))).map((w) => ({ id: String(w.id), name: String(w.name ?? w.id) })).sort((a, b) => a.name.localeCompare(b.name)) });
   if (sub === 'ai' || sub.startsWith('ai/')) return aiplan.handleAdmin(sub, { req, res, json, body, may, deny, log, email, mrrOf });
 
   /* ----- Today ----- */
@@ -1644,11 +1649,17 @@ export async function handleAdmin(p: string, ctx: AdminCtx): Promise<boolean> {
   }
   if (sub === 'settings' && GET) {
     const s = platform.settings();
-    return (json(res, 200, { settings: { homeWorkspace: s.homeWorkspace, internal: s.internal, slaHours: s.slaHours, autoSuspendDays: s.autoSuspendDays, supportName: s.supportName, billing: s.billing }, companies: companyRows(ctx).map((c) => ({ id: c.id, name: c.name })), supportEmail: mailer.SUPPORT_EMAIL }), true);
+    return (json(res, 200, { settings: { homeWorkspace: s.homeWorkspace, internal: s.internal, slaHours: s.slaHours, autoSuspendDays: s.autoSuspendDays, supportName: s.supportName, billing: s.billing, signups: platform.signupsOpen() ? 'open' : 'closed' }, companies: companyRows(ctx).map((c) => ({ id: c.id, name: c.name })), supportEmail: mailer.SUPPORT_EMAIL }), true);
   }
   if (sub === 'settings' && POST) {
     if (deny('platform')) return true;
     const b = await body(req);
+    // Public sign-up: only an owner opens or closes it.
+    if ('signups' in b && (b.signups === 'open') !== platform.signupsOpen()) {
+      if (op.role !== 'owner') return (json(res, 403, { error: mark('Only an owner can open or close sign-up.') }), true);
+      platform.setSetting('signups', b.signups === 'open' ? 'open' : 'closed');
+      log('settings.signups', null, b.signups === 'open' ? 'open' : 'closed');
+    }
     if ('homeWorkspace' in b) platform.setSetting('homeWorkspace', b.homeWorkspace || null);
     if (b.slaHours) platform.setSetting('slaHours', { urgent: Math.max(0.25, Number(b.slaHours.urgent) || 1), paid: Math.max(0.25, Number(b.slaHours.paid) || 2), other: Math.max(0.25, Number(b.slaHours.other) || 8) });
     if ('autoSuspendDays' in b) platform.setSetting('autoSuspendDays', Math.max(0, Math.min(180, Number(b.autoSuspendDays) || 0)));

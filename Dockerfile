@@ -1,6 +1,11 @@
 # Sprint2go: one container with the built app, its server and the mail engine (SMTP on 25). Data lives in /app/data.
 FROM node:24-alpine
 RUN apk add --no-cache openssl
+RUN (apk add --no-cache libgcc libstdc++ ripgrep && adduser -D -H -s /sbin/nologin aitool) || echo "AI sign-in tool extras not installed"
+# The sign-in tools for the owner's AI subscriptions (/admin, AI, Subscriptions; server/aiAccounts.ts): Claude Code and
+# Codex. Never fatal: without them the app runs as before and the page says the tool is missing (API keys still work).
+RUN npm install -g --no-audit --no-fund @anthropic-ai/claude-code @openai/codex || echo "AI sign-in tools not installed"
+ENV DISABLE_AUTOUPDATER=1 USE_BUILTIN_RIPGREP=0
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund

@@ -69,6 +69,20 @@ export function operator(email: string | undefined | null): Operator | null {
   const r = db.prepare('SELECT * FROM operators WHERE email = ? AND disabled = 0').get(email.toLowerCase());
   return r ? opRow(r) : null;
 }
+/**
+ * Whether anyone may sign up and start a company from the app. The owner's switch in /admin (Settings) decides; until
+ * it's set, S2G_SIGNUPS=open opens it, and it's closed on the live server (open on a laptop, for the demo and tests).
+ * Closed: invites, guests, members and every existing company work as before; new companies come from /admin (or an
+ * operator in the app).
+ */
+export function signupsOpen() {
+  const s = settings().signups;
+  if (s) return s === 'open';
+  if (process.env.S2G_SIGNUPS) return process.env.S2G_SIGNUPS === 'open';
+  return process.env.NODE_ENV !== 'production';
+}
+/** Whether this person may start a company in the app right now. */
+export const mayStartCompany = (email: string | undefined | null) => signupsOpen() || !!operator(email);
 /** S2G_OPERATORS bootstraps the team; its first address is always kept as an owner (the way back in). */
 export function bootstrapOperators() {
   const env = (process.env.S2G_OPERATORS ?? '')
@@ -146,6 +160,7 @@ export interface PlatformSettings {
   broadcasts: { id: string; subject: string; audience: string; sent: number; at: string; by: string }[];
   billing: { name: string; address: string; npwp: string; bank: string; email: string }; // printed on invoices
   backupTest: { at: string; file: string; ok: boolean; detail: string } | null;
+  signups?: 'open' | 'closed'; // public sign-up and new companies from the app (see signupsOpen)
   offsite?: { at: string; file: string; bytes: number; kept: number; error?: { at: string; message: string } | null } | null; // the last off-site backup upload (server/offsite.ts)
 }
 const DEFAULTS: PlatformSettings = {

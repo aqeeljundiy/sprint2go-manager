@@ -7,6 +7,7 @@ import { Badge, Confirm, Dialog, Empty, Failed, Field, Loading, Menu, MoneyInput
 import { t, tn, tx } from '../../i18n';
 import { fmtList, fmtNumber, fmtPercent } from '../../i18n/format';
 import { adminV2 } from '../../surface';
+import { Subscriptions } from './AISubscriptions';
 
 interface Choice {
   provider: string;
@@ -125,10 +126,11 @@ export function AIPage({ tab }: { tab: string }) {
           { id: 'keys', label: t('Our keys'), count: keyIssues },
           { id: 'models', label: t('Models per job'), count: modelIssues },
           { id: 'prices', label: t('Prices'), count: priceIssues },
+          { id: 'accounts', label: t('Subscriptions') },
         ]}
       />
       <div className="adm-tab-body" key={tab}>
-        {error ? <Failed error={error} retry={reload} /> : !data ? <Loading rows={6} /> : tab === 'keys' ? <Keys d={data} reload={reload} /> : tab === 'models' ? <Models d={data} reload={reload} /> : tab === 'prices' ? <Prices d={data} reload={reload} /> : <Margin d={data} />}
+        {tab === 'accounts' ? <Subscriptions /> : error ? <Failed error={error} retry={reload} /> : !data ? <Loading rows={6} /> : tab === 'keys' ? <Keys d={data} reload={reload} /> : tab === 'models' ? <Models d={data} reload={reload} /> : tab === 'prices' ? <Prices d={data} reload={reload} /> : <Margin d={data} />}
       </div>
     </Page>
   );

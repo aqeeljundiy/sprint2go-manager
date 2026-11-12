@@ -70,6 +70,8 @@ jobs:
         run: node --import ./server/register.mjs scripts/mail-filters-tests.mjs
       - name: Whitelist (Unlimited lifts every limit, no invoices, AI and Boosted monthly limits, people's rules, operators only, audit, MRR)
         run: node --import ./server/register.mjs scripts/whitelist-tests.mjs
+      - name: AI subscriptions and closed sign-up (stand-in sign-in tools, sealed logins, owners only, priority and auto-switch, invite-only)
+        run: node scripts/ai-accounts-tests.mjs
       - name: Mail attachments (previews, Download all as zip, Save to Drive, big files as links, blocked types and virus scans, files kept on scheduled mail)
         run: node --import ./server/register.mjs scripts/mail-files-tests.mjs
       - name: Mail sorting (search operators, categories, Important, spam scoring and learning, phishing signs, mute, 30-day Spam and Trash)

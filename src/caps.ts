@@ -4,6 +4,7 @@
  */
 export const caps = {
   loaded: false,
+  signups: true, // anyone may sign up here; false: invite-only (no sign-up page, no "Start free")
   demo: true, // demo stand-ins allowed (canned AI answers, a pretend notetaker, pretend calendar connections)
   recorder: false,
   boosted: false,

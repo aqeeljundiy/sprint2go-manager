@@ -23,7 +23,7 @@ import { InstallPrompt } from './components/InstallPrompt';
 import { brand as product, brandOf, setBrandName } from './terms';
 import { registerStages } from './stages';
 import { applyPricing, type PricingOverride } from './data/pricing';
-import { loadCaps } from './caps';
+import { caps, loadCaps } from './caps';
 import { deviceLang, setLang, t, tn } from './i18n';
 import { fmtList } from './i18n/format';
 import { tj } from './i18n/tj';
@@ -81,11 +81,11 @@ export default function Root() {
 
   if (invite) return <AcceptInvite token={invite} onDone={() => location.replace('/')} />;
   if (mode === 'probing') return <div className="boot" />;
-  if (mode === 'signed-out' && signingUp) return <SignUp onDone={() => location.replace('/')} onSignIn={() => (setSigningUp(false), history.replaceState(null, '', '/signin'))} />;
+  if (mode === 'signed-out' && signingUp && caps.signups) return <SignUp onDone={() => location.replace('/')} onSignIn={() => (setSigningUp(false), history.replaceState(null, '', '/signin'))} />;
   if (mode === 'signed-out')
     return (
       <SignIn
-        onCreate={connecting ? undefined : () => (setSigningUp(true), history.replaceState(null, '', '/signup'))}
+        onCreate={connecting || !caps.signups ? undefined : () => (setSigningUp(true), history.replaceState(null, '', '/signup'))}
         sub={connecting ? t('An AI app wants to connect to your sprint2go. Sign in first; you choose what it can reach next.') : undefined}
         users={[]}
         signedIn={[]}

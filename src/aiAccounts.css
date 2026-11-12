@@ -1,0 +1,194 @@
+/* /admin, AI, Subscriptions (src/admin/pages/AISubscriptions.tsx). Built on the AI page's rows (.adm-mini-list,
+   .adm-ai-key, .adm-ai-two, .adm-ai-mark); only what's new lives here. */
+.acc-lead {
+  max-width: 720px;
+  margin: 0 0 16px;
+}
+.acc-adds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.acc-row {
+  gap: 12px;
+  max-height: 520px; /* room for the usage bars; the leaving animation folds it from here */
+}
+.acc-order {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-self: center;
+}
+.acc-order .icon-btn {
+  width: 28px;
+  height: 22px;
+  border-radius: 6px;
+  transition: background-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+}
+.acc-order .icon-btn:disabled {
+  opacity: 0.3;
+}
+
+/* usage: one bar per window, with its reset time */
+.acc-usage {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px 16px;
+  margin: 6px 0 4px;
+  max-width: 640px;
+}
+.acc-win {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-3);
+}
+.acc-win-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+}
+.acc-win-top > span:last-child {
+  color: var(--text);
+  font-weight: 600;
+}
+.acc-meter {
+  display: block;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.acc-meter > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transition: width 0.25s ease-out, background-color 0.2s ease;
+}
+.acc-win.near .acc-meter > span {
+  background: var(--ad-amber);
+}
+.acc-win.over .acc-meter > span {
+  background: var(--ad-red);
+}
+.acc-win-reset {
+  font-size: 12px;
+}
+
+/* the companies list: name, AI, transcripts (the plain field look of Models per job) */
+.acc-page {
+  container-type: inline-size;
+}
+.adm-mini-row.acc-ws {
+  display: grid;
+  grid-template-columns: minmax(140px, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 8px 12px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+@container (max-width: 720px) {
+  .adm-mini-row.acc-ws {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .adm-mini-row.acc-ws > strong {
+    grid-column: 1 / -1;
+  }
+}
+@container (max-width: 480px) {
+  .adm-mini-row.acc-ws {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .acc-row {
+    flex-wrap: wrap;
+  }
+  .acc-row .adm-ai-acts {
+    width: 100%;
+    padding-left: 76px;
+  }
+}
+.adm-mini-row.acc-ws > strong {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.acc-archived {
+  margin-top: 12px;
+}
+.acc-archived .adm-mini-list {
+  margin-top: 8px;
+}
+
+/* signing in */
+.acc-steps {
+  margin: 0;
+  padding-left: 20px;
+  list-style: decimal;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.acc-steps li {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+.acc-code {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.acc-code code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 6px 12px;
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+.acc-wait {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+/* live status: the one thing that moves by itself here */
+.acc-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: acc-pulse 1.2s ease-in-out infinite;
+}
+@keyframes acc-pulse {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+@media (max-width: 767px) {
+  .acc-adds {
+    justify-content: flex-start;
+  }
+  .acc-adds > button {
+    min-height: var(--tap, 44px);
+  }
+  .acc-order .icon-btn {
+    width: 36px;
+    height: 32px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .acc-meter > span,
+  .acc-order .icon-btn {
+    transition: none;
+  }
+  .acc-dot {
+    animation: none;
+  }
+}
