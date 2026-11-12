@@ -48,6 +48,7 @@ const AREAS = [
   ['guest', /^src\/components\/(ClientApp|SharedHome)\.tsx$|^src\/(clientActions|clientView)\.ts$/],
   ['admin', /^src\/admin\//],
   ['server', /^server\//],
+  ['appv2', /^src\/app-v2\//],
   ['misc', /./], // everything no area above claims
 ];
 const areaOf = (file) => AREAS.find(([, re]) => re.test(file))[0];
