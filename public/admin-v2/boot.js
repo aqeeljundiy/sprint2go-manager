@@ -5,7 +5,7 @@
   if (p === '/admin/v2' || p.indexOf('/admin/v2/') === 0) {
     document.querySelectorAll('link[rel~="icon"], link[rel="apple-touch-icon"], link[rel="manifest"], meta[name="apple-mobile-web-app-title"]').forEach(function (n) { n.remove(); });
     document.write('<link rel="icon" href="/admin-v2/app-icons/favicon.ico" sizes="48x48"><link rel="icon" href="/admin-v2/app-icons/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/admin-v2/app-icons/apple-touch-icon.png"><link rel="manifest" href="/admin-v2/app-icons/site.webmanifest"><meta name="apple-mobile-web-app-title" content="Operators">');
-    document.documentElement.classList.add('s2v2');
+    document.documentElement.classList.add('s2v2', 's2v2-admin');
     document.write('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400..800&text=0123456789&display=swap">');
   }
   // The customer app and client portal v2 (/v2): since 13 Nov 2026 v1's own screens, icon and manifest with the v2
@@ -13,6 +13,9 @@
   // digits come from Google Sans Flex (a digits-only download), the text stays Plus Jakarta Sans. v1 at / is unchanged.
   // (The kit build's files in /app-v2 stay in the repo, unused.)
   if (p === '/v2' || p.indexOf('/v2/') === 0) {
+    // v1's own sprint2go icon, rounded (the kit's make-icons.mjs from public/icon-512.png); it installs on /v2.
+    document.querySelectorAll('link[rel~="icon"], link[rel="apple-touch-icon"], link[rel="manifest"]').forEach(function (n) { n.remove(); });
+    document.write('<link rel="icon" href="/v2-icons/favicon.ico" sizes="48x48"><link rel="icon" href="/v2-icons/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/v2-icons/apple-touch-icon.png"><link rel="manifest" href="/v2-icons/site.webmanifest">');
     document.documentElement.classList.add('s2v2');
     document.write('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400..800&text=0123456789&display=swap">');
   }
