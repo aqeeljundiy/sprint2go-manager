@@ -2308,6 +2308,21 @@ await test('Needs you says a late date in words, not 2026-10-06', async () => {
   assert.ok(!/2026-10-06/.test(late.sub ?? ''), late.sub);
 });
 
+/* ---------- v2 is the main version: old /v2 links (src/surface.ts; the server sends the same 302s) ---------- */
+await test('Old /v2 and /admin/v2 addresses open the same page without the /v2', async () => {
+  const { withoutV2, v1AdminAlias } = await import('../src/surface.ts');
+  assert.equal(withoutV2('/v2'), '/');
+  assert.equal(withoutV2('/v2/'), '/');
+  assert.equal(withoutV2('/v2/tasks/upcoming/t1'), '/tasks/upcoming/t1');
+  assert.equal(withoutV2('/admin/v2'), '/admin');
+  assert.equal(withoutV2('/admin/v2/companies/elk'), '/admin/companies/elk');
+  assert.equal(withoutV2('/v2-icons/favicon.svg'), null);
+  assert.equal(withoutV2('/v1/mail'), null);
+  assert.equal(withoutV2('/admin/v20'), null);
+  assert.equal(v1AdminAlias('/v1/admin/tickets'), '/admin/v1/tickets');
+  assert.equal(v1AdminAlias('/v1/mail'), null);
+});
+
 db.db.close();
 rmSync(dir, { recursive: true, force: true });
 console.log(failed ? `\n${failed} failed` : '\nAll passed');

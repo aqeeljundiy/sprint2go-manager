@@ -1,21 +1,30 @@
 // Loaded by index.html in <head>, before anything is drawn (the server's CSP allows no inline scripts).
-  // The operator console v2 (/admin/v2): since 13 Nov 2026 v1's own console with the v2 layer on top (src/surface.ts,
-  // src/v2.css), no kit any more. It keeps its own app icon and manifest (installs as "Operators", opens on /admin/v2).
+// Since 15 Nov 2026 v2 is the main version: the app at / and the console at /admin. v1 is kept as the backup at /v1 and
+// /admin/v1 and gets none of this (src/surface.ts decides the same way). Old /v2 and /admin/v2 links are sent to the
+// same page without the /v2 by the server; this file also handles them when it isn't in front (vite dev).
+(function () {
   var p = location.pathname;
-  if (p === '/admin/v2' || p.indexOf('/admin/v2/') === 0) {
+  if (p === '/v2' || p.indexOf('/v2/') === 0) p = p.slice(3) || '/';
+  else if (p === '/admin/v2' || p.indexOf('/admin/v2/') === 0) p = '/admin' + p.slice(9);
+  var v1 = p === '/v1' || p.indexOf('/v1/') === 0 || p === '/admin/v1' || p.indexOf('/admin/v1/') === 0;
+  if (v1) return;
+  var digits = '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400..800&text=0123456789&display=swap">';
+  // The operator console v2 (/admin): v1's own console with the v2 layer on top (src/surface.ts, src/v2.css). It keeps
+  // its own app icon and manifest (installs as "Operators", opens on /admin).
+  if (p === '/admin' || p.indexOf('/admin/') === 0) {
     document.querySelectorAll('link[rel~="icon"], link[rel="apple-touch-icon"], link[rel="manifest"], meta[name="apple-mobile-web-app-title"]').forEach(function (n) { n.remove(); });
     document.write('<link rel="icon" href="/admin-v2/app-icons/favicon.ico" sizes="48x48"><link rel="icon" href="/admin-v2/app-icons/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/admin-v2/app-icons/apple-touch-icon.png"><link rel="manifest" href="/admin-v2/app-icons/site.webmanifest"><meta name="apple-mobile-web-app-title" content="Operators">');
     document.documentElement.classList.add('s2v2', 's2v2-admin');
-    document.write('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400..800&text=0123456789&display=swap">');
+    document.write(digits);
+    return;
   }
-  // The customer app and client portal v2 (/v2): since 13 Nov 2026 v1's own screens, icon and manifest with the v2
-  // layer on top (src/surface.ts, src/v2.css), so no kit here any more. The class goes on before the first paint;
-  // digits come from Google Sans Flex (a digits-only download), the text stays Plus Jakarta Sans. v1 at / is unchanged.
+  // The customer app and client portal v2 (every other app address): v1's own screens with the v2 layer on top. The
+  // class goes on before the first paint; digits come from Google Sans Flex (a digits-only download), the text stays
+  // Plus Jakarta Sans. The rounded v2 icon replaces the tab icons; the install manifest stays the main one
+  // (/manifest.webmanifest, start and scope /), so installed apps and their shortcuts keep working.
   // (The kit build's files in /app-v2 stay in the repo, unused.)
-  if (p === '/v2' || p.indexOf('/v2/') === 0) {
-    // v1's own sprint2go icon, rounded (the kit's make-icons.mjs from public/icon-512.png); it installs on /v2.
-    document.querySelectorAll('link[rel~="icon"], link[rel="apple-touch-icon"], link[rel="manifest"]').forEach(function (n) { n.remove(); });
-    document.write('<link rel="icon" href="/v2-icons/favicon.ico" sizes="48x48"><link rel="icon" href="/v2-icons/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/v2-icons/apple-touch-icon.png"><link rel="manifest" href="/v2-icons/site.webmanifest">');
-    document.documentElement.classList.add('s2v2');
-    document.write('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400..800&text=0123456789&display=swap">');
-  }
+  document.querySelectorAll('link[rel~="icon"], link[rel="apple-touch-icon"]').forEach(function (n) { n.remove(); });
+  document.write('<link rel="icon" href="/v2-icons/favicon.ico" sizes="48x48"><link rel="icon" href="/v2-icons/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/v2-icons/apple-touch-icon.png">');
+  document.documentElement.classList.add('s2v2');
+  document.write(digits);
+})();

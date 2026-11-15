@@ -6,6 +6,7 @@ import type { Settings, ThemePref } from '../settings';
 import { fmtSize } from '../data/drive';
 import { Avatar } from './Avatar';
 import { t } from '../i18n';
+import { adminHome } from '../surface';
 
 export type SettingsSection = 'workspace' | 'email' | 'agency' | 'permissions' | 'teams' | 'stages' | 'clients' | 'apps' | 'meetings' | 'ai' | 'billing' | 'storage' | 'security' | 'import' | 'account' | 'appearance' | 'mail' | 'notifications' | 'shortcuts' | 'developer' | 'myapps' | 'help' | 'mailapps' | 'mailaccess' | 'mailstorage' | 'mailgroups' | 'mailrules' | 'domains' | 'ai-apps'; // ai-apps: Connect AI apps (AiAppsPage.tsx); before it, the last four: Mail for teams (src/components/mail/)
 
@@ -102,7 +103,7 @@ export function AccountMenu({ me, settings, used, quota, onSettings, onTheme, on
       </button>
       <div className="am-sep" />
       {server.operator && (
-        <a className="am-item" href="/admin">
+        <a className="am-item" href={adminHome}>
           <ServerCog size={16} /> {t('Operator backend')}
         </a>
       )}

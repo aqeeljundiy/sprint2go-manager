@@ -1,8 +1,9 @@
 {
   "name": "sprint2go Operators",
   "short_name": "Operators",
-  "start_url": "/admin/v2",
-  "scope": "/admin/v2",
+  "id": "/admin/v2",
+  "start_url": "/admin",
+  "scope": "/admin",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",

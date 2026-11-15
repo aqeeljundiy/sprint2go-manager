@@ -1234,6 +1234,14 @@ function ownAddress(next: any, before: any) {
   const { domain, domainStatus, domainCheck } = before ?? {};
   return { ...(next ?? before), domain, domainStatus, domainCheck };
 }
+/** Where an address from before v2 became the main version goes now: /v2/mail -> /mail, /admin/v2/x -> /admin/x,
+ * /v1/admin/x -> /admin/v1/x. null: it stays where it is. */
+function oldV2Address(p: string): string | null {
+  if (/^\/v2(\/|$)/.test(p)) return p.slice(3) || '/';
+  if (/^\/admin\/v2(\/|$)/.test(p)) return `/admin${p.slice(9)}`;
+  if (/^\/v1\/admin(\/|$)/.test(p)) return `/admin/v1${p.slice(9)}`;
+  return null;
+}
 function serveStatic(req: IncomingMessage, res: ServerResponse, site = false) {
   const path = normalize(decodeURIComponent((req.url ?? '/').split('?')[0])).replace(/^(\.\.[/\\])+/, '');
   let file = join(DIST, path);
@@ -1860,6 +1868,14 @@ const handle = async (req: IncomingMessage, res: ServerResponse) => {
   }
   // The operator console's MCP for AI agents (any model, any MCP app): a token from Team › Agent access; signed out = 401.
   if (p === opAgents.MCP_PATH) return opAgents.mcpRoute(req, res);
+  // v2 is the main version since 15 Nov 2026 (src/surface.ts): old /v2 and /admin/v2 links open the same page without
+  // the /v2, and /v1/admin… is the v1 console's other spelling (/admin/v1…). 302, not 301: browsers never keep it.
+  const moved = oldV2Address(p);
+  if (moved && (req.method === 'GET' || req.method === 'HEAD')) {
+    const q = (req.url ?? '').indexOf('?');
+    res.writeHead(302, { location: `${moved}${q >= 0 ? (req.url ?? '').slice(q) : ''}`, 'cache-control': 'no-cache' });
+    return res.end();
+  }
   if (!p.startsWith('/api/')) return serveStatic(req, res, !!SITE_HOST && String(req.headers.host ?? '').toLowerCase() === SITE_HOST);
   if (p === '/api/health') return json(res, 200, { ok: true, at: new Date().toISOString(), build: BUILD });
   if (p === '/api/pricing' && req.method === 'GET') return json(res, 200, { pricing: platform.settings().pricing ?? null });

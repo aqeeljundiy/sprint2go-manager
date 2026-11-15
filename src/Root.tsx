@@ -13,8 +13,9 @@ import { clientActions } from './clientActions';
 import { accessFor, afterEnd, clientInbox, portalsFor } from './clientView';
 import { WorkspaceSwitcher } from './components/WorkspaceSwitcher';
 import { ActingBanner, AdminApp, ClientApp, ConnectApp, Onboarding, SharedHome } from './lazy';
-// The team app at /v2 (since 13 Nov 2026): v1's own screens with the v2 layer on top (src/surface.ts,
-// docs/v1-checklist.md), and the operator console at /admin/v2 the same way.
+// The team app is v2 (at / since 15 Nov 2026; built 13 Nov): v1's own screens with the v2 layer on top (src/surface.ts,
+// docs/v1-checklist.md), and the operator console at /admin the same way. v1 is kept as the backup at /v1 and /admin/v1.
+import { appHome } from './surface';
 import { setPhotos } from './photos';
 import { Wordmark } from './components/Logo';
 import { AcceptInvite, SignIn, SignUp } from './components/SignIn';
@@ -79,9 +80,9 @@ export default function Root() {
     });
   }, [invite, admin, connecting]);
 
-  if (invite) return <AcceptInvite token={invite} onDone={() => location.replace('/')} />;
+  if (invite) return <AcceptInvite token={invite} onDone={() => location.replace(appHome)} />;
   if (mode === 'probing') return <div className="boot" />;
-  if (mode === 'signed-out' && signingUp && caps.signups) return <SignUp onDone={() => location.replace('/')} onSignIn={() => (setSigningUp(false), history.replaceState(null, '', '/signin'))} />;
+  if (mode === 'signed-out' && signingUp && caps.signups) return <SignUp onDone={() => location.replace(appHome)} onSignIn={() => (setSigningUp(false), history.replaceState(null, '', '/signin'))} />;
   if (mode === 'signed-out')
     return (
       <SignIn
@@ -104,7 +105,7 @@ export default function Root() {
     );
   if (mode === 'two-step' && session?.twoStep) return <TwoStepGate need={session.twoStep} email={session.email} companies={session.companies} />;
   if (mode === 'ready' && session?.suspended) return <Suspended reason={session.suspended.reason} />;
-  if (admin && !trying && (mode === 'ready' || mode === 'demo')) return <AdminApp />; // /admin and /admin/v2: one console, v2 with its layer (src/surface.ts); the kit console (src/admin/kit) stays in the repo, unrouted
+  if (admin && !trying && (mode === 'ready' || mode === 'demo')) return <AdminApp />; // /admin (v2) and /admin/v1: one console, v2 with its layer (src/surface.ts); the kit console (src/admin/kit) stays in the repo, unrouted
   if (connecting && mode === 'ready' && session && !session.suspended) return <ConnectApp actingAs={session.actingAs} />;
   if (mode === 'ready' && session)
     return (
@@ -155,7 +156,7 @@ function ServerRoot({ me }: { me: string }) {
   // Only a client somewhere (no workspace of their own): straight to their portal.
   if (user && !workspaces.some((w) => w.members.some((m) => m.userId === me))) return <ClientRoot me={user} />;
   if (!user) return <NoWorkspace email="" onBack={() => void signOut()} />;
-  // /v2: the same App as v1 (its routes under /v2, tryOut.ts routeBase) with the v2 layer on top; v1 at / is the backup.
+  // The same App on both surfaces: v2 at / with its layer on top, v1 under /v1 (tryOut.ts routeBase) as the backup.
   return (
     <>
     <PausedBanner workspaces={workspaces} me={me} />
@@ -369,7 +370,7 @@ function FirstRun({ me, existingEmails }: { me: User; existingEmails: string[] }
           onClose={() => setOpen(false)}
           onCreate={async (w, newUsers) => {
             const r = await fetch('/api/workspace', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ workspace: w, users: newUsers }) });
-            if (r.ok) location.replace('/');
+            if (r.ok) location.replace(appHome);
             else {
               const why = ((await r.json().catch(() => ({}))) as { error?: string }).error;
               alert(why ? t(why) : t('Couldn’t create the workspace. Try again.'));
@@ -466,7 +467,7 @@ function ClientRoot({ me }: { me: User }) {
     },
   });
   const inbox = [me.id, clientInbox(me.email)];
-  // /v2 shows v1's portal too (unchanged for now: its v2 layer waits for the owner's yes on the new Home). The kit
+  // v2 shows v1's portal too (unchanged for now: its v2 layer waits for the owner's yes on the new Home). The kit
   // build of the portal (PortalV2, src/app-v2) stays in the repo, no longer routed.
   const Portal = ClientApp;
   return (

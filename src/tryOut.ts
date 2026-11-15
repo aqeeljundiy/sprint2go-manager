@@ -3,12 +3,12 @@
 // remembers between visits sits under its own prefix in this browser (Start over clears it). The only request that
 // still reaches the server is reading the public prices.
 import { clearPrefixed, setStoragePrefix } from './settings';
-import { teamV2 } from './surface';
+import { teamV1 } from './surface';
 
 export const trying = typeof location !== 'undefined' && /^\/try(\/|$)/.test(location.pathname);
 /** The try-out's address prefix: its screens are /try/mail, /try/chat… so a reload stays in the try-out. The app v2
- * (src/surface.ts) lives the same way under /v2: /v2/mail, /v2/tasks/upcoming. */
-export const routeBase = trying ? '/try' : teamV2 ? '/v2' : '';
+ * v1, kept as the backup (src/surface.ts), lives the same way under /v1: /v1/mail, /v1/tasks/upcoming. */
+export const routeBase = trying ? '/try' : teamV1 ? '/v1' : '';
 const PREFIX = 's2g-try:';
 
 /** Before anything renders: its own storage, and no requests to our API except the public prices. */

@@ -19,10 +19,10 @@ import { Popover } from '../components/ui/Popover';
 import { LANGS, getLang, isLang, rememberLang, setLang, t, tx, type Lang } from '../i18n';
 import { tj } from '../i18n/tj';
 import { useLang } from '../i18n/useLang';
-// /admin/v2 (src/surface.ts): this same console with the v2 layer; its addresses live under /admin/v2.
-import { adminPath, adminV2, appHome } from '../surface';
-/** The console's own address without the v2 prefix: the pages always think in /admin/… */
-const v1Path = (p: string) => (adminV2 ? p.replace(/^\/admin\/v2(?=\/|$)/, '/admin') : p);
+// /admin is v2 (src/surface.ts): this console with the v2 layer. v1, the backup, lives under /admin/v1.
+import { adminHome, adminPath, adminV1, adminV2, appHome } from '../surface';
+/** The console's own address without the v1 prefix: the pages always think in /admin/… */
+const v1Path = (p: string) => (adminV1 ? p.replace(/^\/admin\/v1(?=\/|$)/, '/admin') : p);
 
 type Item = { id: string; label: string; icon: LucideIcon; perm?: Perm };
 // Getters: each read gives the words in the console's language of the moment (docs/i18n.md).
@@ -162,7 +162,7 @@ export function AdminApp() {
 
   const go = useCallback((to: string) => {
     if (to.startsWith('/admin')) {
-      history.pushState(null, '', adminPath(to)); // /admin/v2/… on v2
+      history.pushState(null, '', adminPath(to)); // /admin/v1/… on v1
       setPath(v1Path(to.split('?')[0]));
       setNavOpen(false);
       document.querySelector('.adm-main')?.scrollTo({ top: 0 });
@@ -180,7 +180,7 @@ export function AdminApp() {
   if (me === 'denied')
     return (
       <Gate title={t('Operators only')} text={t('This account isn’t on the sprint2go operator team. An owner can add you under Team & settings.')}>
-        <a className="primary-btn signin-btn" href="/">
+        <a className="primary-btn signin-btn" href={appHome}>
           {t('Open the app')}
         </a>
         <p className="signin-switch">
@@ -205,7 +205,7 @@ export function AdminApp() {
       adminV2
         ? setAsking({ userId, ticket })
         : void post('person/signin-as', { userId, ticket })
-            .then(() => location.assign('/'))
+            .then(() => location.assign(appHome))
             .catch((e: Error) => toast(e.message)),
   };
   let page: ReactNode;
@@ -566,7 +566,7 @@ export function ActingBanner({ operator }: { operator: string }) {
       <span>
         <Eye size={14} /> {t('Signed in as this person by {operator}. What you do here is theirs.', { operator })}
       </span>
-      <button className="ghost-btn sm" onClick={() => void fetch('/api/admin/signin-as/stop', { method: 'POST' }).then(() => location.assign('/admin'))}>
+      <button className="ghost-btn sm" onClick={() => void fetch('/api/admin/signin-as/stop', { method: 'POST' }).then(() => location.assign(adminHome))}>
         {t('Back to the backend')}
       </button>
     </div>

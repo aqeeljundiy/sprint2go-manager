@@ -18,6 +18,10 @@ Open http://localhost:8787 and sign in with any demo person's email (for example
 
 While changing the code, run `npm run server` and `npm run dev` together: the dev app on its own port talks to the server.
 
+## Versions
+
+The app at `/` and the operator console at `/admin` are v2: v1's own screens with the v2 layer on top (src/surface.ts, docs/v1-checklist.md). v1 stays as the backup at `/v1` (team app and client portal) and `/admin/v1` (console), same data and sign-in. Old `/v2` and `/admin/v2` links go to the same page without the `/v2`.
+
 ## Clients
 
 Clients sign in to their own portal at the same address. In the demo, Laura Anderson (Kopinara, approver) and Hannah Koh (Selara Skin) can sign in with their emails and the same demo password.

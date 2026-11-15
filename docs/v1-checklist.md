@@ -1,5 +1,10 @@
 # v1 checklist: what /v2 must keep, and what it adds
 
+> **15 Nov 2026: v2 is the main version.** The app is at `/` and the console at `/admin` with the v2 layer; v1 is kept,
+> unchanged and with none of its code deleted, as the backup at `/v1` (team app and client portal) and `/admin/v1` (console).
+> Old `/v2/...` and `/admin/v2/...` links get a 302 to the same page without the `/v2` (server/index.ts `oldV2Address`, and
+> `withoutV2` in src/surface.ts when our server isn't in front). Below, read "/v2" as "/" and "v1 at /" as "v1 at /v1".
+
 13 Nov 2026. The owner, after the kit-built /v2: "The first version has my vibe and identity, but the UI is just not clean
 enough and the features are just not on the level I want, and the UI consistency." So /v2 is now **v1's own screens and
 components** (same code, same look) with a layer on top, and nothing v1 has may go missing.
