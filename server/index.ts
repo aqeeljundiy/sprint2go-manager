@@ -1840,7 +1840,9 @@ const handle = async (req: IncomingMessage, res: ServerResponse) => {
   res.setHeader('x-content-type-options', 'nosniff');
   res.setHeader('referrer-policy', 'strict-origin-when-cross-origin');
   res.setHeader('x-frame-options', 'DENY');
-  res.setHeader('content-security-policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https:; media-src 'self' blob: data:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' ws: wss: https:; frame-ancestors 'none'; worker-src 'self' blob:; base-uri 'self'; form-action 'self'");
+  // GA4 (21 Nov 2026): only the marketing site (sprint2go.com) loads Google's tag; the app keeps 'self' only.
+  const marketing = !!SITE_HOST && String(req.headers.host ?? '').toLowerCase() === SITE_HOST;
+  res.setHeader('content-security-policy', `default-src 'self'; script-src 'self'${marketing ? ' https://www.googletagmanager.com' : ''}; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https:; media-src 'self' blob: data:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' ws: wss: https:; frame-ancestors 'none'; worker-src 'self' blob:; base-uri 'self'; form-action 'self'`);
   if (secureCookies()) res.setHeader('strict-transport-security', 'max-age=15552000; includeSubDomains');
   if (siteRedirect(req, res, p)) return;
   if (strangerHost(req, res, p)) return;
