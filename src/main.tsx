@@ -1,3 +1,5 @@
+// First: the app's stylesheets go in before any other module runs (src/splash.ts appStyles).
+import { appStyles, startSplash } from './splash';
 import { Component, StrictMode, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import Root from './Root';
@@ -35,6 +37,7 @@ import './system.css';
 import './appv2.css'; // app home and Settings in the A+B style (before the phone layer)
 import './mobile/index.css'; // the phone layer: always last
 
+startSplash(); // the opening screen (index.html) fades out once the app has drawn
 startTryOut(); // /try: the demo in this tab, nothing sent to our server
 startExitAnimations();
 startSlidingTabs();
@@ -92,12 +95,15 @@ function Speaking() {
   );
 }
 
-// v2 only (/v2, /admin/v2): its tidy scale (generated from v1's CSS by scripts/v2-scale.mjs, phone layer copied last)
-// and then its layer (motion, hand fixes), in that order, after v1's styles. v1 never downloads either.
-const v2Styles = v2 ? import('./v2-scale.css').then(() => import('./v2.css')).then(() => import('./v2-flex.css')) : Promise.resolve();
+// v2 only (the app at /, the console at /admin): its tidy scale (generated from v1's CSS by scripts/v2-scale.mjs, phone
+// layer copied last), then its layer (motion, hand fixes), then the flex panels, in that order, after v1's styles. All
+// three download at once: each import() adds its <link> when it is called, so calling them in this order keeps this
+// order on the page. v1 never downloads any of them.
+const v2Styles = v2 ? Promise.all([import('./v2-scale.css'), import('./v2.css'), import('./v2-flex.css')]) : Promise.resolve();
 
 // The words first (only Indonesian has any to fetch), then the app: nobody sees English flash before their language.
-void Promise.all([setLang(deviceLang()), v2Styles.catch(() => {})]).finally(() =>
+// appStyles: the app's own stylesheets, downloading since the page arrived (src/splash.ts).
+void Promise.all([setLang(deviceLang()), appStyles, v2Styles.catch(() => {})]).finally(() =>
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
       <Speaking />

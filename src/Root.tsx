@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState, type ComponentProps } from 'react';
 import type { User, Workspace } from './types';
 import { SIGNED_IN_DEFAULT, USERS, WORKSPACES } from './data/workspaces';
 import { usePersisted, usePrefsSync, useSettings } from './settings';
@@ -8,7 +8,16 @@ import { trying, startOver, endTryOut } from './tryOut';
 import { SAMPLE_COMPANY } from './sandbox';
 import { DemoBar, ResetDemoDialog, openDemoCompany, useDemoState } from './components/DemoCompany';
 import { setAIWorkspace } from './ai';
-import App from './App';
+// The app (src/App.tsx) loads on its own, below; its styles stay in the main stylesheet, here where its import used to
+// put them, so the cascade is unchanged: v2's layers (src/main.tsx) come after them. A style the app's code brought along
+// would load after v2 instead; vite.config.ts earlyDownloads stops the build if that happens (add the file here).
+import './components/ui/personCard.css';
+import './components/projectPulse.css';
+import './components/mail/organize.css';
+import './components/mail/teams.css';
+import './mailFiles.css';
+import './connector.css';
+import './components/chat/chat.css';
 import { clientActions } from './clientActions';
 import { accessFor, afterEnd, clientInbox, portalsFor } from './clientView';
 import { WorkspaceSwitcher } from './components/WorkspaceSwitcher';
@@ -29,6 +38,24 @@ import { deviceLang, setLang, t, tn } from './i18n';
 import { fmtList } from './i18n/format';
 import { tj } from './i18n/tj';
 import { useAppLanguage } from './i18n/useLang';
+
+// The app itself (mail, chat, tasks…) is most of the code: it downloads on its own, started the moment we know someone
+// is signed in (or trying it out), next to their data, so the sign-in page never waits for it (warmApp below).
+let appCode: Promise<typeof import('./App')> | null = null;
+const loadApp = () => (appCode ??= import('./App').catch((e) => ((appCode = null), Promise.reject(e))));
+const AppCode = lazy(loadApp);
+function App(props: ComponentProps<typeof AppCode>) {
+  return (
+    <Suspense fallback={<div className="lazy-wait" aria-hidden />}>
+      <AppCode {...props} />
+    </Suspense>
+  );
+}
+/** On the sign-in page: fetch the app once the page is up and the line is quiet, so it opens at once after signing in. */
+const warmApp = () => setTimeout(() => void loadApp().catch(() => {}), 1500);
+// Most opens are by someone already signed in: on the app's own addresses the download starts right away, next to the
+// question of who is signed in, instead of after the answer. Sign-in, sign-up, the console and the consent screen don't.
+if (typeof location !== 'undefined' && !/^\/(signin|signup|admin|oauth)(\/|$)/.test(location.pathname) && !new URLSearchParams(location.search).has('invite')) void loadApp().catch(() => {});
 
 /**
  * With the local server: real sign-in, data from the database, live updates.
@@ -64,11 +91,18 @@ export default function Root() {
       .then((r) => (r.ok ? r.json() : null))
       .then((d: { pricing?: PricingOverride } | null) => applyPricing(d?.pricing), () => {});
     // "Try it without signing up": the demo in this tab, without asking the server who's signed in.
-    if (trying) return setMode('demo');
+    if (trying) {
+      void loadApp().catch(() => {});
+      return setMode('demo');
+    }
     void probe().then(async (r) => {
+      if (r !== 'signed-out' && !admin && !connecting) void loadApp().catch(() => {}); // alongside caps and their data
       if (r === 'none') return setMode('demo');
       await loadCaps(); // what this server can do, before anything shows (features that can't work stay hidden)
-      if (r === 'signed-out') return setMode('signed-out');
+      if (r === 'signed-out') {
+        warmApp();
+        return setMode('signed-out');
+      }
       setSession(r);
       if (r.twoStep) return setMode('two-step'); // the password is done; the code (or setting it up) comes first
       server.operator = !!r.operator;

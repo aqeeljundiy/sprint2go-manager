@@ -15,12 +15,84 @@
     <meta name="theme-color" content="#0e1013" media="(prefers-color-scheme: dark)" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <!-- v2, the main version (the app at /, the console at /admin): its class, digits font and app icons before the first paint; nothing on the v1 backup (/v1, /admin/v1). -->
-    <script src="/admin-v2/boot.js"></script>
+    <!-- Fonts are added by boot.js without holding up the first paint (display=swap: text shows at once, then takes the font). -->
+    <!-- v2, the main version (the app at /, the console at /admin): its class, fonts and app icons before React draws; nothing v2 on the v1 backup (/v1, /admin/v1). -->
+    <script src="/admin-v2/boot.js" defer></script>
+    <!--
+      The opening screen (#splash): plain HTML and CSS, so it shows the moment this page arrives, long before the app's
+      scripts and styles. src/splash.ts fades it out once the app has drawn. No inline script (the CSP allows none): the
+      slow-connection line and Try again appear on CSS delays, and Try again is a plain link to this same address.
+    -->
+    <style>
+      #splash {
+        position: fixed; inset: 0; z-index: 2147483000; display: grid; place-items: center; padding: 16px;
+        background: #fff; color: #0b0c10;
+        font: 15px/1.4 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      #splash .sp-in { display: grid; justify-items: center; gap: 24px; text-align: center; animation: sp-rise 240ms ease-out both; }
+      #splash .sp-word { display: flex; align-items: center; gap: 12px; font-size: 24px; font-weight: 700; letter-spacing: -0.01em; }
+      #splash .sp-word svg { display: block; flex: none; }
+      #splash .sp-word b { color: #2448ff; font-weight: inherit; }
+      #splash .sp-bar { position: relative; width: 120px; height: 3px; border-radius: 999px; overflow: hidden; background: rgba(36, 72, 255, 0.14); }
+      #splash .sp-bar::before {
+        content: ''; position: absolute; inset: 0 auto 0 0; width: 40%; border-radius: inherit; background: #2448ff;
+        animation: sp-run 1100ms cubic-bezier(0.45, 0, 0.55, 1) infinite;
+      }
+      /* The help only appears when opening is slow; it takes its space from the start, so nothing jumps. */
+      #splash .sp-slow { display: grid; justify-items: center; gap: 12px; max-width: 280px; min-height: 92px; }
+      #splash .sp-slow p { margin: 0; font-size: 13px; color: #6b6f7b; opacity: 0; animation: sp-show 240ms ease-out 4s forwards; }
+      #splash .sp-slow a {
+        display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 20px; border-radius: 999px;
+        background: rgba(36, 72, 255, 0.1); color: #2448ff; font-weight: 600; text-decoration: none;
+        opacity: 0; visibility: hidden; animation: sp-show 240ms ease-out 15s forwards;
+      }
+      #splash .sp-id { display: none; }
+      html[lang='id'] #splash .sp-en { display: none; }
+      html[lang='id'] #splash .sp-id { display: inline; }
+      #splash.is-leaving { animation: sp-leave 180ms ease-in forwards; pointer-events: none; }
+      @keyframes sp-rise { from { opacity: 0; transform: translateY(8px); } }
+      @keyframes sp-run { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+      @keyframes sp-show { to { opacity: 1; visibility: visible; } }
+      @keyframes sp-leave { to { opacity: 0; } }
+      @media (prefers-color-scheme: dark) {
+        #splash { background: #0e1013; }
+        #splash { color: #ebecef; }
+        #splash .sp-word b, #splash .sp-slow a { color: #7d93ff; }
+        #splash .sp-bar { background: rgba(125, 147, 255, 0.18); }
+        #splash .sp-bar::before { background: #7d93ff; }
+        #splash .sp-slow p { color: #9a9eaa; }
+        #splash .sp-slow a { background: rgba(125, 147, 255, 0.14); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #splash .sp-in { animation: none; }
+        /* Still a sign of life, without the sliding: the bar breathes. */
+        #splash .sp-bar::before { width: 100%; animation: sp-breathe 1600ms ease-in-out infinite alternate; }
+        #splash.is-leaving { animation-duration: 1ms; }
+        @keyframes sp-breathe { from { opacity: 0.25; } to { opacity: 0.9; } }
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
+    <div id="splash" role="status" aria-live="polite">
+      <div class="sp-in">
+        <div class="sp-word" aria-label="sprint2go">
+          <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
+            <defs><linearGradient id="sp-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4d6bff" /><stop offset="1" stop-color="#2448ff" /></linearGradient></defs>
+            <rect width="32" height="32" rx="9" fill="url(#sp-g)" />
+            <path d="M9 10.5 14.5 16 9 21.5" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M17 10.5 22.5 16 17 21.5" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity=".6" />
+          </svg>
+          <span>sprint<b>2</b>go</span>
+        </div>
+        <div class="sp-bar" aria-hidden="true"></div>
+        <div class="sp-slow">
+          <p><span class="sp-en">Still opening. On a slow connection this can take a moment, no need to reload.</span><span class="sp-id">Masih membuka. Di koneksi lambat ini bisa butuh waktu, tidak perlu memuat ulang.</span></p>
+          <a href=""><span class="sp-en">Try again</span><span class="sp-id">Coba lagi</span></a>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
