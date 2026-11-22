@@ -84,6 +84,8 @@ import * as mailAudit from './mailAudit.ts';
 import * as forwarding from './mailForwarding.ts';
 import * as lang from './lang.ts';
 import * as aiAccounts from './aiAccounts.ts';
+import * as joins from './joins.ts';
+import * as signedIn from './signedIn.ts';
 import { mark, msg, phrase, t, textOf } from '../src/i18n/index.ts';
 import { fmtDayLong, fmtMonth } from '../src/i18n/format.ts';
 
@@ -245,6 +247,12 @@ if (process.env.S2G_PURGE_DEMO === '1' && process.env.NODE_ENV === 'production' 
 type Ws = { id: string; members: { userId: string; role: string }[]; accounts?: { id: string }[]; ai?: { jobs?: Record<string, { provider: string; model: string; fallback?: string; typed?: boolean }>; providers?: { id: string; status: string; model?: string }[]; payer?: string } };
 const workspaces = () => db.allDocs('workspaces') as unknown as Ws[];
 const memberOf = (userId: string) => workspaces().filter((w) => w.members.some((m) => m.userId === userId));
+/** A company with one more member: their role, an optional mailbox of their own, and the shared inboxes they open. */
+function addMember(ws: any, userId: string, role: 'owner' | 'admin' | 'member', mailbox: { email: string; name: string } | null, shared: string[]) {
+  const accounts = (ws.accounts ?? []).map((a: any) => (shared.includes(a.id) && !(a.users ?? []).includes(userId) ? { ...a, users: [...(a.users ?? []), userId] } : a));
+  if (mailbox) accounts.push({ id: randomBytes(8).toString('hex'), email: mailbox.email, name: mailbox.name, kind: 'personal', connected: false, users: [userId] });
+  return { ...ws, members: [...(ws.members ?? []).filter((m: any) => m.userId !== userId), { userId, role }], accounts };
+}
 const isAdminOf = (userId: string, wsId: string) => workspaces().some((w) => w.id === wsId && w.members.some((m) => m.userId === userId && m.role !== 'member'));
 
 /** The signed-in person: a team member, or someone at a client (client portal). */
@@ -666,6 +674,8 @@ const addCookie = (res: ServerResponse, c: string) => {
   res.setHeader('set-cookie', [...(Array.isArray(had) ? had : had ? [String(had)] : []).filter((x) => !x.startsWith(c.split('=')[0] + '=')), c]);
 };
 const setSession = (res: ServerResponse, token: string | null) => addCookie(res, `s2g=${token ?? ''}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${token ? 30 * 86400 : 0}${secureCookies() ? '; Secure' : ''}`);
+/** The other people signed in on this browser, waiting to be switched to (server/signedIn.ts). */
+const setMore = (res: ServerResponse, tokens: string[]) => addCookie(res, `${signedIn.MORE_COOKIE}=${signedIn.pack(tokens)}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${tokens.length ? 30 * 86400 : 0}${secureCookies() ? '; Secure' : ''}`);
 /** The browser's remembered-device tokens (server/twostep.ts), for 30 days. */
 const setDeviceCookie = (res: ServerResponse, value: string | null) => addCookie(res, `${twostep.DEVICE_COOKIE}=${value ?? ''}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${value ? twostep.DEVICE_DAYS * 86400 : 0}${secureCookies() ? '; Secure' : ''}`);
 /** Attempts per key (an address and an email) in a sliding window: sign-in and codes can't be guessed in bulk. */
@@ -1556,6 +1566,16 @@ function applySync(me: string, incoming: any, from: { conn?: string; operator?: 
     if (coll === 'workspaces') {
       if (before) {
         if (!isAdminOf(me, d.id)) return null; // only admins change a company's settings and people
+        // Nobody who already signs in is put into a company by someone else: they get a request and accept it themselves
+        // (/api/people/invite, server/joins.ts). New people without a sign-in come in as before.
+        if (Array.isArray((d as any).members)) {
+          const had = new Set((before.members ?? []).map((m: any) => m.userId));
+          const forced = (d as any).members.filter((m: any) => !had.has(m.userId) && m.userId !== me && db.hasLogin(String(m.userId)));
+          if (forced.length) {
+            (d as any).members = (d as any).members.filter((m: any) => !forced.includes(m));
+            say(mark('People who already use sprint2go join when they accept your invite.'));
+          }
+        }
         // What the server and operators own stays as the server has it: readiness, credits, suspension, discounts,
         // the routing checks' results (the admins only switch the daily check on or off), the company's own address
         // with its state (changed through /api/white-label/domain only), the mail aliases (set through the server)
@@ -1621,7 +1641,7 @@ function applySync(me: string, incoming: any, from: { conn?: string; operator?: 
       const chat = retention.chatOnSave(fresh.chat, undefined);
       if (chat.started) retentionStarted.push({ wsId: d.id, ...chat.started });
       if (fresh.mailRoute === 'boosted' && !mailer.boostedAvailable()) fresh.mailRoute = 'own';
-      const made = { ...fresh, plan, chat: chat.chat, whiteLabel: ownAddress(fresh.whiteLabel, undefined), security: twostep.securityOnSave(undefined, fresh.security, true, twostep.isOn(me)).security, createdAt: new Date().toISOString(), members: [{ userId: me, role: 'owner' }, ...((d.members ?? []) as any[]).filter((m) => m.userId !== me)] }; // whoever makes a company owns it
+      const made = { ...fresh, plan, chat: chat.chat, whiteLabel: ownAddress(fresh.whiteLabel, undefined), security: twostep.securityOnSave(undefined, fresh.security, true, twostep.isOn(me)).security, createdAt: new Date().toISOString(), members: [{ userId: me, role: 'owner' }, ...((d.members ?? []) as any[]).filter((m) => m.userId !== me && !db.hasLogin(String(m.userId)))] }; // whoever makes a company owns it; people who already sign in join by accepting an invite
       return { ...made, accounts: billing.mailboxesOnSave(made, undefined).accounts } as db.Doc;
     }
     // A notice goes to someone in that company (or one of its guests), and only links inside the app.
@@ -1653,6 +1673,8 @@ function applySync(me: string, incoming: any, from: { conn?: string; operator?: 
       if (d.id === me) return d; // own profile: already shaped
       if (before) return null; // nobody edits someone else's record
       if (!admin && mine.size) return null; // new people come in through invites, which admins send
+      // One person per sign-in email: a new record can't take an address someone already signs in with.
+      if ((d as any).email && db.findLogin(String((d as any).email).toLowerCase())) return (say(mark('Someone already signs in with that email. Invite them and they can accept.')), null);
       const { clientOf: _c, vaultKey: _v, ...rest } = d as any;
       return rest as db.Doc;
     }
@@ -1989,8 +2011,11 @@ const handle = async (req: IncomingMessage, res: ServerResponse) => {
         push.forgetSession(t); // this device stops getting their notifications
         for (const [id, c] of clients) if (c.token === t) (c.res.end(), clients.delete(id));
       }
-      setSession(res, null);
-      return json(res, 200, {});
+      // Someone else still signed in on this browser takes over, so signing out of one never signs out of all.
+      const more = signedIn.waiting(cookie(req, signedIn.MORE_COOKIE), undefined).filter((tk) => tk !== t);
+      setSession(res, more[0] ?? null);
+      setMore(res, more.slice(1));
+      return json(res, 200, { next: more[0] ? signedIn.userOf(more[0]) : null });
     }
 
     // Accepting an invite: the new person sets a password and is signed in.
@@ -2105,6 +2130,45 @@ const handle = async (req: IncomingMessage, res: ServerResponse) => {
       saveMeeting(next);
       if (b.status === 'recorded') void writeMeetingNotes(m.id, !!b.again);
       return json(res, 200, {});
+    }
+
+    // Several people signed in on this browser (server/signedIn.ts): who they are, adding one, switching.
+    if (p === '/api/signed-in' || p.startsWith('/api/signed-in/')) {
+      const active = cookie(req, 's2g');
+      const more = signedIn.waiting(cookie(req, signedIn.MORE_COOKIE), active);
+      const card = (tk: string) => {
+        const id = signedIn.userOf(tk)!;
+        const u = (db.getDoc('users', id) ?? {}) as any;
+        return { id, name: String(u.name ?? ''), email: String(u.email ?? ''), color: u.color, photo: u.photo, companies: memberOf(id).map((w: any) => ({ id: w.id, name: w.name, color: w.color, logo: w.logo })) };
+      };
+      if (p === '/api/signed-in' && req.method === 'GET') {
+        const a = db.sessionInfo(active);
+        return json(res, 200, { active: a && !a.operator ? a.userId : null, others: more.map(card) });
+      }
+      if (req.method !== 'POST') return json(res, 405, {});
+      // "Add another account": this one waits, the sign-in page opens for the next.
+      if (p === '/api/signed-in/add') {
+        if (more.length >= signedIn.MAX_MORE) return json(res, 409, { error: mark('This browser already keeps the most sign-ins it can. Sign out of one first.') });
+        setMore(res, signedIn.park(active, more));
+        setSession(res, null);
+        return json(res, 200, {});
+      }
+      if (p === '/api/signed-in/switch') {
+        const to = signedIn.switchTo(String((await body(req)).userId ?? ''), active, more);
+        if (!to) return json(res, 404, { error: mark('That account isn’t signed in here any more. Sign in again.') });
+        setSession(res, to.active);
+        setMore(res, to.more);
+        return json(res, 200, {});
+      }
+      // Forgetting one of them on this browser: their session here ends, the others stay.
+      if (p === '/api/signed-in/forget') {
+        const id = String((await body(req)).userId ?? '');
+        const gone = more.filter((tk) => signedIn.userOf(tk) === id);
+        gone.forEach((tk) => db.endSession(tk));
+        setMore(res, more.filter((tk) => !gone.includes(tk)));
+        return json(res, 200, {});
+      }
+      return json(res, 404, {});
     }
 
     const token = cookie(req, 's2g');
@@ -2914,17 +2978,27 @@ const handle = async (req: IncomingMessage, res: ServerResponse) => {
       return json(res, 200, {});
     }
 
-    // A backup sign-in email: a second address that signs in and gets reset codes, confirmed by a code sent to it.
-    // So leaving a company (and its mailbox) never locks someone out of their own account.
-    if (p === '/api/account/backup-email') {
-      if (req.method === 'GET') return json(res, 200, { email: db.backupEmailOf(me) });
-      if (req.method === 'DELETE') return (db.removeBackupEmail(me), platform.event('security.backup-email', null, me, 'removed'), json(res, 200, { email: null }));
+    // Sign-in emails: more addresses that sign in to this same person and get password codes, each confirmed by a code
+    // sent to it. One person, reachable at work and personal addresses; leaving a company (and its mailbox) never
+    // locks anyone out of their other companies. (/api/account/backup-email is the older one-address form.)
+    if (p === '/api/account/emails' || p === '/api/account/backup-email') {
+      const list = () => ({ main: String(meDoc?.email ?? ''), extra: db.loginEmailsOf(me), email: db.backupEmailOf(me), max: db.MAX_LOGIN_EMAILS });
+      if (req.method === 'GET') return json(res, 200, list());
+      if (req.method === 'DELETE') {
+        const b = await body(req).catch(() => ({}));
+        const which = String(b.email ?? db.backupEmailOf(me) ?? '').toLowerCase();
+        if (which && db.removeLoginEmail(me, which)) platform.event('security.backup-email', null, me, 'removed');
+        return json(res, 200, list());
+      }
       const b = await body(req);
       if (b.code === undefined) {
         const mail = String(b.email ?? '').trim().toLowerCase();
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) return json(res, 400, { error: mark('That email doesn’t look right.') });
+        if (db.loginEmailsOf(me).length >= db.MAX_LOGIN_EMAILS) return json(res, 409, { error: mark('You already have the most sign-in emails. Remove one first.') });
         if (tooMany(`backup:${me}`, 5, 60 * 60_000)) return json(res, 429, { error: mark('Too many tries. Try again later.') });
-        if (db.findLogin(mail)) return json(res, 409, { error: mark('That email already signs in to an account.') });
+        const owner = db.findLogin(mail);
+        if (owner?.user_id === me) return json(res, 409, { error: mark('That email already signs in to your account.') });
+        if (owner) return json(res, 409, { error: mark('That email already signs in to another account. Sign in with it too, then switch between them from your picture.') });
         const code = newCode();
         codes.set(`backup:${me}`, { code, tries: 0, until: Date.now() + 15 * 60_000, data: { email: mail } });
         const sent = await sendCode(mail, 'backup', code, lang.requestLang(req));
@@ -2937,9 +3011,9 @@ const handle = async (req: IncomingMessage, res: ServerResponse) => {
       codes.delete(`backup:${me}`);
       const email = String(c.data?.email ?? '');
       if (!email || db.findLogin(email)) return json(res, 409, { error: mark('That email already signs in to an account.') });
-      db.setBackupEmail(me, email);
+      db.addLoginEmail(me, email);
       platform.event('security.backup-email', null, me, 'added');
-      return json(res, 200, { email });
+      return json(res, 200, list());
     }
 
     // Deleting the account: the sign-in, sessions and the person's record go; work they did stays with its company.
@@ -2963,6 +3037,7 @@ const handle = async (req: IncomingMessage, res: ServerResponse) => {
       const gone = { ...u, name: 'Deleted account', email: '', title: '', photo: undefined, hiddenApps: undefined, vaultKey: undefined, deletedAt: new Date().toISOString() };
       db.writeDocs('users', [gone], [], me);
       broadcast('users', [gone], []);
+      joins.forget(me);
       setSession(res, null);
       return json(res, 200, {});
     }
@@ -3076,6 +3151,109 @@ const handle = async (req: IncomingMessage, res: ServerResponse) => {
       const taken = db.findLogin(email);
       if (taken) return json(res, 409, { error: mark('Someone already uses that email.') });
       return json(res, 200, { link: `/?invite=${db.newInvite(target, email)}` });
+    }
+
+    // Adding someone to a company, by any email (src/components/WorkspaceForms.tsx, Invite). The server decides:
+    // - the email already signs in to someone: they get a request to join and say yes or no in their own app
+    //   (server/joins.ts); nobody is put into a company without their OK;
+    // - nobody yet: their record and membership are made here, with an invite link where they pick a password.
+    // Either way an optional mailbox at the company's domain (separate from how they sign in) and shared inboxes.
+    if (p === '/api/people/invite' && req.method === 'POST') {
+      const b = await body(req);
+      const wsId = String(b.workspaceId ?? '');
+      const ws = db.getDoc('workspaces', wsId) as any;
+      if (!ws || !isAdminOf(me, wsId)) return json(res, 403, { error: mark('Only admins can invite people.') });
+      if (isSandboxId(wsId)) return json(res, 403, { error: mark('The people in the demo company are made up: nobody is invited from it.') });
+      const ro = billing.readOnlyWords(ws);
+      if (ro) return json(res, 403, { error: ro });
+      const email = String(b.email ?? '').trim().toLowerCase();
+      const name = String(b.name ?? '').trim().slice(0, 80);
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json(res, 400, { error: mark('That email doesn’t look right.') });
+      if (!name) return json(res, 400, { error: mark('Add their name.') });
+      // Only an owner makes another owner.
+      const ownerHere = (ws.members ?? []).some((m: any) => m.userId === me && m.role === 'owner');
+      const role: joins.Role = b.role === 'owner' && ownerHere ? 'owner' : b.role === 'admin' || b.role === 'owner' ? 'admin' : 'member';
+      const shared = (Array.isArray(b.shared) ? b.shared.map(String) : []).filter((id: string) => (ws.accounts ?? []).some((a: any) => a.id === id && a.kind === 'shared'));
+      // A mailbox at one of the company's own domains, at an address nobody uses yet.
+      let mailbox: joins.Mailbox = null;
+      if (b.mailbox) {
+        const addr = String(b.mailbox).trim().toLowerCase();
+        const dom = addr.split('@')[1];
+        if (!/^[a-z0-9._+-]+@[a-z0-9.-]+$/.test(addr) || !(ws.domains ?? []).map((d: string) => d.toLowerCase()).includes(dom)) return json(res, 400, { error: mark('The mailbox has to be at one of the company’s domains.') });
+        const used = workspaces().some((w: any) => (w.accounts ?? []).some((a: any) => String(a.email).toLowerCase() === addr) || (w.mailAliases ?? []).some((al: any) => String(al.address ?? al.email ?? '').toLowerCase() === addr));
+        if (used) return json(res, 409, { error: mark('That mailbox address is already taken.') });
+        mailbox = { email: addr, name };
+      }
+      const login = db.findLogin(email);
+      if (login) {
+        if ((ws.members ?? []).some((m: any) => m.userId === login.user_id)) return json(res, 409, { error: mark('They’re already in this company.') });
+        const j = joins.ask({ workspaceId: wsId, userId: login.user_id, role, mailbox, shared, invitedBy: me });
+        const inviter = String((meDoc as any)?.name ?? 'Someone');
+        const to = login.email; // their main sign-in address, which they read
+        void mailer
+          .sendNote(to, `${inviter} asked you to join ${ws.name} on sprint2go`, `${inviter} asked you to join ${ws.name} on sprint2go.\n\nOpen sprint2go to say yes or no: ${PUBLIC_URL || ''}/\n\nYou sign in as you always do; ${ws.name} shows up next to your other companies once you accept.`)
+          .catch(() => false);
+        for (const c of clients.values()) if (c.userId === login.user_id) c.res.write(`event: joins\ndata: {}\n\n`);
+        db.audit(me, 'company.join-asked', login.user_id, wsId);
+        return json(res, 200, { kind: 'asked', token: j.token, name: String((db.getDoc('users', login.user_id) as any)?.name ?? '') });
+      }
+      // Someone new: one record (an earlier invite to the same address that was never used is reused).
+      const before = (db.allDocs('users') as any[]).find((u) => String(u.email ?? '').toLowerCase() === email && !db.hasLogin(u.id) && !u.deletedAt);
+      if (before && !(ws.members ?? []).some((m: any) => m.userId === before.id) && memberOf(before.id).length) return json(res, 409, { error: mark('Someone else has already invited that address. Ask them to join once they’ve signed in.') });
+      const PALETTE = ['#0ea5e9', '#f97316', '#8b5cf6', '#10b981', '#ec4899', '#eab308'];
+      // The app may pick the id (the brain dump assigns work to them straight away), when it's new and well formed.
+      const asked = String(b.userId ?? '');
+      const id = /^[a-z0-9-]{6,40}$/i.test(asked) && !db.getDoc('users', asked) ? asked : randomBytes(8).toString('hex');
+      const user = before ?? { id, name, email, title: '', color: PALETTE[(db.allDocs('users') as any[]).length % PALETTE.length] };
+      const next = addMember(ws, user.id, role, mailbox, shared);
+      const boxes = billing.mailboxesOnSave(next, ws);
+      if (boxes.why) return json(res, 409, { error: boxes.whyWords ?? boxes.why });
+      if (!before) (db.writeDocs('users', [user], [], me), broadcast('users', [user], []));
+      db.writeDocs('workspaces', [next], [], me);
+      broadcast('workspaces', [next], []);
+      return json(res, 200, { kind: 'new', userId: user.id, link: `${PUBLIC_URL || ''}/?invite=${db.newInvite(user.id, email)}` });
+    }
+    // Requests to join a company: yours to answer, or (admins) the ones your company is waiting on.
+    if (p === '/api/joins' && req.method === 'GET') {
+      const wsId = new URL(req.url ?? '/', 'http://x').searchParams.get('workspace');
+      if (wsId) {
+        if (!isAdminOf(me, wsId)) return json(res, 403, { error: mark('Only admins can see this.') });
+        return json(res, 200, { waiting: joins.forCompany(wsId).map((j) => { const u = db.getDoc('users', j.userId) as any; return { token: j.token, name: u?.name ?? '', email: u?.email ?? '', role: j.role, at: j.createdAt }; }) });
+      }
+      return json(res, 200, {
+        joins: joins.forUser(me).flatMap((j) => {
+          const w = db.getDoc('workspaces', j.workspaceId) as any;
+          if (!w) return [];
+          return [{ token: j.token, role: j.role, mailbox: j.mailbox?.email ?? null, company: { id: w.id, name: w.name, color: w.color, logo: w.logo }, by: String((db.getDoc('users', j.invitedBy) as any)?.name ?? ''), at: j.createdAt }];
+        }),
+      });
+    }
+    if ((p === '/api/joins/accept' || p === '/api/joins/decline' || p === '/api/joins/cancel') && req.method === 'POST') {
+      const j = joins.open(String((await body(req)).token ?? ''));
+      const cancel = p === '/api/joins/cancel';
+      if (!j || (cancel ? !isAdminOf(me, j.workspaceId) : j.userId !== me)) return json(res, 404, { error: mark('This request has expired or was already answered.') });
+      if (cancel) return (joins.answer(j.token, 'cancelled'), json(res, 200, {}));
+      if (p === '/api/joins/decline') {
+        joins.answer(j.token, 'declined');
+        const w = db.getDoc('workspaces', j.workspaceId) as any;
+        if (w) notifyUsers([j.invitedBy], msg('{name} said no to joining {company}', { name: String((meDoc as any)?.name ?? ''), company: w.name }), '/settings/workspace', w.id);
+        return json(res, 200, {});
+      }
+      const ws = db.getDoc('workspaces', j.workspaceId) as any;
+      if (!ws || ws.suspended) return json(res, 404, { error: mark('This company isn’t available any more.') });
+      if ((ws.members ?? []).some((m: any) => m.userId === me)) return (joins.answer(j.token, 'accepted'), json(res, 200, { workspaceId: ws.id }));
+      // The mailbox only when its address is still free.
+      const free = j.mailbox && !workspaces().some((w: any) => (w.accounts ?? []).some((a: any) => String(a.email).toLowerCase() === j.mailbox!.email));
+      const next = addMember(ws, me, j.role, free ? j.mailbox : null, j.shared.filter((id) => (ws.accounts ?? []).some((a: any) => a.id === id)));
+      const boxes = billing.mailboxesOnSave(next, ws);
+      const saved = boxes.why ? addMember(ws, me, j.role, null, j.shared) : next;
+      joins.answer(j.token, 'accepted');
+      db.writeDocs('workspaces', [saved], [], me);
+      broadcast('workspaces', [saved], []);
+      broadcast('users', [meDoc as db.Doc], []);
+      notifyUsers([j.invitedBy], msg('{name} joined {company}', { name: String((meDoc as any)?.name ?? ''), company: ws.name }), '/settings/workspace', ws.id);
+      db.audit(me, 'company.join-accepted', me, ws.id);
+      return json(res, 200, { workspaceId: ws.id, mailboxSkipped: !!j.mailbox && (!free || !!boxes.why) });
     }
 
     // Saves changes and tells everyone else who has the app open.

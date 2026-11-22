@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { primaryDomain } from '../domains';
-import { Bell, Check, ChevronDown, ChevronLeft, ChevronRight, FlaskConical, LayoutGrid, Loader2, Menu, Plus, Search, Settings } from 'lucide-react';
-import type { Client, Person, Workspace } from '../types';
+import { Bell, Check, ChevronDown, ChevronLeft, ChevronRight, FlaskConical, LayoutGrid, Loader2, Menu, Plus, Search, Settings, UserPlus } from 'lucide-react';
+import type { Client, Person, Role, Workspace } from '../types';
+import type { OtherSignIn } from '../signedIn';
 import { Avatar } from './Avatar';
 import { WorkspaceLogo } from './WorkspaceLogo';
 import { Badge } from './ui/Person';
@@ -25,6 +26,15 @@ export interface TopSettingsRow {
  * <LargeTitle> in the page tucks the title away until it scrolls under the bar. The hairline under the bar shows only
  * once the content has scrolled under it.
  */
+/** The accounts part of the company panel: your role per company, other accounts signed in here (src/signedIn.ts). */
+export interface SheetAccounts {
+  roles?: Record<string, Role>;
+  signedInAs?: string;
+  elsewhere?: OtherSignIn[];
+  onElsewhere?: (userId: string, workspaceId: string) => void;
+  onAddAccount?: () => void;
+}
+
 export function MobileTop({
   title,
   menu,
@@ -52,7 +62,12 @@ export function MobileTop({
   onLauncher,
   launcherDot,
   onMenu,
-}: {
+  roles,
+  signedInAs,
+  elsewhere,
+  onElsewhere,
+  onAddAccount,
+}: SheetAccounts & {
   title: string;
   menu?: TitleMenu | null;
   settings?: TopSettingsRow[]; // this app's settings, at the bottom of the title switcher
@@ -85,7 +100,7 @@ export function MobileTop({
   useEffect(() => setWsOpen(false), [current.id]); // the demo company opened, or another company was picked
   // An app that took the logo's place opens the same sheet from its own spot (Calendar's drawer header).
   useCompanySheetOpener(() => canSwitch && setWsOpen(true));
-  const elsewhere = workspaces.some((w) => w.id !== current.id && (unreadByWs[w.id] ?? 0) > 0);
+  const newElsewhere = workspaces.some((w) => w.id !== current.id && (unreadByWs[w.id] ?? 0) > 0);
   const canSwitch = workspaces.length > 0 || portals.length > 0 || !!onAddWorkspace || !!demo || !!me; // "View as guest" has nothing to switch to
   const switches = !!menu || settings.length > 0;
   const shownTitle = (menu && menu.options.find((o) => o.value === menu.value)?.label) || title;
@@ -114,7 +129,7 @@ export function MobileTop({
           ) : onLauncher ? (
             <LauncherButton onClick={onLauncher} dot={launcherDot} />
           ) : (
-            <button className="mt-ws" onClick={() => canSwitch && setWsOpen(true)} aria-haspopup="dialog" aria-label={elsewhere ? t('Workspace: {name}, new mail in another workspace', { name: current.name }) : t('Workspace: {name}', { name: current.name })}>
+            <button className="mt-ws" onClick={() => canSwitch && setWsOpen(true)} aria-haspopup="dialog" aria-label={newElsewhere ? t('Workspace: {name}, new mail in another workspace', { name: current.name }) : t('Workspace: {name}', { name: current.name })}>
               <WorkspaceLogo ws={current} size={32} />
             </button>
           )}
@@ -150,7 +165,7 @@ export function MobileTop({
       {wsOpen && (
         <CompanySheet
           onClose={() => setWsOpen(false)}
-          {...{ workspaces, current, unreadByWs, onWorkspace, onAddWorkspace, portals, onPortal, onShared, currentPortal, demo, me, status, onSettings }}
+          {...{ workspaces, current, unreadByWs, onWorkspace, onAddWorkspace, portals, onPortal, onShared, currentPortal, demo, me, status, onSettings, roles, signedInAs, elsewhere, onElsewhere, onAddAccount }}
         />
       )}
     </header>
@@ -187,7 +202,12 @@ export function CompanySheet({
   me,
   status,
   onSettings,
-}: {
+  roles,
+  signedInAs,
+  elsewhere = [],
+  onElsewhere,
+  onAddAccount,
+}: SheetAccounts & {
   onClose: () => void;
   workspaces: Workspace[];
   current: Workspace;
@@ -223,7 +243,7 @@ export function CompanySheet({
           </button>
         )}
         {(me || status) && <div className="as-sep" />}
-        <div className="as-group">{t('Companies')}</div>
+        <div className="as-group">{elsewhere.length && signedInAs ? t('Signed in as {email}', { email: signedInAs }) : t('Companies')}</div>
         {workspaces.map((w) => {
           const n = unreadByWs[w.id] ?? 0;
           const on = w.id === current.id && !currentPortal;
@@ -241,7 +261,7 @@ export function CompanySheet({
                     </Badge>
                   )}
                 </span>
-                <small>{isSandbox(w) ? t('Your own copy to try things in') : (primaryDomain(w) || '')}</small>
+                <small>{isSandbox(w) ? t('Your own copy to try things in') : roles?.[w.id] ? `${roles[w.id] === 'owner' ? t('Owner') : roles[w.id] === 'admin' ? t('Admin') : t('Member')}${primaryDomain(w) ? ` · ${primaryDomain(w)}` : ''}` : (primaryDomain(w) || '')}</small>
               </span>
               {n > 0 && (
                 <b className="ws-unread">{n > 99 ? t('99+ new') : tn(n, '{n} new', '{n} new')}</b>
@@ -288,6 +308,28 @@ export function CompanySheet({
             {pt.key === currentPortal && <Check size={20} className="ws-check" aria-label={t('Current')} />}
           </button>
         ))}
+        {elsewhere.map((o) => (
+          <div key={o.id}>
+            <div className="as-group">{t('Signed in as {email}', { email: o.email })}</div>
+            {(o.companies.length ? o.companies : [null]).map((w) => (
+              <button key={w?.id ?? o.id} type="button" className="as-item ws-row" onClick={() => (onElsewhere?.(o.id, w?.id ?? ''), onClose())}>
+                <span className="ws-logo">{w ? <WorkspaceLogo ws={w} size={40} /> : <Avatar person={{ name: o.name || o.email, email: o.email, color: o.color }} size={40} />}</span>
+                <span className="as-label">
+                  {w ? w.name : o.name || o.email}
+                  <small>{w ? t('Opens as {name}', { name: o.name.split(' ')[0] || o.email }) : t('No companies yet')}</small>
+                </span>
+              </button>
+            ))}
+          </div>
+        ))}
+        {onAddAccount && (
+          <button type="button" className="as-item ws-row" onClick={() => (onAddAccount(), onClose())}>
+            <span className="ws-logo ws-add-icon">
+              <UserPlus size={20} />
+            </span>
+            <span className="as-label">{t('Add another account')}</span>
+          </button>
+        )}
         {onAddWorkspace && (
           <button type="button" className="as-item ws-row" onClick={() => (onAddWorkspace(), onClose())}>
             <span className="ws-logo ws-add-icon">

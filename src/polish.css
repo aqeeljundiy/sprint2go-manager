@@ -4310,3 +4310,26 @@ a.help-file:hover {
 :root[data-theme='dark'] .setup-card .setup-go {
   color: var(--text);
 }
+
+/* Sign-in emails (BackupEmail.tsx): each extra address on its own quiet row under the heading row. */
+.backup-email .set-row.sub {
+  padding: 10px 0;
+  font-size: 14px;
+  color: var(--text);
+  animation: fade-in 0.2s ease-out backwards;
+}
+.backup-email .set-row.sub span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+
+/* Asked to join a company (JoinRequests.tsx). */
+.join-req { display: grid; gap: 12px; }
+.join-req-head { display: flex; align-items: center; gap: 12px; }
+.join-req-head span { display: grid; gap: 2px; min-width: 0; }
+.join-req-head strong { font-size: 16px; }
+.join-req-head small { color: var(--muted); }
+.join-req p { margin: 0; }
+
+/* Company menu: the companies of other accounts signed in on this browser (WorkspaceSwitcher.tsx). */
+.ws-elsewhere { border-top: 1px solid var(--border); margin-top: 4px; padding-top: 4px; }
+@media (prefers-reduced-motion: reduce) {
+  .backup-email .set-row.sub { animation: none; }
+}

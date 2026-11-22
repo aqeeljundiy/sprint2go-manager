@@ -18,7 +18,7 @@ import { ProjectsHome } from './components/ProjectsHome';
 import { Popover } from './components/ui/Popover';
 import { Brain, SlidersHorizontal, Briefcase, Building2, CalendarPlus, Copy, FileText, Hash, ListChecks, ListTodo, Mail, PenLine, Send, Sparkles, Timer, Trash2, Undo2, Upload, User as UserIcon, Video, Table2, MessagesSquare, AlertTriangle, Menu, Inbox, Search as Paperclip, Contact, Clock, History, MessageCircle, Bell, Sun, CalendarRange, CircleCheck, Layers, List, CalendarDays, Users, Star, Folder, UserRound, Archive, NotebookText, LayoutGrid, type LucideIcon, type LucideProps } from 'lucide-react';
 import { DEFAULT_PERMISSIONS } from './types';
-import type { Quote, Team, Note, Account, AppId, Attachment, BlockRule, CalEvent, Channel, ChannelCategory, Client, ClientPerson, ChatFile, ChatMessage, CommentFile, Meeting, Message, Notice, RsvpStatus, TaskEvent, TaskStatus, Todo, DriveItem, DriveSection, Location, Person, Thread, User, View, Workspace, FolderId } from './types';
+import type { Quote, Team, Note, Account, AppId, Attachment, BlockRule, CalEvent, Channel, ChannelCategory, Client, ClientPerson, ChatFile, ChatMessage, CommentFile, Meeting, Message, Notice, RsvpStatus, TaskEvent, TaskStatus, Todo, DriveItem, DriveSection, Location, Person, Thread, User, View, Workspace, FolderId, Role } from './types';
 import { useMailOrganize } from './components/mail/Organize';
 import { CALENDARS, externalEvents } from './data/calendar';
 import { JOBS, costPer100 } from './data/aiCatalog';
@@ -60,6 +60,7 @@ import { EmailDeliverySection } from './components/admin/EmailDelivery';
 import { ai, aiLive, aiStatus } from './ai';
 import type { AskChat } from './components/Assistant';
 import { WorkspaceSwitcher } from './components/WorkspaceSwitcher';
+import type { OtherSignIn } from './signedIn';
 import { InviteMember, NewAccount, RemoveMailbox } from './components/WorkspaceForms';
 import { applyBranding } from './components/WorkspaceLogo';
 import { FOLDERS, Sidebar, SIDEBAR_MAX, SIDEBAR_MIN, folderName, type Mode } from './components/Sidebar';
@@ -276,6 +277,9 @@ interface AppProps {
   onAddUser: () => void;
   onSignOut: () => void;
   onInvite: (u: User) => Promise<string | null>; // the invite link, when the local server makes one
+  /** Other accounts signed in on this browser, with their companies (src/signedIn.ts). */
+  otherSignIns?: OtherSignIn[];
+  onOtherSignIn?: (userId: string, workspaceId: string) => void;
   onWorkspace?: (id: string) => void;
   onUpdateUser: (patch: Partial<User>) => void;
   /** A bar on top of everything (the try-out's "You're trying sprint2go"). */
@@ -285,7 +289,7 @@ interface AppProps {
 // The # fills its whole box, so at the bar's 24 px it looks bigger and heavier than the round icons beside it: drawn at 20.
 const ChannelsIcon = forwardRef<SVGSVGElement, LucideProps>((props, ref) => <Hash ref={ref} {...props} size={22} />) as LucideIcon;
 
-export default function App({ user, signedInUsers, allUsers, workspaces: allWorkspaces, setWorkspaces, onSwitchUser, onAddUser, onSignOut, onInvite: inviteUser, onWorkspace, onUpdateUser, topBar }: AppProps) {
+export default function App({ user, signedInUsers, allUsers, workspaces: allWorkspaces, setWorkspaces, onSwitchUser, onAddUser, onSignOut, onInvite: inviteUser, onWorkspace, onUpdateUser, topBar, otherSignIns = [], onOtherSignIn }: AppProps) {
   const [settings, updateSettings] = useSettings(user);
   const [previewOnboarding, setPreviewOnboarding] = useState(() => new URLSearchParams(location.search).get('preview') === 'onboarding');
   setPhotos(allUsers); // every Avatar finds people's photos by email
@@ -314,6 +318,14 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
   // Their own demo company (src/sandbox.ts): everything in it behaves as the demo, and nothing in it leaves it.
   // `real`: what's on screen is real, so the server does the real thing (sending, the notetaker, calendar links).
   const inSandbox = isSandbox(ws);
+  /** The company menu's accounts part: your role in each company, and the other accounts signed in on this browser. */
+  const switcherAccounts = {
+    roles: Object.fromEntries(allWorkspaces.map((w) => [w.id, w.members.find((m) => m.userId === user.id)?.role ?? 'member'])) as Record<string, Role>,
+    signedInAs: user.email,
+    elsewhere: otherSignIns,
+    onElsewhere: onOtherSignIn,
+    onAddAccount: server.on && !inSandbox ? onAddUser : undefined,
+  };
   const real = server.on && !inSandbox;
   const demo = useDemoState(); // their demo company: allowed, and not made yet, open or hidden
   const [demoBusy, setDemoBusy] = useState(false);
@@ -2682,6 +2694,19 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
     if (inSandbox) return (demoNoInvites(), user);
     const existing = allUsers.find((u) => u.email.toLowerCase() === email);
     const u: User = existing ?? { id: uid(), name: name.charAt(0).toUpperCase() + name.slice(1), email, title: 'Invited', color: ['#0ea5e9', '#f97316', '#8b5cf6', '#10b981'][allUsers.length % 4] };
+    // With the server, it decides (/api/people/invite): someone new gets this record and an invite link; someone who
+    // already uses sprint2go gets a request to join, and their work waits with you until they accept.
+    if (!existing && server.on && !ws.members.some((m) => m.userId === u.id)) {
+      void fetch('/api/people/invite', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ workspaceId: ws.id, name: u.name, email, role: 'member', mailbox: null, shared: [], userId: u.id }) })
+        .then(async (r) => ({ ok: r.ok, d: await r.json().catch(() => ({})) }))
+        .then(({ ok, d }) => {
+          if (!ok) return showToast({ text: typeof d.error === 'string' ? t(d.error) : t('Couldn’t send the invite. Try again.') });
+          if (d.kind === 'asked') return showToast({ text: t('{name} already uses sprint2go, so we asked them to join. Their tasks wait with you until they accept.', { name: String(d.name || u.name).split(' ')[0] }), ms: 8000 });
+          if (d.link) showToast({ text: t('{name} can join with their invite link', { name: u.name.split(' ')[0] }), action: { label: t('Copy link'), run: () => void navigator.clipboard?.writeText(d.link) }, ms: 20000 });
+        })
+        .catch(() => showToast({ text: t('No connection. Try again.') }));
+      return u;
+    }
     if (!existing) onInvite(u);
     if (!ws.members.some((m) => m.userId === u.id)) patchWorkspace(ws.id, { members: [...ws.members, { userId: u.id, role: 'member' }] });
     showToast({ text: t('Invited {name} ({email})', { name: u.name, email }) });
@@ -4832,6 +4857,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
               go('settings');
             }}
             demo={demoEntry}
+            {...switcherAccounts}
           />
         }
         account={
@@ -4891,6 +4917,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
               go('settings');
             }}
             demo={demoEntry}
+            {...switcherAccounts}
           />
           </div>
         }
@@ -5071,6 +5098,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
       <main className="main" key={`${ws.id}:${mode}`}>
         {mobile && (
           <MobileTop
+            {...switcherAccounts}
             title={mode === 'settings' ? t('Settings') : (APPS.find((a) => a.id === mode)?.name ?? '')}
             menu={chrome.title ?? mobileSwitcher}
             settings={mode === 'chat' || mode === 'tasks' ? [] : settingsRows}
@@ -5176,6 +5204,7 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
         )}
         {mobile && mailAccounts && (
           <CompanySheet
+            {...switcherAccounts}
             onClose={() => setMailAccounts(false)}
             workspaces={workspaces}
             current={ws}
@@ -6382,7 +6411,28 @@ export default function App({ user, signedInUsers, allUsers, workspaces: allWork
         <InviteMember
           workspace={ws}
           users={allUsers}
+          me={user.id}
           onClose={() => setInviting(false)}
+          onAsk={
+            server.on && !inSandbox
+              ? async (ask) => {
+                  const r = await fetch('/api/people/invite', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ workspaceId: ws.id, ...ask }) }).catch(() => null);
+                  const d = r ? await r.json().catch(() => ({})) : {};
+                  if (!r?.ok) return typeof d.error === 'string' ? t(d.error) : r ? t('Couldn’t send the invite. Try again.') : t('No connection. Try again.');
+                  setInviting(false);
+                  const first = ask.name.split(' ')[0];
+                  window.dispatchEvent(new Event('s2g:joins')); // Settings' waiting list
+                  if (d.kind === 'asked') showToast({ text: t('{name} already uses sprint2go, so we asked them to join. They show up here once they accept.', { name: String(d.name || first).split(' ')[0] }), ms: 8000 });
+                  else
+                    showToast({
+                      text: t('{name} can join with their invite link', { name: first }),
+                      ...(d.link ? { action: { label: t('Copy link'), run: () => void navigator.clipboard?.writeText(d.link) } } : {}),
+                      ms: 20000,
+                    });
+                  return null;
+                }
+              : undefined
+          }
           onInvite={(u, r, box, shared) => {
             onInvite(u);
             patchWorkspace(ws.id, {

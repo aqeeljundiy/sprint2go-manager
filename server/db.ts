@@ -91,20 +91,32 @@ export function setLoginHashes(list: { userId: string; email: string; hash: stri
 export async function setLogin(userId: string, email: string, pw: string) {
   db.prepare('INSERT INTO logins (user_id, email, pw_hash) VALUES (?, ?, ?) ON CONFLICT (user_id) DO UPDATE SET email = excluded.email, pw_hash = excluded.pw_hash').run(userId, email, await hashPassword(pw));
 }
-export const deleteLogin = (userId: string) => (db.prepare('DELETE FROM login_backup WHERE user_id = ?').run(userId), db.prepare('DELETE FROM logins WHERE user_id = ?').run(userId));
+export const deleteLogin = (userId: string) => (db.prepare('DELETE FROM login_backup WHERE user_id = ?').run(userId), db.prepare('DELETE FROM login_emails WHERE user_id = ?').run(userId), db.prepare('DELETE FROM logins WHERE user_id = ?').run(userId));
 export const hasLogin = (userId: string) => !!db.prepare('SELECT 1 FROM logins WHERE user_id = ?').get(userId);
 /**
- * The sign-in for an email: the account's own email, or its verified backup email (Settings, Account), so losing a
- * company mailbox never locks anyone out of their other companies. `email` is always the account's own sign-in email.
+ * More sign-in emails (Settings, Account, Sign-in emails): each verified by a code, each signs in to the same person and
+ * gets password codes. So one person can be reached at work and personal addresses, and losing a company mailbox never
+ * locks anyone out of their other companies. (Was one "backup email" each, in login_backup: copied over once.)
+ */
+db.exec('CREATE TABLE IF NOT EXISTS login_emails (email TEXT PRIMARY KEY COLLATE NOCASE, user_id TEXT NOT NULL, at TEXT NOT NULL)');
+db.exec('CREATE INDEX IF NOT EXISTS login_emails_user ON login_emails (user_id)');
+db.exec('INSERT OR IGNORE INTO login_emails (email, user_id, at) SELECT email, user_id, at FROM login_backup');
+/** How many extra sign-in emails one person may keep. */
+export const MAX_LOGIN_EMAILS = 5;
+/**
+ * The sign-in for an email: the account's own email, or one of its verified extra sign-in emails. `email` is always
+ * the account's own (main) sign-in email.
  */
 export function findLogin(email: string) {
   return (db.prepare('SELECT user_id, email, pw_hash FROM logins WHERE email = ?').get(email) ??
-    db.prepare('SELECT l.user_id, l.email, l.pw_hash FROM login_backup b JOIN logins l ON l.user_id = b.user_id WHERE b.email = ?').get(email)) as { user_id: string; email: string; pw_hash: string } | undefined;
+    db.prepare('SELECT l.user_id, l.email, l.pw_hash FROM login_emails e JOIN logins l ON l.user_id = e.user_id WHERE e.email = ?').get(email)) as { user_id: string; email: string; pw_hash: string } | undefined;
 }
-/** A person's backup sign-in email, verified by a code. One each. */
-export const backupEmailOf = (userId: string) => (db.prepare('SELECT email FROM login_backup WHERE user_id = ?').get(userId) as { email: string } | undefined)?.email ?? null;
-export const setBackupEmail = (userId: string, email: string) => db.prepare('INSERT INTO login_backup (user_id, email, at) VALUES (?, ?, ?) ON CONFLICT (user_id) DO UPDATE SET email = excluded.email, at = excluded.at').run(userId, email, new Date().toISOString());
-export const removeBackupEmail = (userId: string) => db.prepare('DELETE FROM login_backup WHERE user_id = ?').run(userId);
+/** A person's extra sign-in emails, oldest first. */
+export const loginEmailsOf = (userId: string) => (db.prepare('SELECT email FROM login_emails WHERE user_id = ? ORDER BY at, email').all(userId) as { email: string }[]).map((r) => r.email);
+export const addLoginEmail = (userId: string, email: string) => db.prepare('INSERT INTO login_emails (email, user_id, at) VALUES (?, ?, ?)').run(email.toLowerCase(), userId, new Date().toISOString());
+export const removeLoginEmail = (userId: string, email: string) => db.prepare('DELETE FROM login_emails WHERE user_id = ? AND email = ?').run(userId, email.toLowerCase()).changes > 0;
+/** The first extra sign-in email (older callers that knew only one). */
+export const backupEmailOf = (userId: string) => loginEmailsOf(userId)[0] ?? null;
 
 const DAY = 86_400_000;
 // Only a hash of the session token is stored: a copy of the database can't be used to sign in as anyone.

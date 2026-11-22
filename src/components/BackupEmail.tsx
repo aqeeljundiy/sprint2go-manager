@@ -1,6 +1,7 @@
-// A backup sign-in email (Settings, Account, Security): a second address that signs in and gets password codes.
-// Someone who signs in with a company address keeps their account (and their other companies) if that company
-// closes the mailbox. The server checks the code and keeps the address (server/index.ts /api/account/backup-email).
+// Sign-in emails (Settings, Account, Security): more addresses that sign in to this same person and get password
+// codes, each confirmed by a code. One person reachable at work and personal addresses, and leaving a company (and its
+// mailbox) never locks anyone out of their other companies. The server checks the code and keeps the addresses
+// (server/index.ts /api/account/emails).
 import { useEffect, useState } from 'react';
 import { server } from '../sync';
 import { t } from '../i18n';
@@ -11,20 +12,21 @@ import { GRow } from './ui/Grouped';
 import { Badge } from './ui/Person';
 
 type Step = { kind: 'idle' } | { kind: 'email' } | { kind: 'code'; email: string; devCode?: string };
+type Emails = { main: string; extra: string[]; max: number };
 
 async function call(method: string, payload?: unknown): Promise<{ ok: boolean; data: any }> {
-  const r = await fetch('/api/account/backup-email', { method, headers: payload ? { 'content-type': 'application/json' } : undefined, body: payload ? JSON.stringify(payload) : undefined }).catch(() => null);
+  const r = await fetch('/api/account/emails', { method, headers: payload ? { 'content-type': 'application/json' } : undefined, body: payload ? JSON.stringify(payload) : undefined }).catch(() => null);
   const data = r ? await r.json().catch(() => ({})) : { error: t('No connection. Try again.') };
   return { ok: !!r?.ok, data };
 }
 
 function useBackupEmail(toast?: (s: string) => void) {
-  const [email, setEmail] = useState<string | null | undefined>(undefined);
+  const [emails, setEmails] = useState<Emails | undefined>(undefined);
   const [step, setStep] = useState<Step>({ kind: 'idle' });
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   useEffect(() => {
-    if (server.on) void call('GET').then((r) => setEmail(r.ok ? r.data.email : null));
+    if (server.on) void call('GET').then((r) => r.ok && setEmails(r.data));
   }, []);
   const run = async (fn: () => Promise<void>) => {
     setBusy(true);
@@ -36,7 +38,8 @@ function useBackupEmail(toast?: (s: string) => void) {
     }
   };
   return {
-    email,
+    emails,
+    full: !!emails && emails.extra.length >= emails.max,
     step,
     error,
     busy,
@@ -45,23 +48,23 @@ function useBackupEmail(toast?: (s: string) => void) {
     sendCode: (address: string) =>
       run(async () => {
         const r = await call('POST', { email: address });
-        if (!r.ok) return setError(r.data.error ?? t('Couldn’t send the code. Try again.'));
+        if (!r.ok) return setError(r.data.error ? t(r.data.error) : t('Couldn’t send the code. Try again.'));
         setStep({ kind: 'code', email: address.trim().toLowerCase(), devCode: r.data.devCode });
       }),
     confirm: (code: string) =>
       run(async () => {
         const r = await call('POST', { code });
-        if (!r.ok) return setError(r.data.error ?? t('That code isn’t right.'));
-        setEmail(r.data.email);
+        if (!r.ok) return setError(r.data.error ? t(r.data.error) : t('That code isn’t right.'));
+        setEmails(r.data);
         setStep({ kind: 'idle' });
-        toast?.(t('Backup email added. You can sign in with it too.'));
+        toast?.(t('Email added. You can sign in with it too.'));
       }),
-    remove: () =>
+    remove: (email: string) =>
       run(async () => {
-        const r = await call('DELETE');
-        if (!r.ok) return setError(r.data.error ?? t('Couldn’t remove it. Try again.'));
-        setEmail(null);
-        toast?.(t('Backup email removed'));
+        const r = await call('DELETE', { email });
+        if (!r.ok) return setError(r.data.error ? t(r.data.error) : t('Couldn’t remove it. Try again.'));
+        setEmails(r.data);
+        toast?.(t('{email} no longer signs in', { email }));
       }),
   };
 }
@@ -88,8 +91,8 @@ function BackupForm({ b }: { b: ReturnType<typeof useBackupEmail> }) {
         </>
       ) : (
         <>
-          <small>{t('Use a personal address that isn’t run by a company you work for.')}</small>
-          <input key="email" autoFocus type="email" autoComplete="email" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="you@gmail.com" aria-label={t('Backup email')} />
+          <small>{t('A personal address is safest: a company you leave can close its mailbox.')}</small>
+          <input key="email" autoFocus type="email" autoComplete="email" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="you@gmail.com" aria-label={t('Email address')} />
         </>
       )}
       {b.error && <small className="form-error" role="alert">{b.error}</small>}
@@ -105,17 +108,21 @@ function BackupForm({ b }: { b: ReturnType<typeof useBackupEmail> }) {
   );
 }
 
-/** Desktop: a row in Security, the form folding open under it. */
+/** Settings, Account, Security: the main sign-in email and the others, each removable, the form folding open under them. */
 export function BackupEmailRow({ toast }: { toast?: (s: string) => void }) {
   const b = useBackupEmail(toast);
   const phone = usePhone();
   if (!server.on) return null;
+  const extra = b.emails?.extra ?? [];
   if (phone)
     return (
       <>
-        <GRow label={t('Backup sign-in email')} value={b.email ?? t('Add')} onClick={b.email ? undefined : b.start} accessory={b.email ? <button type="button" className="link-btn" onClick={() => void b.remove()}>{t('Remove')}</button> : undefined} />
+        {extra.map((e) => (
+          <GRow key={e} label={t('Also signs in')} value={e} accessory={<button type="button" className="link-btn" disabled={b.busy} onClick={() => void b.remove(e)}>{t('Remove')}</button>} />
+        ))}
+        {!b.full && <GRow label={t('Sign-in emails')} value={t('Add an email')} onClick={b.start} />}
         {b.step.kind !== 'idle' && (
-          <Sheet title={t('Backup sign-in email')} onClose={b.cancel}>
+          <Sheet title={t('Add a sign-in email')} onClose={b.cancel}>
             <BackupForm b={b} />
           </Sheet>
         )}
@@ -126,23 +133,25 @@ export function BackupEmailRow({ toast }: { toast?: (s: string) => void }) {
       <div className="set-row">
         <span>
           <strong>
-            {t('Backup sign-in email')} {b.email && <Badge tone="good">{t('On')}</Badge>}
+            {t('Sign-in emails')} {extra.length > 0 && <Badge tone="good">{t('On')}</Badge>}
           </strong>
-          <small>{b.email ? t('{email} signs in and gets password codes too.', { email: b.email }) : t('A second address to sign in with, so leaving a company never locks you out.')}</small>
+          <small>{b.emails ? t('You sign in with {email}. Add your other addresses so any of them opens this same account.', { email: b.emails.main }) : t('Add your other addresses so any of them opens this same account.')}</small>
         </span>
-        {b.email ? (
-          <button type="button" className="ghost-btn outline" disabled={b.busy} onClick={() => void b.remove()}>
-            {t('Remove')}
+        {b.step.kind === 'idle' && b.emails && !b.full && (
+          <button type="button" className="ghost-btn outline" onClick={b.start}>
+            {t('Add')}
           </button>
-        ) : (
-          b.step.kind === 'idle' && b.email !== undefined && (
-            <button type="button" className="ghost-btn outline" onClick={b.start}>
-              {t('Add')}
-            </button>
-          )
         )}
       </div>
       <SmoothHeight>
+        {extra.map((e) => (
+          <div key={e} className="set-row sub">
+            <span>{e}</span>
+            <button type="button" className="ghost-btn outline" disabled={b.busy} onClick={() => void b.remove(e)}>
+              {t('Remove')}
+            </button>
+          </div>
+        ))}
         <BackupForm b={b} />
       </SmoothHeight>
     </div>

@@ -1,3 +1,4 @@
+import { WaitingToJoin } from './JoinRequests';
 import { appHome } from '../surface';
 import { useEffect, useState, type ReactNode } from 'react';
 import { primaryDomain } from '../domains';
@@ -512,6 +513,7 @@ export function SettingsPage({ email, settings: s, update, section, onSection, u
                     </div>
                   );
                 })}
+                {canManage && server.on && !demo?.inDemo && <WaitingToJoin workspaceId={ws.id} />}
                 {canManage && (
                   <button className="acct-add" onClick={onInvite}>
                     <UserPlus size={16} /> <span>{t('Invite someone')}</span>

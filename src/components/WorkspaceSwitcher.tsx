@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { primaryDomain } from '../domains';
-import { Check, ChevronsUpDown, FlaskConical, LayoutGrid, Loader2, Plus, Settings2 } from 'lucide-react';
-import type { Client, Workspace } from '../types';
+import { Check, ChevronsUpDown, FlaskConical, LayoutGrid, Loader2, Plus, Settings2, UserPlus } from 'lucide-react';
+import type { Client, Role, Workspace } from '../types';
+import type { OtherSignIn } from '../signedIn';
 import { WorkspaceLogo } from './WorkspaceLogo';
 import { Badge } from './ui/Person';
 import { isSandbox } from '../sandbox';
@@ -22,9 +23,19 @@ interface Props {
   addLabel?: string;
   /** Their own demo company when it isn't open yet (not made, or hidden): opening it makes it or shows it again. */
   demo?: { busy?: boolean; onOpen: () => void } | null;
+  /** Your role in each company, shown under its name. */
+  roles?: Record<string, Role>;
+  /** The email you're signed in with, shown above your companies when other accounts are signed in too. */
+  signedInAs?: string;
+  /** Other accounts signed in on this browser, with their companies: a click switches to them (src/signedIn.ts). */
+  elsewhere?: OtherSignIn[];
+  onElsewhere?: (userId: string, workspaceId: string) => void;
+  onAddAccount?: () => void;
 }
 
-export function WorkspaceSwitcher({ workspaces, current, unread, onSwitch, onAdd, onSettings, portals = [], currentPortal, onPortal, onHome, addLabel = t('Add a workspace'), demo }: Props) {
+const roleWord = (r: Role) => (r === 'owner' ? t('Owner') : r === 'admin' ? t('Admin') : t('Member'));
+
+export function WorkspaceSwitcher({ workspaces, current, unread, onSwitch, onAdd, onSettings, portals = [], currentPortal, onPortal, onHome, addLabel = t('Add a workspace'), demo, roles, signedInAs, elsewhere = [], onElsewhere, onAddAccount }: Props) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -61,7 +72,7 @@ export function WorkspaceSwitcher({ workspaces, current, unread, onSwitch, onAdd
 
       {open && (
         <div className="ws-menu" role="menu">
-          {workspaces.length > 0 && <div className="ws-menu-title">{t('Workspaces')}</div>}
+          {workspaces.length > 0 && <div className="ws-menu-title">{elsewhere.length && signedInAs ? t('Signed in as {email}', { email: signedInAs }) : t('Workspaces')}</div>}
           {workspaces.map((w, i) => (
             <button key={w.id} className={`ws-item ${w.id === current.id && !currentPortal ? 'on' : ''}`} onClick={() => pick(() => onSwitch(w.id))}>
               <WorkspaceLogo ws={w} size={32} />
@@ -77,7 +88,9 @@ export function WorkspaceSwitcher({ workspaces, current, unread, onSwitch, onAdd
                 <small>
                   {isSandbox(w)
                     ? t('Your own copy to try things in')
-                    : `${tn(w.accounts.filter((a) => !a.temp).length, '{n} account', '{n} accounts')} · ${primaryDomain(w) || t('no domain')}`}
+                    : roles?.[w.id]
+                      ? `${roleWord(roles[w.id])} · ${primaryDomain(w) || t('no domain')}`
+                      : `${tn(w.accounts.filter((a) => !a.temp).length, '{n} account', '{n} accounts')} · ${primaryDomain(w) || t('no domain')}`}
                 </small>
               </span>
               {unread[w.id] ? <span className="ws-unread">{unread[w.id]}</span> : null}
@@ -121,7 +134,35 @@ export function WorkspaceSwitcher({ workspaces, current, unread, onSwitch, onAdd
               ))}
             </>
           )}
-          {(onAdd || onSettings) && <div className="am-sep" />}
+          {elsewhere.map((o) => (
+            <div key={o.id} className="ws-elsewhere">
+              <div className="ws-menu-title">{t('Signed in as {email}', { email: o.email })}</div>
+              {o.companies.length ? (
+                o.companies.map((w) => (
+                  <button key={w.id} className="ws-item" onClick={() => pick(() => onElsewhere?.(o.id, w.id))}>
+                    <WorkspaceLogo ws={w} size={32} />
+                    <span className="ws-name">
+                      <strong>{w.name}</strong>
+                      <small>{t('Opens as {name}', { name: o.name.split(' ')[0] || o.email })}</small>
+                    </span>
+                  </button>
+                ))
+              ) : (
+                <button className="ws-item" onClick={() => pick(() => onElsewhere?.(o.id, ''))}>
+                  <span className="ws-name">
+                    <strong>{o.name || o.email}</strong>
+                    <small>{t('No companies yet')}</small>
+                  </span>
+                </button>
+              )}
+            </div>
+          ))}
+          {(onAdd || onSettings || onAddAccount) && <div className="am-sep" />}
+          {onAddAccount && (
+            <button className="am-item" onClick={() => pick(onAddAccount)}>
+              <UserPlus size={16} /> {t('Add another account')}
+            </button>
+          )}
           {onAdd && (
             <button className="am-item" onClick={() => pick(onAdd)}>
               <Plus size={16} /> {addLabel}
