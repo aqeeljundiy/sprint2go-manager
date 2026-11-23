@@ -612,6 +612,15 @@ const id: Record<string, string> = {
   'e.g. Design': 'mis. Desain',
   'e.g. Jakarta': 'mis. Jakarta',
   'e.g. she/her': 'mis. dia (perempuan)',
+  "Add a domain in Settings to give them a company mailbox": "Tambahkan domain di Pengaturan untuk memberi mereka kotak surat perusahaan",
+  "Any address. If they already use sprint2go, they get a request to join and accept it in their own app.": "Alamat apa saja. Jika mereka sudah memakai sprint2go, mereka mendapat permintaan bergabung dan menerimanya di aplikasi mereka sendiri.",
+  "Give them a company mailbox": "Beri mereka kotak surat perusahaan",
+  "How they sign in": "Cara mereka masuk",
+  "That mailbox address is already taken.": "Alamat kotak surat itu sudah dipakai.",
+  "Their mailbox": "Kotak surat mereka",
+  "They’re already in this company.": "Mereka sudah ada di perusahaan ini.",
+  "With their mailbox. Type another address if they’d rather sign in with one they already use.": "Dengan kotak surat mereka. Ketik alamat lain jika mereka lebih suka masuk dengan alamat yang sudah mereka pakai.",
+  "their email address": "alamat email mereka",
 };
 
 export default id;

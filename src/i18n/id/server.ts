@@ -509,6 +509,23 @@ const id: Record<string, string> = {
   "That webhook address can’t be found.": "Alamat webhook itu tidak ditemukan.",
   "Too many wrong codes. Try again in 15 minutes.": "Terlalu banyak kode salah. Coba lagi dalam 15 menit.",
   "Webhooks can only go to addresses on the public internet.": "Webhook hanya bisa dikirim ke alamat di internet publik.",
+  "Add their name.": "Tambahkan nama mereka.",
+  "Only admins can see this.": "Hanya admin yang bisa melihat ini.",
+  "People who already use sprint2go join when they accept your invite.": "Orang yang sudah memakai sprint2go bergabung saat mereka menerima undangan Anda.",
+  "Someone already signs in with that email. Invite them and they can accept.": "Sudah ada yang masuk dengan email itu. Undang mereka, lalu mereka bisa menerima.",
+  "Someone else has already invited that address. Ask them to join once they’ve signed in.": "Alamat itu sudah diundang orang lain. Minta mereka bergabung setelah mereka masuk.",
+  "That account isn’t signed in here any more. Sign in again.": "Akun itu sudah tidak masuk di sini. Masuk lagi.",
+  "That email already signs in to another account. Sign in with it too, then switch between them from your picture.": "Email itu sudah dipakai untuk masuk ke akun lain. Masuk juga dengan email itu, lalu beralih di antara keduanya dari foto Anda.",
+  "That email already signs in to your account.": "Email itu sudah dipakai untuk masuk ke akun Anda.",
+  "That mailbox address is already taken.": "Alamat kotak surat itu sudah dipakai.",
+  "The mailbox has to be at one of the company’s domains.": "Kotak surat harus memakai salah satu domain perusahaan.",
+  "They’re already in this company.": "Mereka sudah ada di perusahaan ini.",
+  "This browser already keeps the most sign-ins it can. Sign out of one first.": "Browser ini sudah menyimpan akun sebanyak mungkin. Keluar dari salah satunya dulu.",
+  "This company isn’t available any more.": "Perusahaan ini sudah tidak tersedia.",
+  "This request has expired or was already answered.": "Permintaan ini sudah kedaluwarsa atau sudah dijawab.",
+  "You already have the most sign-in emails. Remove one first.": "Email masuk Anda sudah mencapai batas. Hapus salah satunya dulu.",
+  "{name} joined {company}": "{name} bergabung dengan {company}",
+  "{name} said no to joining {company}": "{name} menolak bergabung dengan {company}",
 };
 
 export default id;

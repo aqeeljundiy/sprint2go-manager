@@ -430,6 +430,13 @@ const id: Record<string, string> = {
   'Profile of {name}': 'Profil {name}',
   'More apps': 'Aplikasi lainnya',
   'All mail in the inbox': 'Semua email di kotak masuk',
+  "Add another account": "Tambah akun lain",
+  "Also signed in here": "Juga masuk di sini",
+  "Couldn’t send the invite. Try again.": "Undangan tidak terkirim. Coba lagi.",
+  "Opens as {name}": "Dibuka sebagai {name}",
+  "Signed in as {email}": "Masuk sebagai {email}",
+  "{name} already uses sprint2go, so we asked them to join. Their tasks wait with you until they accept.": "{name} sudah memakai sprint2go, jadi kami mengirim permintaan bergabung. Tugasnya tetap di Anda sampai mereka menerima.",
+  "{name} already uses sprint2go, so we asked them to join. They show up here once they accept.": "{name} sudah memakai sprint2go, jadi kami mengirim permintaan bergabung. Mereka muncul di sini setelah menerima.",
 };
 
 export default id;

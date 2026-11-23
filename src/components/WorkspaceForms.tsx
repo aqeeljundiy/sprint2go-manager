@@ -74,7 +74,7 @@ export function BrandFields({
   );
 }
 
-function Modal({ title, children, onClose }: { title: string; children: React.ReactNode; onClose: () => void }) {
+export function Modal({ title, children, onClose }: { title: string; children: React.ReactNode; onClose: () => void }) {
   return (
     <div className="modal-scrim" onMouseDown={onClose}>
       <div className="modal" role="dialog" aria-label={title} onMouseDown={(e) => e.stopPropagation()} onKeyDown={(e) => e.key === 'Escape' && onClose()}>
@@ -243,35 +243,68 @@ export function NewAccount({ workspace, userId, onAdd, onClose }: { workspace: W
 
 const PALETTE = ['#10b981', '#f59e0b', '#0ea5e9', '#d946ef', '#ef4444', '#14b8a6', '#8b5cf6'];
 
-/** Invite a colleague: creates their user, their mailbox, and gives them shared inboxes. */
+/** What inviting someone asks the server for (/api/people/invite): it decides between a new person and a join request. */
+export interface InviteAsk {
+  name: string;
+  email: string; // how they sign in: any address
+  role: Role;
+  mailbox: string | null; // an address at the company's domain, or none
+  shared: string[];
+}
+
+/**
+ * Invite someone: how they sign in (any email; someone who already uses sprint2go gets a request to join instead) and,
+ * separately, an optional mailbox at the company's domain, their role and the shared inboxes they open.
+ * With the server it goes through `onAsk`; the demo without one makes the person in the browser (`onInvite`).
+ */
 export function InviteMember({
   workspace,
   users,
+  me,
   onInvite,
+  onAsk,
   onClose,
 }: {
   workspace: Workspace;
   users: User[];
+  me?: string;
   onInvite: (u: User, role: Role, mailbox: Account | null, shared: string[]) => void;
+  onAsk?: (ask: InviteAsk) => Promise<string | null>; // null when it went, else why it didn't
   onClose: () => void;
 }) {
   const doms = usableDomains(workspace); // primary first: the address starts there
   const [domain, setDomain] = useState(doms[0] ?? '');
   const [name, setName] = useState('');
   const [local, setLocal] = useState('');
+  const [signIn, setSignIn] = useState(''); // empty: the same as the mailbox
   const [role, setRole] = useState<Role>('member');
-  const [mailbox, setMailbox] = useState(true);
+  const [mailbox, setMailbox] = useState(doms.length > 0);
   const shared = workspace.accounts.filter((a) => a.kind === 'shared');
   const [access, setAccess] = useState<string[]>(shared.map((a) => a.id));
-  const email = `${local.trim().toLowerCase()}@${domain}`;
-  const exists = users.some((u) => u.email === email) || workspace.accounts.some((a) => a.email === email);
-  const valid = name.trim() && /^[a-z0-9._+-]+$/i.test(local.trim()) && domain && !exists;
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const box = mailbox && domain ? `${local.trim().toLowerCase()}@${domain}` : '';
+  const email = (signIn.trim() || box).toLowerCase();
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const boxOk = !mailbox || (!!domain && /^[a-z0-9._+-]+$/i.test(local.trim()));
+  const boxTaken = !!box && boxOk && workspace.accounts.some((a) => a.email.toLowerCase() === box);
+  const member = users.find((u) => u.email.toLowerCase() === email && workspace.members.some((m) => m.userId === u.id));
+  const owner = workspace.members.some((m) => m.userId === me && m.role === 'owner');
+  const valid = !!name.trim() && emailOk && boxOk && !boxTaken && !member && !busy;
 
-  const invite = () => {
+  const invite = async () => {
     if (!valid) return;
+    setError('');
+    if (onAsk) {
+      setBusy(true);
+      const why = await onAsk({ name: name.trim(), email, role, mailbox: mailbox && box ? box : null, shared: access });
+      setBusy(false);
+      if (why) setError(why);
+      return;
+    }
     const user: User = { id: uid(), name: name.trim(), email, title: '', color: PALETTE[users.length % PALETTE.length] };
-    const box: Account | null = mailbox ? { id: uid(), email, name: name.trim(), kind: 'personal', connected: false, users: [user.id] } : null;
-    onInvite(user, role, box, access);
+    const acct: Account | null = mailbox && box ? { id: uid(), email: box, name: name.trim(), kind: 'personal', connected: false, users: [user.id] } : null;
+    onInvite(user, role, acct, access);
   };
 
   return (
@@ -290,23 +323,36 @@ export function InviteMember({
             placeholder={t('e.g. Isabel Hayes')}
           />
         </div>
-        <div className="field">
-          <label>{t('Their email address')}</label>
-          <div className="email-split">
-            <input value={local} onChange={(e) => setLocal(e.target.value)} placeholder="isabel" onKeyDown={(e) => e.key === 'Enter' && invite()} />
-            {doms.length > 1 ? <Select<string> value={domain} onChange={setDomain} label={t('Domain')} title={t('Domain')} className="sel-flat" width={220} options={doms.map((d) => ({ value: d, label: `@${d}` }))} /> : <span>@{domain || t('add a domain in settings')}</span>}
-          </div>
-          {exists && <small className="err">{t('Someone already uses that address.')}</small>}
-        </div>
         <label className="check-row">
-          <input type="checkbox" checked={mailbox} onChange={(e) => setMailbox(e.target.checked)} />
-          {t('Create a {product} mailbox for them', { product: product.name })}
+          <input type="checkbox" checked={mailbox} disabled={!doms.length} onChange={(e) => setMailbox(e.target.checked)} />
+          {doms.length ? t('Give them a company mailbox') : t('Add a domain in Settings to give them a company mailbox')}
         </label>
-        {mailbox && workspace.emailSetup === 'mix' && (
-          <small className="muted">
-            {t('Mail for {address} comes through {provider}.', { address: local.trim() ? email : t('their address'), provider: providerLabel(workspace.emailProvider ?? 'google') })} {notAtProvider(workspace.emailProvider ?? 'google')}
-          </small>
-        )}
+        <div className={`fold${mailbox && doms.length ? ' open' : ''}`}>
+          <div>
+            <div className="field">
+              <label>{t('Their mailbox')}</label>
+              <div className="email-split">
+                <input value={local} onChange={(e) => setLocal(e.target.value)} placeholder="isabel" aria-label={t('Their mailbox')} onKeyDown={(e) => e.key === 'Enter' && void invite()} />
+                {doms.length > 1 ? <Select<string> value={domain} onChange={setDomain} label={t('Domain')} title={t('Domain')} className="sel-flat" width={220} options={doms.map((d) => ({ value: d, label: `@${d}` }))} /> : <span>@{domain}</span>}
+              </div>
+              {boxTaken && <small className="err">{t('That mailbox address is already taken.')}</small>}
+              {workspace.emailSetup === 'mix' && (
+                <small className="muted">
+                  {t('Mail for {address} comes through {provider}.', { address: local.trim() ? box : t('their address'), provider: providerLabel(workspace.emailProvider ?? 'google') })} {notAtProvider(workspace.emailProvider ?? 'google')}
+                </small>
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="field">
+          <label>{t('How they sign in')}</label>
+          <input type="email" autoComplete="off" value={signIn} onChange={(e) => setSignIn(e.target.value)} placeholder={box && boxOk ? box : t('their email address')} onKeyDown={(e) => e.key === 'Enter' && void invite()} />
+          {member ? (
+            <small className="err">{t('They’re already in this company.')}</small>
+          ) : (
+            <small className="muted">{mailbox && box && !signIn.trim() ? t('With their mailbox. Type another address if they’d rather sign in with one they already use.') : t('Any address. If they already use sprint2go, they get a request to join and accept it in their own app.')}</small>
+          )}
+        </div>
         <div className="field">
           <label>{t('Role')}</label>
           <div className="kind-pick three">
@@ -317,7 +363,7 @@ export function InviteMember({
                 ['owner', Users, t('Owner'), t('Everything, incl. billing')],
               ] as const
             ).map(([id, Icon, label, hint]) => (
-              <button key={id} className={role === id ? 'on' : ''} onClick={() => setRole(id)}>
+              <button key={id} className={role === id ? 'on' : ''} disabled={id === 'owner' && !!onAsk && !owner} onClick={() => setRole(id)}>
                 <Icon size={18} />
                 <strong>{label}</strong>
                 <small>{hint}</small>
@@ -340,6 +386,7 @@ export function InviteMember({
             ))}
           </div>
         )}
+        {error && <small className="form-error" role="alert">{error}</small>}
         <p className="modal-note">
           <Inbox size={14} /> {t('Admins can manage people, but nobody can read someone else’s personal mailbox.')}
         </p>
@@ -349,8 +396,8 @@ export function InviteMember({
         <button className="ghost-btn" onClick={onClose}>
           {t('Cancel')}
         </button>
-        <button className="primary-btn" onClick={invite} disabled={!valid}>
-          {t('Send invite')}
+        <button className="primary-btn" onClick={() => void invite()} disabled={!valid}>
+          {busy ? t('Sending…') : t('Send invite')}
         </button>
       </footer>
     </Modal>

@@ -48,8 +48,8 @@ export function AccountMenu({ me, settings, used, quota, onSettings, onTheme, on
         <Avatar person={me} size={42} />
         <div>
           <strong>{me.name}</strong>
-          <small>{me.email}</small>
-          <small>{settings.title}</small>
+          <small>{t('Signed in as {email}', { email: me.email })}</small>
+          {settings.title && <small>{settings.title}</small>}
         </div>
       </div>
 
@@ -88,7 +88,7 @@ export function AccountMenu({ me, settings, used, quota, onSettings, onTheme, on
         </span>
       </button>
       <div className="am-sep" />
-      <div className="am-label">{t('Switch user')}</div>
+      {others.length > 0 && <div className="am-label">{t('Also signed in here')}</div>}
       {others.map((u) => (
         <button key={u.id} className="am-item am-user" onClick={() => onSwitchUser(u.id)}>
           <Avatar person={u} size={26} />
@@ -99,7 +99,7 @@ export function AccountMenu({ me, settings, used, quota, onSettings, onTheme, on
         </button>
       ))}
       <button className="am-item" onClick={onAddUser}>
-        <UserPlus size={16} /> {t('Add another user')}
+        <UserPlus size={16} /> {t('Add another account')}
       </button>
       <div className="am-sep" />
       {server.operator && (

@@ -29,6 +29,8 @@ import { setPhotos } from './photos';
 import { Wordmark } from './components/Logo';
 import { AcceptInvite, SignIn, SignUp } from './components/SignIn';
 import { TwoStepGate } from './components/TwoStep';
+import { JoinRequestDialog, useJoinRequests } from './components/JoinRequests';
+import { addSignIn, forgetSignIn, loadSignedIn, switchSignIn, type OtherSignIn } from './signedIn';
 import { InstallPrompt } from './components/InstallPrompt';
 import { brand as product, brandOf, setBrandName } from './terms';
 import { registerStages } from './stages';
@@ -64,6 +66,11 @@ if (typeof location !== 'undefined' && !/^\/(signin|signup|admin|oauth)(\/|$)/.t
 export default function Root() {
   const [mode, setMode] = useState<'probing' | 'demo' | 'signed-out' | 'two-step' | 'ready'>('probing');
   const [session, setSession] = useState<Session | null>(null);
+  // Other accounts signed in on this browser (src/signedIn.ts): the sign-in page lists them, the app switches to them.
+  const [others, setOthers] = useState<OtherSignIn[]>([]);
+  useEffect(() => {
+    if ((mode === 'signed-out' || mode === 'ready') && !trying) void loadSignedIn().then(setOthers);
+  }, [mode]);
   const invite = new URLSearchParams(location.search).get('invite');
   const [signingUp, setSigningUp] = useState(() => location.pathname === '/signup');
   const admin = location.pathname.startsWith('/admin'); // the operator backend: its own screens, its own API
@@ -123,10 +130,10 @@ export default function Root() {
         onCreate={connecting || !caps.signups ? undefined : () => (setSigningUp(true), history.replaceState(null, '', '/signup'))}
         sub={connecting ? t('An AI app wants to connect to your sprint2go. Sign in first; you choose what it can reach next.') : undefined}
         users={[]}
-        signedIn={[]}
+        signedIn={others.map(asUser)}
         realPasswords
-        onPick={() => {}}
-        onForget={() => {}}
+        onPick={(id) => void switchSignIn(id)}
+        onForget={(id) => void forgetSignIn(id).then(() => setOthers((l) => l.filter((o) => o.id !== id)))}
         onSignIn={async (email, password) => {
           const r = await signIn(email, password);
           if ('error' in r) return r.error;
@@ -144,7 +151,7 @@ export default function Root() {
   if (mode === 'ready' && session)
     return (
       <>
-        <ServerRoot me={session.me} />
+        <ServerRoot me={session.me} others={others} />
         <InstallPrompt />
         {session.actingAs && <ActingBanner operator={session.actingAs} />}
         {session.maintenance && (
@@ -183,12 +190,25 @@ function Suspended({ reason }: { reason: string }) {
 }
 
 /** Signed in to the local server: one person per browser, everything saved in the database. */
-function ServerRoot({ me }: { me: string }) {
+/** Another signed-in account as the app's person list shows it. */
+const asUser = (o: OtherSignIn): User => ({ id: o.id, name: o.name || o.email, email: o.email, title: '', color: o.color ?? '#64748b', photo: o.photo });
+
+function ServerRoot({ me, others }: { me: string; others: OtherSignIn[] }) {
+  const joinReqs = useJoinRequests();
+  const [joinLater, setJoinLater] = useState(false);
   const [users, setUsers] = useStored('users');
   const [workspaces, setWorkspaces] = useStored('workspaces');
   const user = users.find((u) => u.id === me);
+  // A request to join a company shows wherever they land, even with no company yet.
+  const joinDialog = !joinLater && joinReqs.list.length > 0 && <JoinRequestDialog me={me} requests={joinReqs.list} onAnswered={joinReqs.drop} onClose={() => setJoinLater(true)} />;
   // Only a client somewhere (no workspace of their own): straight to their portal.
-  if (user && !workspaces.some((w) => w.members.some((m) => m.userId === me))) return <ClientRoot me={user} />;
+  if (user && !workspaces.some((w) => w.members.some((m) => m.userId === me)))
+    return (
+      <>
+        <ClientRoot me={user} />
+        {joinDialog}
+      </>
+    );
   if (!user) return <NoWorkspace email="" onBack={() => void signOut()} />;
   // The same App on both surfaces: v2 at / with its layer on top, v1 under /v1 (tryOut.ts routeBase) as the backup.
   return (
@@ -197,13 +217,15 @@ function ServerRoot({ me }: { me: string }) {
     <App
       key={user.id}
       user={user}
-      signedInUsers={[user]}
+      signedInUsers={[user, ...others.map(asUser)]}
+      otherSignIns={others}
+      onOtherSignIn={(id, ws) => void switchSignIn(id, ws || undefined)}
       allUsers={users}
       workspaces={workspaces}
       setWorkspaces={setWorkspaces}
       onWorkspace={setAIWorkspace}
-      onSwitchUser={() => {}}
-      onAddUser={() => void signOut()}
+      onSwitchUser={(id) => void switchSignIn(id)}
+      onAddUser={() => void addSignIn()}
       onSignOut={() => void signOut()}
       onInvite={async (u) => {
         setUsers((list) => (list.some((x) => x.id === u.id) ? list : [...list, u]));
@@ -214,6 +236,7 @@ function ServerRoot({ me }: { me: string }) {
       }}
       onUpdateUser={(patch) => setUsers((list) => list.map((x) => (x.id === user.id ? { ...x, ...patch } : x)))}
     />
+    {joinDialog}
     </>
   );
 }
